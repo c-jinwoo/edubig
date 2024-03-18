@@ -1,0 +1,25 @@
+<%
+/****************************************
+    subject : 좌측 메뉴
+    summary : 좌측 메뉴 : 온라인서점
+    author  : CSLAB
+    date    : 2020-05-28
+****************************************/
+%>
+<%@ page language="java" contentType="text/html; charset=utf-8" pageEncoding="utf-8"%>
+<%@ include file="/WEB-INF/jsp/ccedu/inc/taglib_inc.jsp"%>
+<h2>온라인서점</h2>
+	<ul class="lnb_menu">
+		<c:forEach items="${courseList}" var="result" varStatus="stat">
+			<c:choose>
+				<c:when test="${param.mtSubCode eq result.MT_SUB_CODE || param.mtScCode eq result.MT_SUB_CODE}">
+					<li class="on">				
+				</c:when>
+				<c:otherwise>
+					<li>				
+				</c:otherwise>		
+			</c:choose>
+				<a href="/ccedu/book/main.do?mtSubCode=${result.MT_SUB_CODE}"/><span>${result.MT_SUB_NAME}</span></a>
+			</li>
+		</c:forEach>
+	</ul>

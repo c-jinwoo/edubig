@@ -1,0 +1,11 @@
+_this.$quizInfo = [
+	["다음 중 Profile(프로파일)에 대한 설명으로 <span style='color:#FF0000;'>틀린</span> 것은?","닫혀있는 2D Sketch(스케치)를 의미한다.","배경 색상으로 구분할 수 있다.","3차원 모델 작성에 필요한 요소이다.","1차원 객체로 구성되어 있으며 배경색이 없다.",false],	
+	["다음 중 3D 모델 시각화 설정 항목에 <span style='color:#FF0000;'>없는</span> 것은?","Appearance(재질)","Background(배경)","Fill Density(밀도)","Effect(효과)",false],
+	["다음 중 후처리 작업 내용이 <span style='color:#FF0000;'>아닌</span> 것은?","표면을 매끄럽게 하고 색상을 입히는 작업","3D 물체를 한 층씩 적층하는 작업","출력 결과물의 강도를 향상 시키는 작업","유해한 성분을 없애는 작업",false]
+];
+
+_this.$quizAnsInfo = [
+	[4,"배경색이 없는 1차원 객체는 Sketch Curve(스케치 커브)이다."],
+	[3,"Fill Density(밀도)는 슬라이싱 설정이다."],
+	[2,"3D 물체를 한 층씩 적층하는 것은 Rapid Prototyping(신속 조형)을 말한다."],
+];

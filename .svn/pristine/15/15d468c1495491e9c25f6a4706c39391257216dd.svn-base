@@ -1,0 +1,170 @@
+<%
+/****************************************
+    subject : 찾아가는 교육
+    summary : 찾아가는 교육 > 교육신청
+    author  : SANGS
+    date    : 2018-06-15
+****************************************/
+%>
+<%@ page language="java" contentType="text/html; charset=utf-8" pageEncoding="utf-8"%>
+<%@ include file="/WEB-INF/jsp/ccedu/inc/taglib_inc.jsp"%>
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+	<title>교육소개 > 찾아가는교육</title>
+	<%@ include file="/WEB-INF/jsp/ccedu/inc/head_inc.jsp"%>
+	<script type="text/javascript">
+		
+		function detailOffice(slNo) {
+			
+			$("#slNo").val(slNo);
+			$("#pageMode").val('inquiry');
+			$("#frm").submit();
+			
+		}
+
+	</script>
+</head>
+
+<body>
+
+<!-- skip nav -->
+	<%@ include file="/WEB-INF/jsp/ccedu/inc/nav_inc.jsp"%>
+<!--// skip nav -->
+
+
+<div id="wrap">
+ 
+	<!-- header -->
+	<%@ include file="/WEB-INF/jsp/ccedu/inc/header_inc.jsp"%>
+	<!--// header -->
+
+	<!-- container -->
+	<div id="container">
+
+		<!-- location -->
+		<jsp:include page="/WEB-INF/jsp/ccedu/inc/location/loc_02_03.jsp">
+			<jsp:param name="menuNm" value="신청결과 확인"/> 
+		</jsp:include>
+		
+		<!--// location -->
+		<div class="con_center">
+
+			<!-- lnb -->
+			<div id="lnb">
+				<jsp:include page="/WEB-INF/jsp/ccedu/inc/lnb/lnb_02.jsp">
+					<jsp:param name="dep2" value="03"/>
+				</jsp:include>
+			</div>
+			<!--// lnb -->
+			
+			<form id="frm" action="/ccedu/visit/lectureCheck.do" method="post">
+			
+				<input type="hidden" id="slNo" name="slNo" value=""/>
+				<input type="hidden" id="pageMode" name="pageMode" value=""/>
+				<input type="hidden" name="slAppEmail" id="slAppEmail" value="<c:out value='${REQUEST_DATA.slAppEmail}'/>"/>
+				<input type="hidden" name="slAppNm" id="slAppNm" value="<c:out value='${REQUEST_DATA.slAppNm}'/>"/>
+			<!-- content 본문 -->
+			<div id="content">
+			
+				<!-- 기존 START 2018-08-30  -->
+<!-- 				<h3 class="cont_titile">신청결과 확인</h3> -->
+				<!-- 기존 END 2018-08-30  -->
+					
+				<!-- 2018-08-28 김동인 작업 S --> 
+				<h3 class="cont_titile type02">신청결과 확인<span></span></h3>
+				<!-- 2018-08-28 김동인 작업 E -->
+
+				<!-- 본문내용 -->
+				<div class="cont_body">
+					<!-- start -->
+
+					<div class="c_section">
+						<ul class="c_txtlist mgt0">
+							<li>
+								신청 후 2~3일 이내로 신청확인이 되며 신청완료 후에는 임의로 취소할 수 없습니다.<br />
+								이미 신청완료된 교육일정을 변경하시고자 할 때는 취소요청을 하시거나 신용교육원으로 직접 연락하여야 합니다.
+							</li>
+						</ul>
+						<ul class="c_txtlist">
+							<li>
+<!-- 								<h5>교육관련 문의</h5> -->
+								<h5>신용교육원</h5>
+								<ul class="in_txtul">
+<!-- 									<li>신용관리교육원</li> -->
+									<li>TEL : 02-750-1232,1233</li>
+<!-- 									<li>FAX : 02-722-8304</li> -->
+								</ul>
+							</li>
+						</ul>
+					</div>
+					
+					<div class="c_section">
+						<h4 class="c_tit">신청내역</h4>
+						<div class="table_style_col">
+							<table>
+								<caption>번호, 기업명, 대상자, 인원, 교육확정일, 신청상태 등 항목을 확인할수있는 표 입니다.</caption>
+								<colgroup>
+									<col  />
+									<col  />
+									<col  />
+									<col  />
+									<col  />
+								</colgroup>
+								<thead>
+									<tr>
+										<th scope="col">No.</th>
+										<th scope="col">단체명</th>
+										<th scope="col">대상자</th>
+										<th scope="col">인원</th>
+										<th scope="col">교육확정일</th>
+										<th scope="col">신청상태</th>
+									</tr>
+								</thead>
+								<tbody>
+									<c:if test="${not empty lectureList}">									
+										<c:forEach var="lectureList" items="${lectureList}">
+											<tr>
+												<td class="align_center"><c:out value='${lectureList.RNUM}'/></td>
+												<td class="align_center">
+													<a href="#" onclick="detailOffice('<c:out value="${lectureList.SL_NO}"/>'); return false;"><b class="txtbule"><c:out value='${lectureList.COMP_NM}'/></b></a></td>
+												<td class="align_center"><c:out value='${lectureList.SL_TARGET_NAME}'/></td>
+												<td class="align_center"><c:out value='${lectureList.SL_PCNT}'/>명</td>
+												<td class="align_center"><c:out value='${lectureList.FINALIZEDAY}'/></td>
+												<td class="align_center"><c:out value='${lectureList.SL_STAT_NAME}'/></td>
+											</tr>
+										</c:forEach>
+									</c:if>
+									<c:if test="${empty lectureList}" >
+										<td class="align_center" colspan="6">방문교육이 존재하지 않습니다.</td>
+									</c:if>
+								</tbody>
+							</table>
+						</div>
+					</div>
+
+					<!--// end -->
+				</div>
+				<!--// 본문내용 -->
+				
+			<!--  -->
+			</div>
+			<!--// content 본문 -->
+			
+			</form>
+			
+		
+		<!-- // con_center end -->
+		</div>
+	
+	</div>
+	<!--// container -->
+
+	<!-- foot -->
+	<%@ include file="/WEB-INF/jsp/ccedu/inc/footer_inc.jsp"%>
+	<!--// foot end -->
+
+</div>
+
+</body>
+</html>

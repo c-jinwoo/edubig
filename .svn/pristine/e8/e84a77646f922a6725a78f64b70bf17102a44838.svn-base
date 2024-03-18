@@ -1,0 +1,353 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.webapp.ccedu.mapper.OnlineEducationMapper">
+    <select id="selectOnlineDetailList" resultType="emap" parameterType="dmap">
+    /*selectOnlineDetailList*/
+        SELECT * FROM (
+            SELECT a.*, ROWNUM AS RNUM FROM
+                ( SELECT   A.COURSETITLE
+                            , A.MT_SC_CODE
+                            , A.PRICE_DEL
+                            , FN_GET_CMMN_CODE_NM('SC',A.MT_SC_CODE) AS MT_SC_NAME
+                            , B.CSEQNO
+                            , B.COURSENO
+                            , B.SEQ
+                            , B.SEQ_TITLE
+                            , B.OPENTYPE
+                            , B.DESCRIPTION
+                            , B.TARGET
+                            , B.COMPLETION
+                            , B.EX_DESCRIPTION
+                            , B.COMP_VAL
+                            , TO_CHAR(B.APPLY_SDATE, 'YYYY-MM-DD') AS APPLY_SDATE
+                            , TO_CHAR(B.APPLY_EDATE, 'YYYY-MM-DD') AS APPLY_EDATE
+                            , TO_CHAR(B.STUDY_SDATE, 'YYYY-MM-DD') AS STUDY_SDATE
+                            , TO_CHAR(B.STUDY_EDATE, 'YYYY-MM-DD') AS STUDY_EDATE
+                            , B.FIX_CNT
+                            , B.MAX_CNT
+                            , B.MT_LEVEL
+                            , FN_GET_CMMN_CODE_NM('LV',B.MT_LEVEL) AS MT_LEVEL_NAME
+                            , ROUND(SUM(C.RUNTIME)/60) AS SUM_RUNTIME
+                            , REPLACE(D.SAVPATH,'\','') AS SAVPATH
+                            , D.SAVFILE
+                            , CASE WHEN COUNT(*) OVER (PARTITION BY A.MT_SC_CODE)  > #{endNo}
+                                      THEN 'Y'
+                                      ELSE 'N'
+                                        END AS ROW_DIV
+                  FROM LMS_ED_COURSE A
+                     , LMS_ED_COURSE_SEQ B
+                     , LMS_ED_COURSE_TREE C
+                     , LMS_ED_COURSE_FILE D
+                 WHERE 1 = 1
+                    AND A.COURSENO = B.COURSENO
+                    AND A.COURSENO = C.COURSENO
+                    AND A.COURSENO = D.COURSENO
+                    AND D.THUM_YN  = 'Y'
+                    AND A.USEYN = 'Y'
+                    AND B.USEYN = 'Y'
+                    <if test="mtScCode != null and mtScCode !=''">
+                        AND A.MT_SC_CODE = #{mtScCode}
+                    </if>
+                 GROUP BY A.COURSETITLE, A.PRICE_DEL, A.MT_SC_CODE, B.CSEQNO, B.COURSENO, B.SEQ, B.SEQ_TITLE, B.OPENTYPE,   B.DESCRIPTION 
+                             , B.TARGET, B.COMPLETION, B.EX_DESCRIPTION,  B.COMP_VAL,  B.APPLY_SDATE, B.APPLY_EDATE, B.STUDY_SDATE, B.STUDY_EDATE, B.FIX_CNT, B.MAX_CNT, B.MT_CSEQ_STATUS_CODE,  B.MT_LEVEL, B.WDATE
+                             , D.SAVPATH, D.SAVFILE
+                 ORDER BY B.SEQ_TITLE DESC
+                 ) a
+            )
+            WHERE 1 = 1
+             AND RNUM BETWEEN #{startNo} AND #{endNo}
+        ORDER BY SEQ_TITLE DESC
+    </select>
+    
+    
+    <select id="getEdCourse1stSeqInfo" parameterType="dmap" resultType="emap">
+        /* getEdCourse1stSeqInfo */
+        SELECT
+              MT_CSEQ_STATUS_CODE
+            , A.SEQ_TITLE
+            , A.EVAL_EXAM_FINAL, A.EVAL_PROGRESS, A.CSEQNO, A.COURSENO
+            , (CASE WHEN A.DESCRIPTION IS NULL OR A.DESCRIPTION = '' THEN B.DESCRIPTION ELSE  A.DESCRIPTION END ) AS RESULT_DESCRIPTION
+            , B.DESCRIPTION AS BDESCRIPTION
+            , A.DESCRIPTION AS ADESCRIPTION
+             
+            , (CASE WHEN A.EX_DESCRIPTION IS NULL OR A.EX_DESCRIPTION = '' THEN B.EX_DESCRIPTION ELSE A.EX_DESCRIPTION END ) AS RESULT_EX_DESCRIPTION
+            , A.EX_DESCRIPTION AS AEX_DESCRIPTION
+            , B.EX_DESCRIPTION AS BEX_DESCRIPTION
+            , (CASE WHEN A.TARGET IS NULL OR A.TARGET = '' THEN B.TARGET ELSE A.TARGET END ) AS RESULT_TARGET
+            , A.TARGET AS ATARGET
+            , B.TARGET AS BTARGET
+            
+            /*
+            , TO_CHAR(A.STUDY_SDATE,'YYYY-MM-DD HH24:MI')STUDY_SDATE
+            , TO_CHAR(A.STUDY_EDATE,'YYYY-MM-DD HH24:MI')STUDY_EDATE
+            */
+            , TO_CHAR(A.STUDY_SDATE,'YYYY-MM-DD')STUDY_SDATE
+            , TO_CHAR(A.STUDY_EDATE,'YYYY-MM-DD')STUDY_EDATE
+            , TO_CHAR(A.APPLY_SDATE,'YYYY-MM-DD')APPLY_SDATE
+            , TO_CHAR(A.APPLY_EDATE,'YYYY-MM-DD')APPLY_EDATE
+            , FN_GET_CMMN_CODE_NM('LV',B.MT_LEVEL) AS MT_LEVEL_NAME
+            , A.FIX_CNT, A.COMPLETION, A.COMP_VAL, A.EDUSEQ_YN
+            , A.MAX_CNT, A.SEQ_TITLE AS TITLE, A.SEQ
+            , A.CLASS_DESK
+            , A.USEYN, A.OPENTYPE
+            , FIX_CNT
+            , MAX_CNT
+            , B.SAMPLMS_LE_YN
+            , (SELECT MT_SUB_NAME FROM LMS_CD_MT_SUB WHERE MT_SUB_CODE = B.MT_SC_CODE)AS MT_SC_NAME
+            , B.MT_SC_CODE
+            , ( SELECT COUNT(*) 
+                FROM LMS_LE_COURSE_USER U
+                WHERE U.CSEQNO = A.CSEQNO 
+                AND U.USEYN = 'Y'
+                ) AS COURSE_USER_CNT
+            , CASE WHEN  (SELECT COUNT(1) FROM LMS_LE_COURSE_USER WHERE CSEQNO = A.CSEQNO AND USERNO = #{SES_USERNO} AND USEYN = 'Y')  > 0 THEN 'Y'
+                ELSE 'N'
+                END AS APPLY_YN
+            , (SELECT CUSERNO FROM LMS_LE_COURSE_USER WHERE CSEQNO = A.CSEQNO AND USERNO = #{SES_USERNO} AND USEYN = 'Y') CUSERNO
+            , (CASE WHEN (TO_CHAR (SYSDATE, 'YYYYMMDD') BETWEEN TO_CHAR (APPLY_SDATE, 'YYYYMMDD') AND TO_CHAR (APPLY_EDATE, 'YYYYMMDD') ) 
+                    THEN 'Y'                       
+                    ELSE 'N' END) AS CANCEL_YN
+            , (CASE WHEN TO_CHAR(SYSDATE,'YYYY-MM-DD') BETWEEN TO_CHAR(A.APPLY_SDATE,'YYYY-MM-DD') AND TO_CHAR(A.APPLY_EDATE,'YYYY-MM-DD')
+                THEN 'Y'
+                ELSE 'N' END) SUGANG_YN
+            , REPLACE(C.SAVPATH,'\','') AS SAVPATH
+            , C.SAVFILE
+            , A.PRICE_DEL
+            , A.PRICE_FK
+            , A.EDUDAY_DEL         
+        FROM  LMS_ED_COURSE_SEQ A , LMS_ED_COURSE B, LMS_ED_COURSE_FILE C
+        WHERE A.COURSENO = B.COURSENO
+            AND A.COURSENO = C.COURSENO
+            AND A.USEYN = 'Y'
+            AND A.SEQ = #{seq}
+            AND A.COURSENO = #{courseno}
+    </select>
+    
+    <select id="getEdCourseSeqInfo" parameterType="dmap" resultType="emap">
+        /* getEdCourseSeqInfo */
+        SELECT
+              MT_CSEQ_STATUS_CODE
+            , A.SEQ_TITLE
+            , A.EVAL_EXAM_FINAL, A.EVAL_PROGRESS, A.CSEQNO, A.COURSENO
+            , (CASE WHEN A.DESCRIPTION IS NULL OR A.DESCRIPTION = '' THEN B.DESCRIPTION ELSE  A.DESCRIPTION END ) AS RESULT_DESCRIPTION
+            , B.DESCRIPTION AS BDESCRIPTION
+            , A.DESCRIPTION AS ADESCRIPTION
+             
+            , (CASE WHEN A.EX_DESCRIPTION IS NULL OR A.EX_DESCRIPTION = '' THEN B.EX_DESCRIPTION ELSE A.EX_DESCRIPTION END ) AS RESULT_EX_DESCRIPTION
+            , A.EX_DESCRIPTION AS AEX_DESCRIPTION
+            , B.EX_DESCRIPTION AS BEX_DESCRIPTION
+            , (CASE WHEN A.TARGET IS NULL OR A.TARGET = '' THEN B.TARGET ELSE A.TARGET END ) AS RESULT_TARGET
+            , A.TARGET AS ATARGET
+            , B.TARGET AS BTARGET
+            
+            /*
+            , TO_CHAR(A.STUDY_SDATE,'YYYY-MM-DD HH24:MI')STUDY_SDATE
+            , TO_CHAR(A.STUDY_EDATE,'YYYY-MM-DD HH24:MI')STUDY_EDATE
+            */
+            , TO_CHAR(A.STUDY_SDATE,'YYYY-MM-DD')STUDY_SDATE
+            , TO_CHAR(A.STUDY_EDATE,'YYYY-MM-DD')STUDY_EDATE
+            , TO_CHAR(A.APPLY_SDATE,'YYYY-MM-DD')APPLY_SDATE
+            , TO_CHAR(A.APPLY_EDATE,'YYYY-MM-DD')APPLY_EDATE
+            , FN_GET_CMMN_CODE_NM('LV',B.MT_LEVEL) AS MT_LEVEL_NAME
+            , A.FIX_CNT, A.COMPLETION, A.COMP_VAL, A.EDUSEQ_YN
+            , A.MAX_CNT, A.SEQ_TITLE AS TITLE, A.SEQ
+            , A.CLASS_DESK
+            , A.USEYN, A.OPENTYPE
+            , FIX_CNT
+            , MAX_CNT
+            , B.SAMPLMS_LE_YN
+            , (SELECT MT_SUB_NAME FROM LMS_CD_MT_SUB WHERE MT_SUB_CODE = B.MT_SC_CODE)AS MT_SC_NAME
+            , B.MT_SC_CODE
+            , ( SELECT COUNT(*) 
+                FROM LMS_LE_COURSE_USER U
+                WHERE U.CSEQNO = A.CSEQNO 
+                AND U.USEYN = 'Y'
+                ) AS COURSE_USER_CNT
+            , CASE WHEN  (SELECT COUNT(1) FROM LMS_LE_COURSE_USER WHERE CSEQNO = A.CSEQNO AND USERNO = #{SES_USERNO} AND USEYN = 'Y')  > 0 THEN 'Y'
+                ELSE 'N'
+                END AS APPLY_YN
+            , (SELECT CUSERNO FROM LMS_LE_COURSE_USER WHERE CSEQNO = A.CSEQNO AND USERNO = #{SES_USERNO} AND USEYN = 'Y') CUSERNO
+            , (CASE WHEN (TO_CHAR (SYSDATE, 'YYYYMMDD') BETWEEN TO_CHAR (APPLY_SDATE, 'YYYYMMDD') AND TO_CHAR (APPLY_EDATE, 'YYYYMMDD') ) 
+                    THEN 'Y'                       
+                    ELSE 'N' END) AS CANCEL_YN
+            , (CASE WHEN TO_CHAR(SYSDATE,'YYYY-MM-DD') BETWEEN TO_CHAR(A.APPLY_SDATE,'YYYY-MM-DD') AND TO_CHAR(A.APPLY_EDATE,'YYYY-MM-DD')
+                THEN 'Y'
+                ELSE 'N' END) SUGANG_YN
+            , REPLACE(C.SAVPATH,'\','') AS SAVPATH
+            , C.SAVFILE
+            , A.PRICE_DEL
+            , A.PRICE_FK
+            , A.EDUDAY_DEL         
+        FROM  LMS_ED_COURSE_SEQ A , LMS_ED_COURSE B, LMS_ED_COURSE_FILE C
+        WHERE A.COURSENO = B.COURSENO
+            AND A.COURSENO = C.COURSENO
+            AND A.USEYN = 'Y'
+            AND A.CSEQNO = #{cseqno}
+    </select>
+           
+    <!-- 과정에 딸린 파일 정보 -->
+    <select id="getFileInfoByCourseNo" resultType="emap" parameterType="int">
+        SELECT FILE_ID
+                , FILE_SEQ
+               , ORGFILE
+               , SAVFILE
+               , SAVPATH
+          FROM LMS_ED_COURSE_FILE
+         WHERE COURSENO = #{courseno}
+    </select>
+    
+     <!-- 과정에 딸린 파일 정보 -->
+    <select id="getFileInfoByCourseNo2" resultType="emap" parameterType="dmap">
+        SELECT FILE_ID 
+                , FILE_SEQ 
+                , FILE_NAME 
+                , FILE_SIZE 
+                , SAVPATH 
+                , ORGFILE 
+                , SAVFILE 
+                , REG_DATE 
+                , COURSENO 
+                , CSEQNO 
+                , OPEN_AT 
+          FROM LMS_ED_COURSE_FILE
+         WHERE COURSENO = #{courseno}
+         AND CSEQNO = #{cseqno}
+         AND NVL(TXT_FILE_YN,'N') != 'Y'
+    </select>
+    
+     <!-- 과정에 딸린 자막 파일 정보 -->
+    <select id="getTxtFileInfoByCourseNo" resultType="emap" parameterType="dmap">
+        SELECT FILE_ID 
+                , FILE_SEQ 
+                , FILE_NAME 
+                , FILE_SIZE 
+                , SAVPATH 
+                , ORGFILE 
+                , SAVFILE 
+                , REG_DATE 
+                , COURSENO 
+                , CSEQNO 
+                , OPEN_AT 
+          FROM LMS_ED_COURSE_FILE
+         WHERE COURSENO = #{courseno}
+         AND CSEQNO = #{cseqno}
+         AND TXT_FILE_YN = 'Y'
+    </select>
+    
+    <!-- 수강정보 확인 -->
+    <select id="getCourseAppUserInfo" resultType="emap" parameterType="dmap" >
+         SELECT
+           A.COURSENO
+          , B.CSEQNO
+          , C.CUSERNO
+          , C.USERNO
+          , (SELECT MT_SUB_NAME FROM LMS_CD_MT_SUB WHERE MT_SUB_CODE = B.MT_CSEQ_STATUS_CODE) AS MT_CSEQ_STATUS_NM
+          , B.OPENTYPE
+          , B.SEQ_TITLE
+          , B.SEQ
+          , B.STUDY_SDATE
+          , B.STUDY_EDATE
+          , NVL(C.ISPASS, 'N') AS ISPASS
+          , (CASE WHEN TO_CHAR(SYSDATE,'YYYYMMDD') BETWEEN TO_CHAR(B.APPLY_SDATE,'YYYYMMDD') AND TO_CHAR(B.APPLY_EDATE,'YYYYMMDD')
+                THEN 'Y'
+                ELSE 'N' END) SUGANG_YN 
+        FROM LMS_ED_COURSE A, LMS_ED_COURSE_SEQ B, LMS_LE_COURSE_USER C
+        WHERE A.COURSENO = B.COURSENO
+        AND   B.CSEQNO   = C.CSEQNO
+        AND   A.COURSENO = #{courseno}
+        AND   B.CSEQNO = #{cseqno}
+        AND   C.USERNO = #{SES_USERNO}
+        AND   C.USEYN = 'Y'  <!-- 수강여부 Y -->
+    </select>
+    
+    
+    <!-- 수강신청 -->
+    <insert id="insertCourseApplyExec" parameterType="hmap">
+        INSERT /*insertCourseApplyExec*/
+        INTO LMS_LE_COURSE_USER
+                 (
+                 CUSERNO
+                , CSEQNO
+                , USERNO
+                , USERID
+                , WDATE
+                , PROGRESS_VAL
+                , EXAM_MT_VAL
+                , EXAM_FINAL_VAL
+                , USEYN
+                , MOBLPHON
+                , STARTDATE
+                , ENDDATE
+                <if test="allat_order_no != null and allat_order_no !=''">
+                , PAYMENT_UID_DEL
+                </if>                
+           )
+          VALUES (
+                  (SELECT NVL (MAX (CUSERNO), 0) + 1  FROM LMS_LE_COURSE_USER)
+                , #{cseqno}
+                , #{SES_USERNO}
+                , ( SELECT UNITY_ID FROM LMS_CT_UNITY_MBER WHERE UNITY_MBERNO = #{SES_USERNO} )
+                , SYSDATE
+                , 0
+                , 0
+                , 0
+                , 'Y'
+                , ( SELECT MOBLPHON FROM LMS_CT_UNITY_MBER WHERE UNITY_MBERNO = #{SES_USERNO} )
+                , (SELECT CASE
+            			WHEN (SELECT OPENTYPE FROM LMS_ED_COURSE_SEQ WHERE CSEQNO = #{cseqno}) = 'D'
+              				THEN STUDY_SDATE
+           				WHEN (SELECT OPENTYPE FROM LMS_ED_COURSE_SEQ WHERE CSEQNO = #{cseqno}) = 'A'
+              				THEN SYSDATE
+            			END
+        			FROM LMS_ED_COURSE_SEQ WHERE CSEQNO = #{cseqno})
+                , (SELECT CASE
+            			WHEN (SELECT OPENTYPE FROM LMS_ED_COURSE_SEQ WHERE CSEQNO = #{cseqno}) = 'D'
+              				THEN STUDY_EDATE
+            			WHEN (SELECT OPENTYPE FROM LMS_ED_COURSE_SEQ WHERE CSEQNO = #{cseqno}) = 'A'
+              				THEN SYSDATE + (SELECT EDUDAY_DEL FROM LMS_ED_COURSE_SEQ WHERE CSEQNO = #{cseqno})
+            			END
+        			FROM LMS_ED_COURSE_SEQ WHERE CSEQNO = #{cseqno})
+                <if test="allat_order_no != null and allat_order_no !=''">
+                , #{allat_order_no}
+                </if>
+         )
+    </insert>
+    
+    <select id="getGuarPttnNoChk" resultType="emap" parameterType="dmap">
+		 SELECT CASE WHEN COUNT(*) > 0
+		             THEN 'Y'
+		             ELSE 'N'
+		              END AS GUAR_PTTN_NO_DIV 
+		  FROM GT_CU_CUSTNOMNG A
+		     , GT_GR_GUARPTTN  B
+		 WHERE 1 = 1
+		   AND A.CUST_NO = B.CUST_NO
+<!-- 		   AND (EDU_CMPLT_YN = 'N' OR EDU_CMPLT_YN IS NULL) -->
+		   AND GUARBIZ_PRG_STS IN ('413101', '413102', '413103', '413104')
+		   AND SUBSTR(A.API_SSNO,1,6) = #{brthdy}
+		   AND B.GUAR_PTTN_NO = 'G' || #{guarPttnNo1} || #{guarPttnNo2}
+		   AND SUBSTR(A.API_SSNO,1,6) = DECODE( LENGTH(#{SES_BRTHDY}), '8' ,  SUBSTR(#{SES_BRTHDY},3,6)
+                                                                 , #{SES_BRTHDY}
+                                              ) 
+    </select>
+    
+    <select id="selectOnlineDetailTitle" resultType="String" parameterType="Integer">
+    	SELECT 
+    		COURSETITLE 
+    	FROM 
+    		LMS_ED_COURSE 
+    	WHERE
+    		COURSENO =#{courseno}   
+    </select>    
+            
+    
+    <select id="getCoursePrice" resultType="Integer" parameterType="String">
+    	SELECT
+    		PRICE_DEL-NVL(PRICE_FK,0)
+    	FROM
+    		LMS_ED_COURSE_SEQ
+    	WHERE
+    		CSEQNO = #{pNo}    
+    </select>    
+</mapper>

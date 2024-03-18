@@ -1,0 +1,234 @@
+﻿<%
+/****************************************
+    subject : 합격자조회/자격증신청 > 합격자조회 > 설문완료 > 소양교육 완료 > 개인정보 동의
+   			: 합격자조회/자격증신청 > 자격증 신청 > 소양교육 완료 > 개인정보 동의
+    summary : 
+    author  : SANGS
+    date    : 2018-06-15
+****************************************/
+%>
+<%@ page language="java" contentType="text/html; charset=utf-8" pageEncoding="utf-8"%>
+<%@ include file="/WEB-INF/jsp/ccedu/inc/taglib_inc.jsp"%>
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+	<title>자격증신청 > 합격자조회/자격증신청 > 신용상담사 > 신용교육위원회 신용교육원</title>
+	<%@ include file="/WEB-INF/jsp/ccedu/inc/head_inc.jsp"%>
+	<script type="text/javascript" src="/cmmn/js/jquery.cookie.js"></script> 
+	<script type="text/javascript">
+		
+		function fnGoSubmit(){
+			if(!fnCheckboxChecked($('#agree2'), "개인정보 수집·이용에 <br> 동의해주시기 바랍니다.")) return false;
+			if(!fnCheckboxChecked($('#agree4'), "고유식별정보 제공 동의에 <br> 동의해주시기 바랍니다.")) return false;
+			if(!fnCheckboxChecked($('#agree6'), "개인정보 제공 동의에 <br> 동의해주시기 바랍니다.")) return false;
+			if(!fnCheckboxChecked($('#agree8'), "고유식별정보 제공 동의에 <br> 동의해주시기 바랍니다.")) return false;
+			
+			$('#frm').submit();
+			
+		}
+		
+		$(document).ready(function() {
+			fnModalMsg("소양교육을 완료 했습니다.<br/>개인정보 입력을 진행해주세요.");
+		});
+		
+
+	</script>
+</head>
+
+<body>
+
+<!-- skip nav -->
+	<%@ include file="/WEB-INF/jsp/ccedu/inc/nav_inc.jsp"%>
+<!--// skip nav -->
+
+
+<div id="wrap">
+
+	<!-- header -->
+	<%@ include file="/WEB-INF/jsp/ccedu/inc/header_inc.jsp"%>
+	<!--// header -->
+
+	<!-- container -->
+	<div id="container">
+
+		<!-- location -->
+		<jsp:include page="/WEB-INF/jsp/ccedu/inc/location/loc_13.jsp">
+			<jsp:param name="menuNm" value="개인정보 동의"/>
+		</jsp:include>
+		<!--// location -->
+
+		<div class="con_center">
+
+			<!-- lnb -->
+			<div id="lnb">
+				<jsp:include page="/WEB-INF/jsp/ccedu/inc/lnb/lnb_13.jsp">
+					<jsp:param name="dep2" value="01"/>
+					<jsp:param name="menuNm" value="개인정보 동의"/>
+				</jsp:include>
+			</div>
+			<!--// lnb -->
+
+			<!-- content 본문 -->
+			<div id="content">
+				<!-- 본문내용 -->
+				
+				<!-- 기존 START 2018-08-30  -->
+<!-- 				<h3 class="cont_titile">개인정보 동의</h3> -->
+				<!-- 기존 END 2018-08-30  -->
+				
+				<!-- 2018-08-28 김동인 작업 S --> 
+				<h3 class="cont_titile type03">개인정보 동의<span></span></h3>
+				<!-- 2018-08-28 김동인 작업 E -->
+				
+				<form name="frm" id="frm" action="<c:out value='${REQUEST_DATA.paramUrl}'/>" method="post">
+				<div class="cont_body">
+					<!-- start -->
+					
+					
+					<div class="c_section">
+						<h4 class="c_tit">개인정보 수집·이용에 관한 사항</h4>
+						<div class="agreement" tabindex="0">
+							<h2 style="font-weight: bold;">수집․이용 목적</h2>
+							<p>￭ 신용상담사 자격시험 응시 원서접수, 전형 및 자격취득자 관리에 필요한 정보제공</p>
+							<p>￭ 법령상 의무이행에 필요한 정보제공</p>
+							<br>
+							<h2 class="txtbule" style="font-weight: bold;">수집․이용할 항목</h2>
+							<p class="txtbule">￭ 개인식별정보</p>
+							<p class="txtbule">성명, 고유식별번호, 최종학교명, 학과, 졸업여부, 학력, 직업, 사진, 전화번호, 핸드폰번호, 이메일, 주소 등</p>
+							<p class="txtbule">※ 본 등의 이전에 발생한 개인정보도 포함됩니다.</p>
+							<br>
+							<!--2018-07-27 class="txtbule" 추가 이희연-->
+							<h2 class="txtbule" style="font-weight: bold;">보유․이용 기간</h2>
+							<p class="txtbule">위 개인정보는 수집·이용에 관한 동의일로부터 동의철회 시까지 보유·이용할 수 있습니다.</p>
+							<p class="txtbule">단, 동의 철회일 후에는 위에 기재된 목적과 관련된 사고 조사, 분쟁 해결, 민원처리, 법령상 의무이행 및 부수업무만을 위하여 보유·이용됩니다.</p>
+							<!--2018-07-27 class="txtbule" 추가 이희연-->
+							<br>
+							<h2 style="font-weight: bold;">동의를 거부할 권리 및 동의를 거부할 경우의 불이익</h2>
+							<p>위 개인정보의 수집·이용에 관한 동의는 신용교육원 포털 이용 및 신용상담사 자격시험 자격취득자 관리를 위하여 필수적이므로, 위 사항에 동의하셔야만 관련 서비스 제공등 업무가 가능합니다.</p>
+							<br>
+<!-- 							<h2>수집․이용 동의여부</h2> -->
+							<p style="font-weight: bold;">귀 위원회가 위와 같이 본인의 개인정보를 수집․ 이용하는 것에 동의합니다. </p>
+						</div>
+						
+						<div class="agree_check">
+							<input type="radio" id="agree1" name="agree1" value="N"/>
+							<label for="agree1">동의하지 않음</label>
+							<input type="radio" id="agree2" name="agree1" value="Y"/>
+							<label for="agree2">동의함</label>
+						</div>
+						
+					</div>
+					
+					<div class="c_section">
+						<div class="agreement type2">
+							<h2 class="txtbule" style="font-weight: bold;">고유식별정보 수집 &middot; 이용 동의여부</h2>
+							<p class="txtbule">귀 위원회가 위 목적으로 다음과 같은 본인의 고유식별정보를 수집․ 이용하는 것에 동의합니다.</p>
+							<p class="txtbule">※ 개인정보법 제24조의 고유식별정보: 주민등록번호, 여권번호, 운전면허번호, 외국인등록번호</p>
+						</div>
+						<div class="agree_check">
+							<input type="radio" id="agree3" name="agree2" value="N"/>
+							<label for="agree3">동의하지 않음</label>
+							<input type="radio" id="agree4" name="agree2" value="Y"/>
+							<label for="agree4">동의함</label>
+						</div>
+					</div>
+					
+					
+					
+					<div class="c_section">
+						<h4 class="c_tit">개인정보 제공에 관한 사항</h4>
+						<div class="agreement" tabindex="0">
+
+							<h2 style="font-weight: bold;">제공받는 자</h2>
+							<p>￭ 자격정책의 수립 및 자격제도 개선을 위한 정보제공 : 금융위원회</p>
+							<p>￭ 신용상담사 자격제도 운영에 관한 정보제공 : 한국직업능력개발원</p>
+							<p>￭ 신용상담사 자격증 발급을 위한 정보제공 : 성원디지텍(주)</p>
+							<br>
+							
+							<h2 class="txtbule">제공받는 자의 이용 목적</h2>
+							<p class="txtbule">￭ 자격정책의 수립 및 자격제도 개선에 필요한 사항</p>
+							<p class="txtbule">￭ 신용상담사 자격제도의 효율적 운영 및 권익보호에 필요한 사항</p>
+							<p class="txtbule">￭ 신용상담사 자격증 및 합격증 발급에 필요한 사항</p>
+							<br>
+							
+							<h2 class="txtbule">제공할 개인정보이 항목</h2>
+							<p class="txtbule">￭ 금융위원회, 한국직업능력개발원</p>
+							<p class="txtbule">&nbsp;&nbsp;&nbsp;수집 &middot; 이용에 동의한 정보 중 감사, 자격정책의 수립, 자격제도 운영, 자격제도 개선 등에 필요한 정보</p>
+							<p class="txtbule">￭ 성원디지텍(주) : 성명, 생년월일, 주소, 사진</p>
+							<p class="txtbule">※ 본 동의 이전에 발생한 개인정보도 포함됩니다.</p>
+							<br>
+							
+							<p class="txtbule">제공받는 자의 개인정보 보유·이용 기간</p>
+							<p class="txtbule">위 개인정보는 수집·이용에 관한 동의일로부터 동의철회 시까지 보유·이용할 수 있습니다.</p>
+							<p class="txtbule">단, 동의 철회일 후에는 위에 기재된 목적과 관련된 사고 조사, 분쟁 해결, 민원처리, 법령상 의무이행 및 부수업무만을 위하여 보유·이용됩니다.</p>
+							<br>
+							<h2 style="font-weight: bold;">동의를 거부할 권리 및 동의를 거부할 경우의 불이익</h2>
+							<p>위 개인정보 수집·이용에 관한 동의는 신용교육원 포털 업무 이용 및 신용상담사 자격시험 자격취득자 관리를 위하여 필수적이므로, 위 사항에 동의하셔야만 관련 서비스 제공 등 업무가 가능합니다.</p>
+							<p>귀 위원회가 위와 같이 본인의 개인정보를 제공하는 것에 동의합니다.</p>
+							<br>
+						</div>
+						<div class="agree_check">
+							<input type="radio" id="agree5" name="agree3" value="N"/>
+							<label for="agree5">동의하지 않음</label>
+							<input type="radio" id="agree6" name="agree3" value="Y"/>
+							<label for="agree6">동의함</label>
+						</div>
+					</div>
+					
+					<div class="c_section">
+						<div class="agreement type2">
+							<h2 class="txtbule">고유식별정보 제공 동의여부</h2>
+							<p class="txtbule">귀 위원회가 위 목적으로 다음과 같은 본인의 고유식별정보를 제공하는 것에 동의합니다.</p>
+							<p class="txtbule">※ 개인정보법 제24조의 고유식별정보: 주민등록번호, 여권번호, 운전면허번호, 외국인등록번호</p>
+						</div>
+						<div class="agree_check">
+							<input type="radio" id="agree7" name="agree4" value="N"/>
+							<label for="agree7">동의하지 않음</label>
+							<input type="radio" id="agree8" name="agree4" value="Y"/>
+							<label for="agree8">동의함</label>
+						</div>
+					</div>
+					
+					
+					<div class="c_section">
+						<div class="agreement type2">
+							<p>* 위원회의 고의 또는 과실 등 귀책사유로 인한 개인정보 유출로 고객님에게 발생한 손해에 대해 관게법령 등에 따라 보상받으실 수 있습니다.</p>
+							<p>* 본인은 개인정보 수집 &middot; 이용 &middot; 제공에 관한 본 동의서의 내용을 충분히 이해하였으며, 위와 같이 개인정보 수집  &middot; 이용 제공에 동의합니다.</p>
+						</div>
+					</div>
+
+					
+
+
+					<!-- <div class="agree_check all">
+						<input type="checkbox" id="allAgree" onchange="fnAllAgree();"/>
+						<label for="allAgree">위 약관에 모두 동의합니다.</label>
+					</div> -->
+
+					<div class="c_btn_center">
+						<button class="btn_bluebg03" onclick="fnGoSubmit();return false;">다음</button>
+					</div>
+
+					<!--// end -->
+				</div>
+				<!--// 본문내용 -->
+				
+			<!--  -->
+				</fieldset>
+			   </form>
+			</div>
+			<!--// content 본문 -->
+		
+		</div>
+	
+	</div>
+	<!--// container -->
+
+	<!-- foot -->
+	<%@ include file="/WEB-INF/jsp/ccedu/inc/footer_inc.jsp"%>
+	<!--// foot end -->
+
+</div>
+
+</body>
+</html>

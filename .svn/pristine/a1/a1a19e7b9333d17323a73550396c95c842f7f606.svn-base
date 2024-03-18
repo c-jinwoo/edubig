@@ -1,0 +1,32 @@
+<%@ page language="java" contentType="text/html; charset=utf-8" pageEncoding="utf-8"%>
+
+<%
+/****************************************
+    subject	: [공통] > 마이페이지 > LEFT 영역
+    summary	: LEFT 영역
+    author	: SANGS
+    date	: 2015-06-01
+****************************************/
+%>
+
+<script type="text/javascript">
+    $(document).ready(function(){
+    	$('.ul_gnb').find('.gnb_<c:out value="${menu_nm}"/>').addClass('on');
+		$('.leftNavi').find('.lnb_<c:out value="${lnb_menu}"/> a').addClass('active');
+    });
+</script>
+<div class="leftMn">
+    <h1 class="ltTitle">
+        <span class="bold">내 강의실</span>
+    </h1>
+    <nav>
+        <ul class="leftNavi">
+            <li class="lnb_myCourse"><a href="/academy/myclass/myclassList.do" title="수강현황">수강현황</a></li>
+			<c:if test="${REQUEST_DATA.SES_USERID ne null && REQUEST_DATA.SES_USERID ne ''}">
+			<li class="lnb_myLecture"><a href="/classdesk/main/main.do" title="강의실">강의실</a></li>
+			<li class="lnb_aprslt"><a href="/academy/myclass/aprsltList.do" title="특강교육/방문교육 신청내역">방문교육신청내역</a></li>
+			<li class="lnb_member"><a href="/academy/myclass/memberModifyAuthForm.do" title="개인정보관리">개인정보관리</a></li>
+			</c:if>
+        </ul>
+    </nav>
+</div>

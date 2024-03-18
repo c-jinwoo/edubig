@@ -1,0 +1,11 @@
+_this.$quizInfo = [
+	["다음 중 Cura 프로그램에 대한 설명으로 <span style='color:#FF0000;'>틀린</span> 것은?","3D Model Data(stl)의 Layer(층)를 분리하는 프로그램이다.","3D 프린터에 따라 전용 또는 범용 프로그램이 있으며, Cura는 범용 슬라이싱 프로그램이다.","슬라이싱 설정을 완료한 후 Gcode 파일을 내보내기 하며, 이를 통해 3D 프린트 한다.","범용 프로그램이기 때문에 지지대(Support) 설정은 할 수 없다.",false],	
+	["다음 중 Cura 프로그램의 화면 구성에 대한 설명으로 <span style='color:#FF0000;'>틀린</span> 것은?","Menu bar(메뉴 바): 파일 관리 및 장비 설정, 옵션 설정의 유형 등을 관리한다.","출력 범위를 벗어난 3D Model(모델)은 노란색으로 표시된다.","View mode(뷰 모드): 3D Model(모델)의 화면 표시 유형을 설정한다.","Setting menu(설정 메뉴): 3D Model의 슬라이싱 옵션을 설정한다.",false],
+	["다음 중 Setting menu(설정 메뉴)에 대한 설명으로 <span style='color:#FF0000;'>틀린</span> 것은?","Quality(품질 설정): Layer(층)의 높이와 수평 방향에서의 출력물 두께를 설정한다.","Fill(채우기 설정): 출력물의 상 하단 두께와 내부 채움 밀도를 설정한다.","Speed Temperature(출력 속도 설정): 인쇄 속도를 출력 상황에 따라 조정할 수 있도록 설정한다.","Support(지지대): 지지대 설정 및 베드 판 플랫폼을 설정한다.",false]
+];
+
+_this.$quizAnsInfo = [
+	[4,"Cura 프로그램은 None, Touching buildplate, Everywhere의 지지대 설정을 할 수 있다."],
+	[2,"출력 범위를 벗어난 3D Model(모델)은 회색으로 표시된다."],
+	[3,"Speed Temperature(출력 속도 설정)은 기본 프린트 속도를 설정한다."],
+];

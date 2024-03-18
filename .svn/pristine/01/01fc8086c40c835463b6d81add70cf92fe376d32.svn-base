@@ -1,0 +1,16 @@
+_this = this;
+_this.$browser = getBrowserType();						// 사용 browser
+_this.$bolFullScreen = false;							// 전체화면 여부 ( false : 창모드 true : 전체화면 )
+_this.$bolPlay = false;									// 재생 여부 ( fasle : 일시정지 true : 재생중 )
+_this.$curChaSiNumber	= getURL(1) * 1;				// 콘텐츠 현재 차시 번호
+_this.$curPageNumber	= getURL(0) * 1;				// 콘텐츠 현재 페이지 번호
+_this.$movieName		= itostr(_this.$curChaSiNumber) + "_" + itostr(_this.$curPageNumber) + ".mp4"; 
+_this.$moviePath		= "http://cslabs-cvod.myskcdn.net/_definst_/mp4:bigdata/"+itostr(_this.$curChaSiNumber)+"/"+_this.$movieName+"/playlist.m3u8";
+
+/* 진도처리 변수 */
+var cuserno = $( '#cuserno', parent.opener.document ).val(); //수강코드 
+var treeno = $( '#treeno', parent.opener.document ).val();   //목차코드
+var frameseq = $( '#sday', parent.opener.document ).val();   //현재프래임번호
+var sTime = $('#studytime', parent.opener.document ).val();// 수강시간
+var vodPath = $('#filePath', parent.opener.document ).val();
+var vodName = $('#mediaFile', parent.opener.document ).val();

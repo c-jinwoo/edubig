@@ -1,0 +1,137 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes" ?>
+<event>
+<!-- 강조빨간색칠하기-->
+<!-- &lt;span style="color:#ff3300"&gt;&lt;u&gt;않은&lt;&#47;span&gt;&lt;&#47;u&gt; -->
+<!-- 내려쓰기 -->
+<!-- &lt;br&gt; -->
+  <quiz flag="5" >
+      <page num="1" answer="3" type="multiple">
+          <question>
+              <alternate>문제 일.다음의 보기에서 빅데이터 전처리와 관련이 없는 것은 어느 것인가?</alternate>
+			  <symbol>Q1.</symbol>
+              <text>다음의 보기에서 빅데이터 전처리와 관련이 없는 것은 어느 것인가?</text>
+          </question>
+
+          <feedback>
+              <alternate>정답은 삼번입니다. 수집과 변환 과정에서 빅데이터 저장소에 적재하기 위하여 수집한 데이터를 필터링(filtering)하거나 유형 변환(transformation), 정제(cleansing) 등을 거치게 되는데 이 과정을 빅데이터 전처리라고 부른다. 저품질 데이터를 개선하고 처리하는 과정은 필터링 과정에 속한다. </alternate>
+              <answer>
+                  <symbol>정답</symbol>
+                  <text>3</text>
+              </answer>
+              <explain>
+                  <symbol>3</symbol>
+                  <text>수집과 변환 과정에서 빅데이터 저장소에 적재하기 위하여 수집한 데이터를 필터링(filtering)하거나 유형 변환(transformation), 정제(cleansing) 등을 거치게 되는데 이 과정을 빅데이터 전처리라고 부른다. 저품질 데이터를 개선하고 처리하는 과정은 필터링 과정에 속한다.</text>
+              </explain>
+          </feedback>
+
+          <example num="1">
+              <alternate>보기 일번 필터링 (filtering)하는 과정</alternate>
+              <symbol>Q1</symbol>
+              <text>필터링 (filtering)하는 과정</text>
+          </example>
+          <example num="2">
+              <alternate>보기 이번 유형 변환 (transformation)의 과정</alternate>
+              <symbol>2</symbol>
+              <text>유형 변환 (transformation)의 과정</text>
+          </example>
+          <example num="3">
+              <alternate>보기 삼번 비교 (comparison)의 과정</alternate>
+              <symbol>3</symbol>
+              <text>비교 (comparison)의 과정</text>
+          </example>
+          <example num="4">
+              <alternate>보기 사번 정제 (cleaning)의 과정</alternate>
+              <symbol>4</symbol>
+              <text>정제 (cleaning)의 과정</text>
+          </example>
+      </page>
+
+      <page num="2" answer="2" type="multiple">
+          <question>
+              <alternate>문제 이. 다음 보기 중에서 빅데이터 분석의 순환 과정에 
+속하지 않는 과정은 어느 것인가? </alternate>
+			  <symbol>Q2.</symbol>
+              <text>다음 보기 중에서 빅데이터 분석의 순환 과정에 
+속하지 않는 과정은 어느 것인가? </text>
+          </question>
+
+          <feedback>
+              <alternate>정답은 일 번입니다. 빅데이터 분석은 수집, 저장, 처리, 분석, 시각화, 이용, 
+폐기의 과정으로 이루어진다. </alternate>
+              <answer>
+                  <symbol>정답</symbol>
+                  <text>2</text>
+              </answer>
+              <explain>
+                  <symbol>2</symbol>
+                  <text>빅데이터 분석은 수집, 저장, 처리, 분석, 시각화, 이용, 
+폐기의 과정으로 이루어진다. </text>
+
+              </explain>
+          </feedback>
+
+          <example num="1">
+              <alternate>보기 일번 빅데이터 수집</alternate>
+              <symbol>1</symbol>
+              <text>빅데이터 수집</text>
+          </example>
+          <example num="2">
+		  <alternate>보기 이번 빅데이터 분할</alternate>
+              <symbol>2</symbol>
+              <text>빅데이터 분할</text>
+          </example>
+          <example num="3">
+              <alternate>보기 삼번 빅데이터 분석</alternate>
+              <symbol>3</symbol>
+              <text>빅데이터 분석</text>
+          </example>
+          <example num="4">
+              <alternate>보기 사번 빅데이터 이용</alternate>
+              <symbol>4</symbol>
+              <text>빅데이터 이용</text>
+          </example>
+      </page>
+
+      <page num="3" answer="3" type="multiple">
+          <question>
+              <alternate>문제 삼. 다음 중 ETL의 기능으로 옳지 않은 것은?</alternate>
+			  <symbol>Q3.</symbol>
+              <text>다음 중 ETL의 기능으로 옳지 않은 것은?</text>
+          </question>
+
+          <feedback>
+              <alternate>정답일 일 번입니다. ETL은 레코드의 분리가 아닌 통합 기능을 수행한다.</alternate>
+              <answer>
+                  <symbol>정답</symbol>
+                  <text>3</text>
+              </answer>
+              <explain>
+                  <symbol>3</symbol>
+                  <text>ETL은 레코드의 분리가 아닌 통합 기능을 수행한다.</text>
+
+              </explain>
+          </feedback>
+
+          <example num="1">
+              <alternate>보기 일번 도메인 검증</alternate>
+              <symbol>1</symbol>
+              <text>도메인 검증</text>
+          </example>
+          <example num="2">
+              <alternate>보기 이번 데이터의 요약</alternate>
+              <symbol>2</symbol>
+              <text>데이터의 요약</text>
+          </example>
+          <example num="3">
+              <alternate>보기 삼번 레코드의 분리</alternate>
+              <symbol>Q3</symbol>
+              <text>레코드의 분리</text>
+          </example>
+          <example num="4">
+              <alternate>보기 사번 데이터키 값의 재구성</alternate>
+              <symbol>4</symbol>
+              <text>데이터키 값의 재구성</text>
+          </example>
+      </page>
+  </quiz>
+</event>

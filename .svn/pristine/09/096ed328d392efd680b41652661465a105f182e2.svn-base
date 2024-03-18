@@ -1,0 +1,742 @@
+﻿
+<%
+	/****************************************
+	 subject : 회원가입
+	 summary : 회원가입 : 정보등록
+	 author  : SANGS
+	 date    : 2018-06-15
+	 ****************************************/
+%>
+<%@ page language="java" contentType="text/html; charset=utf-8"
+	pageEncoding="utf-8"%>
+<%@ include file="/WEB-INF/jsp/ccedu/inc/taglib_inc.jsp"%>
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<title>회원서비스 > 회원가입 > 회원정보 등록</title>
+<%@ include file="/WEB-INF/jsp/ccedu/inc/head_inc.jsp"%>
+
+<!----- 주소검색 레이어 START----->
+<div id="layer"
+	style="display: none; position: fixed; overflow: hidden; z-index: 9999; -webkit-overflow-scrolling: touch;">
+	<button type="button" id="btnCloseLayer"
+		style="cursor: pointer; position: absolute; right: -3px; top: -3px; z-index: 1; width: 20px; height: 20px; background-image: url( '//t1.daumcdn.net/localimg/localimages/07/postcode/320/close.png' );"
+		onclick="closeDaumPostcode()" alt="닫기 버튼"></button>
+</div>
+
+<script
+	src="https://ssl.daumcdn.net/dmaps/map_js_init/postcode.v2.js?autoload=false"></script>
+<script>
+	function isMobile() {
+		return /Android|webOS|iPhone|iPod|BlackBerry|IEMobile|Opera Mini/i
+				.test(navigator.userAgent);
+	}
+
+	// 우편번호 찾기 화면을 넣을 element
+	var element_layer = document.getElementById('layer');
+
+	function closeDaumPostcode() {
+		// iframe을 넣은 element를 안보이게 한다.
+		element_layer.style.display = 'none';
+	}
+
+	function openDaumPostcode() {
+
+		daum.postcode.load(function() {
+			new daum.Postcode({
+				oncomplete : function(data) {
+
+					// 각 주소의 노출 규칙에 따라 주소를 조합한다.
+					// 내려오는 변수가 값이 없는 경우엔 공백('')값을 가지므로, 이를 참고하여 분기 한다.
+					var fullAddr = data.address; // 최종 주소 변수
+					var extraAddr = ''; // 조합형 주소 변수
+
+					// 기본 주소가 도로명 타입일때 조합한다.
+					if (data.addressType === 'R') {
+						//법정동명이 있을 경우 추가한다.
+						if (data.bname !== '') {
+							extraAddr += data.bname;
+						}
+						// 건물명이 있을 경우 추가한다.
+						if (data.buildingName !== '') {
+							extraAddr += (extraAddr !== '' ? ', '
+									+ data.buildingName : data.buildingName);
+						}
+						// 조합형주소의 유무에 따라 양쪽에 괄호를 추가하여 최종 주소를 만든다.
+						fullAddr += (extraAddr !== '' ? ' (' + extraAddr + ')'
+								: '');
+					}
+
+					// 우편번호와 주소 정보를 해당 필드에 넣는다.
+					document.getElementById('lnmZip').value = data.zonecode; //5자리 새우편번호 사용
+					document.getElementById('lnmAdres1').value = fullAddr;
+					//document.getElementById('sample2_addressEnglish').value = data.addressEnglish;
+
+					// iframe을 넣은 element를 안보이게 한다.
+					// (autoClose:false 기능을 이용한다면, 아래 코드를 제거해야 화면에서 사라지지 않는다.)
+					element_layer.style.display = 'none';
+
+					closeDaumPostcode();
+				},
+				width : '100%',
+				height : '100%',
+				maxSuggestItems : 5
+			}).embed(element_layer);
+		});
+		// iframe을 넣은 element를 보이게 한다.
+		element_layer.style.display = 'block';
+
+		// iframe을 넣은 element의 위치를 화면의 가운데로 이동시킨다.
+		initLayerPosition();
+	}
+
+	// 브라우저의 크기 변경에 따라 레이어를 가운데로 이동시키고자 하실때에는
+	// resize이벤트나, orientationchange이벤트를 이용하여 값이 변경될때마다 아래 함수를 실행 시켜 주시거나,
+	// 직접 element_layer의 top,left값을 수정해 주시면 됩니다.
+	function initLayerPosition() {
+
+		var width = 300; //우편번호서비스가 들어갈 element의 width
+		if (!isMobile()) {
+			width = 620;
+		}
+
+		var height = 400; //우편번호서비스가 들어갈 element의 height
+		var borderWidth = 2; //샘플에서 사용하는 border의 두께
+
+		// 위에서 선언한 값들을 실제 element에 넣는다.
+		element_layer.style.width = width + 'px';
+		element_layer.style.height = height + 'px';
+		element_layer.style.border = borderWidth + 'px solid';
+		// 실행되는 순간의 화면 너비와 높이 값을 가져와서 중앙에 뜰 수 있도록 위치를 계산한다.
+		element_layer.style.left = (((window.innerWidth || document.documentElement.clientWidth) - width)
+				/ 2 - borderWidth - 6)
+				+ 'px';
+		element_layer.style.top = (((window.innerHeight || document.documentElement.clientHeight) - height) / 2 - borderWidth)
+				+ 'px';
+	}
+</script>
+<!----- 주소검색 레이어 END----->
+<script type="text/javascript">
+	$(document).ready(function() {
+		fnEmailDomainSet();// 이메일 도메인 세팅
+		onlyNum2('moblphon2');
+		onlyNum2('moblphon3');
+		onlyNum2('telno2');
+		onlyNum2('telno3');
+		onlyNum2('jBrthdy');
+		onlyNumAlpha('userId');
+		onlyNumAlpha('userEmail1');
+
+	});
+
+	function cancle() {
+		fnConfirm("정말로 회원가입을 취소하시겠습니까?", function(result) {
+			if (result) {
+				$('#frm').attr('action', '/ccedu/main/main.do').submit();
+			} else {
+				return false;
+			}
+		})
+	};
+
+	function fnGoSubmit() {
+
+		if ("J" == $("#mberType").val()) {
+			if (!fnValiCheck($('#userName'), '이름을 입력 해 주세요.'))
+				return false;
+			if (!fnValiCheck($('#brthdy'), '생년월일을 입력 해 주세요.'))
+				return false;
+			var userName = $("#userName").val();
+			var birth = $('#brthdy').val();
+			var sex = $("input[name^='sex']:checked").val();
+
+			if (!bthdyCheck($('#brthdy')))
+				return false;
+
+			if (calcAge(birth) > 14) {
+				fnModalMsg("만 14세 이상은 일반회원으로 가입 가능합니다.", function() {
+					$('#brthdy').focus();
+				});
+				return false;
+			}
+
+			if (userName != '') {
+				$("#userName").val(userName);
+			}
+		}
+
+		//if(!fnValiCheck($('#userName'),'이름을 입력 해 주세요.')) return false;
+		if (!fnValiCheck($('#userId'), '아이디를 입력 해 주세요.'))
+			return false;
+		if (!fnValiCheck($('#idDupCheck'), '아이디 중복확인을 해 주세요.'))
+			return false;
+
+		if (!fnValiCheck($('#userPassword'), '비밀번호를 입력 해 주세요.'))
+			return false;
+		if (!fnValiCheck($('#userPassword2'), '비밀번호확인을 입력 해 주세요.'))
+			return false;
+
+		if (!fnValiCheck($('#emailDupCheck'), '이메일 중복확인을 해 주세요.'))
+			return false;
+
+		if(!passwordCheck($('#userPassword'))){
+			return false;
+		}
+		if (!passwordCompare($('#userPassword'), $('#userPassword2')))
+			return false;
+
+		if (!fnValiCheck($('#moblphon1'), '핸드폰번호 첫자리를 입력 해 주세요.'))
+			return false;
+		if (!fnValiCheck($('#moblphon2'), '핸드폰번호 둘째자리를 입력 해 주세요.'))
+			return false;
+		if (!fnValiCheck($('#moblphon3'), '핸드폰번호 셋째자리를 입력 해 주세요.'))
+			return false;
+
+		var email = $('#userEmail1').val();
+		if ($('#userEmail3').val() == '') {
+			email += '@' + $('#userEmail2').val();
+		} else {
+			email += '@' + $('#userEmail3').val();
+		}
+
+		$('#email').val(email);
+		if (!fnValiEmail($('#email'), '이메일주소를 확인 해 주세요.'))
+			return false;
+		
+		/* if (!fnValiCheck($('#lnmZip'), '우편번호를 입력 해 주세요.'))
+			return false;
+		if (!fnValiCheck($('#lnmAdres1'), '주소를 입력 해 주세요.'))
+			return false;
+		if (!fnValiCheck($('#lnmAdres2'), '상세주소를 입력 해 주세요.'))
+			return false;
+
+		if (!fnValiCheck($('#job'), '직업을 선택 해 주세요.'))
+			return false;
+		if (!fnValiCheck($('#userPath'), '가입경로를 선택 해 주세요.'))
+			return false;
+		if ($('#userPath').val() == 'PA0005') {
+			if (!fnValiCheck($('#userEtc'), '기타 가입경로를 입력 해 주세요.'))
+				return false;
+		} */
+
+		if ($('input[name=isMobile]').val() == 'true')
+			mtk.fillEncData();
+
+		$('#frm').attr('action', '/ccedu/user/memberJoinExec.do');
+		frm.submit();
+		/* //비밀번호 체크 ajax
+		$.ajax({
+		    url : '/ccedu/user/pswrdVldtnChk.do',
+		    data : $("#frm").serialize(),
+		    dataType : 'json',
+		    type : 'POST',
+		    success : function(result) {
+		        if(result != 'Y'){
+		        	fnModalMsg(result,function(){
+		        		$('#userPassword').focus();
+		        	});
+		        } else {
+
+					    submitted = true;
+					    $('#frm').attr('action', '/ccedu/user/memberJoinExec.do');
+					    frm.submit();
+					    
+					    submitted = false;
+					    
+						return; 
+		        }
+		    },
+		    error : function(e) {
+		        fnModalMsg("error :" + e.responseText);
+		    }
+		}); */
+	}
+
+	function calcAge(birth) {
+
+		var date = new Date();
+
+		var year = date.getFullYear();
+
+		var month = (date.getMonth() + 1);
+
+		var day = date.getDate();
+
+		if (month < 10)
+			month = '0' + month;
+
+		if (day < 10)
+			day = '0' + day;
+
+		var monthDay = month + day;
+
+		birth = birth.replace('-', '').replace('-', '');
+
+		var birthdayy = birth.substr(0, 4);
+
+		var birthdaymd = birth.substr(4, 4);
+
+		var age = monthDay < birthdaymd ? year - birthdayy - 1 : year
+				- birthdayy;
+
+		return age;
+
+	}
+
+	//아이디 중복확인 초기화
+	function fnIdDupReset() {
+		$('#idDupCheck').val('');
+	}
+
+	//아이디 중복확인
+	function searchId() {
+		if (!fnValiCheck($('#userId'), '아이디를 입력 해 주세요.'))
+			return false;
+
+		var tUserId = $.trim($('#userId').val());
+		if (tUserId == '') {
+			fnModalMsg('아이디를 입력해 주세요.', function() {
+				$('#userId').focus();
+			});
+		} else {
+			ajaxSubmit('/ccedu/user/searchId.do', {
+				userId : tUserId
+			}, 'json', eval('resultSearchId'));
+		}
+	}
+	//아이디 중복확인 콜백
+	function resultSearchId(data) {
+		if (data == 1) {
+			$('#idDupCheck').val('');
+			fnModalMsg('이미 등록된 아이디입니다.', function() {
+				$('#userId').focus();
+			});
+
+		} else if (data == 0) {
+			$('#idDupCheck').val('Y');
+			fnModalMsg('사용가능한 아이디입니다.', function() {
+				$('#userId').focus();
+			});
+		}
+	}
+
+	
+	//이메일 중복확인
+	function searchEmail(){
+		var val1 = true, val2 = true;
+		console.log(val1 +"@"+val2);
+		if($("#userEmail1").val() == ""){
+			val1 = false;			
+		}
+		if($("#userEmail2").val() == ""){
+			val2 = false;			
+		}
+		var result = val1 || val2;
+		if(!val1 || !val2){
+			fnModalMsg('이메일을 입력해 주세요.', function() {
+			});			
+		}	
+		else{
+			ajaxSubmit('/ccedu/user/searchEmail.do', {
+				email : $("#userEmail1").val() +"@"+ $("#userEmail2").val()
+			}, 'json', eval('resultEmail'));			
+		}
+	}
+	function resultEmail(data){
+		if (data == 1) {
+			$('#emailDupCheck').val('');
+			fnModalMsg('이미 등록된 이메일입니다.', function() {
+			});
+
+		} else if (data == 0) {
+			$('#emailDupCheck').val('Y');
+			fnModalMsg('사용가능한 이메일입니다.', function() {
+			});
+		}
+	}
+	//이메일 도메인 설정
+	function fnEmailDomainSet() {
+		var selectedDomain = $('#userEmail3').val();
+		$('#userEmail2').val('');
+
+		if (selectedDomain == '') {
+			$('#userEmail2').removeAttr('readonly');
+		} else {
+			$('#userEmail2').val(selectedDomain);
+			$('#userEmail2').attr('readonly', 'readonly');
+		}
+	}
+
+	//우편번호 콜백 스크립트
+	function fnZipSelect(zip_code, adres) {
+
+		var zipCode = Number(zip_code);
+		zipCode += "";
+
+		if (zipCode.length == 4) {
+			zipCode = "0" + zipCode;
+		}
+
+		$('#lnmZip').val(zipCode);
+		$('#lnmAdres1').val(adres);
+		$("#popPost").find("#close").click();
+	}
+
+	// 가입경로 
+	function chUserPath(obj) {
+		if ($(obj).val() == 'PA0005') {
+			$('#userEtc').show();
+		} else {
+			$('#userEtc').hide();
+		}
+	}
+</script>
+
+</head>
+
+<body>
+
+	<%@ include file="/WEB-INF/jsp/common/pop_post.jsp"%>
+
+	<!-- skip nav -->
+	<%@ include file="/WEB-INF/jsp/ccedu/inc/nav_inc.jsp"%>
+	<!--// skip nav -->
+
+
+	<div id="wrap">
+		<form name="frm" id="frm" action="" method="post">
+			<fieldset>
+				<input type="hidden" name="email" id="email" value="" /> <input
+					type="hidden" name="di" id="di"
+					value="<c:out value="${REQUEST_DATA.di }"/>" /> <input
+					type="hidden" name="confirmGubun" id="confirmGubun"
+					value="<c:out value="${REQUEST_DATA.confirmGubun}"/>" /> <input
+					type="hidden" name="mberType" id="mberType"
+					value="<c:out value="${REQUEST_DATA.mberType }"/>" /> <input
+					type="hidden" name="idDupCheck" id="idDupCheck" value="" /> <input
+					type="hidden" name="emailDupCheck" id="emailDupCheck" value="" /> <input
+					type="hidden" name="isMobile" value="" /> <input type="hidden"
+					name="ssnCd" id="ssnCd"
+					value="<c:out value="${REQUEST_DATA.ssnCd }"/>" />
+
+				<!-- header -->
+				<%@ include file="/WEB-INF/jsp/ccedu/inc/header_inc.jsp"%>
+				<!--// header -->
+
+				<!-- container -->
+				<div id="container">
+
+					<!-- location -->
+					<jsp:include page="/WEB-INF/jsp/ccedu/inc/location/loc_07.jsp">
+						<jsp:param name="menuNm" value="회원가입" />
+					</jsp:include>
+					<!--// location -->
+
+					<div class="con_center">
+
+						<!-- lnb -->
+						<div id="lnb">
+							<jsp:include page="/WEB-INF/jsp/ccedu/inc/lnb/lnb_07.jsp">
+								<jsp:param name="dep2" value="02" />
+							</jsp:include>
+						</div>
+						<!--// lnb -->
+
+						<!-- content 본문 -->
+						<div id="content">
+
+							<!-- 기존 START 2018-08-30  -->
+							<!-- 				<h3 class="cont_titile">회원가입</h3> -->
+							<!-- 기존 END 2018-08-30  -->
+
+							<!-- 2018-08-28 김동인 작업 S -->
+							<h3 class="cont_titile type09">
+								회원가입<span></span>
+							</h3>
+							<!-- 2018-08-28 김동인 작업 E -->
+
+							<!-- 본문내용 -->
+							<div class="cont_body">
+								<!-- start -->
+
+								<div class="c_section">
+									<div class="c_head_step">
+										<ol>
+											<li><a href="#none"><span class="num">1. </span>약관동의</a></li>
+											<!-- <li><a href="#none"><span class="num">2. </span>실명/가입확인</a></li> -->
+											<li class="on"><a href="#none" title="현재페이지"><span
+													class="num">2. </span>회원정보 등록</a></li>
+											<li><a href="#none"><span class="num">3. </span>회원가입
+													완료</a></li>
+										</ol>
+									</div>
+								</div>
+
+								<div class="c_section">
+									<ul class="c_txtlist mgt_first">
+										<li>회원가입을 위해 성명, 휴대폰번호, 이메일주소 등의 정보를 정확히 입력해주시기 바랍니다.</li>
+										<li>입력하신 개인정보는 회원님의 동의없이 제3자에게 제공되지 않으며, 관련 내용은 신용회복위원회의
+											개인정보처리방침에서 확인 가능합니다.</li>
+									</ul>
+									<div class="table_style_row">
+										<table>
+											<caption>개인정보를 설정할수있는 표 입니다.</caption>
+											<colgroup>
+												<col class="col2_1" />
+												<col />
+											</colgroup>
+											<tr>
+												<th scope="row"><span class="required">필수사항 : </span>이름</th>
+												<td>
+													<!-- 주니어일경우, -->
+													<div class="form_field">
+														<input type="text" title="이름 입력" id="userName"
+															name="userName" maxlength="60" class="input_pw_wid" />
+													</div>
+												</td>
+											</tr>
+											<tr>
+												<th scope="row"><span class="required">필수사항 : </span>생년월일</th>
+												<td>
+													<div class="form_field">
+														<input type="text" title="생년월일 입력" id="brthdy"
+															name="brthdy" maxlength="8" class="input_pw_wid"
+															placeholder="ex)19000101" />
+													</div>
+
+												</td>
+											</tr>
+											<%-- <tr>
+												<th scope="row"><span class="required">필수사항 : </span>성별</th>
+												<td><c:if test="${REQUEST_DATA.mberType eq 'J'}">
+														<div class="form_field">
+															<div class="ff_radio">
+																<input type="radio" name="sex" id="jSexM" value="M"
+																	checked="checked" /> <label for="jSexM">남자</label>
+															</div>
+
+															<div class="ff_radio">
+																<input type="radio" name="sex" id="jSexF" value="F" />
+																<label for="jSexF">여자</label>
+															</div>
+														</div>
+													</c:if> <c:if test="${REQUEST_DATA.mberType ne 'J'}">
+														<c:choose>
+															<c:when test="${REQUEST_DATA.sex eq 'F' }">여성</c:when>
+															<c:otherwise>남성</c:otherwise>
+														</c:choose>
+														<input type="hidden" name="sex" id="sex"
+															value="<c:out value="${REQUEST_DATA.sex }"/>" />
+													</c:if></td>
+											</tr> --%>
+											<tr>
+												<th scope="row"><span class="required">필수사항 : </span>아이디</th>
+												<td>
+													<div class="form_field">
+														<input type="text" title="아이디 입력" id="userId"
+															name="userId" maxlemgth="20" class="input_pw_wid" />
+														<button class="btn_graybg02 btn_postal_code"
+															onclick="searchId();return false;">중복확인</button>
+													</div>
+												</td>
+											</tr>
+											<tr>
+												<th scope="row"><span class="required">필수사항 : </span>비밀번호</th>
+												<td>
+													<div class="form_field">
+														<input type="password" title="비밀번호 입력"
+															class="input_pw_wid enKey_qwer" id="userPassword"
+															name="userPassword" />
+														<p class="nt_pw">9~14자 사이의 영문/숫자/특수문자 조합(공백, & 제외)</p>
+													</div>
+												</td>
+											</tr>
+											<tr>
+												<th scope="row"><span class="required">필수사항 : </span>비밀번호
+													확인</th>
+												<td>
+													<div class="form_field">
+														<input type="password" title="비밀번호 확인"
+															class="input_pw_wid enKey_qwer" id="userPassword2"
+															name="userPassword2" />
+													</div>
+												</td>
+											</tr>
+											<tr>
+												<th scope="row"><span class="required">필수사항 : </span>이메일</th>
+												<td>
+													<div class="form_field">
+														<input type="text" title="이메일 아이디 입력" id="userEmail1"
+															name="userEmail1" maxlength="30" class="input_email_id" />
+														<span class="widbox widbox_email">@</span> <input
+															type="text" title="도메인 입력" id="userEmail2"
+															name="userEmail2" maxlength="50"
+															class="input_email_domain" /> <select
+															title="직접입력 할 수 있는 도메인 선택" class="select_email_domain"
+															id="userEmail3" name="userEmail3"
+															onchange="fnEmailDomainSet(); return false;">
+															<c:forEach var="emap2" items="${mailDomainCodeList}"
+																varStatus="status2">
+																<option value="${emap2.MT_SUB_NAME}"><c:out
+																		value="${emap2.MT_SUB_NAME}" /></option>
+															</c:forEach>
+															<option value="">직접입력</option>
+														</select>
+														<button class="btn_graybg02 btn_postal_code"
+														onclick="searchEmail();return false;">중복확인</button>
+													</div>
+												</td>
+											</tr>
+											<tr>
+												<th scope="row"><span class="required">필수사항 : </span>핸드폰번호</th>
+												<td>
+													<div class="form_field maxwid360">
+														<select title="휴대폰번호 앞자리 선택" name="moblphon1"
+															id="moblphon1" style="width: 22%;">
+															<option value="010">010</option>
+															<option value="011">011</option>
+															<option value="016">016</option>
+															<option value="017">017</option>
+															<option value="018">018</option>
+															<option value="019">019</option>
+														</select> <span class="widbox" style="width: 8%;">-</span> <input
+															type="tel" title="휴대폰번호 가운데 4자리 입력" id="moblphon2"
+															name="moblphon2" value="${REQUEST_DATA.moblphon2}"
+															maxlength="4" style="width: 31%;" /> <span
+															class="widbox" style="width: 8%;">-</span> <input
+															type="tel" title="휴대폰번호 마지막 4자리 입력" id="moblphon3"
+															name="moblphon3" value="${REQUEST_DATA.moblphon3}"
+															maxlength="4" style="width: 31%;" />
+													</div>
+												</td>
+											</tr>
+											<tr>
+												<th scope="row">유선전화</th>
+												<td>
+													<div class="form_field maxwid360">
+														<select title="유선전화 앞자리 선택" style="width: 22%;"
+															name="telno1" id="telno1">
+															<option value="02">02</option>
+															<option value="032">032</option>
+															<option value="031">031</option>
+														</select> <span class="widbox" style="width: 8%;">-</span> <input
+															type="tel" title="유선전화 가운데자리 입력" id="telno2"
+															name="telno2" maxlength="4" style="width: 31%;" /> <span
+															class="widbox" style="width: 8%;">-</span> <input
+															type="tel" title="유선전화 마지막자리 입력" id="telno3"
+															name="telno3" maxlength="4" style="width: 31%;" />
+													</div>
+												</td>
+											</tr>
+											<tr>
+												<th scope="row">주소</th>
+												<td>
+													<div class="form_field">
+														<input type="text" title="우편번호 입력"
+															class="input_postal_code" id="lnmZip" name="lnmZip"
+															title="우편번호" readonly="readonly" />
+														<button class="btn_graybg02 btn_postal_code"
+															onclick="openDaumPostcode(); return false;">우편번호
+															찾기</button>
+														<div class="address_box">
+															<input type="text" title="주소 입력" class="input_address"
+																id="lnmAdres1" name="lnmAdres1" title="주소"
+																readonly="readonly" /> <input type="text"
+																title="상세주소 입력" class="input_detail_address"
+																id="lnmAdres2" name="lnmAdres2" maxlength="300" />
+														</div>
+													</div>
+												</td>
+											</tr>
+											<!--
+											<tr>
+												<th scope="row">직업</th>
+												<td>
+													<div class="form_field">
+														<select title="직업 선택" name="job" id="job">
+															<option value="">선택</option>
+															<c:forEach items="${jobKndCodeList}" var="item">
+																<option value="${item.MT_SUB_CODE}">${item.MT_SUB_NAME}</option>
+															</c:forEach>
+														</select>
+													</div>
+												</td>
+											</tr>
+											<tr>
+												<th scope="row">가입경로</th>
+												<td>
+													<div class="form_field ">
+														<select title="가입경로 선택" name="userPath" id="userPath"
+															onchange="chUserPath(this);" style="margin-right: 10px;">
+															<option value="">선택</option>
+															<c:forEach items="${userPathCodeList}" var="item">
+																<option value="${item.MT_SUB_CODE}">${item.MT_SUB_NAME}</option>
+															</c:forEach>
+														</select> <input type="text" title="기타경로 입력"
+															class="input_email_domain" style="display: none;"
+															id="userEtc" style="" name="userEtc" id="userEtc" />
+													</div>
+
+												</td>
+											</tr>
+											<tr>
+												<th scope="row">SMS	수신동의</th>
+												<td>
+													<div class="form_field">
+														<div class="ff_radio">
+															<input type="radio" name="smsRecptnAt" id="smsRecptnY"
+																value="Y" checked="checked" /> <label for="smsRecptnY">예</label>
+														</div>
+														<div class="ff_radio">
+															<input type="radio" name="smsRecptnAt" id="smsRecptnN"
+																value="N" /> <label for="smsRecptnN">아니오</label>
+														</div>
+													</div>
+												</td>
+											</tr>
+											<tr>
+												<th scope="row">뉴스레터 수신동의</th>
+												<td>
+													<div class="form_field">
+														<div class="ff_radio">
+															<input type="radio" name="emailRecptnAt"
+																id="emailRecptnY" value="Y" checked="checked" /> <label
+																for="emailRecptnY">예</label>
+														</div>
+														<div class="ff_radio">
+															<input type="radio" name="emailRecptnAt"
+																id="emailRecptnN" value="N" /> <label for="emailRecptnN">아니오</label>
+														</div>
+													</div>
+												</td>
+											</tr>
+											-->
+										</table>
+									</div>
+								</div>
+
+								<div class="c_btn_center">
+									<button onclick="cancle(); return false;" class="btn_graybg03">취소</button>
+									<button onclick="fnGoSubmit();return false;"
+										class="btn_bluebg03">완료</button>
+								</div>
+								<!--// end -->
+							</div>
+							<!--// 본문내용 -->
+
+							<!--  -->
+						</div>
+						<!--// content 본문 -->
+					</div>
+				</div>
+				<!--// container -->
+
+				<!-- foot -->
+				<%@ include file="/WEB-INF/jsp/ccedu/inc/footer_inc.jsp"%>
+				<!--// foot end -->
+			</fieldset>
+		</form>
+	</div>
+
+</body>
+</html>

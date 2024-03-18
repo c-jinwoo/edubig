@@ -1,0 +1,89 @@
+<%@page import="java.net.HttpCookie"%>
+<%
+/****************************************
+    subject : [공통] 하단영역
+    summary : 하단영역
+****************************************/
+%>
+<%@ page language="java" contentType="text/html; charset=utf-8" pageEncoding="utf-8"%>
+<%
+	HttpServletRequest req = (HttpServletRequest)request;
+	Cookie[] cookies = req.getCookies();
+	try{
+		for (int i = 0; i < cookies.length; i++) {
+			if(cookies[i].getName().equals("JSESSIONID")){
+				response.setHeader("Set-Cookie", "JSESSIONID="+cookies[i].getValue()+";path=/;HttpOnly;Secure;SameSite=none");
+			}		
+		}
+	}
+	catch(Exception e){}
+%>
+	<footer id="footer">
+		<script type="text/javascript">
+			function openWin(URL, winName, Width, Height){
+				/*
+				var window_left = (screen.width-Width)/2;
+				var window_top = (screen.height-Height)/2;
+			    new_win = window.open(URL , winName,'menubar=0, resizable=0, status=0, scrollbars=0, width=' + Width + ', height=' + Height + ' , top=' + window_top + ',left=' + window_left + '');
+				return new_win;
+				*/
+				
+				var windowW = Width;  // 창의 가로 길이
+			    var windowH = Height;  // 창의 세로 길이
+			    var left = Math.ceil((window.screen.width - windowW)/2);
+			    var top = Math.ceil((window.screen.height - windowH)/2);
+	
+			    new_win = window.open(URL,winName,"top="+top+", left="+left+", height="+windowH+", width="+windowW);
+			    
+			    return new_win;
+			}
+		</script>
+		<div class="footlinks_fmlst">
+			<div class="cm_wrapper">
+				<ul class="footlinks">
+					<li class="point"><a href="/common/termsConditions.do"><span>이용약관</span></a></li>
+					<li class="point"><a href="/common/privacy.do"><span>개인정보처리방침</span></a></li>
+					<li class="point"><a href="/common/copyright.do"><span>저작권보호정책</span></a></li>
+					<li class="point"><a href="/common/rejectEmail.do"><span>이메일무단수집거부</span></a></li>
+					<li class="point"><a href="/common/cancel.do"><span>환불규정</span></a></li>
+					<li class="point"><a href="/common/siteMap.do"><span>전체메뉴</span></a></li>
+				</ul>
+				<div class="fmlst">
+					<a href="#family_site" onclick="return false;">Family Site</a>
+					<ul id="family_site" class="site_list">
+						<li><a href="https://cslabs.co.kr" target="_blank" title="새창으로 열립니다"><span>(주)씨에스랩</span></a></li>
+						<li><a href="http://www.bigtest.or.kr" target="_blank" title="새창으로 열립니다"><span>경영빅데이터분석사</span></a></li>
+						<li><a href="https://license.kpc.or.kr/nasec/qlfint/qlfint/selectIeqinfomg.do" target="_blank" title="새창으로 열립니다"><span>IEQ인터넷윤리자격</span></a></li>
+						<li><a href="https://license.kpc.or.kr/nasec/qlfint/qlfint/select3pm.do" target="_blank" title="새창으로 열립니다"><span>3D프린팅모델링자격</span></a></li>
+					</ul>
+				</div>
+			</div>
+		</div>
+
+		<div class="foot_info">
+			<div class="wrapper">
+				<div class="foot_inner">
+					<a href="/main/main.do" class="foot_logo_link">
+						<img src="/cmmn/images/logo.png" class="foot_logo" alt="에듀빅" />
+					</a>
+					<p class="txt_info">
+						서울시 금천구 가산디지털1로 128 stx v타워 1607호<br />
+						TEL:1544-3705 / FAX:02-6677-3086 / 시스템오류문의:1544-3705<br />
+						대표자:양창수 / 사업자등록번호:107-87-83598 / 통신판매업신고번호:2019-서울금천-0998<br />
+						Copyright ⓒ 2021 CSLAB. All rights reserved
+					</p>
+				</div>
+			</div>
+		</div>
+	</footer>
+</div>
+<c:if test="${serverMode eq 'real'}">
+	<script type="text/javascript" src="//wcs.naver.net/wcslog.js"></script>
+	<script type="text/javascript">
+		if(!wcs_add) var wcs_add = {};
+			wcs_add["wa"] = "4159ac7b42abb";
+		if(window.wcs) {
+			wcs_do();
+		}
+	</script>
+</c:if>

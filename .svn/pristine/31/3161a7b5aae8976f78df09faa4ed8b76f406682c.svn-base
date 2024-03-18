@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes" ?>
+<list>
+  <index>
+    <topic>
+      <list title="main" page="1">소개하기</list>
+      <list title="sub" page="1">빅데이터 분석 및 기획 접근법</list>
+
+      <list title="main" page="2">살펴보기</list>
+      <list title="sub" page="2">빅데이터 분석 접근법</list>
+      <list title="sub" page="3">빅데이터 분석 단계</list>
+	  <list title="sub" page="4">분석 기획을 위한 전략적 접근법</list>
+
+      <list title="main" page="5">정리하기</list>
+      <list title="sub" page="5">핵심평가</list>
+      <list title="sub" page="6">학습정리</list>
+    </topic>
+  </index>
+</list>

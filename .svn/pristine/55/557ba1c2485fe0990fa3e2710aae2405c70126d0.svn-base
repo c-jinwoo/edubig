@@ -1,0 +1,11 @@
+_this.$quizInfo = [
+	["다음 중 Move/Copy(이동/복사)에 대한 설명으로 <span style='color:#FF0000;'>틀린</span> 것은?","선택한 객체를 이동하거나 회전, 복사하는 기능이다.","선택 대상에는 Component(부품), Bodies(3D 모델), Faces(면) 등이 있다.","Point to Position 옵션은 기준점을 재지정 하는 기능이다.","Point to Point 옵션은 기준점과 목표점을 지정하여 이동하는 기능이다.",false],	
+	["다음 중 Move/Copy(이동/복사)의 Selection 옵션에 대한 설명으로 <span style='color:#FF0000;'>틀린</span> 것은?","이동 요소를 선택하며, [Move Type]에 따라 조작자의 유형이 변경된다.","Free Move(자유 이동)은 이동 및 회전을 할 수 있다.","Translate(이동)은 선택한 객체를 면 이동 한다.","Rotate(회전)은 선택한 객체를 회전할 수 있다.",false],
+	["다음 중 Align(정렬)에 대한 설명으로 <span style='color:#FF0000;'>틀린</span> 것은?","이동 객체와 목표 객체의 기준점을 지정하여 정렬하는 명령어 이다.","Flip 옵션은 정렬 후 클릭을 할 때마다 정렬 방향을 반전 시킨다.","Angle 옵션은 클릭을 할 때마다 정렬점을 기준으로 회전한다.","정렬한 3D Model(모델)은 이동 및 회전할 수 없다.",false]
+];
+
+_this.$quizAnsInfo = [
+	[3,"Point to Position 옵션은 선택한 객체의 기준점을 지정한 후 원점과의 위치를 참조하여 이동하는 기능이다."],
+	[3,"Translate(이동)은 선택한 객체를 Axis(축) 이동 한다."],
+	[4,"정렬한 3D Model(모델)은 고정되지 않기 때문에 이동 및 회전할 수 있다."],
+];

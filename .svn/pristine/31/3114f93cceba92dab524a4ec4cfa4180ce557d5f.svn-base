@@ -1,0 +1,1218 @@
+<%
+/****************************************
+    subject : 신용상담사
+    summary : 신용상담사 : 원서접수 > 원서접수 > 원서접수 등록폼
+    author  : SANGS
+    date    : 2018-06-15
+****************************************/
+%>
+<%@ page language="java" contentType="text/html; charset=utf-8" pageEncoding="utf-8"%>
+
+<%@ include file="/WEB-INF/jsp/ccedu/inc/taglib_inc.jsp"%>
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+	<c:if test="${REQUEST_DATA.pageMode eq 'insert'}">
+		<title>원서접수 > 원서접수 > 신용상담사 > 신용회복위원회 신용교육원</title>
+	</c:if>
+	<c:if test="${REQUEST_DATA.pageMode eq 'update' || REQUEST_DATA.pageMode eq 'inquiry'}">
+		<title>접수조회/수정 > 원서접수 > 신용상담사 > 신용회복위원회 신용교육원</title>
+	</c:if>
+	<%@ include file="/WEB-INF/jsp/ccedu/inc/head_inc.jsp"%>
+	<%@ include file="/WEB-INF/jsp/common/pop_post.jsp"%>
+	<script type="text/javascript" src="/academy/common/js/jquery.showLoading.js"></script>
+	
+	<script language="javascript" src="/cmmn/js/xpay.js" type="text/javascript"></script>
+	
+	<script type="text/javascript">
+
+		$(document).ready(function(){
+			
+			if('update' == $("#pageMode").val()) {
+				$("#imgFile").hide();
+			}
+			
+			$('#telNo2, #telNo3, #mobile2, #mobile3').keyup(function () { 
+			    this.value = this.value.replace(/[^0-9]/g,'');
+			});
+			
+			$("#photoZone").hide();
+			<c:if test="${REQUEST_DATA.pageMode eq 'inquiry' || REQUEST_DATA.pageMode eq 'update'}">
+			$("#photoZone").show();
+			</c:if>
+		
+		});
+
+		
+		//우편번호 콜백 스크립트
+		function fnZipSelect(zipNo, adres){
+			
+			var zipCode = Number(zipNo);
+			
+			zipCode += "";
+			
+			if(zipCode.length == 4){
+				zipCode  = "0"+zipCode;
+			}
+			
+			 $('#addrCode').val(zipCode);
+		     $('#address').val(adres);
+		     $("#srchText").val('');
+			 $("#zipTable").children().remove();
+			 $("#zipTable").html(zip);
+		     $("#popPost").find("#close").click();
+		} 
+		
+	   //이메일 셀렉트박스 세팅
+	    function emailSelect(val){
+	        $('#email2').val(val);
+	    };
+	    
+	    function userEmailSelect(val){
+	        $('#userEmail2').val(val);
+	    };
+	    
+	    // 등록
+	    function applicationRegit() {
+	
+	    	if('insert' == $("#pageMode").val() || 'update' == $("#pageMode").val()) {
+	    		
+	    		if('insert' == $("#pageMode").val()){
+					if(!fnCheckboxChecked($('#agree2'), "개인정보 수집 · 이용에 관한 사항에<br>동의해주시기 바랍니다.")) return false;
+					if(!fnCheckboxChecked($('#agree4'), "고유식별정보 수집 · 이용에 관한 사항에<br> 동의해주시기 바랍니다.")) return false;
+					if(!fnCheckboxChecked($('#agree6'), "개인정보 제공에 관한 사항에 동의해<br>주시기 바랍니다.")) return false;
+					if(!fnCheckboxChecked($('#agree10'), "고유식별정보 수집․  이용 동의여부에<br> 동의해주시기 바랍니다.")) return false;
+	    		}
+	    		
+	    		// 응시장소 추가
+	    		if(!fnValiCheck($("#cc_place_no"), "응시장소를 선택해주세요.")) return false;
+	    		
+	    		if(!fnValiCheck($("#mobile2"), "휴대폰 가운데 번호를 입력해주세요.")) return false;
+	    		if(!fnValiCheck($("#mobile3"), "휴대폰 뒷 번호를 입력해주세요.")) return false;
+	    		
+	    		if(!fnValiMinCheck($("#mobile2"), "휴대폰 가운데 번호를 입력해주세요.", 4 )) return false;
+	    		if(!fnValiMinCheck($("#mobile3"), "휴대폰 뒷 번호를 입력해주세요.", 4 )) return false;
+	    		
+	    		if($("#telNo2").val() != '' || $("#telNo3").val() ) {
+		    		if(!fnValiMinCheck($("#telNo2"), "유선전화 가운데 번호를 입력해주세요.", 3 )) return false;
+		    		if(!fnValiMinCheck($("#telNo3"), "유선전화 뒷 번호를 입력해주세요.", 4 )) return false;
+	    		}
+		    		
+	    		// 핸드폰 번호
+	    		if($("#mobile1").val() != '' && $("#mobile2").val() != '' && $("#mobile3").val() != '') {
+	    			$("#moblPhon").val($("#mobile1").val() +'-'+ $("#mobile2").val() +'-'+ $("#mobile3").val());
+	    		}
+	    		
+	    		if($("#telNo2").val() != '' && $("#telNo3").val() != '') {
+	    			$("#telNo").val($("#telNo1").val() + "-" + $("#telNo2").val() + "-" + $("#telNo3").val());
+	    		}
+	    		
+	    		// 이메일
+	    		if(!fnValiCheck($("#email1"), "이메일 아이디를 입력해주세요.")) return false;
+	    		if(!fnValiCheck($("#email2"), "이메일 주소를 입력해주세요.")) return false;
+	    		
+	    		if($("#email1").val() != '' && $("#email2").val() != '') {
+	    			var email = $("#email").val($("#email1").val() +'@'+ $("#email2").val());
+	    			if(!fnValiEmail($("#email"), "이메일 형식이 올바르지 않습니다.")) return false;
+	    		}
+	    		
+	    		// 주소
+	    		if(!fnValiCheck($("#addrCode"), "주소를 입력해주세요.")) return false;
+	    		if(!fnValiCheck($("#address2"), "상세주소를 입력해주세요.")) return false;
+	    		
+	    		if(!fnValiCheck($("#mtEdu"), "학력을 선택해주세요.")) return false;
+	    		if(!fnValiCheck($("#job"), "직업을 선택해주세요.")) return false;
+	    		
+
+				if('insert' == $("#pageMode").val() || 'update' == $("#pageMode").val()) {
+	    			
+		    		var fileNm = $("#fileNM").val();
+		    		if (fileNm != "") {
+		    		 
+		    		    var ext = fileNm.slice(fileNm.lastIndexOf(".") + 1).toLowerCase();
+		    		 
+		    		    if (!(ext == 'gif' || ext == 'jpg' || ext == 'png')) {
+		    		    	fnModalMsg("이미지파일 (.jpg, .png, .gif ) 만 업로드 가능합니다.");
+		    		        return false;
+		    		    }
+		    		} 
+	    		}
+	    		
+	    		if('insert' == $("#pageMode").val()) {
+		    		if(!fnValiCheck($("#orgFile"), "증명사진을 첨부해주시기 바랍니다.")) return false;
+	    		}
+	    		
+	    		if('update' == $("#pageMode").val()) {
+					if($("#savFile").val() == '') {
+	    				if(!fnValiCheck($("#fileNM"), "증명사진을 첨부해주시기 바랍니다.")) return false;
+					}
+	    		}
+	    		
+	    	}   
+	    	
+	    	var msg = "";
+	    	if('insert' == $("#pageMode").val()) {
+	    		msg = "등록";
+	    	} else if('update' == $("#pageMode").val()) {
+	    		msg = "수정";
+	    	}
+	    	
+	    	fnConfirm("접수" + msg + "을 하시겠습니까?", function(result) {
+				if(result) {
+					var addrCode = $("#addrCode").val();
+					var address = $("#address").val();
+					var address2 = $("#address2").val();
+			    	
+					if('insert' == $("#pageMode").val() && 'Y'== '${examMap.PAY_AT}'){
+						fnSetUpInfo()
+					}else{
+						fnSubmit();
+					}
+				} else {
+					fnModalMsg("접수 " + msg + "을 취소하였습니다.");
+					return false;
+				}
+			}); 
+	    	
+	    }
+	    
+	    function delImg() {
+	    	$("#photoZone").hide();
+	    	$("#imgFile").show();
+	    	$("#savPath").val('');
+	    	$("#orgFile2").val('');
+	    	$("#savFile").val('');
+	    	$("#fileUpdateYn").val('Y');
+	    }
+	    
+	    
+	 	// 접수 취소
+	   	function appliCancel() {
+	    	if('Y'== '${examMap.PAY_AT}'){
+	    		fnConfirm("접수를 취소하시겠습니까?", function(result){ 
+		   			if(result){
+		   				// 확인 눌렀을때
+		   				$("#frm").attr("action", "/ccedu/cc/appliCancel.do");
+		   				$("#frm").submit();
+		   			}
+		   		})
+	    	} else {
+	    		fnConfirm("접수를 취소하시겠습니까?", function(result){ 
+		   			if(result){
+		   				// 확인 눌렀을때
+		   				$("#frm").attr("action", "/ccedu/cc/appliCancel.do");
+		   				$("#frm").submit();
+		   			}
+		   		})
+	    	}
+	   		
+	   	};
+	    
+	   	function appliPayCancelSuc(){
+	   		// 확인 눌렀을때
+			$("#frm").attr("action", "/ccedu/cc/appliCancel.do");
+			$("#frm").submit();
+	   	}
+
+	    // 접수 수정
+	    function appliUpdate() {
+	    	$("#pageMode").val('update');
+	    	$("#frm").attr("action", "/ccedu/cc/applicationCrud.do");
+			$("#frm").submit();
+	    };
+	    
+		<c:if test="${examMap.PAY_AT eq 'Y' && REQUEST_DATA.pageMode eq 'insert' }">
+			// 결제 정보 설정
+			function fnSetUpInfo(){
+				var payType = $('input[name=PayM]:checked').val();
+					
+				if(!$('input[name=PayM]:checked').is(":checked")){
+					fnModalMsg("결제 구분을 선택해주세요.");
+				}
+				
+				//PC / MB 구분 
+				var UserAgent = navigator.userAgent;
+				var LGD_OSTYPE_CHECK = 'P';
+				if (UserAgent.match(/iPhone|iPod|Android|Windows CE|BlackBerry|Symbian|Windows Phone|webOS|Opera Mini|Opera Mobi|POLARIS|IEMobile|lgtelecom|nokia|SonyEricsson/i) != null || UserAgent.match(/LG|SAMSUNG|Samsung/) != null)
+				{
+
+					LGD_OSTYPE_CHECK = 'M';
+				}
+				
+				$('#LGD_OSTYPE_CHECK').val(LGD_OSTYPE_CHECK);
+				
+				$('input[name=LGD_CUSTOM_USABLEPAY]').val('SC' + payType.substr(2,4));
+				window.open("about:blank","payWinPop","width=650,height=650");
+				var frm = document.frm;
+				frm.action = "/ccedu/pay/applicationOpenUrl.do";
+				frm.target = "payWinPop";
+				frm.submit();
+			}
+	    </c:if>
+
+		/*
+		 * 인증결과 처리
+		 */
+		function payment_return() {
+			var fDoc;
+			
+				fDoc = lgdwin.contentWindow || lgdwin.contentDocument;
+			
+				
+			if (fDoc.document.getElementById('LGD_RESPCODE').value == "0000") {
+				//alert(document.getElementById("LGD_PAYKEY").value);
+				document.getElementById("LGDPaykey").value = fDoc.document.getElementById('LGD_PAYKEY').value;
+				fnSubmit();
+			} else {
+				alert("LGD_RESPCODE (결과코드) : " + fDoc.document.getElementById('LGD_RESPCODE').value + "\n" + "LGD_RESPMSG (결과메시지): " + fDoc.document.getElementById('LGD_RESPMSG').value);
+				closeIframe();
+			}
+		}
+		
+		
+		/*
+		 * submit
+		 */
+		function fnSubmit(){
+			var frm = document.frm;
+			
+			$.ajax({
+				url : "/ccedu/cc/placeChkAjax.do",
+				data : $("#frm").serialize(),
+				dataType : "JSON",
+				type : "get",
+				success : function(data){
+					if(data.PLACE_CHK == 'Y'){
+						frm.target = "";
+						frm.action = "/ccedu/cc/applicationRegit.do";			
+						frm.submit();
+					} else {
+						
+						var opTag = "<option disabled='disabled' value='" + data.CC_PLACE_NO + "'>" + data.MT_CC_PLACE + " - " + data.PLACE_TITLE + " ( " + data.PLACE_CNT + " / " + data.PLACE_CNT +" ) 정원초과</option>" ;
+						$('#cc_place_no option:selected').replaceWith(opTag);
+						fnModalMsg("수용 가능 인원이 초과되었습니다. 다른 장소 선택 바랍니다.");
+						return false;
+					}
+					
+				},
+				error : function(e){
+					fnModalMsg("error :" + e.responseText);
+				}
+			});
+			
+		}
+		
+		
+	    //파일업로드 AJAX
+	    function uploadFileAjax(obj){
+	    	
+	    	$('#fileNM').val($(obj).val());
+	    	
+	    	 var form = $('#frm')[0];
+	    	 var data = new FormData(form);
+	    	
+	    	$.ajax({
+			    type : "POST", 
+			    enctype: 'multipart/form-data',
+			    url : "/ccedu/cc/ccLicenseAjax.do",
+			    contentType: false,
+			    data :  data,
+			    processData: false,
+			    success : function( data ) {
+	    			var result = data.split(",");
+	    			$('#savPath').val(result[0]);
+	    			$('#orgFile2').val(result[1]);
+	    			$('#savFile').val(result[2]);
+	    			$("#photoZone").show();
+	    			$(".u_photo > img").attr("src",result[0]+'/'+result[2]);
+			    }
+	    	});
+	    }
+	    
+		
+		
+		
+		 
+	</script>
+</head>
+
+<body>
+
+<!-- skip nav -->
+	<%@ include file="/WEB-INF/jsp/ccedu/inc/nav_inc.jsp"%>
+<!--// skip nav -->
+
+
+<div id="wrap">
+
+	<!-- header -->
+	<%@ include file="/WEB-INF/jsp/ccedu/inc/header_inc.jsp"%>
+	<!--// header -->
+
+	<!-- container -->
+	<div id="container">
+
+		<!-- location -->
+		<c:if test="${REQUEST_DATA.pageMode eq 'insert'}">
+			<jsp:include page="/WEB-INF/jsp/ccedu/inc/location/loc_03_02.jsp">
+			  	<jsp:param name="menuNm" value="원서접수"/> 
+			</jsp:include>
+		</c:if>
+		<c:if test="${REQUEST_DATA.pageMode eq 'inquiry' || REQUEST_DATA.pageMode eq 'update'}">
+			<jsp:include page="/WEB-INF/jsp/ccedu/inc/location/loc_03_02.jsp"> 
+			  	<jsp:param name="menuNm" value="원서접수/조회"/> 
+			</jsp:include> 
+		</c:if>
+		<!--// location -->
+
+		<div class="con_center">
+
+			<!-- lnb -->
+			<div id="lnb">
+				<c:if test="${REQUEST_DATA.pageMode eq 'insert'}">
+					<jsp:include page="/WEB-INF/jsp/ccedu/inc/lnb/lnb_03.jsp">  
+					  	<jsp:param name="dep2" value="02"/>
+					  	<jsp:param name="dep3" value="01"/> 
+					</jsp:include>
+				</c:if>
+				<c:if test="${REQUEST_DATA.pageMode eq 'inquiry' || REQUEST_DATA.pageMode eq 'update'}">
+					<jsp:include page="/WEB-INF/jsp/ccedu/inc/lnb/lnb_03.jsp">  
+					  	<jsp:param name="dep2" value="02"/>
+					  	<jsp:param name="dep3" value="02"/> 
+					</jsp:include>
+				</c:if>
+			</div>
+			<!--// lnb -->
+			
+			
+			<form name="frm" id="frm" action="" method="post" enctype="multipart/form-data">
+				<input type="hidden" id="pageMode" name="pageMode" value="<c:out value='${REQUEST_DATA.pageMode}'/>"/>
+				<input type="hidden" id="ccNo" name="ccNo" value="<c:out value='${REQUEST_DATA.ccNo}'/>"/>
+				<input type="hidden" id="unityMberNo" name="unityMberNo" value="<c:out value='${REQUEST_DATA.SES_USERNO}'/>"/>
+				<input type="hidden" id="mberNm" name="mberNm" value="<c:out value='${REQUEST_DATA.SES_USERNAME}'/>"/>
+				<input type="hidden" id="moblPhon" name="moblPhon" value=""/>
+				<input type="hidden" id="telNo" name="telNo" value=""/>
+				<input type="hidden" id="email" name="email" value=""/>
+				<input type="hidden" id="mtAppType" name="mtAppType" value="<c:out value='${REQUEST_DATA.mtAppType}'/>"/>
+				
+				<input type="hidden" id="UPLOAD_DIR" name="UPLOAD_DIR" value=""/>
+				<input type="hidden" name="price" id="price" value="0">
+	            <input type="hidden" name="mtTargetType" id="mtTargetType" value="<c:out value='TT0001'/>"/>
+	            <input type="hidden" name="ccAppNo" id="ccAppNo" value="<c:out value='${examUserMap.CC_APP_NO }'/>"/>
+	            <input type="hidden" name="savPath" id="savPath" value="<c:out value='${examUserMap.SAVPATH}'/>">
+	            <input type="hidden" name="orgFile2" id="orgFile2"  value="<c:out value='${examUserMap.ORGFILE}'/>">
+	            <input type="hidden" name="savFile" id="savFile" value="<c:out value='${examUserMap.SAVFILE}'/>">
+	            <input type="hidden" name="deleteSavPath" id="deleteSavPath" value="<c:out value='${examUserMap.SAVPATH}'/>">
+	            <input type="hidden" name="deleteOrgFile" id="deleteOrgFile"  value="<c:out value='${examUserMap.ORGFILE}'/>">
+	            <input type="hidden" name="deleteSavFile" id="deleteSavFile" value="<c:out value='${examUserMap.SAVFILE}'/>">
+	            <input type="hidden" name="fileUpdateYn" id="fileUpdateYn" value="N">
+	            
+	            <c:if test="${examMap.PAY_AT eq 'Y' && REQUEST_DATA.pageMode eq 'insert' }">
+
+	            <!-- 결제 테스트 카드 결제 값  START -->
+	            <input type="hidden" name="LGD_CUSTOM_USABLEPAY" value= "LGD_CUSTOM_USABLEPAY" value=""/>
+	            <!-- 결제 테스트 카드 결제 값 END -->
+	            
+	         	
+	            <!-- 결제 테스트 결과 값  START -->
+	            <input type="hidden" name="LGD_BUYERPHONE" value="<c:out value='${REQUEST_DATA.LGD_BUYERPHONE}'/>">
+				<input type="hidden" name="LGD_PAYDATE" value="<c:out value='${REQUEST_DATA.LGD_PAYDATE}'/>">
+				<input type="hidden" name="LGD_DISCOUNTUSEYN" value="<c:out value='${REQUEST_DATA.LGD_DISCOUNTUSEYN}'/>">
+				<input type="hidden" name="LGD_BUYEREMAIL" value="<c:out value='${REQUEST_DATA.LGD_BUYEREMAIL}'/>">
+				<input type="hidden" name="LGD_RECEIVER" value="<c:out value='${REQUEST_DATA.LGD_RECEIVER}'/>">
+				<input type="hidden" name="LGD_DELIVERYINFO" value="<c:out value='${REQUEST_DATA.LGD_DELIVERYINFO}'/>">
+				<input type="hidden" name="LGD_PAYTYPE" value="<c:out value='${REQUEST_DATA.LGD_PAYTYPE}'/>">
+				<input type="hidden" name="LGD_RECEIVERPHONE" value="<c:out value='${REQUEST_DATA.LGD_RECEIVERPHONE}'/>">
+				<input type="hidden" name="LGD_EXCHANGERATE" value="<c:out value='${REQUEST_DATA.LGD_EXCHANGERATE}'/>">
+				<input type="hidden" name="TAXFREEAMOUNT" value="<c:out value='${REQUEST_DATA.TAXFREEAMOUNT}'/>">
+				<input type="hidden" name="LGD_IFOS" value="<c:out value='${REQUEST_DATA.LGD_IFOS}'/>">
+				<input type="hidden" name="LGD_AFFILIATECODE" value="<c:out value='${REQUEST_DATA.LGD_AFFILIATECODE}'/>">
+				<input type="hidden" name="LGD_RESPMSG" value="<c:out value='${REQUEST_DATA.LGD_RESPMSG}'/>">
+				<input type="hidden" name="LGD_2TR_FLAG" value="<c:out value='${REQUEST_DATA.LGD_2TR_FLAG}'/>">
+				<input type="hidden" name="LGD_CARDNUM" value="<c:out value='${REQUEST_DATA.LGD_CARDNUM}'/>">
+				<input type="hidden" name="LGD_FINANCEAUTHNUM" value="<c:out value='${REQUEST_DATA.LGD_FINANCEAUTHNUM}'/>">
+				<input type="hidden" name="LGD_CARDNOINTEREST_YN" value="<c:out value='${REQUEST_DATA.LGD_CARDNOINTEREST_YN}'/>">
+				<input type="hidden" name="LGD_ESCROWYN" value="<c:out value='${REQUEST_DATA.LGD_ESCROWYN}'/>">
+				<input type="hidden" name="LGD_TRANSAMOUNT" value="<c:out value='${REQUEST_DATA.LGD_TRANSAMOUNT}'/>">
+				<input type="hidden" name="LGD_FINANCECODE" value="<c:out value='${REQUEST_DATA.LGD_FINANCECODE}'/>">
+				<input type="hidden" name="LGD_DISCOUNTUSEAMOUNT" value="<c:out value='${REQUEST_DATA.LGD_DISCOUNTUSEAMOUNT}'/>">
+				<input type="hidden" name="LGD_CARDGUBUN1" value="<c:out value='${REQUEST_DATA.LGD_CARDGUBUN1}'/>">
+				<input type="hidden" name="LGD_CARDGUBUN2" value="<c:out value='${REQUEST_DATA.LGD_CARDGUBUN2}'/>">
+				<input type="hidden" name="LGD_HASHDATA" value="<c:out value='${REQUEST_DATA.LGD_HASHDATA}'/>">
+				<input type="hidden" name="LGD_BUYERADDRESS" value="<c:out value='${REQUEST_DATA.LGD_BUYERADDRESS}'/>">
+				<input type="hidden" name="LGD_FINANCENAME" value="<c:out value='${REQUEST_DATA.LGD_FINANCENAME}'/>">
+				<input type="hidden" name="LGD_CARDNOINTYN" value="<c:out value='${REQUEST_DATA.LGD_CARDNOINTYN}'/>">
+				<input type="hidden" name="LGD_CARDACQUIRER" value="<c:out value='${REQUEST_DATA.LGD_CARDACQUIRER}'/>">
+				<input type="hidden" name="LGD_DEVICE" value="<c:out value='${REQUEST_DATA.LGD_DEVICE}'/>">
+				<input type="hidden" name="LGD_TIMESTAMP" value="<c:out value='${REQUEST_DATA.LGD_TIMESTAMP}'/>">
+				<input type="hidden" name="LGD_PCANCELSTR" value="<c:out value='${REQUEST_DATA.LGD_PCANCELSTR}'/>">
+				<input type="hidden" name="LGD_BUYER" value=<c:out value='${REQUEST_DATA.LGD_BUYER}'/>>
+				<input type="hidden" name="LGD_CARDINSTALLMONTH" value="<c:out value='${REQUEST_DATA.LGD_CARDINSTALLMONTH}'/>">
+				<input type="hidden" name="LGD_PRODUCTINFO" value="<c:out value='${REQUEST_DATA.LGD_PRODUCTINFO}'/>">
+				<input type="hidden" name="LGD_BUYERSSN" value="<c:out value='${REQUEST_DATA.LGD_BUYERSSN}'/>">
+				<input type="hidden" name="LGD_PRODUCTCODE" value="<c:out value='${REQUEST_DATA.LGD_PRODUCTCODE}'/>">
+				<input type="hidden" name="LGD_TID" value="<c:out value='${REQUEST_DATA.LGD_TID}'/>">
+				<input type="hidden" name="LGD_OID" value="<c:out value='${REQUEST_DATA.LGD_OID}'/>">
+				<input type="hidden" name="LGD_AMOUNT" value="<c:out value='${REQUEST_DATA.LGD_AMOUNT}'/>">
+				<input type="hidden" name="LGD_RESPCODE" value="<c:out value='${REQUEST_DATA.LGD_RESPCODE}'/>">
+				<input type="hidden" name="LGD_ACCOUNTNUM" value="<c:out value='${REQUEST_DATA.LGD_ACCOUNTNUM}'/>">
+				<input type="hidden" name="LGD_PAYER" value="<c:out value='${REQUEST_DATA.LGD_PAYER}'/>">
+				
+
+
+
+	            <!-- 결제 테스트 결과 값  END -->
+	            
+	            <input type="hidden" name="LGD_PAYKEY" id="LGDPaykey" value=""/>
+			
+				</c:if>
+				
+			<!-- content 본문 -->
+			<div id="content">
+			
+				<c:if test="${REQUEST_DATA.pageMode eq 'insert'}">
+					<!-- 기존 START 2018-08-30  -->
+	<!-- 				<h3 class="cont_titile">원서접수</h3> -->
+					<!-- 기존 END 2018-08-30  -->
+					
+					<!-- 2018-08-28 김동인 작업 S --> 
+					<h3 class="cont_titile type03">원서접수<span></span></h3>
+					<!-- 2018-08-28 김동인 작업 E -->
+				</c:if>
+				<c:if test="${REQUEST_DATA.pageMode eq 'inquiry'}">
+					<!-- 기존 START 2018-08-30  -->
+<!-- 					<h3 class="cont_titile">접수조회/수정</h3> -->
+					<!-- 기존 END 2018-08-30  -->
+					
+					<!-- 2018-08-28 김동인 작업 S --> 
+					<h3 class="cont_titile type03">접수조회/수정<span></span></h3>
+					<!-- 2018-08-28 김동인 작업 E -->
+				</c:if>
+				<c:if test="${REQUEST_DATA.pageMode eq 'update'}">
+					<!-- 기존 START 2018-08-30  -->
+<!-- 					<h3 class="cont_titile">접수수정</h3> -->
+					<!-- 기존 END 2018-08-30  -->
+					
+					<!-- 2018-08-28 김동인 작업 S --> 
+					<h3 class="cont_titile type03">접수수정<span></span></h3>
+					<!-- 2018-08-28 김동인 작업 E -->
+				</c:if>
+				
+				<!-- 본문내용 -->
+				<div class="cont_body">
+					<!-- start -->
+					<c:if test="${REQUEST_DATA.pageMode eq 'insert'}">
+						<div class="c_section">
+							<h4 class="c_tit">개인정보 수집 &middot; 이용에 관한 사항</h4>
+							<div class="agreement">
+								<h2>수집 &middot; 이용 목적</h2>
+								<p>￭ 신용상담사 자격시험 응시 원서접수, 전형 및 자격취득자 관리에 필요한 정보제공</p>
+								<p>￭ 법령상의 의무이행에 필요한 정보제공</p>
+								<br>
+								<!--2018-07-27 class="txtbule" 추가 이희연-->
+								<h2 class="txtbule">수집 &middot; 이용할 항목</h2>
+								<p class="txtbule">￭ 개인식별정보</p>
+								<p class="txtbule">성명, 고유식별번호, 최종학교명, 학과, 졸업여부, 학력, 직업, 사진, 전화번호, 핸드폰번호, 이메일, 주소 등</p>
+								<p class="txtbule">※ 본 동의 이전에 발생한 개인정보도 포함됩니다.</p>
+								<br>
+								<h2 class="txtbule">보유 &middot; 이용 기간</h2>
+								<p class="txtbule">위 개인정보는 수집·이용에 관한 동의일로부터 동의철회 시까지 보유·이용할 수 있습니다. 단, 동의 철회일 후에는 위에 기재된 목적과 관련된 사고 조사, 분쟁 해결, 민원처리, 법령상 의무이행 및 부수업무만을 위하여 보유·이용됩니다.</p>
+								<!--2018-07-27 class="txtbule" 추가 이희연-->
+								<br>
+								<h2>동의를 거부할 권리 및 동의를 거부할 경우의 불이익</h2>
+								<p>위 개인정보 수집·이용에 관한 동의는 신용교육원 포털 이용 및 신용상담사 자격시험 자격취득자 관리를 위하여 필수적이므로, 위 사항에 동의하셔야만 관련 서비스 제공 등 업무가 가능합니다. </p>
+								<br>
+								<p>귀 위원회가 위와 같이 본인의 개인정보를 수집? 이용하는 것에 동의합니다. </p>
+							</div>
+							<div class="agree_check">
+								<input type="radio" id="agree1" name="agree1"/>
+								<label for="agree1">동의하지 않음</label>
+								<input type="radio" id="agree2" name="agree1"/>
+								<label for="agree2">동의함</label>
+							</div>
+						</div>
+					
+						<div class="c_section">
+							<div class="agreement type2">
+								<h2>고유식별정보 수집 &middot; 이용 동의여부</h2>
+								<p>귀 위원회가 위 목적으로 다음과 같은 본인의 고유식별정보를 수집․ 이용하는 것에 동의합니다.</p>
+								<p>※ 개인정보법 제24조의 고유식별정보: 주민등록번호, 여권번호, 운전면허번호, 외국인등록번호</p>
+							</div>
+							<div class="agree_check">
+								<input type="radio" id="agree3" name="agree2"/>
+								<label for="agree3">동의하지 않음</label>
+								<input type="radio" id="agree4" name="agree2"/>
+								<label for="agree4">동의함</label>
+							</div>
+						</div>
+
+						<div class="c_section">
+							<h4 class="c_tit">개인정보 제공에 관한 사항</h4>
+							<div class="agreement">
+								<h2>제공받는 자</h2>
+								<p>￭ 자격정책의 수립 및 자격제도 개선을 위한 정보제공 : 금융위원회</p>
+								<p>￭ 신용상담사 자격제도 운영에 관한 정보제공 : 한국직업능력개발원</p>
+								<p>￭ 신용상담사 자격증 발급을 위한 정보제공 : 성원디지텍(주)</p>
+								<br>
+								<!--2018-07-27 class="txtbule" 추가 이희연-->
+								<h2 class="txtbule">제공받는 자의 이용 목적</h2>
+								<p class="txtbule">￭ 자격정책의 수립 및 자격제도 개선에 필요한 사항</p>
+								<p class="txtbule">▶ 신용상담사 자격제도의 효율적 운영 및 권익보호에 필요한 사항 </p>
+								<p class="txtbule">￭ 신용상담사 자격증 및 합격증 발급에 필요한 사항</p>
+								<br>
+								<h2 class="txtbule">제공할 개인정보의 항목</h2>
+								<p class="txtbule">￭ 금융위원회, 한국직업능력개발원</p>
+								<p class="txtbule">▶ 수집 · 이용에 동의한 정보 중 감사, 자격정책의 수립, 자격제도 운영, 자격제도</p>
+								<h2 class="txtbule">개선 등에 필요한 정보 </h2>
+								<p class="txtbule">￭ 성원디지텍(주) : 성명, 생년월일, 주소, 사진 </p>
+								<p class="txtbule">※ 본 동의 이전에 발생한 개인정보도 포함됩니다.</p>
+								<br>
+								<h2 class="txtbule">제공받은 자의 개인정보 보유·이용 기간</h2>
+								<p class="txtbule">위 개인정보는 수집·이용에 관한 동의일로부터 동의철회 시까지 보유·이용할 수 있습니다. 단, 동의 철회일 후에는 위에 기재된 목적과 관련된 사고 조사, 분쟁 해결, 민원처리, 법령상 의무이행 및 부수업무만을 위하여 보유·이용됩니다.</p>
+								<!--2018-07-27 class="txtbule" 추가 이희연-->
+								<br>
+								<h2>동의를 거부할 권리 및 동의를 거부할 경우의  불이익</h2>
+								<p>위 개인정보 수집·이용에 관한 동의는 신용교육원 포털 업무 이용 및 신용상담사 자격시험 자격취득자 관리을 위하여 필수적이므로, 위 사항에 동의하셔야만 관련 서비스 제공 등 업무가 가능합니다. </p>
+								<p>귀 위원회가 위와 같이 본인의 개인정보를 제공하는 것에 동의합니다.</p>
+								<br>
+								<p>위 개인정보 수집·이용에 관한 동의는 신용교육원 포털 업무 이용 및 신용상담사 자격시험 자격취득자 관리을 위하여 필수적이므로, 위 사항에 동의하셔야만 관련 서비스 제공 등 업무가 가능합니다. </p>
+								<p>귀 위원회가 위와 같이 본인의 개인정보를 제공하는 것에 동의합니다.</p>
+							</div>
+							<div class="agree_check">
+								<input type="radio" id="agree5" name="agree3"/>
+								<label for="agree5">동의하지 않음</label>
+								<input type="radio" id="agree6" name="agree3"/>
+								<label for="agree6">동의함</label>
+							</div>
+						</div>
+						
+						<div class="c_section">
+							<div class="agreement type2">
+								<h2>고유식별정보 제공 동의여부</h2>
+								<p>귀 위원회가 위 목적으로 다음과 같은 본인의 고유식별정보를 제공하는 것에 동의합니다.</p>
+								<p>※ 개인정보법 제24조의 고유식별정보: 주민등록번호, 여권번호, 운전면허번호, 외국인등록번호</p>
+							</div>
+							<div class="agree_check">
+								<input type="radio" id="agree9" name="agree5"/>
+								<label for="agree9">동의하지 않음</label>
+								<input type="radio" id="agree10" name="agree5"/>
+								<label for="agree10">동의함</label>
+							</div>
+						</div>
+
+						<div class="c_section">
+							<div class="agreement type2">
+								<p>* 위원회의 고의 또는 과실 등 귀책사유로 인한 개인정보 유출로 고객님에게 발생한 손해에 대해 관계법령 등에 따라 보상받으실 수 있습니다.</p>
+								<p>* 본인은 개인정보 수집․이용․제공에 관한 본 동의서의 내용을 충분히 이해하였으며, 위와 같이 개인정보 수집․ 이용 제공에 동의합니다.</p>
+							</div>
+						</div>
+					</c:if>
+					
+
+
+					<!-- 시험정보 START -->
+					<div class="c_section">
+						<h4 class="c_tit">시험정보</h4>
+						<div class="table_style_row">
+							<table>
+								<caption>시행년도, 응시구분, 회차, 시험일시, 시험장소, 비용 등 을 알려드리는 표 입니다.</caption>
+								<colgroup>
+									<col class="col2_1" />
+									<col />
+								</colgroup>
+								<tr>
+									<th scope="row">시행년도</th>
+									<td><c:out value="${examMap.YEAR }"/>년</td>
+								</tr>
+								<tr>
+									<th scope="row">응시구분</th>
+									<td><c:out value="${examMap.MT_APP_NAME}"/></td>
+								</tr>
+								<tr>
+									<th scope="row">회차</th>
+									<td><c:out value="${examMap.MT_ROUND_NAME}"/></td>
+								</tr>
+								<tr>
+									<th scope="row">접수기간</th>
+									<td>
+										<c:out value="${examMap.APPSDT}"/> <c:out value="(${examMap.APPSDAY})"/> ~ 
+										<%-- <c:if test="${(examMap.APP_S_HOUR) < 10}">
+											<c:out value="0${examMap.APP_S_HOUR}"/>:00 ~
+										</c:if>
+										<c:if test="${(examMap.APP_S_HOUR) > 10}">
+											<c:out value="${examMap.APP_S_HOUR}"/>:00 ~
+										</c:if> --%>
+										<c:out value="${examMap.APPEDT}"/> <c:out value="(${examMap.APPEDAY})"/>
+										<%-- <c:if test="${(examMap.APP_E_HOUR) < 10}">
+											<c:out value="0${examMap.APP_E_HOUR}"/>:00
+										</c:if>
+										<c:if test="${(examMap.APP_E_HOUR) > 10}">
+											<c:out value="${examMap.APP_E_HOUR}"/>:00
+										</c:if> --%>
+									</td>
+								</tr>
+										<tr>
+									<th scope="row">수정기간</th>
+									<td>
+										<c:out value="${examMap.MDFSDT}"/> <c:out value="(${examMap.MDFSDAY})"/> ~
+										<%-- <c:if test="${(examMap.CNL_S_HOUR) < 10 }">
+											<c:out value="0${examMap.CNL_S_HOUR}"/>:00 ~
+										</c:if>
+										<c:if test="${(examMap.CNL_S_HOUR) > 10}">
+											<c:out value="${examMap.CNL_S_HOUR}"/>:00 ~
+										</c:if>--%>
+										
+										<c:out value="${examMap.MDFSDT}"/> <c:out value="(${examMap.MDFEDAY})"/>
+										<%-- <c:if test="${(examMap.CNL_E_HOUR) < 10}">
+											<c:out value="0${examMap.CNL_E_HOUR}"/>:00
+										</c:if>
+										<c:if test="${(examMap.CNL_E_HOUR) > 10}">
+											<c:out value="${examMap.CNL_E_HOUR}"/>:00
+										</c:if>  --%>
+									</td>
+								</tr>
+								
+								
+								
+								
+								<tr>
+									<th scope="row">취소기간</th>
+									<td>
+										<c:out value="${examMap.CNLSDT}"/> <c:out value="(${examMap.CNLSEDAY})"/> ~
+										<%-- <c:if test="${(examMap.CNL_S_HOUR) < 10 }">
+											<c:out value="0${examMap.CNL_S_HOUR}"/>:00 ~
+										</c:if>
+										<c:if test="${(examMap.CNL_S_HOUR) > 10}">
+											<c:out value="${examMap.CNL_S_HOUR}"/>:00 ~
+										</c:if>--%>
+										
+										<c:out value="${examMap.CNLEDT}"/> <c:out value="(${examMap.CNLEEDAY})"/>
+										<%-- <c:if test="${(examMap.CNL_E_HOUR) < 10}">
+											<c:out value="0${examMap.CNL_E_HOUR}"/>:00
+										</c:if>
+										<c:if test="${(examMap.CNL_E_HOUR) > 10}">
+											<c:out value="${examMap.CNL_E_HOUR}"/>:00
+										</c:if>  --%>
+									</td>
+								</tr>
+								<tr>
+									<th scope="row">수험표출력기간</th>
+									<td>
+										<c:out value="${examMap.IDNSDT}"/> <c:out value="(${examMap.IDNSEDAY})"/> ~
+										<%-- <c:if test="${(examMap.IDN_S_HOUR) < 10 }">
+											<c:out value="0${examMap.IDN_S_HOUR}"/>:00 ~
+										</c:if>
+										<c:if test="${(examMap.IDN_S_HOUR) > 10}">
+											<c:out value="${examMap.IDN_S_HOUR}"/>:00 ~
+										</c:if>--%>
+										<c:out value="${examMap.IDNEDT}"/> <c:out value="(${examMap.IDNEEDAY})"/>
+										<%-- <c:if test="${(examMap.IDN_E_HOUR) < 10}">
+											<c:out value="0${examMap.IDN_E_HOUR}"/>:00
+										</c:if>
+										<c:if test="${(examMap.IDN_E_HOUR) > 10}">
+											<c:out value="${examMap.IDN_E_HOUR}"/>:00
+										</c:if>  --%>
+									</td>
+								</tr>
+								<tr>
+									<th scope="row">시험일시</th>
+									<td><c:out value="${fn:substring(examMap.EXAMSDATE, 0, 10)}"/> (${examMap.DAY}) 
+										<c:out value="${fn:substring(examMap.EXAMSDATE, 11, 16)}"/> ~ <c:out value="${fn:substring(examMap.EXAMEDATE, 11, 16)}"/></td>
+								</tr>
+								<tr>
+									<th scope="row">응시장소</th>
+									<td>
+									<c:choose>
+										<c:when test="${REQUEST_DATA.pageMode ne 'inquiry'}">
+										<select id="cc_place_no" name="cc_place_no">
+											<option value="">응시지역 - 시험장소</option>
+													<c:forEach var="placeList" items="${placeList}" varStatus="status">
+														<option value="<c:out value="${placeList.CC_PLACE_NO}"/>" <c:if test="${placeList.CC_PLACE_NO eq examUserMap.CC_PLACE_NO}">selected="selected"</c:if> <c:if test="${placeList.PLACE_CNT <= placeList.APPLY_CNT}">disabled="disabled"</c:if>>
+															<c:out value="${placeList.MT_CC_PLACE}"/>
+															- 
+															<c:if test="${placeList.PLACE_TYPE eq 'Y'}"><c:out value="추후공지"/></c:if>
+															<c:if test="${placeList.PLACE_TYPE ne 'Y'}"><c:out value="${placeList.PLACE_TITLE}"/></c:if>
+															(
+															<c:out value="${placeList.APPLY_CNT}"/>
+															/
+															<c:out value="${placeList.PLACE_CNT}"/>
+															)
+															<c:if test="${placeList.PLACE_CNT <= placeList.APPLY_CNT  }">정원초과</c:if>
+													</c:forEach>
+												
+												
+										</select>
+										</c:when>
+												<c:otherwise>
+													<c:out value="${examUserMap.PLACE_LOC}"/>
+															- 
+															<c:if test="${examUserMap.PLACE_TYPE eq 'Y'}"><c:out value="추후공지"/></c:if>
+															<c:if test="${examUserMap.PLACE_TYPE ne 'Y'}"><c:out value="${examUserMap.PLACE_TITLE}"/></c:if> 
+												</c:otherwise>
+											</c:choose>
+									</td>
+								</tr>
+								<tr>
+									<th scope="row">내용</th>
+									<td>
+										<c:out value="${examMap.CONTENT}" escapeXml="false"/>
+									</td>
+								</tr>
+								<tr>
+									<th scope="row">비용</th>
+									<td>
+										<c:if test="${examMap.PAY_AT eq 'N' }"><c:out value="없음"/></c:if>
+			                            <c:if test="${examMap.PAY_AT eq 'Y' }"><fmt:formatNumber value="${examMap.PRICE}" pattern="#,###" /> 원</c:if>
+									</td>
+								</tr>
+							</table>
+						</div>
+					</div>
+
+					<div class="c_section">
+						<h4 class="c_tit">기본정보</h4>
+						<div class="table_style_row">
+							<table>
+								<caption>기본정보를 설정할수있는 표 입니다.</caption>
+								<colgroup>
+									<col class="col2_1" />
+									<col />
+								</colgroup>
+								
+									<tr id="photoZone">
+										<th scope="row">증명사진</th>
+										<td>
+<%-- 											<div class="u_photo"><img src="/common/photoImageViewerCc.do?fileGb=ccedu&fileName=<c:out value='${examUserMap.SAVFILE}'/>&ccNo=<c:out value='${REQUEST_DATA.ccNo}'/>" height="113px;" width="103px;"></div> --%>
+											<div class="u_photo"><img src="<c:out value='${examUserMap.SAVPATH}/${examUserMap.SAVFILE}'/>" height="113px;" width="103px;"></div>
+											<c:if test="${REQUEST_DATA.pageMode eq 'update'}">
+												<button class="btn_u_photo_del" type="button" onclick="delImg(); return false;"><img src="/cmmn/images/sub/btn_del_photo.png" alt="사진삭제" /></button>
+											</c:if>
+                                    	</td>
+                                    </tr>
+                                
+                                
+								<tr>
+									<th scope="row">성명</th>
+									<td><c:out value="${REQUEST_DATA.SES_USERNAME}"/></td>
+								</tr>
+								<tr>
+									<th scope="row">생년월일</th>
+									<td><c:out value="${fn:substring(REQUEST_DATA.SES_BRTHDY, 0, 4)}"/>.<c:out value="${fn:substring(REQUEST_DATA.SES_BRTHDY, 4, 6)}"/>.<c:out value="${fn:substring(REQUEST_DATA.SES_BRTHDY, 6, 8)}"/></td>
+								</tr>
+								
+								<c:choose>
+									<c:when test="${REQUEST_DATA.pageMode eq 'inquiry' || REQUEST_DATA.pageMode eq 'update'}"><!-- 180731 수정일때 기존 입력정보 세팅 -->
+										<tr>
+											<th scope="row"><c:if test="${REQUEST_DATA.pageMode ne 'inquiry'}"><span class="required">필수사항 : </span></c:if>핸드폰번호</th>
+											<td>
+												<div class="form_field maxwid360">
+													<c:if test="${REQUEST_DATA.pageMode eq 'insert' || REQUEST_DATA.pageMode eq 'update'}">
+														<c:set var="mobileFront" value="${fn:substring(examUserMap.MOBLPHON, 0, 3)}"/>
+														<select id="mobile1" name="mobile1" title="휴대폰번호 앞자리 선택" style="width:22%;">
+															<option value="010" <c:if test="${mobileFront eq '010'}"> selected="selected"</c:if>>010</option>
+							                                <option value="011" <c:if test="${mobileFront eq '011'}"> selected="selected"</c:if>>011</option>
+							                                <option value="016" <c:if test="${mobileFront eq '016'}"> selected="selected"</c:if>>016</option>
+							                                <option value="017" <c:if test="${mobileFront eq '017'}"> selected="selected"</c:if>>017</option>
+							                                <option value="018" <c:if test="${mobileFront eq '018'}"> selected="selected"</c:if>>018</option>
+							                                <option value="019" <c:if test="${mobileFront eq '019'}"> selected="selected"</c:if>>019</option>
+														</select>
+														
+														<span class="widbox" style="width:8%;">-</span>
+														<input type="tel" id="mobile2" name="mobile2" value="<c:out value='${fn:substring(examUserMap.MOBLPHON, 4, 8)}'/>" maxlength="4" title="휴대폰번호 가운데 4자리 입력"  style="width:31%;" />
+														<span class="widbox" style="width:8%;">-</span>
+														<input type="tel" id="mobile3" name="mobile3" value="<c:out value='${fn:substring(examUserMap.MOBLPHON, 9, 13)}'/>" maxlength="4" title="휴대폰번호 마지막 4자리 입력"  style="width:31%;" />
+													</c:if>
+													<c:if test="${REQUEST_DATA.pageMode eq 'inquiry'}">
+														<c:out value="${examUserMap.MOBLPHON}"/>
+			                                        </c:if>
+												</div>
+											</td>
+										</tr>
+										<tr>
+											<th scope="row">유선전화</th>
+											<td>
+												<div class="form_field maxwid360">
+													<c:if test="${REQUEST_DATA.pageMode eq 'insert' || REQUEST_DATA.pageMode eq 'update'}">
+														<c:if test="${fn:length(examUserMap.TELNO) eq 12}">
+															<c:set var="frontTelNo" value="${fn:substring(examUserMap.TELNO, 0, 2)}"/>
+															<c:set var="middleTelNo" value="${fn:substring(examUserMap.TELNO, 3, 7)}"/>
+															<c:set var="endTelNo" value="${fn:substring(examUserMap.TELNO, 8, 12)}"/>
+															
+														</c:if>
+														<c:if test="${fn:length(examUserMap.TELNO) eq 13 }">
+															<c:set var="frontTelNo" value="${fn:substring(examUserMap.TELNO, 0, 3)}"/>
+															<c:set var="middleTelNo" value="${fn:substring(examUserMap.TELNO, 4, 8)}"/>
+															<c:set var="endTelNo" value="${fn:substring(examUserMap.TELNO, 9, 13)}"/>
+														</c:if>	
+														
+														<select id="telNo1" name="telNo1" title="유선전화 앞자리 선택" style="width:22%;">
+															<option value="02"  <c:if test="${frontTelNo eq '02'}"> selected="selected" </c:if>>02</option>
+					                                        <option value="031" <c:if test="${frontTelNo eq '031'}"> selected="selected" </c:if>>031</option>
+					                                        <option value="032" <c:if test="${frontTelNo eq '032'}"> selected="selected" </c:if>>032</option>
+					                                        <option value="033" <c:if test="${frontTelNo eq '033'}"> selected="selected" </c:if>>033</option>
+					                                        <option value="041" <c:if test="${frontTelNo eq '041'}"> selected="selected" </c:if>>041</option>
+					                                        <option value="042" <c:if test="${frontTelNo eq '042'}"> selected="selected" </c:if>>042</option>
+					                                        <option value="043" <c:if test="${frontTelNo eq '043'}"> selected="selected" </c:if>>043</option>
+					                                        <option value="044" <c:if test="${frontTelNo eq '044'}"> selected="selected" </c:if>>044</option>
+					                                        <option value="051" <c:if test="${frontTelNo eq '051'}"> selected="selected" </c:if>>051</option>
+					                                        <option value="052" <c:if test="${frontTelNo eq '052'}"> selected="selected" </c:if>>052</option>
+					                                        <option value="053" <c:if test="${frontTelNo eq '053'}"> selected="selected" </c:if>>053</option>
+					                                        <option value="054" <c:if test="${frontTelNo eq '054'}"> selected="selected" </c:if>>054</option>
+					                                        <option value="055" <c:if test="${frontTelNo eq '055'}"> selected="selected" </c:if>>055</option>
+					                                        <option value="061" <c:if test="${frontTelNo eq '061'}"> selected="selected" </c:if>>061</option>
+					                                        <option value="062" <c:if test="${frontTelNo eq '062'}"> selected="selected" </c:if>>062</option>
+					                                        <option value="063" <c:if test="${frontTelNo eq '063'}"> selected="selected" </c:if>>063</option>
+					                                        <option value="064" <c:if test="${frontTelNo eq '064'}"> selected="selected" </c:if>>064</option>
+					                                        <option value="070" <c:if test="${frontTelNo eq '070'}"> selected="selected" </c:if>>070</option>
+														</select>
+														<span class="widbox" style="width:8%;">-</span>
+														<input type="tel" id="telNo2" name="telNo2" value="<c:out value='${middleTelNo}'/>" maxlength="4" title="유선전화 가운데자리 입력"  style="width:31%;" />
+														<span class="widbox" style="width:8%;">-</span>
+														<input type="tel" title="유선전화 마지막자리 입력" id="telNo3" name="telNo3" value="<c:out value='${endTelNo}'/>" maxlength="4" style="width:31%;" />
+													</c:if>
+													<c:if test="${REQUEST_DATA.pageMode eq 'inquiry'}">
+														<c:out value="${examUserMap.TELNO }"/>
+			                                        </c:if>
+												</div>
+											</td>
+										</tr>
+										<tr>
+											<th scope="row"><c:if test="${REQUEST_DATA.pageMode ne 'inquiry'}"><span class="required">필수사항 : </span></c:if>이메일</th>
+											<td>
+												<div class="form_field">
+													<c:if test="${REQUEST_DATA.pageMode eq 'insert' || REQUEST_DATA.pageMode eq 'update'}">
+														<c:set var="emailId" value="${fn:substringBefore(examUserMap.EMAIL, '@')}"/>
+														<input type="text" id="email1" name="email1" value="<c:out value='${emailId}'/>" maxlength="30" title="이메일 아이디 입력" class="input_email_id" />
+														<span class="widbox widbox_email">@</span>
+														<c:set var="emailAddr" value="${fn:substringAfter(examUserMap.EMAIL, '@')}"/>
+														<input type="text" id="email2" name="email2" maxlength="20" value="<c:out value='${emailAddr}'/>" title="도메인 입력" class="input_email_domain" />
+														<select id="email3" name="email3" onchange="emailSelect(this.value); return false;" title="직접입력 할 수 있는 도메인 선택" class="select_email_domain">
+															<c:forEach var="emap2" items="${mtEmailCodeList}" varStatus="status2">
+																<option value="${emap2.MT_SUB_NAME}" <c:if test="${emap2.MT_SUB_NAME eq emailAddr}"> selected="selected" </c:if>><c:out value="${emap2.MT_SUB_NAME}"/></option>
+															</c:forEach>
+															<option value="">직접입력</option>
+														</select>
+													</c:if>
+													<c:if test="${REQUEST_DATA.pageMode eq 'inquiry' }">
+														<c:out value="${examUserMap.EMAIL }"/>
+			                                        </c:if>
+												</div>
+											</td>
+										</tr>
+										<tr>
+											<th scope="row"><c:if test="${REQUEST_DATA.pageMode ne 'inquiry'}"><span class="required">필수사항 : </span></c:if>주소</th>
+											<td>
+												<div class="form_field">
+													<c:if test="${REQUEST_DATA.pageMode eq 'insert' || REQUEST_DATA.pageMode eq 'update'}">
+														<input type="text" id="addrCode" name="addrCode" value="<c:out value='${examUserMap.ADDR_CODE}'/>" readonly="readonly" style="cursor: default;" title="우편번호 입력" class="input_postal_code" />
+														<button class="btn_graybg02 btn_postal_code"  data-tooltip="poppost01">우편번호 찾기</button>
+														<div class="address_box">
+															<input type="text" id="address" name="address" value="<c:out value='${examUserMap.ADDRESS}'/>" readonly="readonly" style="cursor: default;" title="주소 입력" class="input_address" />
+															<input type="text" id="address2" name="address2" value="<c:out value='${examUserMap.ADDRESS2}'/>" maxlength="500" title="상세주소 입력" class="input_detail_address" />
+														</div>
+													</c:if>
+													<c:if test="${REQUEST_DATA.pageMode eq 'inquiry'}">
+														<div class="form-group w20">
+															<c:out value="(${examUserMap.ADDR_CODE})"/> &nbsp;&nbsp; <c:out value="${examUserMap.ADDRESS}"/>&nbsp;&nbsp; <c:out value="${examUserMap.ADDRESS2}"/>
+			                                            </div>
+			                                        </c:if>
+												</div>
+											</td>
+										</tr>
+									</c:when>
+									<c:otherwise> <!-- 180731 초기 접근 일때 회원정보 세팅 -->
+										<tr>
+											<th scope="row"><span class="required">필수사항 : </span>핸드폰번호</th>
+											<td>
+												<div class="form_field maxwid360">
+														<select id="mobile1" name="mobile1" title="휴대폰번호 앞자리 선택" style="width:22%;">
+															<option value="010" <c:if test="${userInfo.MOBLPHON1 eq '010'}"> selected="selected"</c:if>>010</option>
+							                                <option value="011" <c:if test="${userInfo.MOBLPHON1 eq '011'}"> selected="selected"</c:if>>011</option>
+							                                <option value="016" <c:if test="${userInfo.MOBLPHON1 eq '016'}"> selected="selected"</c:if>>016</option>
+							                                <option value="017" <c:if test="${userInfo.MOBLPHON1 eq '017'}"> selected="selected"</c:if>>017</option>
+							                                <option value="018" <c:if test="${userInfo.MOBLPHON1 eq '018'}"> selected="selected"</c:if>>018</option>
+							                                <option value="019" <c:if test="${userInfo.MOBLPHON1 eq '019'}"> selected="selected"</c:if>>019</option>
+														</select>
+														
+														<span class="widbox" style="width:8%;">-</span>
+														<input type="tel" id="mobile2" name="mobile2" value="<c:out value='${userInfo.MOBLPHON2}'/>" maxlength="4" title="휴대폰번호 가운데 4자리 입력"  style="width:31%;" />
+														<span class="widbox" style="width:8%;">-</span>
+														<input type="tel" id="mobile3" name="mobile3" value="<c:out value='${userInfo.MOBLPHON3}'/>" maxlength="4" title="휴대폰번호 마지막 4자리 입력"  style="width:31%;" />
+												</div>
+											</td>
+										</tr>
+										<tr>
+											<th scope="row">유선전화</th>
+											<td>
+												<div class="form_field maxwid360">
+														<select id="telNo1" name="telNo1" title="유선전화 앞자리 선택" style="width:22%;">
+															<option value="02"  <c:if test="${userInfo.TELNO1 eq '02'}"> selected="selected" </c:if>>02</option>
+					                                        <option value="031" <c:if test="${userInfo.TELNO1 eq '031'}"> selected="selected" </c:if>>031</option>
+					                                        <option value="032" <c:if test="${userInfo.TELNO1 eq '032'}"> selected="selected" </c:if>>032</option>
+					                                        <option value="033" <c:if test="${userInfo.TELNO1 eq '033'}"> selected="selected" </c:if>>033</option>
+					                                        <option value="041" <c:if test="${userInfo.TELNO1 eq '041'}"> selected="selected" </c:if>>041</option>
+					                                        <option value="042" <c:if test="${userInfo.TELNO1 eq '042'}"> selected="selected" </c:if>>042</option>
+					                                        <option value="043" <c:if test="${userInfo.TELNO1 eq '043'}"> selected="selected" </c:if>>043</option>
+					                                        <option value="044" <c:if test="${userInfo.TELNO1 eq '044'}"> selected="selected" </c:if>>044</option>
+					                                        <option value="051" <c:if test="${userInfo.TELNO1 eq '051'}"> selected="selected" </c:if>>051</option>
+					                                        <option value="052" <c:if test="${userInfo.TELNO1 eq '052'}"> selected="selected" </c:if>>052</option>
+					                                        <option value="053" <c:if test="${userInfo.TELNO1 eq '053'}"> selected="selected" </c:if>>053</option>
+					                                        <option value="054" <c:if test="${userInfo.TELNO1 eq '054'}"> selected="selected" </c:if>>054</option>
+					                                        <option value="055" <c:if test="${userInfo.TELNO1 eq '055'}"> selected="selected" </c:if>>055</option>
+					                                        <option value="061" <c:if test="${userInfo.TELNO1 eq '061'}"> selected="selected" </c:if>>061</option>
+					                                        <option value="062" <c:if test="${userInfo.TELNO1 eq '062'}"> selected="selected" </c:if>>062</option>
+					                                        <option value="063" <c:if test="${userInfo.TELNO1 eq '063'}"> selected="selected" </c:if>>063</option>
+					                                        <option value="064" <c:if test="${userInfo.TELNO1 eq '064'}"> selected="selected" </c:if>>064</option>
+					                                        <option value="070" <c:if test="${userInfo.TELNO1 eq '070'}"> selected="selected" </c:if>>070</option>
+														</select>
+														<span class="widbox" style="width:8%;">-</span>
+														<input type="tel" id="telNo2" name="telNo2" value="<c:out value='${userInfo.TELNO2}'/>" maxlength="4" title="유선전화 가운데자리 입력"  style="width:31%;" />
+														<span class="widbox" style="width:8%;">-</span>
+														<input type="tel" title="유선전화 마지막자리 입력" id="telNo3" name="telNo3" value="<c:out value='${userInfo.TELNO3}'/>" maxlength="4" style="width:31%;" />
+												</div>
+											</td>
+										</tr>
+										<tr>
+											<th scope="row"><span class="required">필수사항 : </span>이메일</th>
+											<td>
+												<div class="form_field">
+														<input type="text" id="email1" name="email1" value="<c:out value='${userInfo.EMAIL1}'/>" maxlength="30" title="이메일 아이디 입력" class="input_email_id" />
+														<span class="widbox widbox_email">@</span>
+														<c:set var="emailAddr" value="${fn:substringAfter(examUserMap.EMAIL, '@')}"/>
+														<input type="text" id="email2" name="email2" maxlength="20" value="<c:out value='${userInfo.EMAIL2}'/>" title="도메인 입력" class="input_email_domain" />
+														<select id="email3" name="email3" onchange="emailSelect(this.value); return false;" title="직접입력 할 수 있는 도메인 선택" class="select_email_domain">
+															<c:forEach var="emap2" items="${mtEmailCodeList}" varStatus="status2">
+																<option value="${emap2.MT_SUB_NAME}" <c:if test="${emap2.MT_SUB_NAME eq userInfo.EMAIL2}"> selected="selected" </c:if>><c:out value="${emap2.MT_SUB_NAME}"/></option>
+															</c:forEach>
+															<option value="">직접입력</option>
+														</select>
+												</div>
+											</td>
+										</tr>
+		
+										<tr>
+											<th scope="row"><span class="required">필수사항 : </span>주소</th>
+											<td>
+												<div class="form_field">
+														<input type="text" id="addrCode" name="addrCode" value="<c:out value='${userInfo.LNM_ZIP}'/>" readonly="readonly" style="cursor: default;" title="우편번호 입력" class="input_postal_code" />
+														<button class="btn_graybg02 btn_postal_code"  data-tooltip="poppost01">우편번호 찾기</button>
+														<div class="address_box">
+															<input type="text" id="address" name="address" value="<c:out value='${userInfo.LNM_ADRES1}'/>" readonly="readonly" style="cursor: default;" title="주소 입력" class="input_address" />
+															<input type="text" id="address2" name="address2" value="<c:out escapeXml="false"  value='${userInfo.LNM_ADRES2}'/>" maxlength="500" title="상세주소 입력" class="input_detail_address" />
+														</div>
+												</div>
+											</td>
+										</tr>
+									</c:otherwise>
+								</c:choose>
+
+								<tr>
+									<th scope="row"><c:if test="${REQUEST_DATA.pageMode ne 'inquiry'}"><span class="required">필수사항 : </span></c:if>학력</th>
+									<td>
+										<div class="form_field">
+											<c:if test="${REQUEST_DATA.pageMode eq 'insert' || REQUEST_DATA.pageMode eq 'update'}">
+												<select id="mtEdu" name="mtEdu" title="학력 선택">
+													<option value="">선택</option>
+													<c:forEach var="result" items="${mtAcdmcrCodeList}" varStatus="status2">
+														<option value="${result.MT_SUB_CODE}" <c:if test="${result.MT_SUB_CODE eq examUserMap.MT_EDU}">selected="selected"</c:if>><c:out value="${result.MT_SUB_NAME}"/></option>
+													</c:forEach>
+												</select>
+											</c:if>
+											<c:if test="${REQUEST_DATA.pageMode eq 'inquiry'}" >
+												<c:out value="${examUserMap.MT_EUD_NAME}"/>
+			                                </c:if>
+										</div>
+									</td>
+								</tr>
+								<tr>
+									<th scope="row"><c:if test="${REQUEST_DATA.pageMode ne 'inquiry'}"><span class="required">필수사항 : </span></c:if>직업</th>
+									<td>
+										<div class="form_field">
+											<c:if test="${REQUEST_DATA.pageMode eq 'insert' || REQUEST_DATA.pageMode eq 'update'}">
+												<select id="job" name="job" title="직업 선택">
+												<option value="">선택</option>
+													<c:forEach var="result" items="${mtJobCodeList}" varStatus="status2">
+														<option value="${result.MT_SUB_NAME}"<c:if test="${result.MT_SUB_NAME eq examUserMap.JOB}">selected="selected"</c:if>><c:out value="${result.MT_SUB_NAME}"/></option>
+													</c:forEach>
+												</select>
+											</c:if>
+											<c:if test="${REQUEST_DATA.pageMode eq 'inquiry' }">
+												<c:out value="${examUserMap.JOB}"/>
+											</c:if>
+										</div>
+									</td>
+								</tr>
+								<tr>
+									<th scope="row">취약계층 여부</th>
+									<td>
+										<div class="form_field">
+											<div class="ff_radio">
+												<c:if test="${REQUEST_DATA.pageMode eq 'insert' || REQUEST_DATA.pageMode eq 'update'}">
+													<input type="radio" id="N1" checked="checked" name="disYn" value="N" <c:if test="${examUserMap.DIS_YN eq 'N'}">checked="checked"</c:if>/>
+													<label for="N1">없음</label>
+												</c:if>
+											</div>
+											<div class="ff_radio">
+												<c:if test="${REQUEST_DATA.pageMode eq 'insert' || REQUEST_DATA.pageMode eq 'update'}">
+													<input type="radio" id="Y1" name="disYn" value="Y" <c:if test="${examUserMap.DIS_YN eq 'Y'}">checked="checked"</c:if>/>
+													<label for="Y1">해당있음</label>
+												</c:if>
+											</div>
+											<c:if test="${REQUEST_DATA.pageMode eq 'inquiry'}">
+												<c:out value="${examUserMap.DIS_YN}"/>
+											</c:if>
+										</div>
+									</td>
+								</tr>
+								<tr>
+									<th scope="row">학생 여부</th>
+									<td>
+										<div class="form_field">
+											<div class="ff_radio">
+												<c:if test="${REQUEST_DATA.pageMode eq 'insert' || REQUEST_DATA.pageMode eq 'update'}">
+													<input type="radio" id="N2" checked="checked" name="stdYn" value="N" <c:if test="${examUserMap.STD_YN ne 'Y'}">checked="checked"</c:if>/>
+													<label for="N2">없음</label>
+												</c:if>
+											</div>
+											<div class="ff_radio">
+												<c:if test="${REQUEST_DATA.pageMode eq 'insert' || REQUEST_DATA.pageMode eq 'update'}">
+													<input type="radio" id="Y2" name="stdYn" value="Y" <c:if test="${examUserMap.STD_YN eq 'Y'}">checked="checked"</c:if>/>
+													<label for="Y2">해당있음</label>
+												</c:if>
+											</div>
+											<c:if test="${REQUEST_DATA.pageMode eq 'inquiry'}">
+												<c:out value="${examUserMap.STD_YN}"/>
+											</c:if>
+										</div>
+									</td>
+								</tr>
+								
+								<c:if test="${REQUEST_DATA.pageMode eq 'insert' || REQUEST_DATA.pageMode eq 'update'}">
+									<tr id="imgFile">
+										<th scope="row"><c:if test="${REQUEST_DATA.pageMode ne 'inquiry'}"><span class="required">필수사항 : </span></c:if>증명사진 첨부</th>
+										<td>
+											<div class="form_field">
+												<button type="button" class="btn_graybg02 btn_find_file" onclick="$('#orgFile').click();">파일찾기</button>
+												<input type="file" id="orgFile" name="orgFile" title="파일을 선택하세요." tabindex="-1" class="alt_text" onchange="uploadFileAjax(this)" />
+												<input type="text" id="fileNM" aria-hidden="true" tabindex="-1" class="input_file_name" title="선택된 파일명입니다." readonly="readonly"/>
+												
+												<p class="txt_gray_noti">사진 규격(사이즈 : 90픽셀(가로) × 120픽셀(세로) 이상<br />파일형식 : JPG, PNG, GIF, 용량 : 5MB 이하</p>
+											</div>
+										</td>
+									</tr>
+								</c:if>
+							</table>
+						</div>
+					</div>
+					
+					<!------  결제정보 SEC START ------>
+					<c:if test="${examMap.PAY_AT eq 'Y' && REQUEST_DATA.pageMode eq 'insert' }">
+						<div class="c_section">
+							<h4 class="c_tit">결제정보</h4>
+							<div class="table_style_row">
+								<table>
+									<caption>결제정보, 총 결제금액 구분, 카드사 정보 입니다.</caption>
+									<colgroup>
+										<col class="col2_1" />
+										<col />
+									</colgroup>
+									<tr>
+										<th scope="row">총 결제금액</th>
+										<td><fmt:formatNumber value="${examMap.PRICE}" pattern="#,###" /> 원</td>
+									</tr>
+									<tr>
+										<th scope="row">구분</th>
+										<td>
+											<c:forEach var="result" items="${mtPayMCodeList}" varStatus="status2">
+												<input type="radio" id="${result.MT_SUB_CODE}" name="PayM" value="${result.MT_SUB_CODE}"/>
+												<label for="${result.MT_SUB_CODE}" style="margin-right: 20px;">${result.MT_SUB_NAME}</label>
+											</c:forEach>
+										</td>
+									</tr>
+								</table>
+							</div>
+						</div>
+					</c:if>
+					<!------  결제정보 SEC END ------>
+					
+					<!------  결제정보 조회 SEC START ------>
+<%-- 					<c:if test="${pMap ne null && REQUEST_DATA.pageMode ne 'insert' }"> --%>
+<!-- 						<div class="c_section"> -->
+<!-- 							<h4 class="c_tit">결제정보</h4> -->
+<!-- 							<div class="table_style_row"> -->
+<!-- 								<table> -->
+<!-- 									<caption>결제정보, 총 결제금액 구분, 카드사 정보 입니다.</caption> -->
+<!-- 									<colgroup> -->
+<!-- 										<col class="col2_1" /> -->
+<!-- 										<col /> -->
+<!-- 									</colgroup> -->
+<!-- 									<tr> -->
+<!-- 										<th scope="row">결제금액</th> -->
+<%-- 										<td><fmt:formatNumber value="${pMap.PRICE}" pattern="#,###" /> 원</td> --%>
+<!-- 										<th scope="row">결제상태</th> -->
+<%-- 										<td><c:out value="${pMap.PAY_STAT_NM }"/></td> --%>
+<!-- 									</tr> -->
+<!-- 									<tr> -->
+<!-- 										<th scope="row">결제수단</th> -->
+<!-- 										<td colspan="3"> -->
+<%-- 											<c:out value="${pMap.PAY_TYPE_NM }"/> --%>
+<!-- 										</td> -->
+<!-- 									</tr> -->
+<%-- 									<c:if test="${pMap.MT_PAY_TYPE eq 'YT0040' }"> --%>
+<!-- 										<tr> -->
+<!-- 											<th scope="row">은행</th> -->
+<%-- 											<td><c:out value="${pMap.LGD_FINANCENAME}"/></td> --%>
+<!-- 											<th scope="row">입금자명</th> -->
+<%-- 											<td><c:out value="${pMap.LGD_PAYER }"/></td> --%>
+<!-- 										</tr> -->
+<!-- 										<tr> -->
+<!-- 											<th scope="row">계좌번호</th> -->
+<%-- 											<td colspan="3"><c:out value="${pMap.LGD_ACCOUNTNUM}"/></td> --%>
+<!-- 										</tr> -->
+<%-- 									</c:if> --%>
+<!-- 								</table> -->
+<!-- 							</div> -->
+<!-- 						</div> -->
+<%-- 					</c:if> --%>
+					<!------  결제정보 조회 SEC END ------>
+
+					<div class="c_btn_center">
+						<c:if test="${REQUEST_DATA.pageMode eq 'inquiry'}">
+							<c:if test="${examUserMap.CNLYN eq 'Y'}">
+								<button type="button" onclick="appliCancel(); return false;" class="btn_graybg03">신청취소</button>
+								<button type="button" onclick="appliUpdate(); return false;" class="btn_bluebg03">수정</button>
+							</c:if>
+							<c:if test="${examUserMap.MDFYN eq 'Y'}">
+								<button type="button" onclick="appliUpdate(); return false;" class="btn_bluebg03">수정</button>
+							</c:if>
+						</c:if>
+						
+						<c:if test="${REQUEST_DATA.pageMode eq 'insert'|| REQUEST_DATA.pageMode eq 'update'}"> 
+							<button type="button" onclick="applicationRegit(); return false;" class="btn_bluebg03">완료</button>
+						</c:if>
+					</div>
+
+					<!--// end -->
+				</div>
+				<!--// 본문내용 -->
+				
+			<!--  -->
+			</div>
+			<!--// content 본문 -->
+			</form>
+		
+			<form method="post" name="LGD_PAYINFO" id="LGD_PAYINFO" action="return false;"/>
+		<!-- con_center end -->
+		</div>
+	
+	</div>
+	<!--// container -->
+
+	<!-- foot -->
+	<%@ include file="/WEB-INF/jsp/ccedu/inc/footer_inc.jsp"%>
+	<!--// foot end -->
+
+</div>
+
+</body>
+</html>

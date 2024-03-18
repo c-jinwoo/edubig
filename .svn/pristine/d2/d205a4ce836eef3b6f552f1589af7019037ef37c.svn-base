@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.webapp.ccedu.mapper.OnlineReviewMapper">
+    <select id="selectReviewList" resultType="emap" parameterType="dmap">    
+	    SELECT
+		    (SELECT MT_SUB_NAME FROM LMS_CD_MT_SUB WHERE MT_CODE = 'SC' AND MT_SUB_CODE = (SELECT MT_SC_CODE FROM LMS_ED_COURSE WHERE COURSENO = A.COURSENO)) AS CATENM
+		    , WRITER
+		    , CONTENT
+		    , TO_CHAR(WDATE, 'YYYY-MM-DD') AS WDATE
+		    , SCORE
+		FROM 
+		    LMS_ED_REVIEW C
+		WHERE       		    
+		    USEYN = 'Y' 
+		    <if test="courseno != null and courseno != ''">
+        	AND COURSENO = #{courseno}
+       		</if>		    
+		ORDER BY
+		    WDATE DESC
+	</select> 
+</mapper>

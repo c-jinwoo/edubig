@@ -1,0 +1,46 @@
+package com.webapp.ccedu.mapper;
+
+import java.util.List;
+import java.util.Map;
+
+import com.sangs.support.DataMap;
+import com.sangs.support.EduMap;
+import com.sangs.support.FrontException;
+
+import egovframework.rte.psl.dataaccess.mapper.Mapper;
+
+
+/**
+ * Description : 
+ * 
+ * Modification Information
+ * 수정일			수정자			수정내용
+ * -------		-----------------------------------
+ * 2020.09.29	CSLAB		최초작성
+ *
+ */
+@Mapper("onlineBookMapper")
+public interface OnlineBookMapper {
+	
+	String selectBookType(String mtSubCode) throws Exception;
+
+	List<EduMap> selectTotalBookList() throws Exception;
+	
+	List<EduMap> selectCourseList(String mtCode) throws Exception;
+	
+	List<EduMap> selectBookList(String mtSubCode) throws Exception;
+		
+	EduMap selectBookInfo(DataMap data) throws Exception;
+	
+	List<EduMap> selectClassList(String mtSubCode) throws Exception;
+	
+	void insertPayment(DataMap data) throws Exception;
+	
+	Integer getPaymentPrice(String orderno) throws Exception;
+	
+	void insertBookInfo(DataMap data) throws Exception;
+	
+	EduMap selectUserInfo(Integer userno) throws Exception;
+	
+	EduMap getCourseBookInfo(DataMap rMap) throws Exception;
+}

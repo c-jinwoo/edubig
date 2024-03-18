@@ -1,0 +1,56 @@
+<%
+/****************************************
+	subject	: 신용상담사 > 자격시험 > 자격소개
+	summary	: 
+	author	: sangs
+	date	: 2018-05-28
+****************************************/
+%>
+<%@ page language="java" contentType="text/html; charset=utf-8" pageEncoding="utf-8"%>
+<%@ include file="/WEB-INF/jsp/common/inc/taglib_inc.jsp"%>
+<%@ include file="/WEB-INF/jsp/academy/cmmn/inc/top_inc.jsp"%>
+<%@ include file="/WEB-INF/jsp/academy/cmmn/inc/header_inc.jsp"%>
+	
+<script type="text/javascript">
+	$(document).ready(function(){
+		$('.link-txt a').each(function(){
+		    var replaced = $(this).text().replace(/&lt;/g, '<').replace(/&gt;/g, '>');
+		    $(this).text(replaced);
+		});
+		
+	});
+	
+	function applicationCheck() {
+		$("#frm").attr("action", "/ccedu/cceduExam/applicationCheck.do");
+		$("#frm").submit();
+	}
+	
+	
+	
+</script>
+<form id="frm" name="frm" method="post">
+<div class="container" id="Subcontent">
+    <article class="subArea">
+        <div class="subCntWrap">
+		<%@ include file="/WEB-INF/jsp/academy/cmmn/inc/lnb_ccedu.jsp" %>
+		<div class="path">
+        	<ul>
+            	<li><span class="home text-hide">신용상담사</span></li>
+                <li>자격시험</li>
+                <li class="active">자격소개</li>
+            </ul>
+        </div>
+		<div class="subConts" id="sub-content">
+			<section class="bgTop_cate04"><!--   카테고리별 이미지 추가  -->
+            		<div class="contTop">
+            			<h2 class="h2_tit">자격소개</h2>
+            		</div>           	
+	            </section>
+	            
+	            <a href="#" onclikc="applicationCheck(); return false;">접수조회 확인</a>
+
+</div>	 
+	 
+<!-- footer -->
+</form>
+<%@ include file="/WEB-INF/jsp/academy/cmmn/inc/footer_inc.jsp"%>

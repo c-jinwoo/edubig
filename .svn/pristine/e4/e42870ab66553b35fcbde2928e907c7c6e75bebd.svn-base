@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes" ?>
+<list>
+  <index>
+    <topic>
+      <list title="main" page="1">소개하기</list>
+      <list title="sub" page="1">빅데이터의 비지니스 모델</list>
+
+      <list title="main" page="2">살펴보기</list>
+      <list title="sub" page="2">비지니스 모델의 이해</list>
+      <list title="sub" page="3">비지니스 모델의 유형</list>
+
+      <list title="main" page="4">정리하기</list>
+      <list title="sub" page="4">학습평가</list>
+      <list title="sub" page="5">학습정리</list>
+    </topic>
+  </index>
+</list>

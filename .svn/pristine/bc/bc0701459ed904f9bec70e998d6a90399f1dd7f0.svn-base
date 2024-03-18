@@ -1,0 +1,11 @@
+_this.$quizInfo = [
+	["다음 중 3D Model(모델)의 형상을 분할하기 위한 도구가 <span style='color:#FF0000;'>아닌</span> 것은?","Sketch Curve(스케치 커브)","Vertext(꼭지점)","Surface(표면)","Construct(작업 평면)",false],	
+	["다음 중 객체 분할에 대한 설명으로 <span style='color:#FF0000;'>틀린</span> 것은?","Split Face(면 분할): 3D Model(모델)의 면을 분할한다.","Split Body(형상 분할): 3D Model(모델)을 분할한다.","Split Body(형상 분할): 옵션 설정을 통해 Shell(쉘)이 적용된 Body의 윤곽을 분할할 수 있다.","Silhouette Split(실루엣 분할): 3D Model(모델)의 윤곽선을 추출하고, 이를 기준으로 분할한다.",false],
+	["다음 중 Split(분할)을 이용한 객체 분할의 설명으로 <span style='color:#FF0000;'>틀린</span> 것은?","Split Face(면 분할): 면은 분할하지만 하나의 3D Model(모델)이다.","Split Body(형상 분할): 분할된 객체는 하나의 독립된 Body가 된다.","Split Body(형상 분할): Extend Splitting Tool(분할 도구 연장) 옵션은 Sketch Curve(스케치 커브)에만 적용할 수 있다.","Silhouette Split(실루엣 분할): View Direction(뷰 방향)은 외곽선 추출의 [기준면 선택] 설정이다.",false]
+];
+
+_this.$quizAnsInfo = [
+	[2,"Vertext(꼭지점)은 형상 분할을 위한 도구로 사용할 수 없다."],
+	[3,"Shell(쉘)이 적용된 Body의 윤곽을 분할하는 옵션 설정은 Silhouette Split(실루엣 스플릿) 명령어에 있다."],
+	[3,"분할 도구 연장(Extend Splitting Tool) 설정은 모든 Splitting Tool(분할 도구)에 적용할 수 있다."]
+];

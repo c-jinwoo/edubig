@@ -1,0 +1,77 @@
+<%
+/****************************************
+    subject : 리뷰
+    summary : 리뷰
+****************************************/
+%>
+<%@ page language="java" contentType="text/html; charset=utf-8" pageEncoding="utf-8"%>
+<%@ include file="/WEB-INF/jsp/inc/taglib_inc.jsp"%>
+<%@ include file="/WEB-INF/jsp/inc/top_inc.jsp"%>
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+	<title>에듀빅 :: 수강후기</title>
+	<%@ include file="/WEB-INF/jsp/inc/head_inc.jsp"%>
+	<script type="text/javascript">
+		function frmSubmit(query){
+			$("#rvQuery").val(query);
+			$("#frm").submit();
+		}		
+	</script>
+</head>
+<body>
+	<!-- header -->
+	<%@ include file="/WEB-INF/jsp/inc/header_inc.jsp"%>
+	<!--// header -->
+	
+	<div id="container">
+		<div class="con_center">
+			<div class="cont_title_wrapper">
+				<div class="wrapper">
+					<h3 class="cont_title">수강후기</h3>
+				</div>			
+			</div>
+			<div id="content">
+				<div class="wrapper">		
+					<div class="cont_body">
+						<form name="frm" id="frm" method=POST action="/review/exec.do">									
+							<div class="c_section" style="overflow:hidden;">
+								<input type="hidden" id="searchCseqno" name="searchCseqno" value="<c:out value="${REQUEST_DATA.searchCseqno}"/>"/>
+								<input type="hidden" id="courseno" name="courseno" value="<c:out value="${REQUEST_DATA.courseno}"/>"/>
+								<input type="hidden" id="rvScore" name="rvScore" value="<c:out value="${REQUEST_DATA.rvScore}"/>"/>
+								<input type="hidden" id="rvQuery" name="rvQuery" value="<c:out value="${REQUEST_DATA.rvQuery}"/>"/>
+								<input type="text" style="width:100%;" id="rvContent" name="rvContent" value="<c:out value="${review.CONTENT}"/>"/>
+								
+								<c:if test="${REQUEST_DATA.rvQuery eq 'insert'}">
+									<a onclick="frmSubmit('insert'); return false;">
+										등록
+									</a>
+									<a onclick="history.back(); return false;">
+										취소
+									</a>
+								</c:if>
+								<c:if test="${REQUEST_DATA.rvQuery eq 'update'}">
+									<a onclick="frmSubmit('update'); return false;">
+										수정
+									</a>
+									<a onclick="frmSubmit('delete'); return false;">
+										삭제
+									</a>
+									<a onclick="history.back(); return false;">
+										취소
+									</a>
+								</c:if>								
+							</div>
+						</form>
+					</div>
+				</div>
+			</div>			
+		</div>
+	</div>
+	<!--// container -->
+	
+	<!-- foot -->
+	<%@ include file="/WEB-INF/jsp/inc/footer_inc.jsp"%>
+	<!--// foot end -->
+</body>
+</html>

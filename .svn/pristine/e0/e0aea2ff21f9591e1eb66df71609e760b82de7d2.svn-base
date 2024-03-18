@@ -1,0 +1,610 @@
+<%
+/****************************************************
+	system	: 신용상담사 > 고객센터 > Q&A > 상세보기
+	title	: 게시판 목록
+	summary	:	
+	wdate	: 2018-06-19
+	writer	: SANGS
+*****************************************************/
+%>
+<%@ page language="java" contentType="text/html; charset=utf-8" pageEncoding="utf-8"%>
+<%@ include file="/WEB-INF/jsp/ccedu/inc/taglib_inc.jsp"%>
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+	<c:if test="${REQUEST_DATA.bcateno eq '13'}">
+		<title>Q&A > 고객센터 > 신용상담사 > 신용회복위원회 신용교육원</title>
+	</c:if>
+	<c:if test="${REQUEST_DATA.bcateno eq '10'}">
+		<title>자유게시판 > 커뮤니티 > 지식마당 > 신용회복위원회 신용교육원</title>
+	</c:if>
+	<c:if test="${REQUEST_DATA.bcateno eq '7'}">
+		<title>생생교육현장 > 알림마당 > 신용회복위원회 신용교육원</title>
+	</c:if>
+	<%@ include file="/WEB-INF/jsp/ccedu/inc/head_inc.jsp"%>
+	<script type="text/javascript">
+		
+	
+		//이전/다음 상세보기
+		function fnView(mode, bbsNo){
+		    if(bbsNo == 0){
+		        if(mode == 'pre') fnModalMsg('첫 페이지입니다.');
+		        if(mode == 'next') fnModalMsg('마지막 페이지입니다.');
+	
+		    } else if(bbsNo != ''){
+		        $('#bbsNo').val(bbsNo);
+		        $('#bbsForm').attr('action', '/ccedu/cc/boardView.do').submit();
+		    }
+		}
+
+		//파일다운로드
+		function filedown(fileId, bbsNo, fileSeq){
+			var form = document.frm;
+			form.fileId.value = fileId;
+			form.bbsNo.value = bbsNo;
+			form.fileSeq.value = fileSeq;
+			
+			$("#frm").attr("action", "/ccedu/noticeFiledown.do").submit();
+		}
+
+		//다음버튼 클릭
+		function nextClick(bbsNo){
+			if(bbsNo.length != 0){
+				$("#bbsNo").val(bbsNo);
+				$("#frm").attr("action", "/ccedu/cc/boardCmtView.do").submit();
+			}else{
+				fnModalMsg("마지막페이지 입니다.");
+				return;
+			}
+		}
+
+		//이전버튼 클릭
+		function prevClick(bbsNo){
+			var url = "/ccedu/cc/cmtBoardList.do";
+			
+			var bcateno = $('#bcateno').val();
+
+			if(bcateno == '7'){
+				url = "notice";
+			} else if(bcateno == '10'){
+				url = "intellectual";
+			} else {
+				url = "cc";
+			} 
+
+			if(bbsNo.length != 0){
+				$("#bbsNo").val(bbsNo);
+				$("#frm").attr("action", "/ccedu/"+url+"/boardCmtView.do").submit();
+			}else{
+				fnModalMsg("처음페이지 입니다.");
+				return;
+			}
+		}
+
+		//목록 버튼 클릭
+		function mainList(bcateno){
+			var url = "/ccedu/cc/cmtBoardList.do";
+
+			if(bcateno == '1'){
+
+			} else if(bcateno == '4'){
+
+			} else if(bcateno == '6'){
+
+			} else if(bcateno == '7'){
+				url = "/ccedu/notice/thumBoardList.do";
+			} else if(bcateno == '10'){
+				url = "/ccedu/intellectual/cmtBoardList.do";
+			} else if(bcateno == '11'){
+				url = "/ccedu/cc/cmtBoardList.do";
+			} else if(bcateno == '13'){
+
+			} else if(bcateno == '14'){
+
+			}
+
+
+			$("#frm").attr("action", url).submit();
+		}
+
+
+		//목록으로이동 
+		function fnList(){
+		    $('form[name="bbsForm"]').attr('action', '<c:out value="${ctx}"/>/ccedu/cc/cmtBoardList.do').attr('target', '_self').submit();
+		}
+
+		//파일다운로드
+		function fnDown(fname,type){
+		    $('#filename').val(encodeURIComponent(fname));
+		    $('#ftype').val(type);
+		    $('form[name="bbsForm"]').attr('action', '/academy/filedown.do').submit();
+		}
+
+		//페이지 이동
+		function fnMoveForm(type){
+
+			$('#type').val(type);
+			if($("#bcateno").val() == '10') {
+				$('form[name="frm"]').attr('action', '/ccedu/intellectual/bbsForm.do').submit();
+			} else if($("#bcateno").val() == '13') {
+				$('form[name="frm"]').attr('action', '/ccedu/cc/bbsForm.do').submit();
+			}
+		}
+
+		// 댓글 등록
+		function boardReplyExec(mode) {
+
+			var msg = "";
+
+			if('insert' == mode) {
+				msg = "등록";
+			} else if('update' == mode) {
+				msg = "수정";
+			}
+			
+			
+			if( $('#cont').val() == "" ){
+				fnModalMsg("댓글을 입력해주세요.",function(){
+					$('#cont').focus();
+				});
+				return false;
+			}
+			
+			fnConfirm(msg+"하시겠습니까?",function(result){
+				if(result){
+			
+					var data = $("#cont").val();
+					
+					var content = data.replace(/\n/gi,"<br/>").replace(/\r\n/gi,"<br/>").replace(/\r/gi,"<br/>");
+			
+					$.ajax({
+						type : "POST",
+						dataType : "json",
+						url : "/academy/helpdesk/boardReplyExec.do",
+						data :  
+							{ 
+								qu : mode,
+					        	bbsNo : $("#bbsNo").val(),
+					        	content : content
+					        },
+					        
+					    success : function( data ) 
+					    	{
+					    		if(data != "FAIL") {
+
+					    			fnModalMsg("댓글이 " + msg + "되었습니다.",function(){
+					    				$("#cont").val("");
+						    			var html = "";
+						    			
+						    			for(var i = 0; i < data.length; i++) {
+						    				html += '<li><div class="user_name" style="word-wrap:break-word;">'+data[i].userId+'</div>';
+						    				html += '<p class="cmt_text">'+data[i].content+'</p>';
+						    				if(data[i].userId2 == '${REQUEST_DATA.SES_USERID}'){
+						    					var userid = "'" + data[i].userId + "'";
+						    					var userid2 = "'" + data[i].userId2 + "'";
+							    				html +=	'<div class="ctl">';
+							    				html +=	'<button type="button" class="btn_cmt_delete" onclick="deleteReply('+data[i].cmtno+','+userid2+',this); return false;">댓글 삭제하기</button>';
+							    				html +=	'</div></li>';
+						    				}else{
+							    				html +=	"</li>"
+						    				}
+						    			}
+						    			$('.bc_list').find('li').remove();
+						    			$('.bc_list').append(html);
+					    			});
+					    			
+					    		} else {
+					    			fnModalMsg("댓글 달기에 실패 했습니다. <br/>관리자에게 문의해주세요.");
+					    		 
+					    		}
+							} // function
+				 	}); // ajax
+				}
+			});
+			
+		}
+
+		// 댓글 삭제
+		function deleteReply(cmtNo, userId, pthis) {
+			
+			fnConfirm("정말로 삭제하시겠습니까?",function(result){
+				if(result){
+					$.ajax({
+						type : "POST",
+						dataType : "json",
+						url : "/academy/helpdesk/deleteReply.do",
+						data :  
+							{ 
+							  cmtNo : cmtNo
+						    , userid : userId
+						    , bbsNo : $("#bbsNo").val()
+					        },
+					    success : function( data )
+					    	{
+					    		if(data == "SUCCESS") {
+					    			fnModalMsg("댓글이 삭제되었습니다.",function(){
+					    				$(pthis).parents('li').remove();
+					    			});
+					    		} 
+							} // function
+				 	}); // ajax
+				}
+			});
+
+			
+		}
+
+		
+	</script>
+</head>
+
+<body>
+
+<!-- skip nav -->
+	<%@ include file="/WEB-INF/jsp/ccedu/inc/nav_inc.jsp"%>
+<!--// skip nav -->
+
+
+<div id="wrap">
+
+	<!-- header -->
+	<%@ include file="/WEB-INF/jsp/ccedu/inc/header_inc.jsp"%>
+	<!--// header -->
+
+	<!-- container -->
+	
+	<div id="container">
+
+		<!-- location -->
+		<!-- 사이트관리  -->
+		<c:if test="${REQUEST_DATA.bcateno eq '1'}">
+			<jsp:include page="/WEB-INF/jsp/ccedu/inc/location/loc_03_05.jsp"> 
+			  	<jsp:param name="menuNm" value="공지사항"/> 
+			</jsp:include> 
+		</c:if>
+		<c:if test="${REQUEST_DATA.bcateno eq '6'}">
+			<jsp:include page="/WEB-INF/jsp/ccedu/inc/location/loc_03_05.jsp"> 
+			  	<jsp:param name="menuNm" value="이벤트/공모전"/> 
+			</jsp:include> 
+		</c:if>
+		<c:if test="${REQUEST_DATA.bcateno eq '4'}">
+			<jsp:include page="/WEB-INF/jsp/ccedu/inc/location/loc_03_05.jsp"> 
+			  	<jsp:param name="menuNm" value="교욱원소식"/> 
+			</jsp:include> 
+		</c:if>
+		<!-- 생생교육현장 -->
+		<c:if test="${REQUEST_DATA.bcateno eq '7'}">
+			<jsp:include page="/WEB-INF/jsp/ccedu/inc/location/loc_05_04.jsp"> 
+			  	<jsp:param name="menuNm" value="생생교육현장"/> 
+			</jsp:include> 
+		</c:if>
+		<!-- 자유게시판 -->
+		<c:if test="${REQUEST_DATA.bcateno eq '10'}">
+			<jsp:include page="/WEB-INF/jsp/ccedu/inc/location/loc_04_02.jsp"> 
+			  	<jsp:param name="menuNm" value="자유게시판"/> 
+			</jsp:include> 
+		</c:if>
+		<!-- 신용상담사  -->
+		<c:if test="${REQUEST_DATA.bcateno eq '11'}">
+			<jsp:include page="/WEB-INF/jsp/ccedu/inc/location/loc_03_05.jsp"> 
+			  	<jsp:param name="menuNm" value="공지사항"/> 
+			</jsp:include> 
+		</c:if>
+		<c:if test="${REQUEST_DATA.bcateno eq '13'}">
+			<jsp:include page="/WEB-INF/jsp/ccedu/inc/location/loc_03_05.jsp"> 
+			  	<jsp:param name="menuNm" value="Q&A"/> 
+			</jsp:include> 
+		</c:if>
+		<c:if test="${REQUEST_DATA.bcateno eq '14'}">
+			<jsp:include page="/WEB-INF/jsp/ccedu/inc/location/loc_03_05.jsp"> 
+			  	<jsp:param name="menuNm" value="자료실"/> 
+			</jsp:include> 
+		</c:if>
+		<!--// location -->
+
+		<div class="con_center">
+
+			<!-- lnb -->
+			<div id="lnb">
+				<!--  사이트관리  -->
+				<c:if test="${REQUEST_DATA.bcateno eq '1'}">
+					<jsp:include page="/WEB-INF/jsp/ccedu/inc/lnb/lnb_05.jsp"> 
+					  	<jsp:param name="dep2" value="05"/>
+					  	<jsp:param name="dep3" value="01"/> 
+					</jsp:include>
+				</c:if>
+				<c:if test="${REQUEST_DATA.bcateno eq '6'}">
+					<jsp:include page="/WEB-INF/jsp/ccedu/inc/lnb/lnb_05.jsp"> 
+					  	<jsp:param name="dep2" value="05"/>
+					  	<jsp:param name="dep3" value="01"/> 
+					</jsp:include>
+				</c:if>
+				<c:if test="${REQUEST_DATA.bcateno eq '4'}">
+					<jsp:include page="/WEB-INF/jsp/ccedu/inc/lnb/lnb_05.jsp"> 
+					  	<jsp:param name="dep2" value="05"/>
+					  	<jsp:param name="dep3" value="01"/> 
+					</jsp:include>
+				</c:if>
+
+				<c:if test="${REQUEST_DATA.bcateno eq '7'}">
+					<jsp:include page="/WEB-INF/jsp/ccedu/inc/lnb/lnb_05.jsp"> 
+					  	<jsp:param name="dep2" value="04"/>
+					</jsp:include>
+				</c:if>
+
+				<!-- 자유게시판 -->
+				<c:if test="${REQUEST_DATA.bcateno eq '10'}">
+					<jsp:include page="/WEB-INF/jsp/ccedu/inc/lnb/lnb_04.jsp"> 
+					  	<jsp:param name="dep2" value="02"/>
+					  	<jsp:param name="dep3" value="01"/> 
+					</jsp:include>
+				</c:if>
+				<!-- 신용상담사 -->
+				<c:if test="${REQUEST_DATA.bcateno eq '11'}">
+					<jsp:include page="/WEB-INF/jsp/ccedu/inc/lnb/lnb_03.jsp"> 
+					  	<jsp:param name="dep2" value="05"/>
+					  	<jsp:param name="dep3" value="01"/> 
+					</jsp:include>
+				</c:if>
+				<c:if test="${REQUEST_DATA.bcateno eq '13'}">
+					<jsp:include page="/WEB-INF/jsp/ccedu/inc/lnb/lnb_03.jsp"> 
+					  	<jsp:param name="dep2" value="05"/>
+					  	<jsp:param name="dep3" value="03"/> 
+					</jsp:include>
+				</c:if> 
+				<c:if test="${REQUEST_DATA.bcateno eq '14'}">
+					<jsp:include page="/WEB-INF/jsp/ccedu/inc/lnb/lnb_03.jsp"> 
+					  	<jsp:param name="dep2" value="05"/>
+					  	<jsp:param name="dep3" value="04"/> 
+					</jsp:include>
+				</c:if>   
+			</div>
+			
+			<!--// lnb -->
+			
+			<!-- content 본문 -->
+			<div id="content">
+				<!-- 기존 START 2018-08-30  -->
+<!-- 				<h3 class="cont_titile"> -->
+<%-- 					<c:if test="${REQUEST_DATA.bcateno eq '1'}"> --%>
+<!-- 					공지사항 -->
+<%-- 					</c:if> --%>
+<%-- 					<c:if test="${REQUEST_DATA.bcateno eq '6'}"> --%>
+<!-- 					이벤트/공모전 -->
+<%-- 					</c:if> --%>
+<%-- 					<c:if test="${REQUEST_DATA.bcateno eq '4'}"> --%>
+<!-- 					교욱원소식 -->
+<%-- 					</c:if> --%>
+<!-- 					생생교육현장 -->
+<%-- 					<c:if test="${REQUEST_DATA.bcateno eq '7'}"> --%>
+<!-- 					생생교육현장 -->
+<%-- 					</c:if> --%>
+<!-- 					자유게시판 -->
+<%-- 					<c:if test="${REQUEST_DATA.bcateno eq '10'}"> --%>
+<!-- 					자유게시판 -->
+<%-- 					</c:if> --%>
+<!-- 					신용상담사  -->
+<%-- 					<c:if test="${REQUEST_DATA.bcateno eq '11'}"> --%>
+<!-- 					공지사항 -->
+<%-- 					</c:if> --%>
+<%-- 					<c:if test="${REQUEST_DATA.bcateno eq '13'}"> --%>
+<!-- 					Q&A -->
+<%-- 					</c:if> --%>
+<%-- 					<c:if test="${REQUEST_DATA.bcateno eq '14'}"> --%>
+<!-- 					자료실 -->
+<%-- 					</c:if> --%>
+<!-- 				</h3> -->
+				<!-- 기존 END 2018-08-30  -->
+				
+				<!-- 2018-08-28 김동인 작업 S --> 
+				<c:if test="${REQUEST_DATA.bcateno eq '13'}"><h3 class="cont_titile type03">Q&A<span></span></h3></c:if>
+				<c:if test="${REQUEST_DATA.bcateno eq '10'}"><h3 class="cont_titile type04">자유게시판<span></span></h3></c:if>
+				<c:if test="${REQUEST_DATA.bcateno eq '7'}"><h3 class="cont_titile type05">생생교육현장<span></span></h3></c:if>
+				<!-- 2018-08-28 김동인 작업 E -->
+				<!-- 본문내용 -->
+				<div class="cont_body">
+					<!-- start -->
+					<form name="frm" id="frm" action="" method="post">
+						<input type="hidden" name="bcateno" id="bcateno" value="${REQUEST_DATA.bcateno}"/>
+						<input type="hidden" name="bbsNo" id="bbsNo" value="${rowData.BBSNO}"/>
+						<input type="hidden" name="fileId" id="fileId" value=""/>
+						<input type="hidden" name="fileSeq" id="fileSeq" value=""/>
+						<input type="hidden" name="type" id="type" value=""/>
+						
+						<div class="c_section">
+							
+							<c:if test="${REQUEST_DATA.bcateno eq '13'}">
+							<!--2018-08-28 김동인 작업 s-->
+								<h2 class="bullet_question"><span></span>질문</h2>
+							<!--2018-08-28 김동인 작업 e-->
+							</c:if>
+							
+							<div class="board_view">
+								<div class="b_title">
+<%-- 									<h4><c:out value="${rowData.TITLE}" escapeXml="false;"/></h4> --%>
+									<h4><c:out value="${title}"/></h4>
+								</div>
+
+								<div class="b_info">
+									<div class="line">
+										<dl>
+											<dt>작성일</dt>
+											<dd><c:out value="${rowData.WDATE}"/></dd>
+										</dl>
+										<dl>
+											<dt>조회수</dt>
+											<dd><c:out value="${rowData.RCNT}"/></dd>
+										</dl>
+									</div>
+									<c:if test="${REQUEST_DATA.bcateno ne '10'}">
+										<div class="line">
+											<dl class="wid100">
+												<dt>첨부파일</dt>
+												<dd>
+												<c:choose>
+													<c:when test="${empty listData}">
+														<div class="file_box">
+															첨부파일이 없습니다.
+														</div>
+													</c:when>
+													<c:when test="${not empty listData}">
+														<div class="file_box">
+															<c:forEach items="${listData}" var="result" varStatus="status">
+																<a href="#" onclick="filedown('<c:out value="${result.FILE_ID}" />' , '<c:out value="${result.BBSNO}" />', '<c:out value="${result.FILE_SEQ}" />');return false" title="다운로드">
+																	<c:out value="${result.ORGFILE}"/><br>
+																</a>
+															</c:forEach>
+														</div>
+													</c:when>
+												</c:choose>
+												</dd>
+											</dl>
+										</div>
+									</c:if>
+								</div>
+
+								<div class="b_content" style="word-wrap:break-word;">
+<%-- 									<pre><c:out value="${rowData.CONTENT}"/></pre> --%>
+<%-- 									<pre><c:out value="${rowData.CONTENT}" escapeXml="true" /></pre> --%>
+									<p>
+<%-- 										<c:out value="${rowData.CONTENT}" escapeXml="false"/> --%>
+										<c:out value="${content}" escapeXml="false"/>
+									</p>
+								</div>
+								
+								<!-- 댓글 -->
+								<c:if test="${REQUEST_DATA.bcateno eq '10' or REQUEST_DATA.bcateno eq '7'}">
+									<div class="b_comment">
+										<h4 class="alt_text">댓글쓰기</h4>
+										<div class="bc_head">
+											<c:if test="${REQUEST_DATA.loginDiv=='N'}">
+												<textarea cols="50" rows="10" name="contentText" id="cont" placeholder="<c:out value='${REQUEST_DATA.cmtTitle}' escapeXml="false"/>" title="<c:out value='${REQUEST_DATA.cmtTitle}' escapeXml="false"/>" disabled="disabled"></textarea>
+												<button type="button" onclick="fnModalMsg('로그인 해주세요.')" class="btn_cmt_submit">등록</button>
+											</c:if>
+											
+											<c:if test="${REQUEST_DATA.loginDiv !='N'}">
+												<textarea cols="50" rows="10" name="contentText" id="cont" placeholder="<c:out value='${REQUEST_DATA.cmtTitle}' escapeXml="false"/>" title="<c:out value='${REQUEST_DATA.cmtTitle}' escapeXml="false"/>"></textarea>
+												<button type="button" onclick="boardReplyExec('insert')" class="btn_cmt_submit">등록</button>
+											</c:if>
+
+										</div>
+										<h4 class="alt_text">댓글리스트</h4>
+										<ul class="bc_list">
+											<c:forEach items="${cmtListReply}" var="replyResult" varStatus="status">
+												<li>
+													<div class="user_name"><c:out value='${replyResult.USERID}' escapeXml="false"/></div>
+													<p class="cmt_text" style="word-wrap:break-word;">
+														<c:out value='${replyResult.CONTENT}' escapeXml="false"/>
+													</p>
+													<c:if test="${ replyResult.USERID2 eq REQUEST_DATA.SES_USERID }">
+														<div class="ctl">
+															<!-- <button type="button" class="btn_cmt_modify">댓글 수정하기</button> -->
+															<button type="button" class="btn_cmt_delete" onclick="deleteReply('<c:out value="${replyResult.CMTNO}"/>','<c:out value="${replyResult.USERID2}"/>',this); return false;">댓글 삭제하기</button>
+														</div>
+													</c:if>
+												</li>
+											</c:forEach>
+										</ul>
+									</div>
+								</c:if>
+								<!--// 댓글 -->
+								<!-- 답변영역 -->
+								<c:if test="${REQUEST_DATA.bcateno eq '13'}">
+									<c:if test="${rowData.ANYN eq 'Y'}">
+										<!--2018-08-28 김동인 작업 s-->
+										<h2 class="bullet_answer"><span></span>담당자 답변</h2>
+										<!--2018-08-28 김동인 작업 e-->
+									
+										<div class="answer_section">
+										
+											<div class="b_info">
+												<div class="line">
+													<dl>
+														<dt>담당자</dt>
+														<dd>
+															<c:if test="${cmtRowData.CMTWRITER eq 'admin'}">	
+																관리자
+															</c:if>
+															<c:if test="${cmtRowData.CMTWRITER ne 'admin'}">	
+																<c:out value="${cmtRowData.CMTWRITER}"/>
+															</c:if>
+														</dd>
+													</dl>
+													<dl>
+														<dt>답변일</dt>
+														<dd >${cmtRowData.CMTWDATE}</dd>
+													</dl>
+												</div>
+											</div>
+											<div class="b_content" style="word-break:break-all;">
+												<p>
+													<c:out value='${cmtRowData.REPLY}' escapeXml="false"/>
+												</p>
+											</div>
+										</div>
+									</c:if>
+								</c:if>
+								<!--// 답변영역 -->
+								
+								<div class="c_btn_right02">
+									<!-- 작성자일 경우  -->
+									<c:if test="${REQUEST_DATA.userInfoDiv=='Y'}">
+											<a href="#" onclick="fnMoveForm('UPDATE');return false" class="btn_bluebg03">수정</a>
+									</c:if>
+									<a href="#" onclick="mainList('${REQUEST_DATA.bcateno}');return false" class="btn_blueline03">목록</a>
+								</div>
+
+								<ul class="prev_next">
+									<li>
+										<span class="view_prev">이전글</span>
+										<div class="view_title_box">
+											<c:if test="${prevData.TITLE eq null || prevData.TITLE eq ''}">
+												<p class="view_title">이전글이 없습니다.</p>
+											</c:if>
+											<c:if test="${prevData.TITLE ne null || prevData.TITLE ne ''}">
+												<a href="#" onclick="prevClick('<c:out value="${prevData.BBSNO}"/>', '<c:out value="${REQUEST_DATA.bcateno}"/>');return false" class="view_title">
+													<c:out value="${prevData.TITLE}"/>
+												</a>
+											</c:if>
+										</div>
+									</li>
+									<li>
+										<span class="view_next">다음글</span>
+										<div class="view_title_box">
+											<c:if test="${nextData.TITLE eq null || nextData.TITLE eq ''}">
+												<p class="view_title">다음글이 없습니다.</p>
+											</c:if>
+											<c:if test="${nextData.TITLE ne null || nextData.TITLE ne ''}">
+												<a href="#" onclick="nextClick('<c:out value="${nextData.BBSNO}"/>', '<c:out value="${REQUEST_DATA.bcateno}"/>');return false" class="view_title">
+													<c:out value="${nextData.TITLE}"/>
+												</a>
+											</c:if>
+										</div>
+									</li>
+								</ul>
+
+							</div>
+
+						</div>
+					</form>
+					<!--// end -->
+				</div>
+				<!--// 본문내용 -->
+				
+			<!--  -->
+			</div>
+			<!--// content 본문 -->
+			
+		</div>
+	
+	</div>
+	<!--// container -->
+
+	<!-- foot -->
+	<%@ include file="/WEB-INF/jsp/ccedu/inc/footer_inc.jsp"%>
+	<!--// foot end -->
+
+</div>
+
+</body>
+</html>

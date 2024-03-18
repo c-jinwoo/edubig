@@ -1,0 +1,173 @@
+package com.webapp.ccedu.service.impl;
+
+import java.util.List;
+
+import javax.annotation.Resource;
+
+import org.springframework.stereotype.Service;
+
+import com.sangs.support.DataMap;
+import com.sangs.support.EduMap;
+import com.sangs.support.FrontException;
+import com.sangs.util.ParamUtil;
+import com.webapp.ccedu.mapper.OnlineEducationMapper;
+import com.webapp.ccedu.service.OnlineEducationService;
+import com.webapp.classdesk.service.ConvertJavaToProcedureService;
+
+
+/**
+ * Description : 사용자 > 신용상담사 > 자격시험(자격소개 / 시험안내 / 시험(일정)공고 )
+ * 
+ * Modification Information
+ * 수정일			수정자			수정내용
+ * -------		-----------------------------------
+ * 2020.09.29	CSLAB		최초작성
+ *
+ */
+
+@Service("onlineEducationService")
+public class OnlineEducationServiceImpl implements OnlineEducationService {
+	
+	@Resource(name = "onlineEducationMapper")
+	private OnlineEducationMapper onlineEducationMapper;
+	 
+	
+	@Resource(name = "convertJavaToProcedureService")
+    private ConvertJavaToProcedureService convertJavaToProcedureService;
+	    
+    /**
+     * 온라인교육 > 과정목록
+     * 
+     * @param data
+     * @return
+     * @throws Exception
+     */
+    public List<EduMap> selectOnlineDetailList(DataMap data) throws Exception {
+        data.setInt("rowCount", 6);
+        ParamUtil.setPagingValue(data);
+        return onlineEducationMapper.selectOnlineDetailList(data);
+    }
+    
+    public Integer getPaymentPrice(String orderno) throws Exception{
+    	return onlineEducationMapper.getPaymentPrice(orderno);
+    }
+    
+    
+    /**
+     * 온라인교육 > 과정 상세
+     * @param request
+     * @param model
+     * @param rMap
+     * @return
+     * @throws FrontException
+     */
+    public EduMap getEdCourseSeqInfo(DataMap data) throws Exception {
+        return onlineEducationMapper.getEdCourseSeqInfo(data);
+    }
+    /**
+     * 온라인교육 > 과정타이틀
+     * @param rMap
+     * @return
+     * @throws Exception
+     */   
+    public String selectOnlineDetailTitle(String str) throws Exception{
+    	return onlineEducationMapper.selectOnlineDetailTitle(str);
+    }
+    
+    /**
+     * 온라인교육 > 과정 파일 조회 
+     * 
+     * @param data
+     * @return
+     * @throws Exception
+     */
+    public List<EduMap> getCurriculum(DataMap data) throws Exception {
+        return onlineEducationMapper.getCurriculum(data);
+    }
+    
+    /**
+     * 온라인교육 > 과정 파일정보
+     *
+     * @param data
+     * @return
+     * @throws Exception
+     */
+    public List<EduMap> getFileInfoByCourseNo(int data) throws Exception {
+        return onlineEducationMapper.getFileInfoByCourseNo(data);
+    }
+    
+    /**
+     * 온라인교육 > 과정 파일정보
+     *
+     * @param data
+     * @return
+     * @throws Exception
+     */
+    public List<EduMap> getFileInfoByCourseNo2(DataMap data) throws Exception {
+        return onlineEducationMapper.getFileInfoByCourseNo2(data);
+    }
+    
+    /**
+     * 온라인교육 > 과정 자막 파일정보
+     *
+     * @param data
+     * @return
+     * @throws Exception
+     */
+    public List<EduMap> getTxtFileInfoByCourseNo(DataMap data) throws Exception {
+        return onlineEducationMapper.getTxtFileInfoByCourseNo(data);
+    }
+    
+    /**
+     * 온라인교육 > 교육 조회
+     *
+     * @param data
+     * @return
+     * @throws Exception
+     */
+    public EduMap getCourseAppUserInfo(DataMap data) throws Exception {
+        return onlineEducationMapper.getCourseAppUserInfo(data);
+    }
+    
+    
+    /**
+     * 일반 입금신청
+     *
+     * @param data
+     * @throws Exception
+     */
+    public void insertCourApplyExec(DataMap data) throws Exception {
+        onlineEducationMapper.insertCourseApplyExec(data);
+    }
+    
+    /**
+     * 온라인교육 > 보증시스템 교육이수 여부 확인 
+     *
+     * @param data
+     * @throws Exception
+     */
+    public EduMap getGuarPttnNoChk(DataMap data) throws Exception {
+        return onlineEducationMapper.getGuarPttnNoChk(data);
+    }
+
+    /**
+     * 온라인교육 > 결제
+     *
+     * @param data
+     * @throws Exception
+     */
+    public void insertPayment(DataMap data) throws Exception {
+        onlineEducationMapper.insertPayment(data);
+    }
+    /**
+     * 온라인교육 > 결제
+     *
+     * @param data
+     * @throws Exception
+     */
+    public Integer selectPaymentLastOrder() throws Exception {    	
+        return onlineEducationMapper.selectPaymentLastOrder();
+    }
+    
+
+}

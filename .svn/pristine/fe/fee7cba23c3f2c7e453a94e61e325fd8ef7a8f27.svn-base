@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.webapp.ccedu.mapper.IntellectualFieldMapper">
+	<!--     상시설문조사 -->
+    <select id="selectsitePollList" resultType="emap" parameterType="dmap">
+        /* selectsitePollList */
+		SELECT A.*
+		  FROM ( SELECT ROW_NUMBER() OVER(ORDER BY WDATE DESC  ) AS RNUM
+		              , POLLCSEQNO
+		              , TITLE
+		              , TO_CHAR(SDATE,'YYYY-MM-DD') AS SDATE
+		              , TO_CHAR(EDATE,'YYYY-MM-DD') AS EDATE
+		              , CASE WHEN TO_CHAR(TO_DATE(SYSDATE,'YYYY-MM-DD'),'YYYY-MM-DD') BETWEEN TO_CHAR(TO_DATE(SDATE,'YYYY-MM-DD'),'YYYY-MM-DD') AND TO_CHAR(TO_DATE(EDATE,'YYYY-MM-DD'),'YYYY-MM-DD')
+                             THEN 'Y'
+                             ELSE 'N'
+                              END AS DATE_CHK_YN
+		           FROM ED_POLL
+		          WHERE 1 = 1
+		            AND USEYN = 'Y'
+		            AND MT_POLL_TYPE = 'PT0003'
+		       ORDER BY WDATE DESC
+		       ) A
+		WHERE 1 = 1
+		  AND RNUM BETWEEN #{startNo} AND #{endNo} 
+    </select>
+    <!--     상시설문조사 총 개수-->
+    <select id="selectsitePollListCnt" resultType="int" parameterType="dmap">
+        SELECT COUNT(*)
+          FROM ED_POLL
+         WHERE 1 = 1
+           AND USEYN = 'Y'
+           AND MT_POLL_TYPE = 'PT0003'
+   ORDER BY WDATE DESC
+    </select> 
+    
+    <!-- 시험기간 여부 체크-->
+    <select id="selectsitePollInfo" resultType="emap" parameterType="dmap">
+         SELECT ROW_NUMBER() OVER(ORDER BY WDATE DESC  ) AS RNUM
+                 , POLLCSEQNO
+                 , TITLE
+                 , SUMMARY
+                 , TO_CHAR(SDATE,'YYYY-MM-DD') AS SDATE
+                 , TO_CHAR(EDATE,'YYYY-MM-DD') AS EDATE
+                 , CASE WHEN TO_CHAR(SYSDATE,'YYMMDD') BETWEEN REPLACE(SDATE,'/','') AND REPLACE(EDATE,'/','')
+                             THEN 'Y'
+                             ELSE 'N'
+                              END DATE_CHK_YN
+          FROM ED_POLL
+         WHERE 1 = 1
+             AND USEYN = 'Y'
+             AND POLLCSEQNO = #{pollCseQno}
+    </select>
+    
+    
+</mapper>

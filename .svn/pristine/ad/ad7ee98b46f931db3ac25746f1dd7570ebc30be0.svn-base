@@ -1,0 +1,522 @@
+package com.webapp.ccedu.ctrl;
+
+import java.io.PrintWriter;
+
+import javax.annotation.Resource;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
+
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.RequestMapping;
+
+import com.google.gson.Gson;
+import com.ibm.icu.util.Calendar;
+import com.sangs.session.UserSessionManager;
+import com.sangs.support.DataMap;
+import com.sangs.support.EduMap;
+import com.sangs.support.FrontException;
+import com.sangs.support.SangsProperties;
+import com.sangs.util.NxKeyUtil;
+import com.sangs.util.SangsCryptUtil;
+import com.sangs.util.SangsUtil;
+import com.webapp.academy.service.CommonService;
+import com.webapp.academy.service.UserService;
+import com.webapp.common.service.CommonEmsService;
+import com.webapp.common.service.CommonUserService;
+
+/**
+ * Description : 회원 관련 컨트롤러
+ *
+ * Modification Information
+ * 수정일			수정자			수정내용
+ * -------		-----------------------------------
+ * 2020.09.29	CSLAB		최초작성
+ *
+ */
+
+@Controller
+public class MemberController {
+	
+    private Logger  log = LogManager.getLogger(MemberController.class);
+
+    @Resource(name = "userService")
+    private UserService       userService;
+
+    @Resource(name = "commonUserService")
+    private CommonUserService commonUserService;
+
+    @Resource(name = "commonService")
+    private CommonService commonService;
+
+    @Resource(name = "commonEmsService")
+    private CommonEmsService commonEmsService;
+
+
+    /**
+     * 회원가입 > 회원구분
+     * @param request
+     * @param model
+     * @param rMap
+     * @return
+     * @throws FrontException
+     */
+    // TODO: 회원가입 > 회원구분
+    @RequestMapping(value = "/ccedu/user/memberJoinType.do")
+    public String memberJoinType(HttpServletRequest request, HttpServletResponse res, DataMap rMap) throws FrontException {
+
+        if ("Y".equals(rMap.getString("SES_ISLOGIN")) || rMap.getInt("SES_USERNO") > 0) {
+            request.setAttribute("msg", "로그인 상태에서는 회원가입을 할 수 없습니다.");
+            request.setAttribute("url", "/ccedu/main/main.do");
+            return "forward:/common/msgForward.do";
+        }
+        
+        request.setAttribute("REQUEST_DATA", rMap);
+
+        return "ccedu/member/member_join_type";
+    }
+    
+    /**
+     * 회원가입 > 약관동의
+     * @param request
+     * @param model
+     * @param rMap
+     * @return
+     * @throws FrontException
+     */
+    // TODO: 회원가입 > 약관동의
+    @RequestMapping(value = "/ccedu/user/memberJoinStep01.do")
+    public String memberJoinStep01(HttpServletRequest request, HttpServletResponse res, DataMap rMap) throws FrontException {
+
+        if ("Y".equals(rMap.getString("SES_ISLOGIN")) || rMap.getInt("SES_USERNO") > 0) {
+            request.setAttribute("msg", "로그인 상태에서는 회원가입을 할 수 없습니다.");
+            request.setAttribute("url", "/ccedu/main/main.do");
+            return "forward:/common/msgForward.do";
+        }
+        
+        request.setAttribute("REQUEST_DATA", rMap);
+
+        return "ccedu/member/member_join_step01";
+    }
+    
+    /**
+     * 회원가입 > 실명인증
+     * @param request
+     * @param model
+     * @param rMap
+     * @return
+     * @throws FrontException
+     */
+    // TODO: 회원가입 > 실명인증
+    @RequestMapping(value = "/ccedu/user/memberJoinStep02.do")
+    public String memberJoinStep02(HttpServletRequest request, HttpServletResponse res, DataMap rMap) throws FrontException {
+
+        if ("Y".equals(rMap.getString("SES_ISLOGIN")) || rMap.getInt("SES_USERNO") > 0) {
+            request.setAttribute("msg", "로그인 상태에서는 회원가입을 할 수 없습니다.");
+            request.setAttribute("url", "/ccedu/main/main.do");
+            return "forward:/common/msgForward.do";
+        }
+        
+        String mberType = rMap.getString("mberType");
+        if("".equals(mberType)){
+        	request.setAttribute("msg", "회원 구분값이 누락되었습니다.");
+            request.setAttribute("url", "/ccedu/user/memberJoinType.do");
+            return "forward:/common/msgForward.do";
+        }
+        
+        // 18.07.30 주니어도 부모님의 정보로 인증후 진행하도록 변경 (실제 부모인지는 확인 불가능)
+        //주니어 회원의 경우 본인인증 없이 회원가입 진행
+        /*if("J".equals(mberType)){
+        	rMap.putString("$mberType", mberType);
+        	
+        	DataMap removeDataMap = new DataMap();
+    	    removeDataMap = SangsUtil.dataMapRemoveScriptTag(rMap);
+    	    
+        	request.setAttribute("paramInputs", ControllerParamManager.getParamHtmlFormConvert(removeDataMap));
+            request.setAttribute("url", "/ccedu/user/memberJoinStep03.do");
+            return "forward:/common/msgForward.do";
+        }*/
+        
+        request.setAttribute("REQUEST_DATA", rMap);
+
+        return "ccedu/member/member_join_step02";
+    }
+    
+    
+    
+    /**
+     * 회원가입 > 회원정보 등록
+     * @param request
+     * @param model
+     * @param rMap
+     * @return
+     * @throws FrontException
+     */
+    // TODO: 회원가입 > 등록
+    @RequestMapping(value = "/ccedu/user/memberJoinStep03.do")
+    public String memberJoinStep03(HttpServletRequest request, HttpServletResponse res, DataMap rMap) throws FrontException {
+
+        if ("Y".equals(rMap.getString("SES_ISLOGIN")) || rMap.getInt("SES_USERNO") > 0) {// 로그인 안했다면
+            request.setAttribute("msg", "로그인 상태에서는 회원가입을 할 수 없습니다.");
+            request.setAttribute("url", "/ccedu/main/main.do");
+            return "forward:/common/msgForward.do";
+        }
+        
+        String mberType = rMap.getString("mberType");
+        if("".equals(mberType)){
+        	request.setAttribute("msg", "회원 구분값이 누락되었습니다.");
+            request.setAttribute("url", "/ccedu/user/memberJoinType.do");
+            return "forward:/common/msgForward.do";
+        }
+        
+       /* if("N".equals(mberType) && ("".equals(rMap.getString("confirmGubun")) || "".equals(rMap.getString("di")))){
+        	request.setAttribute("msg", "본인인증 데이터가 누락되었습니다.");
+            request.setAttribute("url", "/ccedu/user/memberJoinType.do");
+            return "forward:/common/msgForward.do";
+        }*/
+        
+        // 실명 인증 로그
+      /*  if("Y".equals(rMap.getString("dataGubun"))){	
+    		try {
+    			List result = new ArrayList();
+				commonService.insertRealNameAuth((ArrayList) result, rMap);
+			} catch (Exception e) {
+				log.debug(e);
+			}
+        }*/
+
+        try {
+            //	이메일 도메인 목록
+            rMap.setString("mtCode","MA");
+            request.setAttribute("mailDomainCodeList", commonService.selectMtCodeSub(rMap));
+            
+            //	직업 목록
+            rMap.setString("mtCode","JO");
+            request.setAttribute("jobKndCodeList", commonService.selectMtCodeSub(rMap));
+            
+            //	가입경로 목록
+            rMap.setString("mtCode","PA");
+            request.setAttribute("userPathCodeList", commonService.selectMtCodeSub(rMap));
+            
+            request.setAttribute("REQUEST_DATA", rMap);
+        } 
+        catch (Exception e) { log.debug(e.getMessage());
+            throw new FrontException(e);
+        }
+        
+        return "ccedu/member/member_join_step03";
+    }
+    
+    
+    
+    /**
+     * 회원가입 > 회원정보 등록 폼 실행 (EXEC)
+     * @param request
+     * @param model
+     * @param rMap
+     * @return
+     * @throws FrontException
+     */
+    // TODO: 회원가입 > 회원정보 등록 폼 실행
+    @RequestMapping(value = "/ccedu/user/memberJoinExec.do")
+    public String memberJoinExec(HttpServletRequest request, HttpServletResponse res, DataMap rMap) throws FrontException {
+    	if ("Y".equals(rMap.getString("SES_ISLOGIN")) || rMap.getInt("SES_USERNO") > 0) {// 로그인 안했다면
+            request.setAttribute("msg", "로그인 상태에서는 회원가입을 할 수 없습니다.");
+            request.setAttribute("url", "/ccedu/main/main.do");
+            return "forward:/common/msgForward.do";
+        }
+        
+      String mberType = rMap.getString("mberType");
+      if("".equals(mberType)){
+      	request.setAttribute("msg", "회원 구분값이 누락되었습니다.");
+          request.setAttribute("url", "/ccedu/user/memberJoinType.do");
+          return "forward:/common/msgForward.do";
+      }    	
+        HttpSession session = request.getSession();
+        try {
+        	/*일반회원이면서 가입정보가 존재 함
+            if("N".equals(mberType)){
+    	      	request.setAttribute("msg", "이미 가입정보가 있습니다.");
+    	        request.setAttribute("url", "/ccedu/common/login.do");
+    	        return "forward:/common/msgForward.do";
+    		}
+            */
+
+            String password = SangsCryptUtil.crypt(rMap.getString("userPassword"));
+            
+            //승인상태 Y
+            rMap.setString("regAt", "Y");      
+            rMap.setString("userPassword", password);       
+            rMap.setString("brthdy",rMap.getString("brthdy").replace(" ", ""));
+        	rMap.setString("url", "/ccedu/user/memberJoinStep04.do");
+
+            userService.insertUnityMber(rMap);
+            	
+            request.setAttribute("REQUEST_DATA", rMap);            
+        } 
+        catch (Exception e) {
+			log.error(e.getMessage());
+			throw new FrontException(e);
+		}
+        return "redirect:/ccedu/user/memberJoinStep04.do?joinYn=Y&mberType="+mberType;
+    }
+    
+    
+    /**
+     * 회원가입 > 회원가입 완료
+     * @param request
+     * @param model
+     * @param rMap
+     * @return
+     * @throws FrontException
+     */
+    // TODO: 회원가입  완료
+    @RequestMapping(value = "/ccedu/user/memberJoinStep04.do")
+    public String memberJoinStep04(HttpServletRequest request, HttpServletResponse res, DataMap rMap) throws FrontException {
+
+       if ("Y".equals(rMap.getString("SES_ISLOGIN")) || rMap.getInt("SES_USERNO") > 0) {
+            request.setAttribute("msg", "로그인 상태에서는 회원가입을 할 수 없습니다.");
+            request.setAttribute("url", "/ccedu/main/main.do");
+            return "forward:/common/msgForward.do";
+        }
+        
+        if (!"Y".equals(rMap.getString("joinYn"))) {
+            return "redirect:/ccedu/main/main.do";
+        }
+        
+        
+        
+        try{
+            rMap.setString("msg", "회원가입 되었습니다.");
+
+            request.setAttribute("menu_nm", "mypage");
+            request.setAttribute("lnb_menu", "memberJoin");
+            rMap.setString("title", SangsProperties.getProperty("Globals.memberJoinAgree"));
+
+            request.setAttribute("REQUEST_DATA", rMap);
+        } catch (Exception e) { log.debug(e.getMessage());
+            throw new FrontException(e);
+        }
+        return  "ccedu/member/member_join_step04";
+    }
+    
+    
+    /**
+     * 회원 가입 중복 체크
+     * @param request
+     * @param rMap
+     * @throws Exception
+     */
+    @RequestMapping(value = "/ccedu/user/memberDupChkAjax.do")
+    public void memberDupChkAjax(HttpServletRequest request, HttpServletResponse res, DataMap rMap) throws Exception {
+        res.setContentType("text/html; charset=utf-8");
+        PrintWriter out = res.getWriter();
+        Gson gson = new Gson();
+        String json = null;
+
+        try {
+        	int dupCnt = userService.memberDupChk(rMap).getInt("DUP_CNT");
+            json = gson.toJson(String.valueOf(dupCnt));
+        } catch (Exception ex) {
+            json = gson.toJson("FAIL");
+        }
+
+        out.print(json);
+        out.flush();
+        out.close();
+
+    }
+    
+    
+    
+    /**
+     * 회원 가입 아이디 중복체크 (ajax)
+     * @param request
+     * @param rMap
+     * @throws Exception
+     */
+    @RequestMapping(value = "/ccedu/user/searchId.do")
+    public void searchId(HttpServletRequest request, HttpServletResponse res, DataMap rMap) throws Exception {
+        res.setContentType("text/html; charset=utf-8");
+        PrintWriter out = res.getWriter();
+        Gson gson = new Gson();
+        String json = null;
+
+        try {
+
+            request.setAttribute("userId", userService.searchMberId(rMap));
+
+            int checkStat = 0;
+
+            //중복값 존재
+            if (request.getAttribute("userId") != null) {
+                checkStat = 1;
+
+                //검색결과 없음
+            } else {
+                checkStat = 0;
+            }
+            json = gson.toJson(String.valueOf(checkStat));
+        } catch (Exception ex) {
+            json = gson.toJson("FAIL");
+        }
+
+        out.print(json);
+        out.flush();
+        out.close();
+
+    }
+    /**
+     * 회원 가입 아이디 중복체크 (ajax)
+     * @param request
+     * @param rMap
+     * @throws Exception
+     */
+    @RequestMapping(value = "/ccedu/user/searchEmail.do")
+    public void searchEmail(HttpServletRequest request, HttpServletResponse res, DataMap rMap) throws Exception {
+        res.setContentType("text/html; charset=utf-8");
+        PrintWriter out = res.getWriter();
+        Gson gson = new Gson();
+        String json = null;
+
+        try {
+
+            request.setAttribute("email", userService.searchMberEmail(rMap));
+
+            int checkStat = 0;
+
+            //중복값 존재
+            if (request.getAttribute("email") != null) {
+                checkStat = 1;
+
+                //검색결과 없음
+            } else {
+                checkStat = 0;
+            }
+            json = gson.toJson(String.valueOf(checkStat));
+        } catch (Exception ex) {
+            json = gson.toJson("FAIL");
+        }
+
+        out.print(json);
+        out.flush();
+        out.close();
+
+    }
+    
+    
+    /**
+     * 기타 > 아이디 비밀번호찾기 폼
+     * @param request
+     * @param model
+     * @param rMap
+     * @return
+     * @throws Exception 
+     */
+    @RequestMapping(value = "/ccedu/user/memberFindIdPw.do")
+    public String memberFindIdPw(HttpServletRequest request, HttpServletResponse res, DataMap rMap) throws Exception {
+
+        if ("Y".equals(rMap.getString("SES_ISLOGIN")) || rMap.getInt("SES_USERNO") > 0) {// 로그인 안했다면
+            request.setAttribute("msg", "로그인 상태에서는 아이디/비밀번호 찾기를 할 수 없습니다.");
+            request.setAttribute("url", "/ccedu/main/main.do");
+            return "forward:/common/msgForward.do";
+        }
+
+        //	이메일 도메인 목록
+        rMap.setString("mtCode","MA");
+        request.setAttribute("mailDomainCodeList", commonService.selectMtCodeSub(rMap));
+        
+        rMap.setInt("nowYear", Calendar.getInstance().get(Calendar.YEAR));
+        request.setAttribute("REQUEST_DATA", rMap);
+        
+        return "ccedu/member/member_find_idpw";
+    }
+    
+
+
+    
+    /**
+     * 아이디 찾기 결과
+     * @param request
+     * @param rMap
+     * @throws Exception
+     */
+    @RequestMapping(value = "/ccedu/user/memberFindIdAjax.do")
+    public void memberFindIdAjax(HttpServletRequest request, HttpServletResponse res, DataMap rMap) throws Exception {
+        res.setContentType("text/html; charset=utf-8");
+        PrintWriter out = res.getWriter();
+        Gson gson = new Gson();
+        String json = null;
+        EduMap eMap = null;
+        
+        try {
+        	
+        	String authCode = UserSessionManager.getSessionString(request, "authCode"); // 인증 값
+        	String userAuthNumber = UserSessionManager.getSessionString(request, "userAuthNumber"); // 사용자 값
+        	
+        	if(authCode.equals(userAuthNumber)){
+        		
+        		eMap = userService.getFindId(rMap);
+        		json = gson.toJson(eMap);
+        		/** 세션 정보를 삭제한다. */
+                UserSessionManager.deleteUserSessionVO(request);
+        		
+        	} else {
+        		json = gson.toJson("CERT_FAIL");
+        	}
+        	
+            
+            
+        } catch (Exception ex) {
+        	/** 세션 정보를 삭제한다. */
+            UserSessionManager.deleteUserSessionVO(request);
+            json = gson.toJson("FAIL");
+        }
+
+        out.print(json);
+        out.flush();
+        out.close();
+
+    }
+    
+    /**
+     * 패스워드 찾기 결과 ajax
+     * @param request
+     * @param rMap
+     * @throws Exception
+     */
+    @RequestMapping(value = "/ccedu/user/memberFindPwAjax.do")
+    public void memberFindPwAjax(HttpServletRequest request, HttpServletResponse res, DataMap rMap) throws Exception {
+        res.setContentType("text/html; charset=utf-8");
+        PrintWriter out = res.getWriter();
+        Gson gson = new Gson();
+        String json = null;
+        EduMap eMap = null;
+        
+        try {
+        	
+        	
+        	String authCode = UserSessionManager.getSessionString(request, "authCode"); // 인증 값
+        	String userAuthNumber = UserSessionManager.getSessionString(request, "userAuthNumber"); // 사용자 값
+        	
+        	if(authCode.equals(userAuthNumber)){
+                
+                eMap = userService.getFindPw(rMap);
+                json = gson.toJson(eMap);
+        		
+        	} else {
+        		json = gson.toJson("CERT_FAIL");
+        	}
+            
+        } catch (Exception ex) {
+            json = gson.toJson("FAIL");
+        }
+
+        out.print(json);
+        out.flush();
+        out.close();
+
+    }
+}

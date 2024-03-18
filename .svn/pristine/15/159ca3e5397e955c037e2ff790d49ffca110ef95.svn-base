@@ -1,0 +1,337 @@
+<%
+/****************************************
+    subject : 신용상담사
+    summary : 신용상담사 : 합격자조회/자격증신청 > 합격자조회 > 상세보기
+    author  : SANGS
+    date    : 2018-06-15
+****************************************/
+%>
+<%@ page language="java" contentType="text/html; charset=utf-8" pageEncoding="utf-8"%>
+<%@ include file="/WEB-INF/jsp/ccedu/inc/taglib_inc.jsp"%>
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+	<title>합격자조회 > 합격자조회/자격증신청 > 신용상담사 > 신용회복위원회 신용교육원</title>
+	<%@ include file="/WEB-INF/jsp/ccedu/inc/head_inc.jsp"%>
+	<script type="text/javascript">
+		
+		
+		 $(document).ready(function(){
+			 $('.nothing').hide();
+			 if('<c:out value='${REQUEST_DATA.soyangDiv}'/>' == 'Y' && '<c:out value='${rowData.PASS_YN}'/>' == 'Y'){
+				$('.nothing').show();
+
+				//레이어 팝업 확인 클릭시 
+				$('#layerpopChk').click(function(){
+					$('#frm').attr('action', '/ccedu/cc/passAddInfo.do');
+					$('#frm').submit();
+				});
+
+				//레이어 팝업 취소 클릭시
+				$('#layerpopClose').click(function(){
+					$('.nothing').hide();
+				});				
+
+				
+			};	 
+		 });
+		
+	
+		function examPassYnListGo() {
+			location.href="/ccedu/cc/examPassYnList.do";
+		}
+		
+		// 합격자 > 소양체크
+		function addInfo(){
+			
+			$('#frm').attr('action', '/ccedu/cc/addEduCheck.do');
+			$('#frm').submit();
+			
+		}
+	
+	</script>
+</head>
+
+
+<body>
+
+<!-- skip nav -->
+	<%@ include file="/WEB-INF/jsp/ccedu/inc/nav_inc.jsp"%>
+<!--// skip nav -->
+
+
+<div id="wrap">
+
+	<!-- popup -->
+	<div class="layerpop nothing" tabindex="0" data-tooltip-con="popsearch01" data-focus="popsearch01" data-focus-prev="popsearch01-close" style="display: block;">
+		<div class="layer_mask tooltip-close"></div><!-- 블랙mask영역 -->
+		<div class="layer_cont">
+			<div class="lc_head">
+				<h4 class="lc_tit">합격자 조회</h4>
+			</div>
+			<div class="lc_cont">
+				<div class="image_area">
+					<img src="/cmmn/modal/images/event.png" alt="">
+				</div>
+				<p>축하합니다!! <br>소양교육을 받으시고, 추가정보를<br>입력하시길 바랍니다.</p>
+				<div class="c_btn_center">
+					<button type="button" id="layerpopChk" class="btn_bluebg02">확인</button>
+				</div>
+			</div>
+		</div>
+		<button type="button" id="layerpopClose" class="btn_close tooltip-close" data-focus="popsearch01-close" data-focus-next="popsearch01">닫기</button>
+	</div>
+	<!--// popup -->
+
+	<!-- header -->
+	<%@ include file="/WEB-INF/jsp/ccedu/inc/header_inc.jsp"%>
+	<!--// header -->
+
+	<!-- container -->
+	<div id="container">
+
+		<!-- location -->
+		<jsp:include page="/WEB-INF/jsp/ccedu/inc/location/loc_03_03.jsp"> 
+		  	<jsp:param name="menuNm" value="합격자조회"/> 
+		</jsp:include> 
+		<!--// location -->
+
+		<div class="con_center">
+
+			<!-- lnb -->
+			<div id="lnb">
+				<jsp:include page="/WEB-INF/jsp/ccedu/inc/lnb/lnb_03.jsp"> 
+				  	<jsp:param name="dep2" value="03"/>
+				  	<jsp:param name="dep3" value="01"/> 
+				</jsp:include> 
+			</div>
+			<!--// lnb -->
+			
+			
+			<form id="frm" name="frm" method="post">		
+			<!-- content 본문 -->
+			<div id="content">
+			
+				<!-- 기존 START 2018-08-30  -->
+<!-- 				<h3 class="cont_titile">합격자 조회</h3> -->
+				<!-- 기존 END 2018-08-30  -->
+				
+				<!-- 2018-08-28 김동인 작업 S --> 
+				<h3 class="cont_titile type03">합격자 조회<span></span></h3>
+				<!-- 2018-08-28 김동인 작업 E -->
+
+				<!-- 본문내용 -->
+				<div class="cont_body">
+					<!-- start -->
+
+					<div class="c_section">
+						<h4 class="c_tit">기본정보</h4>
+						<div class="table_style_row">
+							<input type = "hidden" id="ccNo" name ="ccNo" value="${REQUEST_DATA.ccNo}"/>
+							<input type = "hidden" id="mtAppType" name ="mtAppType" value="${REQUEST_DATA.mtAppType}"/>
+							<input type = "hidden" id="ccAppNo" name ="ccAppNo" value="${REQUEST_DATA.ccAppNo}"/>
+							<table>
+								<caption>기본정보를 확인할수있는 표 입니다.</caption>
+								<colgroup>
+									<col class="col2_1" />
+									<col  />
+								</colgroup>
+								<tr>
+									<th scope="row">시행년도</th>
+									<td><c:out value='${rowData.YEAR}'/>년</td>
+								</tr>
+								<tr>
+									<th scope="row">응시구분</th>
+									<td><c:out value='${rowData.MT_APP_NAME}'/></td>
+								</tr>
+								<tr>
+									<th scope="row">회차</th>
+									<td><c:out value='${rowData.MT_ROUND_NAME}'/></td>
+								</tr>
+								<tr>
+									<c:if test="${rowData.PASS_YN ne 'Y'}">
+										<th scope="row">수험번호</th>
+										<td><c:out value='${rowData.EXAM_NO}'/></td>    
+									</c:if>
+									<c:if test="${rowData.PASS_YN eq 'Y'}">
+										<th scope="row">합격번호</th>
+										<td><c:out value='${rowData.LICENSE_NO}'/></td>    
+									</c:if>
+									
+								</tr>
+								<tr>
+									<th scope="row">사진</th>
+									<td>
+										<div class="u_view_photo"><img src="<c:out value='${rowData.SAVPATH}'/>/<c:out value='${rowData.SAVFILE}'/>" alt="인물사진입니다." height="113px;" width="103px;"/></div>
+									</td>
+								</tr>
+								<tr>
+									<th scope="row">성명</th>
+									<td><c:out value='${rowData.MBERNM}'/></td>
+								</tr>
+								<c:if test="${rowData.PASS_YN eq 'Y'}">
+								    <c:if test="${not empty rowData.JUMIN1}">
+										<tr>
+											<th scope="row">주민번호</th>
+											<td>
+												<c:out value="${rowData.JUMIN1 }"/> - <c:out value="${fn:substring(rowData.JUMIN2, 0, 1) }"/>******
+											</td>
+										</tr>
+									</c:if>
+								</c:if>
+								<tr>
+									<th scope="row">핸드폰번호</th>
+									<td><c:out value='${rowData.MOBLPHON}'/></td>
+								</tr>
+								<tr>
+									<th scope="row">유선전화</th>
+									<td><c:out value='${rowData.TELNO}'/></td>
+								</tr>
+								<tr>
+									<th scope="row">이메일</th>
+									<td><c:out value='${rowData.EMAIL}'/></td>
+								</tr>
+								<tr>
+									<th scope="row">주소</th>
+									<td><c:out value='${rowData.ADDR_CODE}  ${rowData.ADDRESS} ${rowData.ADDRESS2}'/></td>
+								</tr>
+								<tr>
+									<th scope="row">학력</th>
+									<td><c:out value='${rowData.MT_EUD_NAME}'/></td>
+								</tr>
+								<c:if test="${rowData.PASS_YN eq 'Y'}">
+									<tr>
+										<th scope="row">최종학교명</th>
+										<td>
+											<c:if test="${rowData.PASS_YN eq 'Y'}"><c:out value='${rowData.FIN_SCHOOL_NM}'/></c:if>
+										</td>
+									</tr>
+								
+									<tr>
+										<th scope="row">학과(전공)</th>
+										<td>
+											<c:if test="${rowData.PASS_YN eq 'Y'}"><c:out value='${rowData.MAJOR}'/></c:if>
+										</td>
+									</tr>
+								</c:if>
+								<tr>
+									<th scope="row">직업</th>
+									<td><c:out value='${rowData.JOB}'/></td>
+								</tr>
+								<tr>
+									<th scope="row">취약계층</th>
+									<td><c:out value='${rowData.DIS_YN}'/></td>
+								</tr>
+								<tr>
+									<th scope="row">학생유무</th>
+									<td><c:out value='${rowData.STD_YN}'/></td>
+								</tr>
+								<tr>
+									<th scope="row">응시장소</th>
+									<td><c:out value='${rowData.PLACE_LOC}'/> - <c:out value='${rowData.PLACE_TITLE}'/></td>
+								</tr>
+							</table>
+						</div>
+					</div>
+
+					<div class="c_section">
+						<h4 class="c_tit">합격여부</h4>
+						<div class="table_style_col">
+							<table>
+								<caption>합격여부 확인할수있는 표 입니다.</caption>
+								<colgroup>
+									<col  />
+									<col  />
+									<col  />
+									<col  />
+									<col  />
+									<col  />
+									<col  />
+									<col  />
+								</colgroup>
+								<thead>
+									<tr>
+										<th scope="colgroup" colspan="4">과목별 점수</th>
+										<th scope="col" rowspan="2">총점</th>
+										<th scope="col" rowspan="2">평균</th>
+										<th scope="col" rowspan="2">합격 여부</th>
+										<th scope="col" rowspan="2">비고</th>
+									</tr>
+									<tr>
+										<th scope="col">1과목</th>
+										<th scope="col">2과목</th>
+										<th scope="col">3과목</th>
+										<th scope="col">4과목</th>
+									</tr>
+								</thead>
+								<tbody>
+									<tr>
+										<td class="align_center"><c:out value='${rowData.SUBJECT1}'/></td>
+										<td class="align_center"><c:out value='${rowData.SUBJECT2}'/></td>
+										<td class="align_center"><c:out value='${rowData.SUBJECT3}'/></td>
+										<td class="align_center"><c:out value='${rowData.SUBJECT4}'/></td>
+										<td class="align_center"><c:out value='${rowData.TOTAL}'/></td>
+										<td class="align_center"><c:out value='${rowData.AVERAGE}'/></td>
+										<td class="align_center">
+											<c:if test="${rowData.PASS_YN eq 'Y'}"><span class="color_blue">합격</span></c:if>
+											<c:if test="${rowData.PASS_YN ne 'Y'}"><span class="color_blue">불합격</span></c:if>
+										</td>
+										<td class="align_center">
+											<c:if test="${rowData.PASS_YN eq 'Y'}">-</c:if>
+											<c:if test="${rowData.PASS_YN ne 'Y'}"><c:out value='${rowData.ETC}'/></c:if>
+										</td>
+									</tr>
+								</tbody>
+							</table>
+						</div>
+					</div>
+
+<!-- 					<div class="c_section"> -->
+<!-- 						<h4 class="c_tit">요약</h4> -->
+<!-- 						<div class="table_style_row"> -->
+<!-- 							<table> -->
+<!-- 								<caption>결론을 알려드리는 표 입니다.</caption> -->
+<!-- 								<colgroup> -->
+<!-- 									<col class="col2_1" /> -->
+<!-- 									<col  /> -->
+<!-- 								</colgroup> -->
+<!-- 								<tr> -->
+<!-- 									<th scope="row">결론</th> -->
+<!-- 									<td> -->
+<%-- 										<c:if test="${rowData.PASS_YN eq 'Y'}"> 국가공인 신용상담사 자격시험에 합격하셨습니다. 축하드립니다.</c:if> --%>
+<%-- 										<c:if test="${rowData.PASS_YN ne 'Y'}"> 금번 시험에 불합격하셨습니다. 다음 기회를 이용하시기 바라며, 신용상담사 자격시험에 관심을 가져주셔서 진심으로 감사드립니다.</c:if> --%>
+<!-- 									</td> -->
+<!-- 								</tr> -->
+<!-- 							</table> -->
+<!-- 						</div> -->
+<!-- 					</div> -->
+
+					<div class="c_btn_right_m_center">
+<%-- 						<c:if test="${rowData.PASS_YN eq 'Y'}"> --%>
+<!-- 							<a href="page" onclick="addInfo(); return false;" class="btn_blueline03">추가정보입력</a>&nbsp;&nbsp;&nbsp;&nbsp; -->
+<%-- 						</c:if> --%>
+						<a href="page" onclick="examPassYnListGo(); return false;" class="btn_blueline03">목록</a>
+					</div>
+					
+					<!--// end -->
+				</div>
+				<!--// 본문내용 -->
+				
+			<!--  -->
+			</div>
+			<!--// content 본문 -->
+			</form>
+		<!-- con_cneter end -->
+		</div>
+	
+	</div>
+	<!--// container -->
+
+	<!-- foot -->
+	<%@ include file="/WEB-INF/jsp/ccedu/inc/footer_inc.jsp"%>
+	<!--// foot end -->
+
+</div>
+
+</body>
+</html>

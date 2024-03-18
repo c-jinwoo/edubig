@@ -1,0 +1,377 @@
+<%
+/****************************************
+    subject : 온라인교육
+    summary : 온라인교육 > 교육소개
+    author  : SANGS
+    date    : 2018-06-15
+****************************************/
+%>
+<%@ page language="java" contentType="text/html; charset=utf-8" pageEncoding="utf-8"%>
+<%@ include file="/WEB-INF/jsp/ccedu/inc/taglib_inc.jsp"%>
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+	<title>신용건강검진 ( 문제 ) > 지식마당 > 신용회복위원회 </title>
+	<%@ include file="/WEB-INF/jsp/ccedu/inc/head_inc.jsp"%>
+</head>
+
+<body>
+<!-- skip nav -->
+	<%@ include file="/WEB-INF/jsp/ccedu/inc/nav_inc.jsp"%>
+<!--// skip nav -->
+<script type="text/javascript">
+	function fnSubmit() {
+		var sum = 0; 
+
+		$('input[type=radio]').each(function(){ 
+			if($(this).is(':checked')) sum += parseInt($(this).val()); 
+		}); 
+
+		$('#sum').val(sum);
+		$('form[name=frm]').attr('action', '/ccedu/intellectual/creditHealthCheckupResult.do').submit();
+	}
+
+</script>
+<div id="wrap">
+
+	<!-- header -->
+	<%@ include file="/WEB-INF/jsp/ccedu/inc/header_inc.jsp"%>
+	<!--// header -->
+
+	<!-- container -->
+	<div id="container">
+
+		<!-- location -->
+		<jsp:include page="/WEB-INF/jsp/ccedu/inc/location/loc_04_03.jsp"> 
+		  	<jsp:param name="menuNm" value="신용건강검진"/> 
+		</jsp:include> 
+		<!--// location -->
+
+		<div class="con_center">
+
+			<!-- lnb -->
+			<div id="lnb">
+				<jsp:include page="/WEB-INF/jsp/ccedu/inc/lnb/lnb_04.jsp"> 
+				  	<jsp:param name="dep2" value="04"/>
+				</jsp:include>
+			</div>
+			<!--// lnb -->
+
+			<!-- content 본문 -->
+			<div id="content">
+				
+				
+				<!-- 기존 START 2018-08-30  -->
+<!-- 				<h3 class="cont_titile">신용건강검진</h3> -->
+				<!-- 기존 END 2018-08-30  -->
+				
+				<!-- 2018-08-28 김동인 작업 S --> 
+				<h3 class="cont_titile type04">신용건강검진<span></span></h3>
+				<!-- 2018-08-28 김동인 작업 E -->
+
+				<form name="frm" id="frm" action="" method="post">
+					<input type="hidden" name="sum" id="sum" value=""/>
+				</form>
+
+				<!-- 본문내용 -->
+				<div class="cont_body">
+					<!-- start -->
+
+					<div class="questionnaire">
+						<h4 class="q_title">신용건강검진</h4>
+						<ol class="q_list">
+							<!-- step01 -->
+							<li>
+								<h5 class="q_list_tit"><span class="num">1</span>채권자가 나를 상대로 법적인 조치를 취하고 있다.</h5>
+								<ul class="q_list_con">
+									<li>
+										<input type="radio" id="q1_1" name="q1" value="0" />
+										<label for="q1_1">그렇다</label>
+									</li>
+									<li>
+										<input type="radio" id="q1_2" name="q1" value="5" />
+										<label for="q1_2">아니다</label>
+									</li>
+								</ul>
+							</li>
+							<li>
+								<h5 class="q_list_tit"><span class="num">2</span>파산신청을 할까 궁리 중이다.</h5>
+								<ul class="q_list_con">
+									<li>
+										<input type="radio" id="q2_1" name="q2" value="0" />
+										<label for="q2_1">그렇다</label>
+									</li>
+									<li>
+										<input type="radio" id="q2_2" name="q2" value="5" />
+										<label for="q2_2">아니다</label>
+									</li>
+								</ul>
+							</li>
+							<li>
+								<h5 class="q_list_tit"><span class="num">3</span>부채를 해결할 희망이 보이지 않아 자살하고 싶은 충동이 있다.</h5>
+								<ul class="q_list_con">
+									<li>
+										<input type="radio" id="q3_1" name="q3" value="0" />
+										<label for="q3_1">그렇다</label>
+									</li>
+									<li>
+										<input type="radio" id="q3_2" name="q3" value="5" />
+										<label for="q3_2">아니다</label>
+									</li>
+								</ul>
+							</li>
+							<li>
+								<h5 class="q_list_tit"><span class="num">4</span>고리의 사채를 쓰고 있다.</h5>
+								<ul class="q_list_con">
+									<li>
+										<input type="radio" id="q4_1" name="q4" value="0" />
+										<label for="q4_1">그렇다</label>
+									</li>
+									<li>
+										<input type="radio" id="q4_2" name="q4" value="5" />
+										<label for="q4_2">아니다</label>
+									</li>
+								</ul>
+							</li>
+							<li>
+								<h5 class="q_list_tit"><span class="num">5</span>빚 독촉 때문에 전화를 받기가 꺼려진다.</h5>
+								<ul class="q_list_con">
+									<li>
+										<input type="radio" id="q5_1" name="q5" value="0" />
+										<label for="q5_1">그렇다</label>
+									</li>
+									<li>
+										<input type="radio" id="q5_2" name="q5" value="5" />
+										<label for="q5_2">아니다</label>
+									</li>
+								</ul>
+							</li>
+							<!-- //step01 -->
+							<!-- step02 -->
+							<li>
+								<h5 class="q_list_tit"><span class="num">6</span>대출금(신용카드 현금서비스 포함), 할부금 등을 연체하고 있다.</h5>
+								<ul class="q_list_con">
+									<li>
+										<input type="radio" id="q6_1" name="q6" value="0" />
+										<label for="q6_1">그렇다</label>
+									</li>
+									<li>
+										<input type="radio" id="q6_2" name="q6" value="5" />
+										<label for="q6_2">아니다</label>
+									</li>
+								</ul>
+							</li>
+							<li>
+								<h5 class="q_list_tit"><span class="num">7</span>빚을 갚기 위해 살고 있는 집을 줄이거나 처분해야 한다.</h5>
+								<ul class="q_list_con">
+									<li>
+										<input type="radio" id="q7_1" name="q7" value="0" />
+										<label for="q7_1">그렇다</label>
+									</li>
+									<li>
+										<input type="radio" id="q7_2" name="q7" value="5" />
+										<label for="q7_2">아니다</label>
+									</li>
+								</ul>
+							</li>
+							<li>
+								<h5 class="q_list_tit"><span class="num">8</span>채권자가 나를 상대로 법적인 조치를 취하겠다고 협박하고 있다.</h5>
+								<ul class="q_list_con">
+									<li>
+										<input type="radio" id="q8_1" name="q8" value="0" />
+										<label for="q8_1">그렇다</label>
+									</li>
+									<li>
+										<input type="radio" id="q8_2" name="q8" value="5" />
+										<label for="q8_2">아니다</label>
+									</li>
+								</ul>
+							</li>
+							<li>
+								<h5 class="q_list_tit"><span class="num">9</span>대출이나 신용카드 발급을 거절당하고 있다.</h5>
+								<ul class="q_list_con">
+									<li>
+										<input type="radio" id="q9_1" name="q9" value="0" />
+										<label for="q9_1">그렇다</label>
+									</li>
+									<li>
+										<input type="radio" id="q9_2" name="q9" value="5" />
+										<label for="q9_2">아니다</label>
+									</li>
+								</ul>
+							</li>
+							<li>
+								<h5 class="q_list_tit"><span class="num">10</span>나로 인해 가족들의 빚이 증가하고 있다.</h5>
+								<ul class="q_list_con">
+									<li>
+										<input type="radio" id="q10_1" name="q10" value="0" />
+										<label for="q10_1">그렇다</label>
+									</li>
+									<li>
+										<input type="radio" id="q10_2" name="q10" value="5" />
+										<label for="q10_2">아니다</label>
+									</li>
+								</ul>
+							</li>
+							<!-- //step02 -->
+							<!-- step03 -->
+							<li>
+								<h5 class="q_list_tit"><span class="num">11</span>집세나 아파트 관리비 등 반드시 내야 되는 돈을 내지 못하고 있다.</h5>
+								<ul class="q_list_con">
+									<li>
+										<input type="radio" id="q11_1" name="q11" value="0" />
+										<label for="q11_1">그렇다</label>
+									</li>
+									<li>
+										<input type="radio" id="q11_2" name="q11" value="5" />
+										<label for="q11_2">아니다</label>
+									</li>
+								</ul>
+							</li>
+							<li>
+								<h5 class="q_list_tit"><span class="num">12</span>빚을 갚기 위해 또 다른 빚을 졌다.</h5>
+								<ul class="q_list_con">
+									<li>
+										<input type="radio" id="q12_1" name="q12" value="0" />
+										<label for="q12_1">그렇다</label>
+									</li>
+									<li>
+										<input type="radio" id="q12_2" name="q12" value="5" />
+										<label for="q12_2">아니다</label>
+									</li>
+								</ul>
+							</li>
+							<li>
+								<h5 class="q_list_tit"><span class="num">13</span>돈 때문에 직장이나 가정 또는 대인관계에 문제가 생겼다.</h5>
+								<ul class="q_list_con">
+									<li>
+										<input type="radio" id="q13_1" name="q13" value="0" />
+										<label for="q13_1">그렇다</label>
+									</li>
+									<li>
+										<input type="radio" id="q13_2" name="q13" value="5" />
+										<label for="q13_2">아니다</label>
+									</li>
+								</ul>
+							</li>
+							<li>
+								<h5 class="q_list_tit"><span class="num">14</span>빚이 얼마나 되는지 계산하는 것이 두렵다.</h5>
+								<ul class="q_list_con">
+									<li>
+										<input type="radio" id="q14_1" name="q14" value="0" />
+										<label for="q14_1">그렇다</label>
+									</li>
+									<li>
+										<input type="radio" id="q14_2" name="q14" value="5" />
+										<label for="q14_2">아니다</label>
+									</li>
+								</ul>
+							</li>
+							<li>
+								<h5 class="q_list_tit"><span class="num">15</span>빚을 갚기 위해 만기가 되지 않은 적금이나 보험을 해약해야 한다.</h5>
+								<ul class="q_list_con">
+									<li>
+										<input type="radio" id="q15_1" name="q15" value="0" />
+										<label for="q15_1">그렇다</label>
+									</li>
+									<li>
+										<input type="radio" id="q15_2" name="q15" value="5" />
+										<label for="q15_2">아니다</label>
+									</li>
+								</ul>
+							</li>
+							<!-- /step03 -->
+							<!-- step04 -->
+							<li>
+								<h5 class="q_list_tit"><span class="num">16</span>빚을 갚기 위해 매달 지불해야 하는 돈(부채상환금)의 액수가 얼마인지 정확히 모른다.</h5>
+								<ul class="q_list_con">
+									<li>
+										<input type="radio" id="q16_1" name="q16" value="0" />
+										<label for="q16_1">그렇다</label>
+									</li>
+									<li>
+										<input type="radio" id="q16_2" name="q16" value="5" />
+										<label for="q16_2">아니다</label>
+									</li>
+								</ul>
+							</li>
+							<li>
+								<h5 class="q_list_tit"><span class="num">17</span>하나 이상의 신용카드를 한도액까지 사용하고 있다.</h5>
+								<ul class="q_list_con">
+									<li>
+										<input type="radio" id="q17_1" name="q17" value="0" />
+										<label for="q17_1">그렇다</label>
+									</li>
+									<li>
+										<input type="radio" id="q17_2" name="q17" value="5" />
+										<label for="q17_2">아니다</label>
+									</li>
+								</ul>
+							</li>
+							<li>
+								<h5 class="q_list_tit"><span class="num">18</span>다른 가족이 모르는 빚이 있다.</h5>
+								<ul class="q_list_con">
+									<li>
+										<input type="radio" id="q18_1" name="q18" value="0" />
+										<label for="q18_1">그렇다</label>
+									</li>
+									<li>
+										<input type="radio" id="q18_2" name="q18" value="5" />
+										<label for="q18_2">아니다</label>
+									</li>
+								</ul>
+							</li>
+							<li>
+								<h5 class="q_list_tit"><span class="num">19</span>저축한 돈이 거의 없거나 전혀 없다.</h5>
+								<ul class="q_list_con">
+									<li>
+										<input type="radio" id="q19_1" name="q19" value="0" />
+										<label for="q19_1">그렇다</label>
+									</li>
+									<li>
+										<input type="radio" id="q19_2" name="q19" value="5" />
+										<label for="q19_2">아니다</label>
+									</li>
+								</ul>
+							</li>
+							<li>
+								<h5 class="q_list_tit"><span class="num">20</span>은행통장의 잔고가 마이너스다.</h5>
+								<ul class="q_list_con">
+									<li>
+										<input type="radio" id="q20_1" name="q20" value="0" />
+										<label for="q20_1">그렇다</label>
+									</li>
+									<li>
+										<input type="radio" id="q20_2" name="q20" value="5" />
+										<label for="q20_2">아니다</label>
+									</li>
+								</ul>
+							</li>
+							<!-- //step04 -->
+						</ol>
+					</div>
+
+					<div class="c_btn_center">
+						<button type="button" class="btn_bluebg03" onclick="fnSubmit()" data-tooltip="alertpop01">결과확인</button>
+					</div>
+
+					<!--// end -->
+				</div>
+				<!--// 본문내용 -->
+				
+			<!--  -->
+			</div>
+			<!--// content 본문 -->
+
+		</div>
+	</div>
+	<!--// container -->
+
+	<!-- foot -->
+	<%@ include file="/WEB-INF/jsp/ccedu/inc/footer_inc.jsp"%>
+	<!--// foot end -->
+
+</div>
+
+</body>
+</html>

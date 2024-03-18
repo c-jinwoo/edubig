@@ -1,0 +1,7 @@
+User-agent: * 
+Disallow: /ccedu/myclass/
+Disallow: /ccedu/mypage/
+Disallow: /ccedu/user/
+Disallow: /ccedu/common/
+
+Sitemap: https://www.edubig.co.kr/sitemap.xml

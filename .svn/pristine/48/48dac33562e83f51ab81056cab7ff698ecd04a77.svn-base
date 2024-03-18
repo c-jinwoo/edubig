@@ -1,0 +1,109 @@
+<%
+/****************************************
+	subject	: 이용약관
+	summary	: 
+	author	: 이진영
+	date	: 2016-07-07
+****************************************/
+%>
+<%@ page language="java" contentType="text/html; charset=utf-8" pageEncoding="utf-8"%>
+<%@ include file="/WEB-INF/jsp/common/inc/taglib_inc.jsp"%>
+<%@ include file="/WEB-INF/jsp/academy/cmmn/inc/top_inc.jsp"%>
+<%@ include file="/WEB-INF/jsp/academy/cmmn/inc/header_inc.jsp"%>
+
+<div class="container" id="Subcontent">
+	<article class="subArea">
+        <div class="subCntWrap">
+			
+		<%@ include file="/WEB-INF/jsp/academy/cmmn/inc/lnb_edu.jsp"%>
+			<div class="path">
+	            <ul>
+	                <li><span class="home text-hide">홈</span></li>
+	                <li>금융교육</li>
+	                <li class="active">금융교육 소개</li>
+	            </ul>
+	        </div>
+			<div class="subConts" id="sub-content">
+				  <section class="bgTop_cate08"><!--   카테고리별 이미지 추가  -->
+	            		<div class="contTop">
+	            			 <h2 class="h2_tit">금융교육 소개</h2>
+	            		</div>           	
+	          	  </section>
+	
+				<div class="contents" id="sContents">
+	
+					<section>
+                                <h3 class="main_tit">교육근거</h3>
+                                <div class="borBoxW3">
+                                    <ul class="li_dash">
+                                        <li class="po_C7 fnt15">신용교육원은 <strong><span class="po_C4">「서민의 금융생활 지원에 관한 법률」 제24조 제1항 제1호*</span>에 의거 서민의 금융생활과 관련된 교육을 실시</strong>하고 있습니다.</li>
+                                    </ul>
+                                    <p class="mrg_l10">* 제24조(진흥원의 업무) 제1항 제1호 서민의 금융생활 관련 상담, 교육 및 정보제공</p>
+                                </div>
+                            </section>
+
+                            <hr>
+                            <section>
+                                <h3 class="main_tit">교육방향</h3>
+                                <div class="borBox">
+                                    <div class="icoRow">
+                                        <div>
+                                            <dl>
+                                                <dt><img src="../../../academy/images/sub/introIco01.png" alt=""></dt>
+                                                <dd>
+                                                    <div><strong class="po_C7">금융소비자</strong> 개개인의 <strong class="po_C7">금융이해력</strong>을 제고시키고 건전한 금융의사결정을 도와줌으로써,</div>
+                                                    <div>금융상품의 올바른 수요를 확대하는 등 금융포용을 확대</div>
+                                                </dd>
+                                            </dl>
+                                        </div>
+                                        <div>
+                                            <dl>
+                                                <dt><img src="../../../academy/images/sub/introIco02.png" alt=""></dt>
+                                                <dd>
+                                                    <div>서민, 취약계층, 대출이용자, 상담전문인력, 정부부처·공공기관 유관기관</div>
+                                                    <div>대상자 등 <strong class="po_C7">다양한 교육 대상자의 수요를 반영한 맞춤형 교육의 실시</strong></div>
+                                                </dd>
+                                            </dl>
+                                        </div>
+                                        <div>
+                                            <dl>
+                                                <dt><img src="../../../academy/images/sub/introIco03.png" alt=""></dt>
+                                                <dd>
+                                                    <div><strong class="po_C7">금융소외대상자</strong>의 금융이해력 수준에 맞는 금융교육을 모바일,&nbsp;온라인,&nbsp;전파 형식 등 다양한 방법으로 제공</div>
+                                                </dd>
+                                            </dl>
+                                        </div>
+
+
+                                    </div>
+                                </div>
+                            </section>
+
+                            <hr>
+
+                            <section>
+                                <h3 class="main_tit">교육연혁</h3>
+                                <div class="eduHisWrap">
+                                    <ul>
+                                        <li><strong>‘17.3월</strong><span>‘찾아가는 금융교육’ 개시</span></li>
+                                        <li><strong>‘17.3월</strong><span>서민금융 전문강사 선발 및 교육 실시</span></li>
+                                        <li><strong>‘17.3월</strong><span> ‘찾아가는 금융교육’ 표준교안 제작(9개 주제)</span></li>
+                                        <li><strong>‘16.12월</strong><span>금융교육협의회 가입</span></li>
+                                        <li><strong>‘12.6월</strong><span>창업·사업운영자금, 대학생·청년 햇살론 이용자 의무교육 개시</span></li>
+                                        <li><strong>‘11.3월</strong><span>마이크로크레딧전문가 양성교육 개시</span></li>
+                                    </ul>
+                                </div>
+                            </section>
+	
+	
+				</div><!-- //contents-->
+		
+		
+		
+			</div><!-- //sub-contents -->
+	
+		</div><!-- //sub-wrap -->
+	</article>
+</div>
+<!-- footer -->
+<%@ include file="/WEB-INF/jsp/academy/cmmn/inc/footer_inc.jsp"%>

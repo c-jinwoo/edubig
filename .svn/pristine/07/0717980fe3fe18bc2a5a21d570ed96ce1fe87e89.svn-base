@@ -1,0 +1,124 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.webapp.academy.mapper.MyClassEduMapper">
+	
+	<!--쿼리명 : 과정 수료증 정보 조회-->
+	<select id="getCompInfo" resultType="emap" parameterType="dmap">
+		 SELECT
+            A.COMPCODE
+            , C.MBERNM AS USERNAME
+            , B.SEQ_TITLE
+           	, TO_CHAR(CURRENT_DATE, 'YYYY') AS NOWYEAR
+            , TO_CHAR(CURRENT_DATE, 'MM') AS NOWMONTH
+            , TO_CHAR(CURRENT_DATE, 'DD') AS NOWDAY
+            , C.BRTHDY
+            , B.OPENTYPE
+            , TO_CHAR (B.STUDY_SDATE, 'YYYY-MM-DD') STUDY_SDATE
+            , TO_CHAR (B.STUDY_EDATE, 'YYYY-MM-DD') STUDY_EDATE
+            , TO_CHAR (A.WDATE, 'YYYY-MM-DD') WDATE
+            , TO_CHAR ((A.WDATE + B.EDUDAY), 'YYYY-MM-DD') AS EDUDAY
+            , B.STUDYTIME
+            , (SELECT STUDYTIME FROM LMS_ED_COURSE WHERE COURSENO=B.COURSENO) AS STUDYTIME2
+            , (SELECT COUNT(D.TREENO) FROM LMS_ED_COURSE_TREE D WHERE D.COURSENO=B.COURSENO) AS TREECNT
+            , TO_CHAR(A.COMPDATE,'YYYY-MM-DD') AS COMPDATE
+            , TO_CHAR(A.WDATE,'YYYY-MM-DD') AS WDATE
+        FROM  LMS_LE_COURSE_USER A , LMS_ED_COURSE_SEQ B, LMS_CT_UNITY_MBER C 
+        WHERE 1=1
+            AND A.CSEQNO = B.CSEQNO
+            <if test="userNo != null and userNo != ''">
+            AND C.UNITY_MBERNO = #{userNo}
+            </if>
+            <if test="cuserNo != null and cuserNo != ''">
+            AND A.CUSERNO = #{cuserNo}
+            </if>      
+	</select>
+	
+	
+	
+	<select id="getCompLoanInfo" resultType="map" parameterType="dmap">
+		 SELECT
+              MT_CTYPE_NAME   -- 교육구분
+             , MT_SC_NAME   -- 과정구분
+             , COURSETITLE -- 과정명
+             , SEQ_TITLE -- 과목명
+             , STUDY_DATE -- 교육기간
+             , STUDYTIME_TOT -- 총교육시간
+             , SDATE -- 학습기간시작일  (수료증 팝업시사용)
+             , EDATE -- 학습기간종료일 (수료증 팝업시사용)
+             , ISPASS --수료여부(YN)
+             , COMPCODE -- 수료코드
+             , COMPDATE -- 수료일자
+             , SUBCMD -- 01:온라인 , 02:오프라인   수료증 팝업시사용
+             , COURSENO -- 수료증 팝업시사용
+             , CSEQNO  -- 수료증 팝업시사용
+             , USERNO  -- 수료증 팝업시사용
+             , CUSERNO -- 수료증 팝업시사용 
+             , MBERNM
+         	 , BRTHDY
+             , FND_USECD_NM
+           	 , GDNM
+           	 , TODAY_HH
+           	 , TODAY_MM
+           	 , TODAY_DD
+        FROM(    
+            SELECT  
+                (SELECT MT_SUB_NAME
+                    FROM LMS_CD_MT_SUB T3
+                   WHERE T3.MT_SUB_CODE = D.MT_CTYPE_CODE) MT_CTYPE_NAME
+                ,(SELECT REF3
+                    FROM LMS_CD_MT_SUB T3
+                   WHERE T3.MT_SUB_CODE = D.MT_SC_CODE) MT_SC_NAME
+               , D.COURSETITLE
+               , A.SEQ_TITLE
+               , DECODE( TO_CHAR (A.STUDY_SDATE), '' , '상시운영', TO_CHAR (A.STUDY_SDATE, 'YYYY-MM-DD')||'~'||TO_CHAR (A.STUDY_EDATE, 'YYYY-MM-DD') ) AS STUDY_DATE
+               , A.STUDYTIME_TOT
+               , TO_CHAR (DECODE (A.OPENTYPE, 'D', A.STUDY_SDATE, A.WDATE), 'YYYY-MM-DD') AS SDATE -- 
+               , TO_CHAR (DECODE (A.OPENTYPE, 'D', A.STUDY_EDATE, A.WDATE + A.EDUDAY), 'YYYY-MM-DD') AS EDATE
+               , B.ISPASS 
+               , DECODE(B.ISPASS,'Y', '수료', '미수료') AS ISPASS_NM --수료여부(수료/미수료)  
+               , B.COMPCODE 
+               , TO_CHAR(B.COMPDATE, 'YYYY.MM.DD') AS COMPDATE
+               , DECODE(D.MT_CTYPE_CODE , 'DAAA00', '01', '02') AS SUBCMD 
+               , D.COURSENO
+               , A.CSEQNO 
+               , B.USERNO 
+               , B.CUSERNO
+               , E.MBERNM
+         	   , E.BRTHDY
+               , C.FND_USECD_NM
+           	   , C.GDNM
+           	   , C.FND_KND_NM
+           	   , TO_CHAR(SYSDATE, 'YYYY') AS TODAY_HH
+           	   , TO_CHAR(SYSDATE, 'MM') AS TODAY_MM
+           	   , TO_CHAR(SYSDATE, 'DD') AS TODAY_DD
+            FROM LMS_LE_COURSE_USER B 
+                    INNER JOIN LMS_ED_COURSE_SEQ A ON B.CSEQNO = A.CSEQNO AND A.USEYN = 'Y'
+                    INNER JOIN LMS_ED_COURSE D ON D.COURSENO = A.COURSENO
+                    INNER JOIN LMS_ED_COURSE_LOAN_MAPP Z ON Z.COURSENO = D.COURSENO
+                    INNER JOIN (SELECT 
+                                    T1.EDU_LOAN_SEQ
+                                    , T2.LOAN_PRD_GRP
+                                    , T2.LOAN_PRD_CODE
+                                    , MCSYSTEM01.FN_CD_NM(FND_USECD) FND_USECD_NM
+                                 	,(SELECT GDNM FROM MCSYSTEM01.MCGM_PBI WHERE FND_USECD = T3.FND_USECD AND GDCD = T3.GDCD ) AS GDNM
+                                 	, MCSYSTEM01.FN_CD_NM(FND_KND_CD) FND_KND_NM 
+                                FROM LMS_ED_LOAN_MNG T1
+                                    INNER JOIN LMS_ED_LOAN_MAPP T2 ON T1.EDU_LOAN_SEQ = T2.EDU_LOAN_SEQ 
+                                    INNER JOIN MCSYSTEM01.LSGMEDU_GDCD T3  ON T2.LOAN_PRD_GRP = T3.FND_USECD  
+                                    AND T2.LOAN_PRD_CODE = T3.GDCD 
+                                    AND NVL(T2.LOAN_USE_CODE,'NULL') = NVL(T3.FND_KND_CD,'NULL')
+                                WHERE T2.LOAN_PRD_GRP  = #{loanPrdGrp} /* PARAM1 자금용도코드*/
+                                AND   T2.LOAN_PRD_CODE = #{loanPrdCode}  /* PARAM2 대출상품코드*/ 
+                                AND   NVL(T2.LOAN_USE_CODE,'NULL') = NVL(#{loanKndCode},'NULL') 
+                                AND   T1.USE_YN = 'Y'
+                                AND   T2.USE_YN = 'Y'  ) C ON Z.EDU_LOAN_SEQ = C.EDU_LOAN_SEQ
+            INNER JOIN LMS_CT_UNITY_MBER E ON B.USERNO = E.UNITY_MBERNO
+             WHERE B.USEYN = 'Y'
+             AND B.ISPASS = 'Y'
+             AND B.USERNO =  #{userNo} 
+            ORDER BY B.COMPDATE
+        ) T
+	
+	</select>
+</mapper>

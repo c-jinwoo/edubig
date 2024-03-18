@@ -1,0 +1,8 @@
+User-agent: * 
+Disallow: /myclass/
+Disallow: /user/
+Disallow: /common/
+Disallow: /online/
+Disallow: /payment/
+
+Sitemap: https://www.edubig.co.kr/sitemap.xml

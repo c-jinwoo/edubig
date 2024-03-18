@@ -1,0 +1,321 @@
+package com.webapp.academy.ctrl;
+
+import java.io.PrintWriter;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Properties;
+import java.util.Random;
+
+import javax.annotation.Resource;
+import javax.mail.Session;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
+
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.RequestMapping;
+
+import com.google.gson.Gson;
+import com.sangs.support.DataMap;
+import com.sangs.support.EduMap;
+import com.sangs.support.FrontException;
+import com.sangs.support.SangsProperties;
+import com.sangs.util.SangsCryptUtil;
+import com.sangs.util.SangsUtil;
+import com.webapp.academy.service.BoardService;
+import com.webapp.academy.service.CommonService;
+import com.webapp.academy.service.UserService;
+import com.webapp.academy.util.MyAuthentication;
+import com.webapp.ccedu.service.OnlineBookService;
+
+import javax.mail.*;
+import javax.mail.internet.InternetAddress;
+import javax.mail.internet.MimeMessage;
+
+/**
+ * Description : 사용자 메인 관련 컨트롤러
+ *
+ * Modification Information
+ * 수정일			수정자			수정내용
+ * -------		-----------------------------------
+ * 2020.09.29	CSLAB		최초작성
+ *
+ */
+@Controller
+public class MainController {
+
+    private Logger log = LogManager.getLogger(this.getClass());
+    
+    @Resource(name = "commonService")
+    private CommonService    commonService;
+
+    @Resource(name = "boardService")
+    private BoardService     boardService;
+    
+    @Resource(name = "userService")
+    private UserService       userService;
+    
+    @Resource(name = "onlineBookService")
+    private OnlineBookService onlineBookService; 
+
+    /**
+     * 메인 페이지
+     * (사용)
+     * @param request
+     * @param model
+     * @param rMap
+     * @return
+     * @throws FrontException
+     */
+    // TODO: 메인페이지
+    @RequestMapping(value = "/ccedu/main/main.do")
+    public String main(HttpServletRequest request, HttpServletResponse res, DataMap rMap) throws FrontException {
+    	String returnJsp = "";
+        try {     
+        	// 상단배너 : 과정
+            String mtCode = "SC";        
+            request.setAttribute("courseList",commonService.getToSangsCodes(mtCode));
+        	
+            // 중간 : 교재
+			request.setAttribute("bookList", onlineBookService.selectTotalBookList());
+        	
+            // 하단 : 이벤트
+            rMap.putString("bcateno", SangsProperties.getProperty("Globals.bbsBcateSiteData"));
+			request.setAttribute("eventList", boardService.getLateBoardList(rMap));
+            
+            // 하단 : 공지사항
+            rMap.putString("bcateno", SangsProperties.getProperty("Globals.bbsBcateSiteNotice"));
+            request.setAttribute("noticeList", boardService.getLateBoardList(rMap));
+
+            // 좌측 : 배너
+            request.setAttribute("bannerList", boardService.getBannerList(rMap));
+            rMap.setString("title", SangsProperties.getProperty("Globals.academyMain"));
+            request.setAttribute("REQUEST_DATA", rMap);
+            
+            returnJsp = "ccedu/main/main";
+        }
+        catch(Exception e) { 
+        	log.debug(e.getMessage());
+            throw new FrontException(e);
+        }
+        return returnJsp;
+    }	
+	private String stringToHtmlSign(String str){
+	    String data =  str.replaceAll("&amp;", "&").replaceAll("&lt;", "<").replaceAll("&gt;", ">").replaceAll("&quot;", "\"").replaceAll("&#39;", "\'");
+//	    return data.replaceAll("<p>","").replaceAll("</p>","<br/>");
+	    return data.replaceAll("<([pP]*)(\\s[a-zA-Z]*=[^>]*)?(\\s)*(/)?>","").replaceAll("</p>","<br/>");
+	}
+	 private char[] ranChar = { 
+		'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 
+		'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 
+		'u', 'v', 'w', 'x', 'y', 'z', '0', '1', '2', '3', 
+		'4', '5', '6', '7', '8', '9' };
+	 public String getRandomStr(int len){
+	    String str = "";
+	
+	    for(int i = 0; i < len; i++){
+	    	str = str + this.ranChar[getRanIdx()];
+	    }	
+	    return str;
+	  }
+	
+	  private int getRanIdx(){
+	    int ran = 0;
+	    Random r = new Random();
+	    ran = Math.abs(r.nextInt(this.ranChar.length));
+	    return ran;
+	  }
+	
+    /**
+     * @param request
+     * @param model
+     * @param rMap
+     * @return
+     * @throws FrontException
+     * 메일전송
+     */
+    @RequestMapping(value = "/ccedu/user/ajaxMemberCheck.do")
+    public void ajaxMemberCheck(HttpServletRequest request, HttpServletResponse res, DataMap rMap, HttpSession sess) throws Exception{
+    	res.setContentType("text/html; charset=utf-8");
+        PrintWriter out = res.getWriter();
+        Gson gson = new Gson();
+        String json = null;
+
+        Map<String,Object> resultMap = new HashMap<String,Object>();
+      
+    	String checkMberInfo =  commonService.check(rMap);
+    	
+    	if(checkMberInfo != null) {
+    		final String FROM = "cslabskr2020@gmail.com";
+    	    final String FROMNAME = "EDUBIG";
+    	    FROMNAME.getBytes("UTF-8");
+    	    final String TO = rMap.getString("email");
+    	    int PORT = 587;
+    	    String authNumber = this.getRandomStr(6);
+    	    
+    	    String SUBJECT = "에듀빅 회원정보찾기 인증메일입니다.";    	    
+    	    String BODY = String.join(
+    	        System.getProperty("line.separator"),
+    	        "<h3>"+authNumber+"</h3>"
+	    	);   
+    	    
+    	    Properties props = System.getProperties();
+            props.put("mail.smtp.port", PORT); 
+            props.put("mail.smtp.starttls.enable", "true");
+            props.put("mail.smtp.auth", "true");      
+            props.put("mail.smtp.host", "smtp.gmail.com");
+            
+            Authenticator auth = new MyAuthentication();
+            Session session = Session.getInstance(props, auth);
+            MimeMessage msg = new MimeMessage(session);
+            
+            sess.setAttribute("authNumber",authNumber);
+     
+            try{
+                msg.setFrom(new InternetAddress(FROM, FROMNAME));
+                msg.setRecipient(Message.RecipientType.TO, new InternetAddress(TO));
+                msg.setSubject(SUBJECT, "UTF-8");
+                msg.setContent(BODY, "text/html;charset=euc-kr");
+                javax.mail.Transport.send(msg);
+            } 
+            catch(Exception ex){
+                ex.printStackTrace();     
+            } 
+    		resultMap.put("result", "SUCCESS");
+        	
+    	} 
+    	else{
+    		resultMap.put("result", "FAIL");
+    	} 
+    	
+        json = gson.toJson(resultMap);
+        out.print(json);
+    }
+    
+    /**
+     * @param request
+     * @param model
+     * @param rMap
+     * @return
+     * @throws FrontException
+     * 인증코드확인
+     */
+    @RequestMapping(value = "/ccedu/user/ajaxAuthCodeCheck.do")
+    public void ajaxAuthCodeCheck(HttpServletRequest request, HttpServletResponse res, DataMap rMap, HttpSession sess) throws Exception{
+    	res.setContentType("text/html; charset=utf-8");
+        PrintWriter out = res.getWriter();
+        Gson gson = new Gson();
+        String json = null;
+        Map<String,Object> resultMap = new HashMap<String,Object>();
+        
+        if(rMap.getString("authNumber").equals((String)sess.getAttribute("authNumber"))){
+        	String checkMberInfo =  commonService.check(rMap);
+        	resultMap.put("checkMberInfo", checkMberInfo);
+        	resultMap.put("result", "SUCCESS");        	
+        }
+        else{
+    		resultMap.put("result", "FAIL");        	
+        }
+    	
+        json = gson.toJson(resultMap);
+        out.print(json);
+    } 
+    
+    /**
+     * @param request
+     * @param model
+     * @param rMap
+     * @return
+     * @throws FrontException
+     * 비밀번호 변경
+     */
+    @RequestMapping(value = "/ccedu/user/ajaxChangePW.do")
+    public void ajaxChangePW(HttpServletRequest request, HttpServletResponse res, DataMap rMap, HttpSession sess) throws Exception{
+    	res.setContentType("text/html; charset=utf-8");
+        PrintWriter out = res.getWriter();
+        Gson gson = new Gson();
+        String json = null;
+        Map<String,Object> resultMap = new HashMap<String,Object>();
+        
+        try{
+        	String pass = rMap.getString("mberPw");
+        	rMap.putString("pass", SangsCryptUtil.crypt(pass));
+
+	    	commonService.changePw(rMap);
+	    	
+        	resultMap.put("result", "SUCCESS");        	
+        }
+        catch(Exception e){
+    		resultMap.put("result", "FAIL");        	
+        }
+    	
+        json = gson.toJson(resultMap);
+        out.print(json);
+    }
+    
+    /**
+     * @param request
+     * @param model
+     * @param rMap
+     * @return
+     * @throws FrontException
+     * 메일전송
+     */
+    @RequestMapping(value = "/ccedu/user/ajaxMailConfirm.do")
+    public void ajaxMailConfirm(HttpServletRequest request, HttpServletResponse res, DataMap rMap, HttpSession sess) throws Exception{
+    	res.setContentType("text/html; charset=utf-8");
+        PrintWriter out = res.getWriter();
+        Gson gson = new Gson();
+        String json = null;
+        Map<String,Object> resultMap = new HashMap<String,Object>();
+
+        request.setAttribute("email", userService.searchMberEmail(rMap));
+    	
+    	if(request.getAttribute("email") == null){
+			final String FROM = "cslabskr2020@gmail.com";
+		    final String FROMNAME = "EDUBIG";
+		    FROMNAME.getBytes("UTF-8");
+		    final String TO = rMap.getString("email");
+		    int PORT = 587;
+		    String authNumber = this.getRandomStr(6);
+		    
+		    String SUBJECT = "에듀빅 인증코드입니다.";    	    
+		    String BODY = String.join(
+		        System.getProperty("line.separator"),
+		        "<h3>"+authNumber+"</h3>"
+	    	);   
+		    
+		    Properties props = System.getProperties();
+	        props.put("mail.smtp.port", PORT); 
+	        props.put("mail.smtp.starttls.enable", "true");
+	        props.put("mail.smtp.auth", "true");      
+	        props.put("mail.smtp.host", "smtp.gmail.com");
+	        
+	        Authenticator auth = new MyAuthentication();
+	        Session session = Session.getInstance(props, auth);
+	        MimeMessage msg = new MimeMessage(session);
+	        
+	        sess.setAttribute("authNumber",authNumber);
+	 
+	        try{
+	            msg.setFrom(new InternetAddress(FROM, FROMNAME));
+	            msg.setRecipient(Message.RecipientType.TO, new InternetAddress(TO));
+	            msg.setSubject(SUBJECT, "UTF-8");
+	            msg.setContent(BODY, "text/html;charset=euc-kr");
+	            javax.mail.Transport.send(msg);
+	        } 
+	        catch(Exception ex){
+	            ex.printStackTrace();     
+	        } 
+			resultMap.put("result", "SUCCESS");
+    	}
+    	else{
+    		resultMap.put("result", "FAIL");  	
+    	}
+        json = gson.toJson(resultMap);
+        out.print(json);
+    }
+}

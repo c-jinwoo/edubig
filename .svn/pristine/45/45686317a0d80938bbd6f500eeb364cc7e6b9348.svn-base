@@ -1,0 +1,167 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes" ?>
+<event>
+<!-- 강조빨간색칠하기-->
+<!-- &lt;span style="color:#ff3300"&gt;&lt;u&gt;않은&lt;&#47;span&gt;&lt;&#47;u&gt; -->
+<!-- 내려쓰기 -->
+<!-- &lt;br&gt; -->
+  <quiz flag="5" >
+      <page num="1" answer="1" type="multiple">
+          <question>
+              <alternate>문제 일다음 중 애널리틱스(Analytics)의 데이터 분석 역량에 
+해당하지 않는 것은?    </alternate>
+			  <symbol>Q1.</symbol>
+              <text>다음 중 애널리틱스(Analytics)의 데이터 분석 역량에 
+해당하지 않는 것은?    </text>
+          </question>
+
+          <feedback>
+              <alternate>정답은 일번입니다. 애널리틱스(Analytics)의 데이터 분석 역량은 
+수학적/통계적 역량, 데이터 프로그래밍 역량, 
+전문적 지식 역량의 3가지가 있다.</alternate>
+              <answer>
+                  <symbol>정답</symbol>
+                  <text>1</text>
+              </answer>
+              <explain>
+                  <symbol>1</symbol>
+                  <text>애널리틱스(Analytics)의 데이터 분석 역량은 
+수학적/통계적 역량, 데이터 프로그래밍 역량, 
+전문적 지식 역량의 3가지가 있다.</text>
+              </explain>
+          </feedback>
+
+          <example num="1">
+              <alternate>보기 일번 전술적 역량</alternate>
+              <symbol>1</symbol>
+              <text>전술적 역량</text>
+          </example>
+          <example num="2">
+              <alternate>보기 이번 데이터 프로그래밍 역량</alternate>
+              <symbol>2</symbol>
+              <text>데이터 프로그래밍 역량</text>
+          </example>
+          <example num="3">
+              <alternate>보기 삼번수학적 역량</alternate>
+              <symbol>3</symbol>
+              <text>수학적 역량</text>
+          </example>
+          <example num="4">
+              <alternate>보기 사번 전문적 지식 역량</alternate>
+              <symbol>4</symbol>
+              <text>전문적 지식 역량</text>
+          </example>
+      </page>
+
+      <page num="2" answer="3" type="multiple">
+          <question>
+              <alternate>문제 이. 마케팅 애널리틱스의 가격/프로모션의 결정에 대한 
+설명이 아닌 것은? </alternate>
+			  <symbol>Q2.</symbol>
+              <text>다음 중 마케팅 애널리틱스의 가격/프로모션의 결정에 대한 
+설명이 아닌 것은? </text>
+          </question>
+
+          <feedback>
+              <alternate>정답은 삼 번입니다.
+			  B2C기업에 있어 가장 중요한 의사결정은 가격이며,애널리틱스 성공 기업은 공통적으로 가격 의사결정에 
+			  많은 노력을 투입하고 있다. 빅데이터를 활용하여 효과를 보는 분야가 가격과 프로모션의 의사결정이다. 
+			  사례로 68개 미국 소재 소매상 대상으로 한 설문조사 결과 70~80%가 가격 최적화를 향후 전략 방향에 
+			  중요한 도구로 인식하고 있었다. 또 하나의 사례로 스타벅스를 예로 생각해보면, 고객들의 가격 민감도는 
+			  상품과 상황에 따라 천차만별로 달라짐을 알 수 있다. 
+			  </alternate>
+              <answer>
+                  <symbol>정답</symbol>
+                  <text>3</text>
+              </answer>
+              <explain>
+                  <symbol>3</symbol>
+                  <text>
+			  B2C기업에 있어 가장 중요한 의사결정은 가격이며,애널리틱스 성공 기업은 공통적으로 가격 의사결정에 
+			  많은 노력을 투입하고 있다. 빅데이터를 활용하여 효과를 보는 분야가 가격과 프로모션의 의사결정이다. 
+			  사례로 68개 미국 소재 소매상 대상으로 한 설문조사 결과 70~80%가 가격 최적화를 향후 전략 방향에
+			  중요한 도구로 인식하고 있었다. 또 하나의 사례로 스타벅스를 예로 생각해보면, 고객들의 가격 민감도는 
+			  상품과 상황에 따라 천차만별로 달라짐을 알 수 있다. 
+				</text>
+              </explain>
+          </feedback>
+
+          <example num="1">
+              <alternate>보기 일번 B2C기업에서 있어 가장 중요한 의사결정은 
+가격이다. </alternate>
+              <symbol>1</symbol>
+              <text>B2C기업에서 있어 가장 중요한 의사결정은 
+가격이다.</text>
+          </example>
+          <example num="2">
+		  <alternate>보기 이번 고객들의 가격민감도는 상품과 상황에 
+따라 천차만별로 달라질 수 있다.</alternate>
+              <symbol>2</symbol>
+              <text>고객들의 가격민감도는 상품과 상황에 
+따라 천차만별로 달라질 수 있다.</text>
+          </example>
+          <example num="3">
+              <alternate>보기 삼번 빅데이터를 이용하여 개인의 취향과 
+성향에 맞춤화된 콘텐츠를 제공하는 것이다.</alternate>
+              <symbol>3</symbol>
+              <text>빅데이터를 이용하여 개인의 취향과 
+성향에 맞춤화된 콘텐츠를 제공하는 것이다.</text>
+          </example>
+          <example num="4">
+              <alternate>보기 사번 애널리틱스 성공 기업은 공통적으로 
+가격 의사결정에 많은 노력을 투입하고 있다.</alternate>
+              <symbol>4</symbol>
+              <text>애널리틱스 성공 기업은 공통적으로 
+가격 의사결정에 많은 노력을 투입하고 있다.</text>
+          </example>
+      </page>
+
+      <page num="3" answer="2" type="multiple">
+          <question>
+              <alternate>문제 삼. 다음 중 마케팅 애널리틱스의 분석 대상이 아닌 것은?</alternate>
+			  <symbol>Q3.</symbol>
+              <text>다음 중 마케팅 애널리틱스의 분석 대상이 아닌 것은?</text>
+          </question>
+          <feedback>
+              <alternate>정답일 이 번입니다. 빅데이터와 결합해 사용되는 마케팅 분석은 마케팅
+실적을 적절히 평가하고, 고객들의 구매 습관, 시장 
+트렌드와 니즈에 대한 통찰을 얻고, 증거 기반의 
+마케팅 결정을 내리는 데 도움을 받기 위해 진행된다. 
+②는 생산 애널리틱스 분석에 해당한다.</alternate>
+              <answer>
+                  <symbol>정답</symbol>
+                  <text>2</text>
+              </answer>
+              <explain>
+                  <symbol>2</symbol>
+                  <text>빅데이터와 결합해 사용되는 마케팅 분석은 마케팅
+실적을 적절히 평가하고, 고객들의 구매 습관, 시장 
+트렌드와 니즈에 대한 통찰을 얻고, 증거 기반의 
+마케팅 결정을 내리는 데 도움을 받기 위해 진행된다. 
+②는 생산 애널리틱스 분석에 해당한다.</text>
+
+              </explain>
+          </feedback>
+
+          <example num="1">
+              <alternate>보기 일번 마케팅 실적 평가</alternate>
+              <symbol>1</symbol>
+              <text>마케팅 실적 평가</text>
+          </example>
+          <example num="2">
+              <alternate>보기 이번 생산시간</alternate>
+              <symbol>2</symbol>
+              <text>생산시간</text>
+          </example>
+          <example num="3">
+              <alternate>보기 삼번 시장 트렌드</alternate>
+              <symbol>3</symbol>
+              <text>시장 트렌드</text>
+          </example>
+          <example num="4">
+              <alternate>보기 사번 고객 니즈 </alternate>
+              <symbol>4</symbol>
+              <text>고객 니즈 </text>
+          </example>
+      </page>
+  </quiz>
+</event>

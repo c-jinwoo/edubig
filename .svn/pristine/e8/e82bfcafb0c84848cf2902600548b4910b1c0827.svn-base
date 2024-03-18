@@ -1,0 +1,149 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes" ?>
+<event>
+<!-- 강조빨간색칠하기-->
+<!-- &lt;span style="color:#ff3300"&gt;&lt;u&gt;않은&lt;&#47;span&gt;&lt;&#47;u&gt; -->
+<!-- 내려쓰기 -->
+<!-- &lt;br&gt; -->
+  <quiz flag="4" >
+      <page num="1" answer="3" type="multiple">
+          <question>
+              <alternate>문제 일.맥아피와 브린욜프손이 제시한 기업이 빅데이터를 
+성공적으로 활용하기 위해 필요한 다섯 가지 조건으로 볼 수 없는 것은?   </alternate>
+			  <symbol>Q1.</symbol>
+              <text>맥아피와 브린욜프손이 제시한 기업이 빅데이터를 
+성공적으로 활용하기 위해 필요한 다섯 가지 조건으로 볼 수 없는 것은?   </text>
+          </question>
+
+          <feedback>
+              <alternate>정답은 이번입니다. 맥아피와 브린욜프손은 기업이 빅데이터를 
+성공적으로 활용하기 위해 필요한 조건으로 리더십, 
+역량관리, 기술도입, 의사결정, 기업문화 등 다섯 가지를 제시하고 있다..  </alternate>
+              <answer>
+                  <symbol>정답</symbol>
+                  <text>3</text>
+              </answer>
+              <explain>
+                  <symbol>3</symbol>
+                  <text>맥아피와 브린욜프손은 기업이 빅데이터를 
+성공적으로 활용하기 위해 필요한 조건으로 리더십, 
+역량관리, 기술도입, 의사결정, 기업문화 등 다섯 가지를 제시하고 있다. </text>
+              </explain>
+          </feedback>
+
+          <example num="1">
+              <alternate>보기 일번 기업문화 </alternate>
+              <symbol>Q1</symbol>
+              <text>기업문화  </text>
+          </example>
+          <example num="2">
+              <alternate>보기 이번 의사결정</alternate>
+              <symbol>2</symbol>
+              <text>의사결정</text>
+          </example>
+          <example num="3">
+              <alternate>보기 삼번 제품과 서비스의 유형</alternate>
+              <symbol>3</symbol>
+              <text>제품과 서비스의 유형</text>
+          </example>
+          <example num="4">
+              <alternate>보기 사번 역량관리</alternate>
+              <symbol>4</symbol>
+              <text>역량관리</text>
+          </example>
+      </page>
+
+      <page num="2" answer="4" type="multiple">
+          <question>
+              <alternate>문제 이. 다음 중 빅데이터 활용의 3대 전략요소를 바르게 
+나타낸 것은?</alternate>
+			  <symbol>Q2.</symbol>
+              <text>다음 중 다음 중 빅데이터 활용의 3대 전략요소를 바르게 
+나타낸 것은?</text>
+          </question>
+
+          <feedback>
+              <alternate>정답은 이 번입니다. 성공적인 빅데이터 활용 전략의 3요소는 자원, 
+기술, 인력을 의미한다.</alternate>
+              <answer>
+                  <symbol>정답</symbol>
+                  <text>4</text>
+              </answer>
+              <explain>
+                  <symbol>4</symbol>
+                  <text>성공적인 빅데이터 활용 전략의 3요소는 자원, 
+기술, 인력을 의미한다.</text>
+
+              </explain>
+          </feedback>
+
+          <example num="1">
+              <alternate>보기 일번 시간-기술-인력 </alternate>
+              <symbol>1</symbol>
+              <text>시간-기술-인력 </text>
+          </example>
+          <example num="2">
+		  <alternate>보기 이번 자원-기술-절차</alternate>
+              <symbol>2</symbol>
+              <text>자원-기술-절차</text>
+          </example>
+          <example num="3">
+              <alternate>보기 삼번 기술-예산-인력</alternate>
+              <symbol>3</symbol>
+              <text>기술-예산-인력</text>
+          </example>
+          <example num="4">
+              <alternate>보기 사번 기술-자원-인력 </alternate>
+              <symbol>4</symbol>
+              <text>기술-자원-인력 </text>
+          </example>
+      </page>
+
+      <page num="3" answer="3" type="multiple">
+          <question>
+              <alternate>문제 삼. 다음 중 빅데이터 사이언티스트(Big Data Scientist)에 
+관한 설명이 아닌 것은?</alternate>
+			  <symbol>Q3.</symbol>
+              <text>다음 중 빅데이터 사이언티스트(Big Data Scientist)에 
+관한 설명이 아닌 것은?</text>
+          </question>
+
+          <feedback>
+              <alternate>정답일 일 번입니다. 빅데이터 분석(자연어 처리, 의미분석, 데이터마이닝 등)은 
+빅데이터 플랫폼 (Big Data Platform)에 관한 설명이다.</alternate>
+              <answer>
+                  <symbol>정답</symbol>
+                  <text>3</text>
+              </answer>
+              <explain>
+                  <symbol>3</symbol>
+                  <text>빅데이터 분석(자연어 처리, 의미분석, 데이터마이닝 등)은 
+빅데이터 플랫폼 (Big Data Platform)에 관한 설명이다.</text>
+
+              </explain>
+          </feedback>
+
+          <example num="1">
+              <alternate>보기 일번 수학·공학(IT기술과 엔지니어링) 능력</alternate>
+              <symbol>1</symbol>
+              <text>수학·공학(IT기술과 엔지니어링) 능력</text>
+          </example>
+          <example num="2">
+              <alternate>보기 이번 스토리텔링 등 시각화 능력</alternate>
+              <symbol>2</symbol>
+              <text>스토리텔링 등 시각화 능력</text>
+          </example>
+          <example num="3">
+              <alternate>보기 삼번 빅데이터 분석 
+(자연어 처리, 의미분석, 데이터마이닝 등)</alternate>
+              <symbol>3</symbol>
+              <text>빅데이터 분석 
+(자연어 처리, 의미분석, 데이터마이닝 등)</text>
+          </example>
+          <example num="4">
+              <alternate>보기 사번 비판적 시각과 커뮤니케이션 능력</alternate>
+              <symbol>4</symbol>
+              <text>비판적 시각과 커뮤니케이션 능력</text>
+          </example>
+      </page>
+  </quiz>
+</event>

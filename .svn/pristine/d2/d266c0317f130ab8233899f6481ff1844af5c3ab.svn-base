@@ -1,0 +1,204 @@
+<%--
+	Description : 
+	 
+	Modification Information
+	수정일		수정자			수정내용
+	-------		-----------------------------------
+	2015.04.01 	SANGS			최초작성
+
+--%>
+
+<%@ page contentType="text/html; charset=utf-8" pageEncoding="utf-8"%>
+<%@ taglib prefix="spring" uri="http://www.springframework.org/tags"%>
+<%
+	HttpServletResponse res = ((HttpServletResponse) response);
+	  //교차 프레임 스크립팅 방어 누락
+	  res.addHeader("X-Frame-Options", "DENY");
+	  //HTTP Strict-Transport-Security 헤더 누락
+	  res.addHeader("Strict-Transport-Security", "max-age=31536000; includeSubDomains; preload");
+	  //Missing "X-Content-Type-Options" header
+	  res.addHeader("X-Content-Type-Options", "nosniff");
+%>
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+	<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+	<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+	<title>에듀빅 :: 온라인 교육</title>
+    <link rel="stylesheet" href="/academy/common/css/style.css">
+    <link rel="stylesheet" href="/academy/common/fonts/font.css">
+    <link rel="stylesheet" href="/academy/common/css/bootstrap_jy.css">
+	<%@ include file="/WEB-INF/jsp/ccedu/inc/head_inc.jsp"%>
+	<script type="text/javascript">
+		$(document).ready(function(){
+			$(".gnb_items li").on("mouseover",function(e){
+			    if($(e.currentTarget).hasClass("target_s_layer")){
+			        if($(e.currentTarget).hasClass("course_layer")){
+			            $(".gnb_s_layer").removeClass("on");
+			            $(".gnb_course_layer").addClass("on");
+			        }
+			    }else{
+			        $(".gnb_s_layer").removeClass("on");
+			    }
+			});
+			
+			$(".gnb_s_layer").on("mouseleave",function(){
+			    $(".gnb_s_layer").removeClass("on");
+			});
+		});
+		function navi(){
+			if($(".new_navi").hasClass("active")){
+				$(".new_navi").removeClass("active");
+				$(".mobile_head .btn_allmenu").css("background","url('/cmmn/images/m_btn_allmenu.png') no-repeat 100% 100% / 100% 100%");	
+			}
+			else{
+				$(".new_navi").addClass("active");
+				$(".mobile_head .btn_allmenu").css("background","url('/cmmn/images/m_btn_allmenu_close.png') no-repeat 100% 100% / 100% 100%");	
+			}
+		}	
+	</script>
+	<style>
+		.error{height:638px;}
+		.box{text-align:center; padding-top:160px;}
+		.box h1{font-size:30px; padding:15px 0px; color:#000;}
+		.box h3{font-size:15px; line-height:20px; margin-bottom:30px; font-weight:400;}
+		.err_btn{background:#434a7b; color:#fff; font-size:15px; padding:8px 20px;}
+		
+		@media (max-width:768px) {
+			.box h1 {font-size:20px;}
+			.box h3 {font-size:13px;}
+		}
+		
+		@media (max-width:480px){
+			.box h1 {font-size:15px;}
+			.box h3 {font-size:11px;}
+		}
+	</style>
+</head>
+<body>
+	<div id="wrap">
+	<!-- head -->
+	<header id="header">
+		<!-- util -->
+		<section class="util_section">
+			<div class="cm_wrapper h100">
+				<a href="/ccedu/main/main.do" class="top_logo_link">
+					<img src="/cmmn/images/logo.png" class="top_logo" alt="에듀빅" />
+				</a>				
+				<div class="top_r">
+					<ul class="util_sec_r">
+						<li class="util_cs">
+							<a href="/ccedu/bbs/notice.do" onclick="return false;">고객센터</a>
+							<div class="util_ly">
+	                            <ul>
+									<li><a href="/ccedu/bbs/notice/main.do">공지사항</a></li>
+									<li><a href="/ccedu/bbs/faq/main.do">자주묻는질문</a></li>
+	                            </ul>
+	                        </div>
+						</li>
+						<li>
+							<a href="/ccedu/common/siteMap.do">전체메뉴</a>
+						</li>
+					</ul>
+				</div>
+			</div>
+		</section>
+		<!--// util -->
+
+		<!-- gnb section -->
+		<section class="gnb_section">
+			<div class="gnb_outer">
+				<div class="wrapper">				
+					<div class="gnb_items">
+						<ul id="gnb">
+							<li class="target_s_layer course_layer">
+								<a href="/ccedu/online/onlineEducationInfo.do">강의소개</a>		                        
+							</li>
+							<li>
+								<a href="/ccedu/book/main.do">온라인서점</a>
+							</li>
+							<li>
+								<a href="/ccedu/tutor/main.do">강사소개</a>
+							</li>
+							<li>
+								<a href="/ccedu/bbs/event/main.do">이벤트</a>
+							</li>
+							<li>
+								<a href="/ccedu/free/main.do">무료강의</a>
+							</li>
+							<li class="target_s_layer myclass_layer">
+								<a href="/ccedu/myclass/learningStatusList.do">나의강의실</a>
+							</li>
+						</ul>
+					</div>	                
+				</div>
+			</div>
+				
+			<div class="gnb_s_layer gnb_course_layer">
+				<div class="wrapper">
+					<ul>
+						<li><a href="/ccedu/online/onlineEducationInfo.do">경영빅데이터분석사</a></li>
+						<li><a href="/ccedu/online/onlineEducationInfo.do?mtSubCode=SC1002">IEQ인터넷윤리지도사</a></li>
+						<li><a href="/ccedu/online/onlineEducationInfo.do?mtSubCode=SC1003">3D프린팅모델링</a></li>
+					</ul>
+				</div>
+			</div>	
+		</section>
+		<!--// gnb section -->
+		
+		<!-- mobile head -->
+		<div class="mobile_head">
+			<div class="wrapper">
+				<div class="mobile_top_wrapper">
+					<button class="btn_allmenu" onclick="javascript:navi();">주메뉴 열기/닫기 버튼</button>
+					<div class="mobile_logo_wrapper">
+						<a href="/ccedu/main/main.do" class="mobile_logo_link" style="display:inline-block;width:auto;height:100%;">
+							<img class="mobile_logo" src="/cmmn/images/logo.png" alt="에듀빅" />
+						</a>
+					</div>
+				</div>
+			</div>
+		</div>
+		<div class="new_navi">
+			<div class="new_navi_menu">		
+				<a href="/ccedu/online/onlineEducationInfo.do">경영빅데이터분석사</a>
+			</div>
+			<div class="new_navi_menu">		
+				<a href="/ccedu/online/onlineEducationInfo.do?mtSubCode=SC1002">IEQ인터넷윤리지도사</a>
+			</div>
+			<div class="new_navi_menu">		
+				<a href="/ccedu/online/onlineEducationInfo.do?mtSubCode=SC1003">3D프린팅모델링</a>
+			</div>
+			<div class="new_navi_menu">		
+				<a href="/ccedu/book/main.do">온라인서점</a>
+			</div>	
+			<div class="new_navi_menu">		
+				<a href="/ccedu/tutor/main.do">강사소개</a>
+			</div>	
+			<div class="new_navi_menu">		
+				<a href="/ccedu/bbs/event/main.do">이벤트</a>
+			</div>	
+			<div class="new_navi_menu">		
+				<a href="/ccedu/free/main.do">무료강의</a>
+			</div>
+			<div class="new_navi_menu">		
+				<a href="/ccedu/myclass/learningStatusList.do">나의강의실</a>
+			</div>	
+		</div>
+	</header>
+	<!-- error -->
+	<div class="error">
+		<div class="cm_wrapper">
+			<div class="box">
+				<img src="/cmmn/images/sub/img_error_404.png" alt="요청하신 페이지를 찾을 수 없습니다.">
+				<h1>죄송합니다.</br>요청하신 페이지를 찾을 수 없습니다.</h1>
+				<h3>존재하지 않는 주소를 입력하셨거나,</br>요청하신 페이지의 주소가 변경, 삭제되어 찾을 수 없습니다.</br>입력하신 주소가  정확한지 다시 확인해주시기 바랍니다.</h3>
+				<a href="/ccedu/main/main.do" class="err_btn">메인으로</a>
+			</div>
+		</div>
+	</div>
+	<!-- foot -->
+	<%@ include file="/WEB-INF/jsp/ccedu/inc/footer_inc.jsp"%>
+	<!--// foot end -->
+</body>
+</html>

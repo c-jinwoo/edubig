@@ -1,0 +1,33 @@
+<%@ page language="java" contentType="text/html; charset=utf-8" pageEncoding="utf-8"%>
+
+<%
+/****************************************
+    subject	: [공통] > 집합교육 > LEFT 영역
+    summary	: LEFT 영역
+    author	: SANGS
+    date	: 2015-06-01
+****************************************/
+%>
+
+<script type="text/javascript">
+$(document).ready(function(){
+    //initPage();
+
+	$('#gnb').find('.gnb_<c:out value="${menu_nm}"/>').addClass('on');
+	$('#sub-gnb ul').find('.lnb_<c:out value="${lnb_menu}"/>').addClass('on');
+});
+</script>
+
+<!-- 왼쪽 메뉴 영역 -->
+<div class="sub-gnb" id="sub-gnb">
+	<h2 class="sub-c2">배움터</h2><!-- 서브 메뉴1부터 sub-c1 ~ sub-c6-->
+	<ul>
+		<li class="lnb_courseInfo"><a href="/academy/course/courseInfo.do" title="교육과정소개">교육과정소개</a></li>
+		<li class="lnb_cyber"><a href="/academy/course/onMain.do" title="사이버교육">사이버교육</a></li>
+		<li class="lnb_offline"><a href="/academy/course/offMain.do" title="집합교육">집합교육</a></li>
+		<li class="lnb_cpsedu"><a href="/academy/course/cpseduMain.do" title="의무교육">의무교육</a></li>
+		<li class="lnb_lecture"><a href="/academy/course/lectureMain.do" title="특강교육">특강교육</a></li>
+		<li class="lnb_openEdu"><a href="/academy/course/openEduMain.do" title="열린교육">열린교육</a></li>
+	</ul>
+</div>
+<!-- // 왼쪽 메뉴 영역 -->

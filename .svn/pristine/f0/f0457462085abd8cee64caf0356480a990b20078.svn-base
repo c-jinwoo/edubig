@@ -1,0 +1,842 @@
+<%
+/****************************************
+    subject : 신용상담사
+    summary : 신용상담사 : 합격자조회/자격증신청 > 자격증 신청 폼
+    author  : SANGS
+    date    : 2018-06-15
+****************************************/
+%>
+<%@ page language="java" contentType="text/html; charset=utf-8" pageEncoding="utf-8"%>
+<%@ include file="/WEB-INF/jsp/ccedu/inc/taglib_inc.jsp"%>
+<%@ page import="com.sangs.support.SangsProperties" %>
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+	<c:if test="${REQUEST_DATA.pageMode eq ''}">
+		<title>자격증신청 > 합격자조회/자격증신청 > 신용상담사 > 신용회복위원회 신용교육원</title>
+	</c:if>
+	<c:if test="${REQUEST_DATA.pageMode eq 'update' || REQUEST_DATA.pageMode eq 'inquiry'}">
+		<title>자격증발급조회 > 합격자조회/자격증신청 > 신용상담사 > 신용회복위원회 신용교육원</title>
+	</c:if>
+	<%@ include file="/WEB-INF/jsp/ccedu/inc/head_inc.jsp"%>
+	<%@ include file="/WEB-INF/jsp/common/pop_post.jsp"%>
+	<script language="javascript" src="/cmmn/js/xpay.js" type="text/javascript"></script>
+	<script type="text/javascript" src="/academy/common/js/jquery.showLoading.js"></script>
+		<!----- 주소검색 레이어 START----->
+	<div id="layer" style="display:none;position:fixed;overflow:hidden;z-index:9999;-webkit-overflow-scrolling:touch;">
+	<img src="//t1.daumcdn.net/localimg/localimages/07/postcode/320/close.png" id="btnCloseLayer" style="cursor:pointer;position:absolute;right:-3px;top:-3px;z-index:1" onclick="closeDaumPostcode()" alt="닫기 버튼">
+	</div>
+	
+	<script src="https://ssl.daumcdn.net/dmaps/map_js_init/postcode.v2.js?autoload=false"></script>
+	<script>
+		function isMobile() {
+		    return /Android|webOS|iPhone|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+		}
+		
+	    // 우편번호 찾기 화면을 넣을 element
+	    var element_layer = document.getElementById('layer');
+	
+	    function closeDaumPostcode() {
+	        // iframe을 넣은 element를 안보이게 한다.
+	        element_layer.style.display = 'none';
+	    }
+	
+	    function openDaumPostcode() {
+	    	
+	    	daum.postcode.load(function(){
+		        new daum.Postcode({
+		            oncomplete: function(data) {
+		
+		                // 각 주소의 노출 규칙에 따라 주소를 조합한다.
+		                // 내려오는 변수가 값이 없는 경우엔 공백('')값을 가지므로, 이를 참고하여 분기 한다.
+		                var fullAddr = data.address; // 최종 주소 변수
+		                var extraAddr = ''; // 조합형 주소 변수
+		
+		                // 기본 주소가 도로명 타입일때 조합한다.
+		                if(data.addressType === 'R'){
+		                    //법정동명이 있을 경우 추가한다.
+		                    if(data.bname !== ''){
+		                        extraAddr += data.bname;
+		                    }
+		                    // 건물명이 있을 경우 추가한다.
+		                    if(data.buildingName !== ''){
+		                        extraAddr += (extraAddr !== '' ? ', ' + data.buildingName : data.buildingName);
+		                    }
+		                    // 조합형주소의 유무에 따라 양쪽에 괄호를 추가하여 최종 주소를 만든다.
+		                    fullAddr += (extraAddr !== '' ? ' ('+ extraAddr +')' : '');
+		                }
+		                
+		                // 우편번호와 주소 정보를 해당 필드에 넣는다.
+		                document.getElementById('addrCode').value = data.zonecode; //5자리 새우편번호 사용
+		                document.getElementById('address').value = fullAddr;
+		                
+		                //document.getElementById('sample2_addressEnglish').value = data.addressEnglish;
+		
+		                // iframe을 넣은 element를 안보이게 한다.
+		                // (autoClose:false 기능을 이용한다면, 아래 코드를 제거해야 화면에서 사라지지 않는다.)
+		                element_layer.style.display = 'none';
+		                
+		                closeDaumPostcode();
+		            },
+		            width : '100%',
+		            height : '100%',
+		            maxSuggestItems : 5
+		        }).embed(element_layer);
+	    	});
+	        // iframe을 넣은 element를 보이게 한다.
+	        element_layer.style.display = 'block';
+	
+	        // iframe을 넣은 element의 위치를 화면의 가운데로 이동시킨다.
+	        initLayerPosition();
+	    }
+	
+	    // 브라우저의 크기 변경에 따라 레이어를 가운데로 이동시키고자 하실때에는
+	    // resize이벤트나, orientationchange이벤트를 이용하여 값이 변경될때마다 아래 함수를 실행 시켜 주시거나,
+	    // 직접 element_layer의 top,left값을 수정해 주시면 됩니다.
+	    function initLayerPosition(){
+	    	
+	        var width = 300; //우편번호서비스가 들어갈 element의 width
+	    	if (!isMobile()) {
+	    		width = 620;
+	    	}
+	    	
+	        var height = 400; //우편번호서비스가 들어갈 element의 height
+	        var borderWidth = 2; //샘플에서 사용하는 border의 두께
+	
+	        // 위에서 선언한 값들을 실제 element에 넣는다.
+	        element_layer.style.width = width + 'px';
+	        element_layer.style.height = height + 'px';
+	        element_layer.style.border = borderWidth + 'px solid';
+	        // 실행되는 순간의 화면 너비와 높이 값을 가져와서 중앙에 뜰 수 있도록 위치를 계산한다.
+	        element_layer.style.left = (((window.innerWidth || document.documentElement.clientWidth) - width)/2 - borderWidth - 6) + 'px';
+	        element_layer.style.top = (((window.innerHeight || document.documentElement.clientHeight) - height)/2 - borderWidth) + 'px';
+	    }
+	</script>
+	<!----- 주소검색 레이어 END----->
+	
+	
+	<script type="text/javascript">
+	
+		$(document).ready(function(){
+			
+			if('' == $("#pageMode").val() || 'update' == $("#pageMode").val()) {
+				$("#imgFile").hide();
+			}
+			
+			
+			$('#telNo2, #telNo3, #mobile2, #mobile3').keyup(function () { 
+			    this.value = this.value.replace(/[^0-9]/g,'');
+			});
+			
+			onlyNumAlpha('email1');
+			onlyNumAlpha('email2');
+			
+			
+			$('#email3').on('change', function() {
+				if($('#email3 option:selected').val() != '') {
+					$('#email2').val($('#email3 option:selected').val());
+				} else if($('#email3 option:selected').val() == '') {
+					$('#email2').val('');
+				}
+			})
+		});
+	
+	
+		//우편번호 콜백 스크립트
+		function fnZipSelect(zip_code, adres){
+			
+			var zipCode = Number(zip_code);
+			
+			zipCode += "";
+			
+			if(zipCode.length == 4){
+				zipCode  = "0"+zipCode;
+			}
+			
+			 $('#addrCode').val(zipCode);
+		     $('#address').val(adres);
+		     $("#popPost").find("#close").click();
+		} 
+			
+	    //이메일 셀렉트박스 세팅
+	    function emailSelect(val){
+	        $('#email2').val(val);
+	    }
+	    function userEmailSelect(val){
+	        $('#userEmail2').val(val);
+	    }
+	    
+	    // 등록
+	    function licenseRegit() {
+	    	
+	    	var payAt = "<c:out value="${REQUEST_DATA.payAt}"/>";
+	    	
+	    	fnConfirm("결제 테스트하시겠습니까?", function(result) {
+				if(result) {
+					fnSetUpInfo();
+				}
+			});
+		
+		}
+	
+	    // 접수 수정
+	    function licenseUpdate() {
+	    	$("#pageMode").val('update');
+	    	$("#frm").attr("action", "/ccedu/payTest/ccLicenseCrud.do");
+			$("#frm").submit();
+	    }
+	    
+	    function delImg() {
+	    	$("#photoZone").hide();
+	    	$("#imgFile").show();
+	    	$("#savPath").val('');
+	    	$("#orgFile2").val('');
+	    	$("#savFile").val('');
+	    	$("#fileUpdateYn").val('Y');
+	    	
+	    }
+
+		// 결제 정보 설정
+		function fnSetUpInfo(){
+			
+			var payType = $('input[name=PayM]:checked').val();
+			
+			if(!$('input[name=PayM]:checked').is(":checked")){
+				fnModalMsg("결제 구분을 선택해주세요.");
+			}
+			
+			$('input[name=LGD_CUSTOM_USABLEPAY]').val('SC' + payType.substr(2,4));
+			window.open("about:blank","payWinPop","width=650,height=650");
+			var frm = document.frm;
+			frm.action = "/ccedu/payTest/openUrl.do";
+			frm.target = "payWinPop";
+			frm.submit();
+		}
+		
+		function fnSubmit(){
+			$("#address2").val();
+			var frm = document.frm;
+			frm.target = "";
+			frm.action = "/ccedu/payTest/ccLicenseCrud.do";			
+			frm.submit();
+		}
+	
+	</script>
+</head>
+
+
+<body>
+
+<!-- skip nav -->
+	<%@ include file="/WEB-INF/jsp/ccedu/inc/nav_inc.jsp"%>
+<!--// skip nav -->
+
+
+<div id="wrap">
+
+	<!-- header -->
+	<%@ include file="/WEB-INF/jsp/ccedu/inc/header_inc.jsp"%>
+	<!--// header -->
+
+	<!-- container -->
+	<div id="container">
+
+		<!-- location -->
+		<c:if test="${REQUEST_DATA.pageMode eq ''}">
+			<jsp:include page="/WEB-INF/jsp/ccedu/inc/location/loc_03_03.jsp"> 
+			  	<jsp:param name="menuNm" value="자격증 신청"/> 
+			</jsp:include>
+		</c:if>
+		<c:if test="${REQUEST_DATA.pageMode eq 'update' || REQUEST_DATA.pageMode eq 'inquiry'}">
+			<jsp:include page="/WEB-INF/jsp/ccedu/inc/location/loc_03_03.jsp"> 
+			  	<jsp:param name="menuNm" value="자격증발급조회"/> 
+			</jsp:include>
+		</c:if>
+		<!--// location -->
+
+		<div class="con_center">
+
+			<!-- lnb -->
+			<div id="lnb">
+				<c:if test="${REQUEST_DATA.pageMode eq ''}">
+					<jsp:include page="/WEB-INF/jsp/ccedu/inc/lnb/lnb_03.jsp"> 
+					  	<jsp:param name="dep2" value="03"/>
+					  	<jsp:param name="dep3" value="02"/> 
+					</jsp:include>
+				</c:if>
+				<c:if test="${REQUEST_DATA.pageMode eq 'update' || REQUEST_DATA.pageMode eq 'inquiry'}">
+					<jsp:include page="/WEB-INF/jsp/ccedu/inc/lnb/lnb_03.jsp"> 
+					  	<jsp:param name="dep2" value="03"/>
+					  	<jsp:param name="dep3" value="03"/> 
+					</jsp:include>
+				</c:if>
+			</div>
+			
+			<!--// lnb -->
+			<form name="frm" id="frm" action="" method="post" enctype="multipart/form-data">
+				<input type="hidden" id="pageMode" name="pageMode" value="<c:out value='${REQUEST_DATA.pageMode}'/>"/>
+				<input type="hidden" id="ccAppNo" name="ccAppNo" value="<c:out value='${passInfo.CC_APP_NO}'/>"/>
+				<input type="hidden" id="ccNo" name="ccNo" value="<c:out value='${passInfo.CC_NO}'/>"/>
+				<input type="hidden" id="unityMberNo" name="unityMberNo" value="<c:out value='${REQUEST_DATA.SES_USERNO}'/>"/>
+				<input type="hidden" id="mberNm" name="mberNm" value="<c:out value='${REQUEST_DATA.SES_USERNAME}'/>"/>
+				<input type="hidden" id="moblPhon" name="moblPhon" value=""/>
+				<input type="hidden" id="telNo" name="telNo" value=""/>
+				<input type="hidden" id="email" name="email" value=""/>
+				<input type="hidden" id="mtAppType" name="mtAppType" value="<c:out value='${REQUEST_DATA.mtAppType}'/>"/>
+				<input type="hidden" id="UPLOAD_DIR" name="UPLOAD_DIR" value=""/>
+				<input type="hidden" id="licnNo" name="licnNo" value="<c:out value='${REQUEST_DATA.licnNo }'/>"/>
+				<input type="hidden" name="savPath" id="savPath" value="<c:out value='${passInfo.SAVPATH}'/>">
+	            <input type="hidden" name="orgFile2" id="orgFile2"  value="<c:out value='${passInfo.ORGFILE}'/>">
+	            <input type="hidden" name="savFile" id="savFile" value="<c:out value='${passInfo.SAVFILE}'/>">
+	            <input type="hidden" name="deleteSavPath" id="deleteSavPath" value="<c:out value='${passInfo.SAVPATH}'/>">
+	            <input type="hidden" name="deleteOrgFile" id="deleteOrgFile"  value="<c:out value='${passInfo.ORGFILE}'/>">
+	            <input type="hidden" name="deleteSavFile" id="deleteSavFile" value="<c:out value='${passInfo.SAVFILE}'/>">
+	            <input type="hidden" name="fileUpdateYn" id="fileUpdateYn" value="N">
+	            <input type="hidden" name="payAt" value="<c:out value="${REQUEST_DATA.payAt }"/>">
+	            <input type="hidden" name="isLic" value="Y">
+	            
+	            <!-- 결제 테스트 카드 결제 값  START -->
+	            <input type="hidden" name="LGD_CUSTOM_USABLEPAY" value= "LGD_CUSTOM_USABLEPAY" value=""/>
+	            <!-- 결제 테스트 카드 결제 값 END -->
+	            
+	            <%
+	            	if(SangsProperties.getProperty("Globals.mtCode_MT_CSEQ_STATUS_CODE_APPLY_END").equals("Y")){
+	            %>
+	            <!-- 결제 테스트 결과 값  START -->
+	            <input type="hidden" name="LGD_BUYERPHONE" value="<c:out value='${REQUEST_DATA.LGD_BUYERPHONE}'/>">
+				<input type="hidden" name="LGD_PAYDATE" value="<c:out value='${REQUEST_DATA.LGD_PAYDATE}'/>">
+				<input type="hidden" name="LGD_DISCOUNTUSEYN" value="<c:out value='${REQUEST_DATA.LGD_DISCOUNTUSEYN}'/>">
+				<input type="hidden" name="LGD_BUYEREMAIL" value="<c:out value='${REQUEST_DATA.LGD_BUYEREMAIL}'/>">
+				<input type="hidden" name="LGD_RECEIVER" value="<c:out value='${REQUEST_DATA.LGD_RECEIVER}'/>">
+				<input type="hidden" name="LGD_DELIVERYINFO" value="<c:out value='${REQUEST_DATA.LGD_DELIVERYINFO}'/>">
+				<input type="hidden" name="LGD_PAYTYPE" value="<c:out value='${REQUEST_DATA.LGD_PAYTYPE}'/>">
+				<input type="hidden" name="LGD_RECEIVERPHONE" value="<c:out value='${REQUEST_DATA.LGD_RECEIVERPHONE}'/>">
+				<input type="hidden" name="LGD_EXCHANGERATE" value="<c:out value='${REQUEST_DATA.LGD_EXCHANGERATE}'/>">
+				<input type="hidden" name="TAXFREEAMOUNT" value="<c:out value='${REQUEST_DATA.TAXFREEAMOUNT}'/>">
+				<input type="hidden" name="LGD_IFOS" value="<c:out value='${REQUEST_DATA.LGD_IFOS}'/>">
+				<input type="hidden" name="LGD_AFFILIATECODE" value="<c:out value='${REQUEST_DATA.LGD_AFFILIATECODE}'/>">
+				<input type="hidden" name="LGD_RESPMSG" value="<c:out value='${REQUEST_DATA.LGD_RESPMSG}'/>">
+				<input type="hidden" name="LGD_2TR_FLAG" value="<c:out value='${REQUEST_DATA.LGD_2TR_FLAG}'/>">
+				<input type="hidden" name="LGD_CARDNUM" value="<c:out value='${REQUEST_DATA.LGD_CARDNUM}'/>">
+				<input type="hidden" name="LGD_FINANCEAUTHNUM" value="<c:out value='${REQUEST_DATA.LGD_FINANCEAUTHNUM}'/>">
+				<input type="hidden" name="LGD_CARDNOINTEREST_YN" value="<c:out value='${REQUEST_DATA.LGD_CARDNOINTEREST_YN}'/>">
+				<input type="hidden" name="LGD_ESCROWYN" value="<c:out value='${REQUEST_DATA.LGD_ESCROWYN}'/>">
+				<input type="hidden" name="LGD_TRANSAMOUNT" value="<c:out value='${REQUEST_DATA.LGD_TRANSAMOUNT}'/>">
+				<input type="hidden" name="LGD_FINANCECODE" value="<c:out value='${REQUEST_DATA.LGD_FINANCECODE}'/>">
+				<input type="hidden" name="LGD_DISCOUNTUSEAMOUNT" value="<c:out value='${REQUEST_DATA.LGD_DISCOUNTUSEAMOUNT}'/>">
+				<input type="hidden" name="LGD_CARDGUBUN1" value="<c:out value='${REQUEST_DATA.LGD_CARDGUBUN1}'/>">
+				<input type="hidden" name="LGD_CARDGUBUN2" value="<c:out value='${REQUEST_DATA.LGD_CARDGUBUN2}'/>">
+				<input type="hidden" name="LGD_HASHDATA" value="<c:out value='${REQUEST_DATA.LGD_HASHDATA}'/>">
+				<input type="hidden" name="LGD_BUYERADDRESS" value="<c:out value='${REQUEST_DATA.LGD_BUYERADDRESS}'/>">
+				<input type="hidden" name="LGD_FINANCENAME" value="<c:out value='${REQUEST_DATA.LGD_FINANCENAME}'/>">
+				<input type="hidden" name="LGD_CARDNOINTYN" value="<c:out value='${REQUEST_DATA.LGD_CARDNOINTYN}'/>">
+				<input type="hidden" name="LGD_CARDACQUIRER" value="<c:out value='${REQUEST_DATA.LGD_CARDACQUIRER}'/>">
+				<input type="hidden" name="LGD_DEVICE" value="<c:out value='${REQUEST_DATA.LGD_DEVICE}'/>">
+				<input type="hidden" name="LGD_TIMESTAMP" value="<c:out value='${REQUEST_DATA.LGD_TIMESTAMP}'/>">
+				<input type="hidden" name="LGD_PCANCELSTR" value="<c:out value='${REQUEST_DATA.LGD_PCANCELSTR}'/>">
+				<input type="hidden" name="LGD_BUYER" value=<c:out value='${REQUEST_DATA.LGD_BUYER}'/>>
+				<input type="hidden" name="LGD_CARDINSTALLMONTH" value="<c:out value='${REQUEST_DATA.LGD_CARDINSTALLMONTH}'/>">
+				<input type="hidden" name="LGD_PRODUCTINFO" value="<c:out value='${REQUEST_DATA.LGD_PRODUCTINFO}'/>">
+				<input type="hidden" name="LGD_BUYERSSN" value="<c:out value='${REQUEST_DATA.LGD_BUYERSSN}'/>">
+				<input type="hidden" name="LGD_PRODUCTCODE" value="<c:out value='${REQUEST_DATA.LGD_PRODUCTCODE}'/>">
+				<input type="hidden" name="LGD_TID" value="<c:out value='${REQUEST_DATA.LGD_TID}'/>">
+				<input type="hidden" name="LGD_OID" value="<c:out value='${REQUEST_DATA.LGD_OID}'/>">
+	            <!-- 결제 테스트 결과 값  END -->
+	            
+	            <input type="hidden" name="LGD_PAYKEY" id="LGDPaykey" value=""/>
+	            <%
+	            	}
+	            %>
+	            
+	            
+			
+			
+			<!-- content 본문 -->
+			<div id="content">
+				<c:if test="${REQUEST_DATA.pageMode eq ''}">
+				<!-- 기존 START 2018-08-30  -->
+<!-- 					<h3 class="cont_titile">자격증 발급신청</h3> -->
+				<!-- 기존 END 2018-08-30  -->
+				
+				<!-- 2018-08-28 김동인 작업 S --> 
+				<h3 class="cont_titile type03">자격증 발급신청<span></span></h3>
+				<!-- 2018-08-28 김동인 작업 E -->
+				</c:if>
+				<c:if test="${REQUEST_DATA.pageMode eq 'update' || REQUEST_DATA.pageMode eq 'inquiry' }">
+				<!-- 기존 START 2018-08-30  -->
+<!-- 					<h3 class="cont_titile">자격증 발급조회/수정</h3> -->
+				<!-- 기존 END 2018-08-30  -->
+				
+				<!-- 2018-08-28 김동인 작업 S --> 
+				<h3 class="cont_titile type03">자격증 발급조회/수정<span></span></h3>
+				<!-- 2018-08-28 김동인 작업 E -->
+				</c:if>
+				<!-- 본문내용 -->
+				<div class="cont_body">
+					<!-- start -->
+						
+						
+					<div class="c_section">
+						<h4 class="c_tit">신청정보</h4>
+						<div class="table_style_row">
+							<table>
+								<caption>신청정보를 입력설정하는 표 입니다.</caption>
+								<colgroup>
+									<col class="col2_1" />
+									<col />
+								</colgroup>
+								<tr id="photoZone">
+									<th scope="row">사진</th>
+									<td>
+										<div class="u_photo"><img src="/att_file/ccedu/<c:out value='${passInfo.CC_NO}'/>/<c:out value='${passInfo.SAVFILE}'/>" height="113px;" width="103px;"></div>
+<%-- 										<div class="u_photo"><img src="<c:out value='${passInfo.SAVPATH}/${passInfo.SAVFILE}'/>" height="113px;" width="103px;"></div> --%>
+										<c:if test="${REQUEST_DATA.pageMode ne 'inquiry'}">
+											<button type="button" onclick="delImg(); return false;" class="btn_u_photo_del"><img src="/cmmn/images/sub/btn_del_photo.png" alt="사진삭제" /></button>
+										</c:if>
+									</td>
+								</tr>
+								<tr>
+									<th scope="row">성명</th>
+									<td><c:out value="${REQUEST_DATA.SES_USERNAME}"/></td>
+								</tr>
+								<tr>
+									<th scope="row">주민등록번호</th>
+									<td>
+										<div class="form_field maxwid360">
+											<c:if test="${REQUEST_DATA.pageMode eq ''}">
+												<c:if test="${empty passInfo.JUMIN1 || empty passInfo.JUMIN2}">
+													<input type="text" id="jumin1" name="jumin1" value="" title="주민번호 앞자리 입력"  style="width:31%;" maxlength="6"/>
+													<span class="widbox" style="width:8%;">-</span>
+													<input type="password" id="jumin2" name="jumin2" value="" title="주민번호 뒷자리 입력"  style="width:31%;" maxlength="7"/>
+												</c:if>
+												<!-- 정보 한번만 입력 -->
+												<c:if test="${not empty passInfo.JUMIN1 && not empty passInfo.JUMIN2}">	
+													<c:out value="${passInfo.JUMIN1 }"/> - <c:out value="${fn:substring(passInfo.JUMIN2, 0, 1) }"/>******
+													<input type="hidden" name="jumin1" value="<c:out value="${passInfo.JUMIN1 }"/>"/>
+													<input type="hidden" name="jumin2" value="<c:out value="${passInfo.JUMIN2 }"/>"/>
+												</c:if>
+											</c:if>
+											
+											<c:if test="${REQUEST_DATA.pageMode eq 'inquiry' || REQUEST_DATA.pageMode eq 'update'}">
+												<c:out value="${passInfo.JUMIN1 }"/> - <c:out value="${fn:substring(passInfo.JUMIN2, 0, 1) }"/>******
+												<input type="hidden" name="jumin1" value="<c:out value="${passInfo.JUMIN1 }"/>"/>
+												<input type="hidden" name="jumin2" value="<c:out value="${passInfo.JUMIN2 }"/>"/>
+											</c:if>
+										</div>
+									</td>
+								</tr>
+								<tr>
+									<th scope="row">최종학교명</th>
+									<td>
+										<div class="form_field">
+											<c:if test="${REQUEST_DATA.pageMode eq '' || REQUEST_DATA.pageMode eq 'update'}">
+												<c:if test="${empty passInfo.FIN_SCHOOL_NM}">
+													<input type="text" id="finSchoolNm" name="finSchoolNm" title="최종학교명 입력" class="input_address" maxlength="140" value="<c:out value='${licenseInfo.FIN_SCHOOL_NM}'/>"/>
+												</c:if>
+												<c:if test="${not empty passInfo.FIN_SCHOOL_NM}">
+													<c:out value="${passInfo.FIN_SCHOOL_NM }"/>
+													<input type="hidden" name="finSchoolNm" value="<c:out value="${passInfo.FIN_SCHOOL_NM }"/>"/>
+												</c:if>
+											</c:if>
+										</div>
+										
+										<c:if test="${REQUEST_DATA.pageMode eq 'inquiry' }">
+											<c:out value="${passInfo.FIN_SCHOOL_NM }"/>
+											<input type="hidden" name="finschoolNm" value="<c:out value="${passInfo.FIN_SCHOOL_NM }"/>"/>
+										</c:if>
+									</td>
+								</tr>
+								
+								<tr>
+									<th scope="row">학과/재학상태</th>
+									<td>
+										<div class="form_field">
+											<c:if test="${REQUEST_DATA.pageMode eq '' || REQUEST_DATA.pageMode eq 'update'}">
+												<c:if test="${empty passInfo.MAJOR}">
+													<input type="text" id="majorNm" name="majorNm" maxlength="130" value="<c:out value='${passInfo.MAJOR }'/>"  title="학과 전공과목 입력" class="input_email_domain" />
+													<select title="재학상태 선택" class="select_email_domain" name="mtSchoolStat" id="mtSchoolStat">
+														<c:forEach var="emap2" items="${mtSchStatList}" varStatus="status2">
+															<option value="${emap2.MT_SUB_CODE}"><c:out value="${emap2.MT_SUB_NAME}"/></option>
+														</c:forEach>
+													</select>
+												</c:if>
+												<c:if test="${not empty passInfo.MAJOR}">
+													<c:out value="${passInfo.MAJOR }"/>
+													<c:if test="${passInfo.MT_SCHOOL_STAT eq 'SS0001'}"> 졸업 </c:if>
+													<c:if test="${passInfo.MT_SCHOOL_STAT eq 'SS0002'}"> 재학 </c:if>
+													<c:if test="${passInfo.MT_SCHOOL_STAT eq 'SS0003'}"> 중퇴 </c:if>
+													<input type="hidden" name="majorNm" value="<c:out value="${passInfo.MAJOR}"/>"/>
+													<input type="hidden" name="mtSchoolStat" value="<c:out value="${passInfo.MT_SCHOOL_STAT}"/>"/>
+												</c:if>
+											</c:if>
+											<c:if test="${REQUEST_DATA.pageMode eq 'inquiry' }">
+												<c:out value="${passInfo.MAJOR}"/> / 
+												<c:if test="${passInfo.MT_SCHOOL_STAT eq 'SS0001'}"> 졸업 </c:if>
+												<c:if test="${passInfo.MT_SCHOOL_STAT eq 'SS0002'}"> 재학 </c:if>
+												<c:if test="${passInfo.MT_SCHOOL_STAT eq 'SS0003'}"> 중퇴 </c:if>
+												<input type="hidden" name="majorNm" value="<c:out value="${passInfo.MAJOR}"/>"/>
+												<input type="hidden" name="mtSchoolStat" value="<c:out value="${passInfo.MT_SCHOOL_STAT}"/>"/> 
+	                                        </c:if>
+										</div>
+									</td>
+								</tr>
+								<tr>
+									<th scope="row">핸드폰번호</th>
+									<td>
+										<c:choose>
+											<c:when test="${REQUEST_DATA.pageMode eq ''}">
+												<div class="form_field maxwid360">
+													<c:set var="mobileFront" value="${fn:substring(passInfo.MOBLPHON, 0, 3)}"/>
+													<select title="휴대폰번호 앞자리 선택" style="width:22%;" id="mobile1" name="mobile1">
+														<option value="010" <c:if test="${mobileFront eq '010'}"> selected="selected"</c:if>>010</option>
+						                                <option value="011" <c:if test="${mobileFront eq '011'}"> selected="selected"</c:if>>011</option>
+						                                <option value="016" <c:if test="${mobileFront eq '016'}"> selected="selected"</c:if>>016</option>
+						                                <option value="017" <c:if test="${mobileFront eq '017'}"> selected="selected"</c:if>>017</option>
+						                                <option value="018" <c:if test="${mobileFront eq '018'}"> selected="selected"</c:if>>018</option>
+						                                <option value="019" <c:if test="${mobileFront eq '019'}"> selected="selected"</c:if>>019</option>
+													</select>
+													<span class="widbox" style="width:8%;">-</span>
+													<input type="tel" id="mobile2" name="mobile2" value="<c:out value='${fn:substring(passInfo.MOBLPHON, 4, 8)}'/>" title="휴대폰번호 가운데 4자리 입력"  style="width:31%;" maxlength="4"/>
+													<span class="widbox" style="width:8%;">-</span>
+													<input type="tel" id="mobile3" name="mobile3" value="<c:out value='${fn:substring(passInfo.MOBLPHON, 9, 13)}'/>" title="휴대폰번호 마지막 4자리 입력"  style="width:31%;" maxlength="4" />
+												</div>
+											</c:when>
+											
+											<c:when test="${REQUEST_DATA.pageMode eq 'update'}">
+												<div class="form_field maxwid360">
+													<c:set var="mobileFront" value="${fn:substring(licenseInfo.MOBLPHON, 0, 3)}"/>
+													<select title="휴대폰번호 앞자리 선택" style="width:22%;" id="mobile1" name="mobile1">
+														<option value="010" <c:if test="${mobileFront eq '010'}"> selected="selected"</c:if>>010</option>
+						                                <option value="011" <c:if test="${mobileFront eq '011'}"> selected="selected"</c:if>>011</option>
+						                                <option value="016" <c:if test="${mobileFront eq '016'}"> selected="selected"</c:if>>016</option>
+						                                <option value="017" <c:if test="${mobileFront eq '017'}"> selected="selected"</c:if>>017</option>
+						                                <option value="018" <c:if test="${mobileFront eq '018'}"> selected="selected"</c:if>>018</option>
+						                                <option value="019" <c:if test="${mobileFront eq '019'}"> selected="selected"</c:if>>019</option>
+													</select>
+													<span class="widbox" style="width:8%;">-</span>
+													<input type="tel" id="mobile2" name="mobile2" value="<c:out value='${fn:substring(licenseInfo.MOBLPHON, 4, 8)}'/>" title="휴대폰번호 가운데 4자리 입력"  style="width:31%;" maxlength="4"/>
+													<span class="widbox" style="width:8%;">-</span>
+													<input type="tel" id="mobile3" name="mobile3" value="<c:out value='${fn:substring(licenseInfo.MOBLPHON, 9, 13)}'/>" title="휴대폰번호 마지막 4자리 입력"  style="width:31%;" maxlength="4" />
+												</div>
+											</c:when>
+											
+											<c:when test="${REQUEST_DATA.pageMode eq 'inquiry'}">
+												<c:out value="${licenseInfo.MOBLPHON }"/>
+											</c:when>
+											
+											<c:otherwise>
+												<c:out value="${licenseInfo.MOBLPHON }"/>
+											</c:otherwise>
+										</c:choose>
+									</td>
+								</tr>
+								<tr>
+									<th scope="row">유선전화</th>
+									<td>
+										<div class="form_field maxwid360">
+											<c:choose>
+												<c:when test="${REQUEST_DATA.pageMode eq ''}">
+													
+													<c:if test="${fn:length(passInfo.TELNO) eq 12}">
+														<c:set var="frontTelNo" value="${fn:substring(passInfo.TELNO, 0, 2)}"/>
+														<c:set var="middleTelNo" value="${fn:substring(passInfo.TELNO, 3, 7)}"/>
+														<c:set var="endTelNo" value="${fn:substring(passInfo.TELNO, 8, 12)}"/>
+													</c:if>
+													<c:if test="${fn:length(passInfo.TELNO) eq 13 }">
+														<c:set var="frontTelNo" value="${fn:substring(passInfo.TELNO, 0, 3)}"/>
+														<c:set var="middleTelNo" value="${fn:substring(passInfo.TELNO, 4, 8)}"/>
+														<c:set var="endTelNo" value="${fn:substring(passInfo.TELNO, 9, 13)}"/>
+													</c:if>	
+												
+													<select id="telNo1" name="telNo1" title="유선전화 앞자리 선택" style="width:22%;">
+														<option value="02"  <c:if test="${frontTelNo eq '02'}"> selected="selected" </c:if>>02</option>
+														<option value="031" <c:if test="${frontTelNo eq '031'}"> selected="selected" </c:if>>031</option>
+														<option value="032" <c:if test="${frontTelNo eq '032'}"> selected="selected" </c:if>>032</option>
+														<option value="033" <c:if test="${frontTelNo eq '033'}"> selected="selected" </c:if>>033</option>
+														<option value="041" <c:if test="${frontTelNo eq '041'}"> selected="selected" </c:if>>041</option>
+														<option value="042" <c:if test="${frontTelNo eq '042'}"> selected="selected" </c:if>>042</option>
+														<option value="043" <c:if test="${frontTelNo eq '043'}"> selected="selected" </c:if>>043</option>
+														<option value="044" <c:if test="${frontTelNo eq '044'}"> selected="selected" </c:if>>044</option>
+														<option value="051" <c:if test="${frontTelNo eq '051'}"> selected="selected" </c:if>>051</option>
+														<option value="052" <c:if test="${frontTelNo eq '052'}"> selected="selected" </c:if>>052</option>
+														<option value="053" <c:if test="${frontTelNo eq '053'}"> selected="selected" </c:if>>053</option>
+														<option value="054" <c:if test="${frontTelNo eq '054'}"> selected="selected" </c:if>>054</option>
+														<option value="055" <c:if test="${frontTelNo eq '055'}"> selected="selected" </c:if>>055</option>
+														<option value="061" <c:if test="${frontTelNo eq '061'}"> selected="selected" </c:if>>061</option>
+														<option value="062" <c:if test="${frontTelNo eq '062'}"> selected="selected" </c:if>>062</option>
+														<option value="063" <c:if test="${frontTelNo eq '063'}"> selected="selected" </c:if>>063</option>
+														<option value="064" <c:if test="${frontTelNo eq '064'}"> selected="selected" </c:if>>064</option>
+														<option value="070" <c:if test="${frontTelNo eq '070'}"> selected="selected" </c:if>>070</option>
+													</select>
+													
+													<span class="widbox" style="width:8%;">-</span>
+													<input type="tel" id="telNo2" name="telNo2" value="<c:out value='${middleTelNo}'/>" title="유선전화 가운데자리 입력"  style="width:31%;" maxlength="4"/>
+													<span class="widbox" style="width:8%;">-</span>
+													<input type="tel" id="telNo3" name="telNo3" value="<c:out value='${endTelNo}'/>"  title="유선전화 마지막자리 입력"  style="width:31%;" maxlength="4"/>
+												</c:when>
+												
+												<c:when test="${REQUEST_DATA.pageMode eq 'update'}">
+													<c:if test="${fn:length(licenseInfo.TELNO) eq 12}">
+														<c:set var="frontTelNo" value="${fn:substring(licenseInfo.TELNO, 0, 2)}"/>
+														<c:set var="middleTelNo" value="${fn:substring(licenseInfo.TELNO, 3, 7)}"/>
+														<c:set var="endTelNo" value="${fn:substring(licenseInfo.TELNO, 8, 12)}"/>
+													</c:if>
+													<c:if test="${fn:length(licenseInfo.TELNO) eq 13 }">
+														<c:set var="frontTelNo" value="${fn:substring(licenseInfo.TELNO, 0, 3)}"/>
+														<c:set var="middleTelNo" value="${fn:substring(licenseInfo.TELNO, 4, 8)}"/>
+														<c:set var="endTelNo" value="${fn:substring(licenseInfo.TELNO, 9, 13)}"/>
+													</c:if>	
+													<select id="telNo1" name="telNo1" title="유선전화 앞자리 선택" style="width:22%;">
+														<option value="02"  <c:if test="${frontTelNo eq '02'}"> selected="selected" </c:if>>02</option>
+														<option value="031" <c:if test="${frontTelNo eq '031'}"> selected="selected" </c:if>>031</option>
+														<option value="032" <c:if test="${frontTelNo eq '032'}"> selected="selected" </c:if>>032</option>
+														<option value="033" <c:if test="${frontTelNo eq '033'}"> selected="selected" </c:if>>033</option>
+														<option value="041" <c:if test="${frontTelNo eq '041'}"> selected="selected" </c:if>>041</option>
+														<option value="042" <c:if test="${frontTelNo eq '042'}"> selected="selected" </c:if>>042</option>
+														<option value="043" <c:if test="${frontTelNo eq '043'}"> selected="selected" </c:if>>043</option>
+														<option value="044" <c:if test="${frontTelNo eq '044'}"> selected="selected" </c:if>>044</option>
+														<option value="051" <c:if test="${frontTelNo eq '051'}"> selected="selected" </c:if>>051</option>
+														<option value="052" <c:if test="${frontTelNo eq '052'}"> selected="selected" </c:if>>052</option>
+														<option value="053" <c:if test="${frontTelNo eq '053'}"> selected="selected" </c:if>>053</option>
+														<option value="054" <c:if test="${frontTelNo eq '054'}"> selected="selected" </c:if>>054</option>
+														<option value="055" <c:if test="${frontTelNo eq '055'}"> selected="selected" </c:if>>055</option>
+														<option value="061" <c:if test="${frontTelNo eq '061'}"> selected="selected" </c:if>>061</option>
+														<option value="062" <c:if test="${frontTelNo eq '062'}"> selected="selected" </c:if>>062</option>
+														<option value="063" <c:if test="${frontTelNo eq '063'}"> selected="selected" </c:if>>063</option>
+														<option value="064" <c:if test="${frontTelNo eq '064'}"> selected="selected" </c:if>>064</option>
+														<option value="070" <c:if test="${frontTelNo eq '070'}"> selected="selected" </c:if>>070</option>
+													</select>
+													<span class="widbox" style="width:8%;">-</span>
+													<input type="tel" id="telNo2" name="telNo2" value="<c:out value='${middleTelNo}'/>" title="유선전화 가운데자리 입력"  style="width:31%;" maxlength="4"/>
+													<span class="widbox" style="width:8%;">-</span>
+													<input type="tel" id="telNo3" name="telNo3" value="<c:out value='${endTelNo}'/>"  title="유선전화 마지막자리 입력"  style="width:31%;" maxlength="4"/>
+												</c:when>
+												
+												<c:when test="${REQUEST_DATA.pageMode eq 'inquiry'}">
+													<c:out value="${licenseInfo.TELNO }"/>
+												</c:when>
+												<c:otherwise>
+													<c:out value="${licenseInfo.TELNO }"/>
+												</c:otherwise>
+											</c:choose>
+	                                    </div>
+									</td>
+								</tr>
+								<tr>
+									<th scope="row">이메일</th>
+									<td>
+										<div class="form_field">
+											<c:choose>
+												<c:when test="${REQUEST_DATA.pageMode eq ''}">
+													<c:set var="emailId" value="${fn:substringBefore(passInfo.EMAIL, '@')}"/>
+													<input type="text" id="email1" name="email1" value="<c:out value='${emailId}'/>" title="이메일 아이디 입력" class="input_email_id" />
+													<span class="widbox widbox_email">@</span>
+													<c:set var="emailAddr" value="${fn:substringAfter(passInfo.EMAIL, '@')}"/>
+													<input type="text" id="email2" name="email2" maxlength="20" value="<c:out value='${emailAddr }'/>"  title="도메인 입력" class="input_email_domain" />
+													<select title="직접입력 할 수 있는 도메인 선택" class="select_email_domain" id="email3">
+														<c:forEach var="emap2" items="${mtEmailCodeList}" varStatus="status2">
+															<option value="${emap2.MT_SUB_NAME}" <c:if test="${emap2.MT_SUB_NAME eq emailAddr}"> selected="selected" </c:if>><c:out value="${emap2.MT_SUB_NAME}"/></option>
+														</c:forEach>
+														<option value="">직접입력</option>
+													</select>
+												</c:when>
+												
+												<c:when test="${REQUEST_DATA.pageMode eq 'update'}">
+													<c:set var="emailId" value="${fn:substringBefore(licenseInfo.EMAIL, '@')}"/>
+													<input type="text" id="email1" name="email1" value="<c:out value='${emailId}'/>" title="이메일 아이디 입력" class="input_email_id" />
+													<span class="widbox widbox_email">@</span>
+													<c:set var="emailAddr" value="${fn:substringAfter(licenseInfo.EMAIL, '@')}"/>
+													<input type="text" id="email2" name="email2" maxlength="20" value="<c:out value='${emailAddr }'/>"  title="도메인 입력" class="input_email_domain" />
+													<select title="직접입력 할 수 있는 도메인 선택" class="select_email_domain" id="email3">
+														<c:forEach var="emap2" items="${mtEmailCodeList}" varStatus="status2">
+															<option value="${emap2.MT_SUB_NAME}" <c:if test="${emap2.MT_SUB_NAME eq emailAddr}"> selected="selected" </c:if>><c:out value="${emap2.MT_SUB_NAME}"/></option>
+														</c:forEach>
+														<option value="">직접입력</option>
+													</select>
+												</c:when>
+												
+												<c:when test="${REQUEST_DATA.pageMode eq 'inquiry' }">
+													<c:out value="${licenseInfo.EMAIL }"/>
+												</c:when>
+												
+												<c:otherwise>
+													<c:out value="${licenseInfo.EMAIL }"/>
+												</c:otherwise>
+											</c:choose>
+										</div>
+									</td>
+								</tr>
+								<tr>
+									<th scope="row">주소</th>
+									<td>
+										<div class="form_field">
+											<c:choose>
+												<c:when test="${REQUEST_DATA.pageMode eq ''}">
+													<input type="text" id="addrCode" name="addrCode"  value="<c:out value='${passInfo.ADDR_CODE}'/>" readonly="readonly" title="우편번호 입력" class="input_postal_code" />
+													<button class="btn_graybg02 btn_postal_code" onclick="openDaumPostcode(); return false;">우편번호 찾기</button>
+													<div class="address_box">
+														<input type="text" id="address" name="address" readonly="readonly" title="주소 입력" class="input_address" value="<c:out value='${passInfo.ADDRESS}'/>"/>
+														<input type="text" title="상세주소 입력" id="address2" name="address2" class="input_detail_address" value="<c:out value='${passInfo.ADDRESS2}'/>"/>
+													</div>
+												</c:when>
+												
+												<c:when test="${REQUEST_DATA.pageMode eq 'update'}">
+													<input type="text" id="addrCode" name="addrCode"  value="<c:out value='${licenseInfo.ADDR_CODE}'/>" readonly="readonly" title="우편번호 입력" class="input_postal_code" />
+													<button class="btn_graybg02 btn_postal_code" onclick="openDaumPostcode(); return false;">우편번호 찾기</button>
+													<div class="address_box">
+														<input type="text" id="address" name="address" readonly="readonly" title="주소 입력" class="input_address" value="<c:out value='${licenseInfo.ADDRESS}'/>"/>
+														<input type="text" title="상세주소 입력" id="address2" name="address2" class="input_detail_address" value="<c:out value='${licenseInfo.ADDRESS2}'/>"/>
+													</div>
+												</c:when>
+												
+												<c:when test="${REQUEST_DATA.pageMode eq 'inquiry'}">
+													<c:out value='${licenseInfo.ADDR_CODE}'/>&nbsp;&nbsp;<c:out value="${licenseInfo.ADDRESS}"/> <c:out value="${licenseInfo.ADDRESS2}"/>
+												</c:when>
+												
+												<c:otherwise>
+													<c:out value='${licenseInfo.ADDR_CODE}'/>&nbsp;&nbsp;<c:out value="${licenseInfo.ADDRESS}"/> <c:out value="${licenseInfo.ADDRESS2}"/>
+												</c:otherwise>
+												
+											</c:choose>
+										</div>
+									</td>
+								</tr>
+								<tr>
+									<th scope="row">신청구분</th>
+									<td>
+										<div class="form_field">
+											<c:choose>
+												<c:when test="${REQUEST_DATA.pageMode eq '' || REQUEST_DATA.pageMode eq 'update'}">
+													<select title="학력 선택" id="mtLicenceType" name="mtLicenceType">
+													<c:forEach var="result" items="${licenseList}" varStatus="status2">
+														<option value="${result.MT_SUB_CODE}"<c:if test="${result.MT_SUB_CODE eq  licenseInfo.MT_LICENCE_TYPE}">selected="selected"</c:if>><c:out value="${result.MT_SUB_NAME}"/></option>
+													</c:forEach>
+													</select>
+												</c:when>
+												
+												<c:when test="${REQUEST_DATA.pageMode eq 'inquiry'}">
+													<c:out value="${licenseInfo.MT_APP_NAME}"/>
+												</c:when>
+												
+												<c:otherwise>
+													<c:out value="${licenseInfo.MT_APP_NAME}"/>
+												</c:otherwise>
+											</c:choose>
+										</div>
+									</td>
+								</tr>
+								<tr>
+									<th scope="row">배송시 요청사항</th>
+									<td>
+										<c:if test="${REQUEST_DATA.pageMode eq '' || REQUEST_DATA.pageMode eq 'update'}">
+											<div class="form_field">
+												<textarea cols="" rows="" id="deliEtc" name="deliEtc" class="textarea" title="배송시 요청사항을 입력하세요."><c:out value='${licenseInfo.DELI_ETC}'/></textarea>
+											</div>
+										</c:if>
+										<c:if test="${REQUEST_DATA.pageMode eq 'inquiry'}">
+											<c:out value='${licenseInfo.DELI_ETC}'/>
+										</c:if> 
+									</td>
+								</tr>
+								
+								<c:if test="${REQUEST_DATA.pageMode eq 'update' || REQUEST_DATA.pageMode eq ''}">
+									<tr id="imgFile">
+										<th scope="row">증명사진 첨부</th>
+										<td>
+											<div class="form_field">
+												<button type="button" class="btn_graybg02 btn_find_file" onclick="$('#orgFile').click();">파일찾기</button>
+												<input type="file" id="orgFile" name="orgFile" title="파일을 선택하세요." tabindex="-1" class="alt_text" onchange="$('#fileNM').val($(this).val());" />
+												<input type="text" id="fileNM" name="fileNm" aria-hidden="true" tabindex="-1" class="input_file_name" title="선택된 파일명입니다." readonly="readonly" />
+											</div>
+										</td>
+									</tr>
+								</c:if>
+								
+								<c:if test="${REQUEST_DATA.pageMode eq ''}">
+									<tr>
+										<td class="txtbule" colspan="2" rowspan="4">
+											* 공인자격을 취득한 자에 대한 개인정보를 수집 · 이용 · 제공하기 위하여 자격 기본법 제34조 및 자격기본법 시행령 제 32조에 따라 본인의 동의를 얻어야 하는 정보입니다.<br/>
+											* 자격증 발급비용 입금 안내<br/>	
+											자격증 발급신청을 하시는 분은 신청 완료 자격증 발급비용을 아래 계좌로 송금하여 주시기 바랍니다.<br />
+											- 기업은행 001-112939-04-481(예금주 : 신용회복위원회)
+										</td>
+									</tr>
+								</c:if>
+							</table>
+						</div>
+					</div>
+					
+					<!------  결제정보 SEC START ------>
+					<c:if test="${REQUEST_DATA.payAt eq 'Y' }">
+						<div class="c_section">
+							<h4 class="c_tit">결제정보</h4>
+							<div class="table_style_row">
+								<table>
+									<caption>결제정보, 총 결제금액 구분, 카드사 정보 입니다.</caption>
+									<colgroup>
+										<col class="col2_1" />
+										<col />
+									</colgroup>
+									<tr>
+										<th scope="row">총 결제금액</th>
+										<td><fmt:formatNumber value="8000" pattern="#,###" /> 원</td>
+									</tr>
+									<tr>
+										<th scope="row">구분</th>
+										<td>
+											<c:forEach var="result" items="${mtPayMCodeList}" varStatus="status2">
+												<input type="radio" id="${result.MT_SUB_CODE}" name="PayM" value="${result.MT_SUB_CODE}"/>
+												<label for="${result.MT_SUB_CODE}" style="margin-right: 20px;">${result.MT_SUB_NAME}</label>
+											</c:forEach>
+										</td>
+									</tr>
+								</table>
+							</div>
+						</div>
+					</c:if>
+					<!------  결제정보 SEC END ------>
+
+					<div class="c_btn_center">
+						<button onclick="window.history.go(-1); return false;" class="btn_graybg03">취소</button>
+						<c:if test="${REQUEST_DATA.pageMode eq 'inquiry'}">
+							<c:if test="${licenseInfo.MT_PAY_STAT eq 'YS0001'}">
+								<button onclick="licenseUpdate(); return false;" class="btn_bluebg03">수정</button>
+							</c:if>	
+						</c:if>
+						
+						<c:if test="${REQUEST_DATA.pageMode eq ''}">
+							<button type="button" onclick="licenseRegit(); return false;" class="btn_bluebg03">발급신청</button>
+						</c:if>
+							
+						<c:if test="${REQUEST_DATA.pageMode eq 'update'}">
+							<c:if test="${licenseInfo.MT_PAY_STAT eq 'YS0001'}">
+								<button onclick="licenseRegit(); return false;" class="btn_bluebg03">수정</button>
+							</c:if>
+						</c:if>
+							
+					</div>
+
+					<!--// end -->
+				</div>
+				<!--// 본문내용 -->
+				
+			<!--  -->
+			</div>
+			<!--// content 본문 -->
+			</form>
+			
+			<form method="post" name="LGD_PAYINFO" id="LGD_PAYINFO" action="return false;"/>
+		<!-- con_cneter end -->
+		</div>
+	
+	</div>
+	<!--// container -->
+
+	<!-- foot -->
+	<%@ include file="/WEB-INF/jsp/ccedu/inc/footer_inc.jsp"%>
+	<!--// foot end -->
+
+</div>
+
+</body>
+</html>

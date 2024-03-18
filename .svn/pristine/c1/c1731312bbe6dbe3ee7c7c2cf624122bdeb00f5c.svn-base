@@ -1,0 +1,176 @@
+/* 200420 �߰� */
+var maxNum = 4;
+if(strChapter == "02" || strChapter == "03" || strChapter == "04" || strChapter == "08" || strChapter == "09" || strChapter == "10" || strChapter == "15" ||
+   strChapter == "16" || strChapter == "05" || strChapter == "06" || strChapter == "07" || strChapter == "06") {
+	maxNum = 2;
+}
+if(strChapter == "11" || strChapter == "14" || strChapter == "17" || strChapter == "18") {
+	maxNum = 3;
+}
+if(strChapter == "12") {
+	maxNum = 5;
+}
+if(maxNum <= 1){
+	$("#tabSet, .numSet").hide();
+}
+var thisNum = 1;
+var totalNum = maxNum;
+var currentPanel = null;
+var lastNum=0;
+var lastTab=null;
+
+var thisMain = this;
+var thisParent=null;
+if(this!=parent){
+	thisParent = parent;
+}
+
+var isConImgURL;
+
+//$(window).load(function(e){
+//$(document).ready(function(e) {});
+	$("#summaryContainer").css("opacity",0);
+
+	$(".sumPannel").each(function(idx){
+		if(idx==0){
+			currentPanel = $(this);
+			$(this).show();
+		}else{
+			$(this).hide();
+		}
+
+	});
+//	$("#printBtn").bind("click",function(){
+//		_doPrint();
+//	});
+		
+
+
+	tabInit();
+
+	var btnBack = $('#prevBn');
+	var btnNext = $('#nextBn');
+
+	
+		btnNext.bind("click",function(){
+			setAudio('summary');
+			if(thisNum >= 1 &&  thisNum < totalNum)	{
+				next_go();
+				tabInit();
+			}
+		  });
+	
+	
+		btnBack.bind("click",function(){
+			setAudio('summary');
+			if(thisNum > 1 &&  thisNum <= totalNum)
+			{
+				prev_go();
+				tabInit();
+			}
+		  });
+//	$("#sumBtn").bind("click",function(){
+//        summaryDown();
+//	  });
+
+//	$(document).bind("contextmenu", function(e){
+//        return false;
+//    });
+
+//});
+
+
+//$(window).load(function(e){
+//	setTimeout(function(){
+		$("#summaryContainer").css("opacity",1);
+//	},50);
+	
+//});
+
+
+
+function tabInit(){
+	$("#curNum").html(itostrnum(thisNum));
+	$("#toNum").html("/ "+itostrnum(totalNum));
+
+	$("#sum_"+thisNum).fadeIn();
+	isConImgURL = "../common/img/summary/summary_"+itostrnum(strChapter)+"_"+itostrnum(thisNum)+".png"
+//	isConImgURL = "../common/img/summary/summary_1_1.png"
+	$("#img_"+thisNum).attr("src",isConImgURL);
+
+	if(thisNum < 2)
+	{
+//		$('#prevBn').show();
+//		$('#nextBn').show();
+		$("#prevBn").css("background", "url(../common/img/summary/prev_di.png)");
+		$("#nextBn").css("background", "");
+
+
+	}else if(thisNum > 1 && thisNum < totalNum){
+//		$('#prevBn').show();
+//		$('#nextBn').show();
+		$("#prevBn").css("background", "");
+		$("#nextBn").css("background", "");
+	}else if(thisNum > totalNum-1){
+//		if(thisParent){
+//			thisParent._isEndCurrentPageAct();
+//		}
+//		$('#prevBn').show();
+//		$('#nextBn').show();
+		$("#prevBn").css("background", "");
+		$("#nextBn").css("background", "url(../common/img/summary/next_di.png)");
+		
+	}
+	
+}
+
+	
+//	$("#prevBn").hover(function(){
+//		  $(this).css("background", "url(../common/img/summary/prev_over.png)");
+//		  }, function(){
+//		  $(this).css("background", "url(../common/img/summary/prev.png)");
+//	});
+
+//	$("#nextBn").hover(function(){
+//		  $(this).css("background", "url(../common/img/summary/next_over.png)");
+//		  }, function(){
+//		  $(this).css("background", "url(../common/img/summary/next.png)");
+//	});
+
+
+function next_go(){
+	$("#sum_"+thisNum).hide();
+ 	if (thisNum < totalNum) {
+		thisNum++;
+		}
+
+}
+
+function prev_go(){
+	$("#sum_"+thisNum).hide();
+	if (thisNum > 1) {
+		thisNum--;
+	}
+
+}
+//
+//function summaryDown(){
+//    
+//	parent.otherEvent("summaryDown");
+//}
+//
+//function _doPrint(){
+//	window.open("summary_print.html");
+//}
+
+
+
+
+function itostrnum(n){
+	if(n<10){
+		return ""+n;
+	}else{
+		return ""+n;
+	}
+}
+

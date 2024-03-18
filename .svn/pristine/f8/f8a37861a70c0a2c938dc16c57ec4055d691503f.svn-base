@@ -1,0 +1,11 @@
+<%
+/****************************************
+    subject : 좌측 메뉴
+    summary : 좌측 메뉴 : 알림(08)
+    author  : SANGS
+    date    : 2018-06-12
+****************************************/
+%>
+<%@ page language="java" contentType="text/html; charset=utf-8" pageEncoding="utf-8"%>
+
+<h2 style="display: none;">알림</h2>

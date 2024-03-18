@@ -1,0 +1,185 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.webapp.ccedu.mapper.OnlineBookMapper">
+    <select id="selectBookType" resultType="String" parameterType="String">
+    	SELECT
+    		MT_SUB_NAME
+    	FROM
+    		LMS_CD_MT_SUB
+    	WHERE
+    		MT_SUB_CODE = #{mtSubCode} 
+    </select>  
+    
+    <select id="selectCourseList" resultType="emap" parameterType="String">
+    	SELECT
+    		MT_SUB_NAME
+    		, MT_SUB_CODE
+    	FROM
+    		LMS_CD_MT_SUB
+    	WHERE
+    		MT_CODE = #{mtCode} 
+    </select>  
+    
+    <select id="selectBookList" resultType="emap" parameterType="String">
+    	SELECT 
+			A.BOOKNO
+			, A.TITLE
+			, A.PRICE
+			, A.PRICE_REAL
+			, A.B_WRITER
+			, A.B_COMP
+			, B.SAVFILE			
+		FROM 
+  			LMS_ED_BOOK A,
+  			LMS_ED_BOOK_FILE B
+		WHERE
+  			A.BOOKCATENO = (SELECT ORDR FROM LMS_CD_MT_SUB WHERE MT_SUB_CODE = #{mtSubCode})
+  			AND A.BOOKNO = B.BOOKNO
+  			AND A.USEYN = 'Y'
+    </select>
+     
+    
+    <select id="selectBookInfo" resultType="emap" parameterType="dmap">
+	    SELECT 
+		  A.BOOKNO
+		  , A.TITLE
+		  , DBMS_LOB.SUBSTR(A.CONTENT, 1000, 1) AS CONTENT
+		  , A.PRICE
+		  , A.PRICE_REAL
+		  , A.B_WRITER
+		  , A.B_COMP
+		  , TO_CHAR(A.B_PUBD,'YYYY-MM-DD') AS B_PUBD
+		  , A.B_PAGE
+		  , A.B_ISBN
+		  , B.SAVFILE
+		FROM 
+	  		LMS_ED_BOOK A,
+	  		LMS_ED_BOOK_FILE B
+		WHERE
+	 		A.BOOKCATENO = (SELECT ORDR FROM LMS_CD_MT_SUB WHERE MT_SUB_CODE = #{mtSubCode})
+	  		AND A.BOOKNO = #{bookno}
+	  		AND A.BOOKNO = B.BOOKNO
+	  		AND A.USEYN = 'Y'
+    </select>  
+    
+    <select id="selectClassList" resultType="emap" parameterType="String">
+	    SELECT 
+			B.SEQ_TITLE
+			, B.OPENTYPE
+			, B.EDUDAY_DEL
+			, B.PRICE_DEL
+			, TO_CHAR(B.STUDY_SDATE,'YYYY-MM-DD') AS STUDY_SDATE
+			, TO_CHAR(B.STUDY_EDATE,'YYYY-MM-DD') AS STUDY_EDATE
+		FROM 
+			LMS_ED_COURSE A,
+			LMS_ED_COURSE_SEQ B,
+			LMS_CD_MT_SUB C
+		WHERE
+			A.COURSENO = B.COURSENO
+			AND B.USEYN = 'Y'
+			AND A.MT_SC_CODE = C.MT_SUB_CODE
+			AND C.MT_SUB_CODE = #{mtSubCode}
+    </select> 
+    
+    <select id="getPaymentPrice" resultType="Integer" parameterType="String">
+    	SELECT
+    		PRICE
+    	FROM
+    		CC_PAYMENT
+    	WHERE
+    		CC_TARGET_NO = #{orderno}
+    </select>
+    
+    <select id="selectUserInfo" resultType="emap" parameterType="Integer">
+		SELECT 
+			MBERNM
+		  , SUBSTR(MOBLPHON,1,INSTR(MOBLPHON,'-',1,1)-1) AS MOBLPHON1
+		  , SUBSTR(MOBLPHON,INSTR(MOBLPHON,'-',1,1)+1,INSTR(MOBLPHON,'-',1,2)-INSTR(MOBLPHON,'-',1,1)-1) AS MOBLPHON2
+		  , SUBSTR(MOBLPHON,INSTR(MOBLPHON,'-',1,2)+1) AS MOBLPHON3
+		  , LNM_ZIP
+		  , LNM_ADRES1
+		  , LNM_ADRES2
+		FROM
+		  LMS_CT_UNITY_MBER
+		WHERE 
+		  UNITY_MBERNO = #{userno}
+    </select>
+    
+	<select id="getCourseBookInfo" resultType="emap" parameterType="dmap">
+		SELECT		
+			B.TITLE
+			, DBMS_LOB.SUBSTR(B.CONTENT, 1000, 1) AS BOOKCONTENT
+			, B.PRICE_REAL
+			, C.SAVFILE
+		FROM
+			LMS_ED_COURSE_SEQ A, LMS_ED_BOOK B, LMS_ED_BOOK_FILE C
+		WHERE
+			1=1
+			AND A.BOOKNO = B.BOOKNO
+			AND A.BOOKNO = C.BOOKNO
+			AND A.CSEQNO = #{cseqno}
+	</select>
+    
+    <insert id="insertPayment" parameterType="dmap">
+	/* insertPayment */	
+		INSERT INTO CC_PAYMENT
+			(
+				  CC_PAY_NO
+				, UNITY_MBERNO
+				, CC_TARGET_NO
+				, PRICE
+				, REGIST_DT
+        		, MT_TARGET_TYPE
+        		, MT_PAY_TYPE
+        		, MT_PAY_STAT
+        		, PRODUCT_NO
+			)
+		VALUES
+			(
+				  (SELECT NVL(MAX(CC_PAY_NO), 0) + 1 FROM CC_PAYMENT)
+				, #{allat_buyer_no}
+				, #{allat_order_no}
+				, #{allat_amt}
+				, SYSDATE
+      			, #{allat_product_cd}
+      			, #{allat_pay_type}
+      			, #{allat_pay_stat}
+      			, #{book_no}
+			)	
+	</insert>
+	
+    <insert id="insertBookInfo" parameterType="dmap">
+	/* insertBookInfo */	
+		INSERT INTO LMS_ED_BOOK_PAYMENT
+			(
+				  CC_PAY_NO
+				, UNITY_MBERNO
+				, CC_TARGET_NO
+				, RECP_NM
+				, RECP_PH
+				, RECP_ZP
+				, RECP_AD1
+				, RECP_AD2
+				, RECP_TX
+				, AMOUNT
+				, PAY_DATE
+				, BOOKNO
+			)
+		VALUES
+			(
+				  (SELECT NVL(MAX(CC_PAY_NO), 0) + 1 FROM LMS_ED_BOOK_PAYMENT)
+				, #{allat_buyer_no}
+				, #{allat_order_no}
+				, #{book_receipt_nm}
+				, #{book_mobile}
+				, #{book_zip}
+				, #{book_addr1}
+				, #{book_addr2}
+				, #{book_text}
+				, #{book_amount}
+				, SYSDATE
+				, #{book_no}
+			)	
+	</insert>
+</mapper>

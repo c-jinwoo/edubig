@@ -1,0 +1,11 @@
+_this.$quizInfo = [
+	["다음 중 Construction(구성선)에 대한 설명으로 <span style='color:#FF0000;'>틀린</span> 것은?","선택한 2D Sketch(스케치)를 Construction(구성선)으로 변경한다.","Construction(구성선)은 3D 모델 작성에 사용된다.","중심선이나 대칭 선과 같이 참조 선으로 사용한다.","직성 뿐 아니라 호나 곡선도 Construction(구성선)으로 변경할 수 있다.",false],	
+	["다음 중 Sketch Palette(스케치 팔레트)의 옵션 설명으로 <span style='color:#FF0000;'>틀린</span> 것은?","Sketch Grid(스케치 그리드): 배경에 그리드 표시 여부를 설정한다.","Slice(슬라이스): 작업 평면이 3D 모델 내부에 있는 경우 단면으로의 표시 여부를 설정한다.","Show Constraints(구속조건 표시): Sketch(스케치)에 적용된 구속 조건 아이콘의 화면 표시 여부를 설정한다.","Show Projected Geometries(투영선 표시): 원이나 호의 중심점 등의 화면 표시 여부를 설정한다.",false],
+	["다음 중 Sketch Palette(스케치 팔레트)의 옵션 설명으로 <span style='color:#FF0000;'>틀린</span> 것은?","Look At(화면정렬): 작업 평면의 뷰 방향 및 원점을 초기 화면으로 되돌린다.","Show Profile(프로파일 표시): Profile(프로파일) 영역에 대하여 아이콘 표시 여부를 설정한다.","3D Sketch(3D 스케치): Line(선) 작성에 대하여 3차원 으로의 생성 여부를 설정한다.","Finish Sketch(스케치 종료): 활성화 중인 스케치 작성을 완료하고 작업 영역을 빠져나간다.",false]
+];
+
+_this.$quizAnsInfo = [
+	[2,"Construction(구성선)은 3D 모델에는 적용할 수 없다."],
+	[4,"Show Projected Geometries(투영선 표시)는 Project/Include(프로젝트/포함) 등을 이용해 생성한 2D 투영선에 대하여 화면 표시 여부를 설정한다."],
+	[2,"Show Profile(프로파일 표시)는 Profile(프로파일) 영역에 대하여 색상 표시 여부를 설정한다."]
+];

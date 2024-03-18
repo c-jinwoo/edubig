@@ -1,0 +1,121 @@
+<%
+/****************************************
+    subject : 리뷰
+    summary : 리뷰
+****************************************/
+%>
+<%@ page language="java" contentType="text/html; charset=utf-8" pageEncoding="utf-8"%>
+<%@ include file="/WEB-INF/jsp/inc/taglib_inc.jsp"%>
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+	<title>에듀빅 :: 수강후기</title>
+	<%@ include file="/WEB-INF/jsp/inc/head_inc.jsp"%>
+</style>
+<script type="text/javascript">	
+	$(document).ready(function(){
+		$(".reviews_box").each(function(){
+			var appendHTML = "";
+			var star = $(this).find("#rvScore").val();
+			for(var i=0;i<5;i++){
+				if(i < star){
+					appendHTML += "<span class='starR on'></span>";
+				}
+				else{
+					appendHTML += "<span class='starR'></span>";					
+				}				
+			}						
+			$(this).find("p").append(appendHTML);
+		});
+		
+		$(".reviews_menu").click(function(){
+			var submenu = $(".reviews_menu_title");			
+			if(submenu.is(":visible")){
+                submenu.slideUp();
+            }else{
+                submenu.slideDown();
+            }			
+		});	
+		
+		$(".reviews_sub li").click(function(){
+			($(this).index() > 0) ? $("#courseno").val($(this).index()) : $("#courseno").val("");
+			$("#frm").submit();
+		});
+		
+		var activeList = ($("#courseno").val() == null || $("#courseno").val() == "") ? 0 : $("#courseno").val();
+		$(".reviews_menu span").html($(".reviews_sub li").eq(activeList).html());
+		
+
+		
+	});
+	
+	$(window).scroll(function(){
+		if($(window).scrollTop() >= ($(document).height() - $(window).height())){
+			
+		}
+	});
+</script>
+</head>
+<body>	
+	<!-- header -->
+	<%@ include file="/WEB-INF/jsp/inc/header_inc.jsp"%>
+	<!--// header -->
+	
+	<form name="frm" id="frm" method="post" action="/review/main.do">
+		<input type="hidden" id="courseno" name="courseno" value="<c:out value="${REQUEST_DATA.courseno}"/>"/>
+	</form>	
+	<!-- container -->
+	<div id="container">
+		<div class="con_center">	
+			<div class="cont_title_wrapper">
+				<div class="wrapper">
+					<h3 class="cont_title">수강후기</h3>
+				</div>			
+			</div>			
+			<div id="content">
+				<div class="wrapper">		
+					<div class="cont_body">
+						<div class="reviews_title">
+							<button class="reviews_menu">
+								<span>전체보기</span>
+								<img class="arrow" src="/cmmn/images/ico_review.png" alt="화살표" />
+							</button>
+							<div class="reviews_menu_title">
+								<ul class="reviews_sub">
+									<li>전체보기</li>
+									<c:forEach items="${courseList}" var="result">		
+										<li><c:out value="${result.COURSETITLE}"/></li>
+									</c:forEach>	
+								</ul>
+							</div>
+						</div>
+						<div class="reviews_list">
+							<c:forEach items="${list_data}" var="result">
+								<div class="reviews_box" >
+									<input type="hidden" id="rvScore" name="rvScore" value="<c:out value="${result.SCORE}"/>"/>									
+									<div class="reviews_box_cont">
+										<div class="reviews_header">
+											<h5><c:out value="${result.COURSETITLE}"/></h5>
+											<span><c:out value="${result.WRITER}"/></span>
+											<span><c:out value="${result.WDATE}"/></span>
+											<p></p>
+										</div>
+										<div class="reviews_cont">
+											<c:out value="${result.CONTENT}"/>
+										</div>
+									</div>
+								</div>
+							</c:forEach>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>	
+	</div>
+	<!--// container -->
+	
+	<!-- foot -->
+	<%@ include file="/WEB-INF/jsp/inc/footer_inc.jsp"%>
+	<!--// foot end -->
+</body>
+</html>

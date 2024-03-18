@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes" ?>
+<list>
+  <index>
+    <topic>
+      <list title="main" page="1">소개하기</list>
+      <list title="sub" page="1">빅데이터의 분석 도구</list>
+
+      <list title="main" page="2">살펴보기</list>
+      <list title="sub" page="2">빅데이터 분석도구 개요</list>
+      <list title="sub" page="3">빅데이터 분석도구 및 기술: 엑셀</list>
+	  <list title="sub" page="4">빅데이터 분석도구 및 기술: SPSS</list>
+	  <list title="sub" page="5">빅데이터 분석도구 및 기술: SAS</list>
+	  <list title="sub" page="6">빅데이터 분석도구 및 기술: R</list>
+	  <list title="sub" page="7">빅데이터 분석도구 및 기술: Python</list>
+
+      <list title="main" page="8">정리하기</list>
+      <list title="sub" page="8">핵심평가</list>
+      <list title="sub" page="9">학습정리</list>
+    </topic>
+  </index>
+</list>

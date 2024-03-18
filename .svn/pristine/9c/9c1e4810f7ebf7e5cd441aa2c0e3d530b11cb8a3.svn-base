@@ -1,0 +1,11 @@
+_this.$quizInfo = [
+	["다음 중 Assemble(조립)의 준비과정에 대한 설명으로 <span style='color:#FF0000;'>틀린</span> 것은?","조립을 위해 Solid Body를 Component(구성요소)로 변환한다.","Component(구성요소)는 두 개 이상이어야 하며, Ground(객체 고정)을 이용해 고정할 수 있다.","Position(포지션)은 Component(구성요소) 선택 및 Joint(조인트)의 정렬 방향 등을 설정한다.","적용한 Joint(조인트)의 Motion(움직임)은 변경할 수 없다.",false],	
+	["다음 중 Joint Motion(조인트 모션)에 대한 설명으로 <span style='color:#FF0000;'>틀린</span> 것은?","Rigid(강체): 모든 자유도를 제거하고 구성요소를 고정한다.","Revolute(회전): 구성요소가 조인트 원점을 기준으로 회전한다.","Slider(슬라이더): 구성요소가 하나의 축을 기준으로 회전하거나 이동한다.","Ball(구): 구성요소가 조인트 원점을 기준으로 회전한다.",false],
+	["다음 중 Joint Motion(조인트 모션)에 대한 설명으로 <span style='color:#FF0000;'>틀린</span> 것은?","Cylinderical(원통): 구성요소가 하나의 축을 기준으로 회전하거나 이동한다.","Pin-slot(핀-슬롯): 축을 중심으로 회전하며, 또 다른 축을 기준으로 이동한다.","Planar(평면): 두 개의 축을 따라 이동하고, 한 축을 중심으로 회전한다.","Ball(구): 구성요소가 두 개의 축을 기준으로 회전한다.",false]
+];
+
+_this.$quizAnsInfo = [
+	[4,"Browser의 팝업 메뉴 및 Time Line(타임라인)을 이용해 Joint(연결 점) 설정을 편집할 수 있다."],
+	[3,"Slider는 구성요소가 축을 따라 이동하는 Motion(움직임)이다."],
+	[4,"Ball(구)는 원점을 기준으로 모든 축 방향으로 회전한다."],
+];

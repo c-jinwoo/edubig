@@ -1,0 +1,213 @@
+<%
+/****************************************
+    subject : [공통] 상단 header 영역
+    summary : 상단영역
+****************************************/
+%>
+<%@ page language="java" contentType="text/html; charset=utf-8" pageEncoding="utf-8"%>
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<script>
+$(document).ready(function(){
+	$(".gnb_items li").on("mouseover",function(e){
+	    if($(e.currentTarget).hasClass("target_s_layer")){
+	        if($(e.currentTarget).hasClass("course_layer")){
+	            $(".gnb_s_layer").removeClass("on");
+	            $(".gnb_course_layer").addClass("on");
+	        } /* else if ($(e.currentTarget).hasClass("myclass_layer")){
+	            $(".gnb_s_layer").removeClass("on");
+	            $(".gnb_myclass_layer").addClass("on");
+	        } */
+	    }else{
+	        $(".gnb_s_layer").removeClass("on");
+	    }
+	});
+	
+	$(".gnb_s_layer").on("mouseleave",function(){
+	    $(".gnb_s_layer").removeClass("on");
+	});
+});
+
+$(window).scroll(function () {
+    var QuickHeight = $(document).scrollTop();
+    setTimeout(function(){
+    	$(".quick_menu_renew").css('top',190+QuickHeight+'px');
+    	
+    },100);    
+});
+
+function navi(){
+	if($(".new_navi").hasClass("active")){
+		$(".new_navi").removeClass("active");
+		$(".mobile_head .btn_allmenu").css("background","url('/cmmn/images/m_btn_allmenu.png') no-repeat 100% 100% / 100% 100%");	
+	}
+	else{
+		$(".new_navi").addClass("active");
+		$(".mobile_head .btn_allmenu").css("background","url('/cmmn/images/m_btn_allmenu_close.png') no-repeat 100% 100% / 100% 100%");	
+	}
+}
+</script>
+<body>
+
+<div id="wrap">
+	<!-- head -->
+	<header id="header">
+
+		<!-- util -->
+		<section class="util_section">
+			<div class="cm_wrapper">
+				<a href="/ccedu/main/main.do" class="top_logo">
+					<img src="/cmmn/images/logo.png" alt="에듀빅" />
+				</a>
+				
+				<div class="top_r">
+					<ul class="util_sec_r">
+						<c:if test="${REQUEST_DATA.SES_USERNO == 0 or REQUEST_DATA.SES_USERNO eq null}">
+							<li>
+								<a href="/ccedu/common/login.do">로그인</a>
+							</li>
+							<li>
+								<a href="/ccedu/user/memberJoinType.do">회원가입</a>
+							</li>
+							<li class="util_cs">
+								<a href="/ccedu/notice/boardList.do" onclick="return false;">고객센터</a>
+								<div class="util_ly">
+		                            <ul>
+										<li><a href="/ccedu/notice/faqList.do?bcateno=5">자주묻는질문</a></li>
+										<li><a href="/ccedu/notice/boardList.do?bcateno=1">공지사항</a></li>
+		                            </ul>
+		                        </div>
+							</li>
+						</c:if>
+						<c:if test="${REQUEST_DATA.SES_USERNO > 0}">
+							<li>
+								<a href="/ccedu/common/logout.do">로그아웃</a>
+							</li>
+							<li class="util_mylect">
+								<a href="/ccedu/common/modiCheck.do" onclick="return false;">Mypage</a>
+								<div class="util_ly">
+		                            <ul>
+										<li><a href=" /ccedu/common/modiCheck.do">개인정보관리</a></li>
+										<li><a href="/ccedu/myclass/payList.do">결재내역</a></li>
+		                            </ul>
+		                        </div>
+							</li>
+							<li>
+								<a href="/ccedu/common/commonMenu.do">전체메뉴</a>
+							</li>
+						</c:if>
+					</ul>
+				</div>
+			</div>
+		</section>
+		<!--// util -->
+
+		<!-- gnb section -->
+		<section class="gnb_section">
+			<div class="gnb_outer">
+				<div class="wrapper">				
+					<div class="gnb_items">
+						<ul id="gnb">
+							<li class="target_s_layer course_layer">
+								<a href="/ccedu/online/onlineEducationInfo.do">과정소개</a>		                        
+							</li>
+							<li>
+								<a href="/ccedu/book/main.do">온라인서점</a>
+							</li>
+							<li>
+								<a href="#">강사소개</a>
+							</li>
+							<li>
+								<a href="#">이벤트</a>
+							</li>
+							<li>
+								<a href="#">무료강의</a>
+							</li>
+							<li class="target_s_layer myclass_layer">
+								<a href="/ccedu/myclass/learningStatusList.do">나의강의실</a>
+							</li>
+						</ul>
+					</div>	                
+				</div>
+			</div>
+				
+			<div class="gnb_s_layer gnb_course_layer">
+				<div class="wrapper">
+					<ul>
+						<li><a href="/ccedu/online/onlineEducationInfo.do">경영빅데이터분석사</a></li>
+						<li><a href="/ccedu/online/onlineEducationInfo.do?mtSubCode=SC1002">IEQ인터넷윤리지도사</a></li>
+						<li><a href="/ccedu/online/onlineEducationInfo.do?mtSubCode=SC1003">3D프린팅모델링</a></li>
+					</ul>
+				</div>
+			</div>	
+			<!-- <div class="gnb_s_layer gnb_myclass_layer">
+                 <div class="gnb_s_inner">
+                     <ul class="mycla">
+						<li><a href="/ccedu/myclass/learningStatusList.do">학습현황</a></li>
+						<li><a href="">강의실</a></li>
+						<li><a href="/ccedu/myclass/payList.do">결제내역조회</a></li>
+                     </ul>
+                 </div>
+             </div> -->
+		</section>
+		<!--// gnb section -->
+		
+		<!-- right quick menu -->
+			<div class="quick_menu_renew">
+                <h3 class="quick_menu_tit">quick menu</h3>
+                <ul>
+                    <li><a href="/ccedu/myclass/learningStatusList.do" target="_blank">내강의실</a></li>
+                    <li><a href="#" target="_blank">이벤트</a></li>
+                    <li><a href="/ccedu/notice/boardList.do?bcateno=1" target="_blank">공지사항</a></li>
+                    <li><a href="#" target="_blank">교재</a></li>
+                    <li><a href="#" target="_blank">오시는길</a></li>
+                </ul>
+                <a href="#" class="top">top</a>
+                <!-- <div class="btn_quick open">
+					<a href="javascript:;" class="close" onclick=""><span>빠른메뉴</span></a>
+					<a href="javascript:;" class="open" onclick=""><span>빠른메뉴</span></a>
+				</div> -->
+            </div>
+		<!-- // right quick menu -->
+
+		<!-- mobile head -->
+		<div class="mobile_head">
+
+			<h1 class="logo"><a href="/ccedu/main/main.do" style="display:inline-block;width:auto;height:100%;"><img style="width:auto;height:100%;" src="/cmmn/images/logo.png" alt="법무부로고" /></a></h1>
+
+			<button class="btn_allmenu" onclick="javascript:navi();">주메뉴 열기/닫기 버튼</button>
+
+			<div class="login_state">
+				<c:if test="${REQUEST_DATA.SES_USERNO == 0 or REQUEST_DATA.SES_USERNO eq null}">
+					<a href="/ccedu/common/login.do">
+						<img src="/cmmn/images/m_btn_login.png" alt="로그인 전 입니다." />				
+					</a>
+				</c:if>
+				<c:if test="${REQUEST_DATA.SES_USERNO > 0}">	
+					<a href="/ccedu/common/logout.do">
+						<img src="/cmmn/images/m_btn_logout.png" alt="로그인 후 입니다." />				
+					</a>
+				</c:if>			
+			</div>
+		</div>
+		<!--// mobile head 
+		<div class="new_navi">
+			<div class="new_navi_menu">		
+				<a href="/ccedu/online/onlineEducationInfo.do">교육분야</a>
+			</div>	
+			<div class="new_navi_menu">		
+				<a href="/ccedu/online/onlineDetailList.do">교육과정</a>
+			</div>	
+			<div class="new_navi_menu">		
+				<a href="/ccedu/book/main.do?mtSubCode=SC1001">온라인서점</a>
+			</div>	
+			<div class="new_navi_menu">		
+				<a href="/ccedu/notice/boardList.do?bcateno=1">알림마당</a>
+			</div>	
+			<div class="new_navi_menu">		
+				<a href="/ccedu/myclass/learningStatusList.do">나의 강의실</a>
+			</div>	
+		</div>-->
+
+	</header>

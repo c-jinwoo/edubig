@@ -1,0 +1,31 @@
+.content > .script {
+  position: absolute;
+  background: hsla(0, 10%, 10%, 0.9);
+  font-family: NanumBarunGothic;
+  font-size: 14px;
+  width: 96%;
+  bottom: 42px;
+  height: 65px;
+  z-index: 101;
+  color: #ffffff;
+  left: 2%;
+  border-radius: 7px;
+  line-height : 135%;
+/*   letter-spacing:-1px; */
+  display: none;
+}
+
+.content > .script > .part{
+  margin: 1px 0px -10px 20px;
+}
+.content > .script >  .part > .teller{
+  position: relative;
+  width: 10%;
+  top: 3px;
+}
+.content > .script >  .part > .track{
+  position: relative;
+  left: 50px;
+  width: 87%;
+  bottom: 15px;
+}

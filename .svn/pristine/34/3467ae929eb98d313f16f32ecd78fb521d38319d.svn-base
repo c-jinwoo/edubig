@@ -1,0 +1,316 @@
+<%
+/****************************************************
+	system	: 신용상담사 > 고객센터 > 공지사항 / 자료실
+	title	: 게시판 목록
+	summary	:	
+	wdate	: 2018-06-19
+	writer	: SANGS
+*****************************************************/
+%>
+<%@ page language="java" contentType="text/html; charset=utf-8" pageEncoding="utf-8"%>
+<%@ include file="/WEB-INF/jsp/ccedu/inc/taglib_inc.jsp"%>
+
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+	<c:if test="${REQUEST_DATA.bcateno eq '11'}">
+		<title>공지사항 > 고객센터 > 신용상담사 > 신용회복위원회 신용교육원</title>
+	</c:if>
+	<c:if test="${REQUEST_DATA.bcateno eq '14'}">
+		<title>자료실 > 고객센터 > 신용상담사 > 신용회복위원회 신용교육원</title>
+	</c:if>
+	<c:if test="${REQUEST_DATA.bcateno eq '1'}">
+		<title>알림마당 > 공지사항</title>
+	</c:if>
+	<c:if test="${REQUEST_DATA.bcateno eq '6'}">
+		<title>알림마당 > 이벤트/공모전</title>
+	</c:if>
+	<c:if test="${REQUEST_DATA.bcateno eq '4'}">
+		<title>알림마당 > 교육원소식</title>
+	</c:if>
+	<c:if test="${REQUEST_DATA.bcateno eq '9'}">
+		<title>알림마당 > 지식자료실</title>
+	</c:if>
+	<%@ include file="/WEB-INF/jsp/ccedu/inc/head_inc.jsp"%>
+	
+	<script type="text/javascript">
+		
+		//상세보기
+		function fnView(bcateno, bbsNo){
+			$("#bbsNo").val(bbsNo);
+			$("#bcateno").val(bcateno);
+			
+			// 신용상담사
+			if('11' == $("#bcateno").val() || '14' == $("#bcateno").val()) {
+				$("#frm").attr("action", "/ccedu/cc/boardView.do").submit();
+			// 사이트 관리
+			} else if('1' == $("#bcateno").val() || '6' == $("#bcateno").val() || '4' == $("#bcateno").val()) {
+				$("#frm").attr("action" , "/ccedu/notice/boardView.do").submit();
+			
+			// 지식자료실
+			} else if('9' == $("#bcateno").val()) {
+				$("#frm").attr("action" , "/ccedu/intellectual/boardView.do").submit();
+			}
+			
+		}
+
+		$(document).ready(function(){
+			$('#searchWord').on('keydown',function(){
+				if(event.keyCode == 13){
+					search();
+				}
+			});
+		})
+
+
+	 	function tabMove(count) {
+	 		$('input[name=searchType]').val('');
+	 		$('#searchWord').val('');
+	 		$('#cPage').val('1');
+			$("#mtCateCode").val(count);
+			$("#frm").attr("action", "/ccedu/cc/boardList.do");
+			$("#frm").submit();
+		}
+		
+		
+	</script>
+</head>
+
+<body>
+
+<!-- skip nav -->
+	<%@ include file="/WEB-INF/jsp/ccedu/inc/nav_inc.jsp"%>
+<!--// skip nav -->
+
+
+<div id="wrap">
+
+	<!-- header -->
+	<%@ include file="/WEB-INF/jsp/ccedu/inc/header_inc.jsp"%>
+	<!--// header -->
+
+	<!-- container -->
+	<div id="container">
+
+		<!-- location -->
+		<!-- 사이트관리  -->
+		<c:if test="${REQUEST_DATA.bcateno eq '1'}">
+			<jsp:include page="/WEB-INF/jsp/ccedu/inc/location/loc_05_01.jsp"> 
+			  	<jsp:param name="menuNm" value="공지사항"/> 
+			</jsp:include> 
+		</c:if>	
+			
+		<!-- 지식자료실 -->
+		<c:if test="${REQUEST_DATA.bcateno eq '9'}">
+			<jsp:include page="/WEB-INF/jsp/ccedu/inc/location/loc_05_01.jsp"> 
+			  	<jsp:param name="menuNm" value="지식자료실"/> 
+			</jsp:include> 
+		</c:if>
+		<!--// location -->
+
+		<div class="con_center">
+
+			<!-- lnb -->
+			<div id="lnb">
+				<!--  사이트관리  -->
+				<c:if test="${REQUEST_DATA.bcateno eq '1'}">
+					<jsp:include page="/WEB-INF/jsp/ccedu/inc/lnb/lnb_05.jsp"> 
+					  	<jsp:param name="dep2" value="01"/>
+					</jsp:include>
+				</c:if>
+				<!-- 지식자료실 -->
+				<c:if test="${REQUEST_DATA.bcateno eq '9'}">
+					<jsp:include page="/WEB-INF/jsp/ccedu/inc/lnb/lnb_05.jsp"> 
+					  	<jsp:param name="dep2" value="02"/>
+					  	
+					</jsp:include>
+				</c:if>
+			</div>
+			<!--// lnb -->
+
+			<!-- content 본문 -->
+			<div id="content">
+				
+				
+				<!-- 기존 START 2018-08-30  -->
+<!-- 				<h3 class="cont_titile"> -->
+<%-- 					<c:if test="${REQUEST_DATA.bcateno eq '1'}">공지사항</c:if> --%>
+<%-- 					<c:if test="${REQUEST_DATA.bcateno eq '4'}">교육원소식</c:if> --%>
+<%-- 					<c:if test="${REQUEST_DATA.bcateno eq '6'}">이벤트/공모전</c:if> --%>
+<%-- 					<c:if test="${REQUEST_DATA.bcateno eq '9'}">지식자료실</c:if> --%>
+<%-- 					<c:if test="${REQUEST_DATA.bcateno eq '11'}">공지사항</c:if> --%>
+<%-- 					<c:if test="${REQUEST_DATA.bcateno eq '14'}">자료실</c:if> --%>
+<!-- 				</h3> -->
+				<!-- 기존 END 2018-08-30  -->
+				
+				<!-- 2018-08-28 김동인 작업 S --> 
+				<c:if test="${REQUEST_DATA.bcateno eq '11'}"><h3 class="cont_titile type03">공지사항<span></span></h3></c:if>
+				<c:if test="${REQUEST_DATA.bcateno eq '14'}"><h3 class="cont_titile type03">자료실<span></span></h3></c:if>
+				<c:if test="${REQUEST_DATA.bcateno eq '9'}"><h3 class="cont_titile type04">지식자료실<span></span></h3></c:if>
+				<c:if test="${REQUEST_DATA.bcateno eq '1'}"><h3 class="cont_titile type05">공지사항<span></span></h3></c:if>
+				<c:if test="${REQUEST_DATA.bcateno eq '6'}"><h3 class="cont_titile type05">이벤트/공모전<span></span></h3></c:if>
+				<c:if test="${REQUEST_DATA.bcateno eq '4'}"><h3 class="cont_titile type05">교육원소식<span></span></h3></c:if>
+				<!-- 2018-08-28 김동인 작업 E -->
+				
+				
+				
+				<!-- 본문내용 -->
+				<div class="cont_body">
+					<!-- start -->
+					<form name="frm" id="frm" action="" method="post">
+						<input type="hidden" name="cPage" id="cPage" value="<c:out value="${REQUEST_DATA.cPage}"/>"/>
+						<input type="hidden" name="bbsNo" id="bbsNo" value=""/>
+						<input type="hidden" name="prevBbsNo" id="prevBbsNo" value=""/>
+						<input type="hidden" name="nextBbsNo" id="nextBbsNo" value=""/>
+						<input type="hidden" name="qu" id="qu" value=""/>
+						<input type="hidden" name="bcateno" id="bcateno" value="${REQUEST_DATA.bcateno}"/>
+						<input type="hidden" name="mtCateCode"   id="mtCateCode"  value="<c:out value='${REQUEST_DATA.mtCateCode}'/>">
+					
+
+						<div class="c_section">
+							<c:if test="${REQUEST_DATA.bcateno eq '9'}">
+								<div class="c_tab_link col3">
+									<ul>
+										<li><a href="#none" onclick="tabMove('')" <c:if test="${REQUEST_DATA.mtCateCode eq '0' or REQUEST_DATA.mtCateCode eq ''}"> class="on" title="현재페이지" </c:if> <c:if test="${REQUEST_DATA.mtCateCode ne ''}"> title="전체" </c:if> >전체</a></li>
+										<li><a href="#none" onclick="tabMove('KN0001')" <c:if test="${REQUEST_DATA.mtCateCode eq 'KN0001'}"> class="on" title="현재페이지" </c:if> <c:if test="${REQUEST_DATA.mtCateCode ne ''}"> title="교재·교구" </c:if>>교재·교구</a></li>
+										<li><a href="#none" onclick="tabMove('KN0002')" <c:if test="${REQUEST_DATA.mtCateCode eq 'KN0002'}"> class="on" title="현재페이지" </c:if> <c:if test="${REQUEST_DATA.mtCateCode ne ''}"> title="외부기관콘텐츠" </c:if>>외부기관콘텐츠</a></li>
+									</ul>
+								</div>
+							</c:if>
+							<div class="c_search_section">
+								<fieldset>
+									<legend>게시판 검색영역</legend>
+									<select name="searchType" id="searchType" title="검색분류를 선택하세요.">
+										<option value="TITLE" <c:if test = "${ REQUEST_DATA.searchType eq 'TITLE' }"> selected="selected"  </c:if>>제목</option>
+										<option value="CONT" <c:if test = "${ REQUEST_DATA.searchType eq 'CONT' }"> selected="selected"  </c:if>>내용</option>
+										<option value="ALL" <c:if test = "${ REQUEST_DATA.searchType eq 'ALL' }"> selected="selected"  </c:if>>제목+내용</option>
+									</select>
+									<input type="text" name="searchWord" id="searchWord" value="${REQUEST_DATA.searchWord}" placeholder="검색어입력" title="검색어를 입력하세요." />
+									<input type="text" style="display: none;" name="searchAt" id="searchAt" />
+									<button type="button" onclick="search();" class="btn_search">검색하기</button>
+								</fieldset>
+							</div>
+
+							<div class="board_list">
+								<table>
+									<c:if test="${REQUEST_DATA.bcateno eq '1'}">
+										<caption>공지사항 리스트 - 번호, 제목, 등록일, 조회수, 첨부파일 여부로 구성된 표</caption>
+									</c:if>
+									<c:if test="${REQUEST_DATA.bcateno eq '4'}">
+										<caption>교육원소식 리스트 - 번호, 제목, 등록일, 조회수, 첨부파일 여부로 구성된 표</caption>
+									</c:if>
+									<c:if test="${REQUEST_DATA.bcateno eq '6'}">
+										<caption>이벤트/공모전 리스트 - 번호, 제목, 등록일, 조회수, 첨부파일 여부로 구성된 표</caption>
+									</c:if>
+									<c:if test="${REQUEST_DATA.bcateno eq '9'}">
+										<caption>지식자료실 리스트 - 번호, 제목, 등록일, 조회수, 첨부파일 여부로 구성된 표</caption>
+									</c:if>
+									<c:if test="${REQUEST_DATA.bcateno eq '11'}">
+										<caption>공지사항 리스트 - 번호, 제목, 등록일, 조회수, 첨부파일 여부로 구성된 표</caption>
+									</c:if>
+									<c:if test="${REQUEST_DATA.bcateno eq '14'}">
+										<caption>자료실 리스트 - 번호, 제목, 등록일, 조회수, 첨부파일 여부로 구성된 표</caption>
+									</c:if>
+									<colgroup>
+										<col />
+										<col />
+									</colgroup>
+									<thead class="alt_text">
+										<tr>
+											<th scope="col">번호</th>
+											<th scope="col">제목, 등록일, 조회수, 첨부파일여부</th>
+										</tr>
+									</thead>
+									<tbody>
+										<c:forEach items="${listData}" var="result" varStatus="status">
+											<tr>
+												<c:if test="${result.TOPYN eq 'Y'}">
+													<td><strong class="fnt16 po_C2">[공지]</strong></td>
+												</c:if>
+												<c:if test="${result.TOPYN ne 'Y'}">
+													<td><strong class="fnt16 po_C7">${resultCount-(REQUEST_DATA.cPage-1)*10-status.count+1}</strong></td>
+												</c:if>
+											
+	<%-- 											<td>${result.RNUM}</td> --%>
+												<td class="align_left">
+													<div class="tit"><a href="#" onclick="fnView('<c:out value="${REQUEST_DATA.bcateno}"/>', '<c:out value="${result.BBSNO}"/>'); return false;" title="<c:out value='${result.TITLE}'/>">${result.TITLE}</a></div>
+													<span class="t_c">등록일<span class="dd"><c:out value='${result.WDATE}'/></span></span>
+													<span class="t_c">조회수<span class="dd"><c:out value="${result.RCNT}"/></span></span>
+													<c:if test="${result.FILECNT > 0}">
+														<span class="t_c"><img src="/cmmn/images/sub/ico_board_file.png" alt="첨부파일있음" /></span><!-- 첨부파일 있을시 -->
+													</c:if>
+												</td>
+											</tr>
+										</c:forEach>
+										<c:if test="${empty listData}">
+										<tr><td colspan="2">데이터가 없습니다.</td></tr>
+										</c:if>
+									</tbody>
+								</table>
+							</div>
+							
+							<c:if test="${not empty listData}">
+								<div class="paging">
+									<paging:page cpage="${REQUEST_DATA.cPage}" total="${resultCount}" pageSize="${REQUEST_DATA.rowCount}" link="javascript:move_page" />
+								</div>
+							</c:if>
+						</div>
+					</form>
+					<!--// end -->
+				</div>
+				<!--// 본문내용 -->
+				
+			<!--  -->
+			</div>
+			<!--// content 본문 -->
+		
+		</div>
+	
+	</div>
+	<!--// container -->
+
+	<!-- foot -->
+	<%@ include file="/WEB-INF/jsp/ccedu/inc/footer_inc.jsp"%>
+	<!--// foot end -->
+	<script type="text/javascript">
+		
+
+		//검색
+		function search(){
+
+			$('#cPage').val(1);
+
+			//신용상담사
+			if('11' == $("#bcateno").val() || '14' == $("#bcateno").val()) {
+				$("#frm").attr("action" , "/ccedu/cc/boardList.do").submit();
+			// 사이트 관리
+			} else if('1' == $("#bcateno").val() || '6' == $("#bcateno").val() || '4' == $("#bcateno").val()) {
+				$("#frm").attr("action" , "/ccedu/notice/boardList.do").submit();
+			
+			// 지식자료실
+			} else if('9' == $("#bcateno").val()) {
+				$("#frm").attr("action" , "/ccedu/intellectual/boardList.do").submit();
+			}
+		}
+
+		function move_page(cPage){
+			$('#cPage').val(cPage);
+			
+			// 신용상담사
+			if('11' == $("#bcateno").val() || '14' == $("#bcateno").val()) {
+				$('form[name=frm]').attr('action', '/ccedu/cc/boardList.do').submit();
+			// 사이트 관리
+			} else if('1' == $("#bcateno").val() || '6' == $("#bcateno").val() || '4' == $("#bcateno").val()) {
+				$('form[name=frm]').attr('action', '/ccedu/cc/boardList.do').submit();
+			} else {
+				$('form[name=frm]').attr('action', '/ccedu/notice/boardList.do').submit();
+			}
+			
+		} 
+		
+	</script>
+
+</div>
+
+</body>
+</html>

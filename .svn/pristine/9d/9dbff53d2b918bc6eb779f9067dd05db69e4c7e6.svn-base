@@ -1,0 +1,75 @@
+<%
+/****************************************
+	subject	: 과정수료관리 > 수료증발급(온라인)
+	summary	: 수료증 발급
+    author  : SANGS
+    date    : 2018-06-15
+*****************************************************/
+%>
+<%@ page language="java" contentType="text/html; charset=utf-8" pageEncoding="utf-8"%>
+<%@ include file="/WEB-INF/jsp/ccedu/inc/taglib_inc.jsp"%>
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+	<title>접수증 출력 > 접수조회/수정 > 원서접수 > 신용상담사 > 신용회복위원회 신용교육원</title>
+	<%@ include file="/WEB-INF/jsp/ccedu/inc/head_inc.jsp"%>
+</head>
+<body>
+<!-- content 본문 -->
+<!-- <div id="content" > -->
+
+	<!-- 본문내용 -->
+<!-- 	<div class="cont_body"> -->
+		<!-- 접수증 영역 s-->
+		<div class="receipt_area">
+		
+			<section>
+				<p class="title"><c:out value='${examUserMap.YEAR}'/></p>
+			</section>
+			<section>
+				<img src="<c:out value='${examUserMap.SAVPATH}/${examUserMap.SAVFILE}'/>" alt="접수자 이미지">
+			</section>
+			<section>
+				<p class="registration_number"><c:out value='${examUserMap.EXAM_NO}'/></p>
+				<p class="user_place"><c:out value='${examUserMap.PLACE_LOC }'/> - <c:out value='${examUserMap.PLACE_TITLE }'/></p>
+				<p class="user_name"><c:out value='${examUserMap.MBERNM }'/></p>
+				<p class="user_date">
+					<c:out value="${fn:substring(examUserMap.BRTHDY , 0, 4)}"/>년
+					<c:out value="${fn:substring(examUserMap.BRTHDY , 5, 7)}"/>월
+					<c:out value="${fn:substring(examUserMap.BRTHDY , 8, 10)}"/>일
+				</p>
+				<p class="user_address" style="width: 540px;">
+					<c:out value='${examUserMap.ADDRESS }'/>&nbsp;
+					<br><c:out value='${examUserMap.ADDRESS2}'/>&nbsp;(<c:out value='${examUserMap.ADDR_CODE }'/>)
+				</p>
+			</section>
+			<section>
+				<span class="year"><c:out value="${fn:substring(examUserMap.APP_DT , 0, 4)}"/></span>
+				<span class="month"><c:out value="${fn:substring(examUserMap.APP_DT , 5, 7)}"/></span>
+				<span class="day"><c:out value="${fn:substring(examUserMap.APP_DT , 8, 10)}"/></span>
+			</section>
+		</div>
+		<!-- 접수증 영역 e-->
+<!-- 	</div> -->
+<!-- </div> -->
+<script type="text/javascript">
+
+/* $(function(){
+	
+	var initBody = document.body.innerHTML;
+	window.onbeforeprint = function(){
+	document.body.innerHTML = document.getElementByClassName('receipt_area').innerHTML;
+	};
+	window.onafterprint = function(){
+	document.body.innerHTML = initBody ;
+	};
+
+ 		window.print();
+}); */
+
+
+	window.print();
+</script>
+
+</body>
+</html>

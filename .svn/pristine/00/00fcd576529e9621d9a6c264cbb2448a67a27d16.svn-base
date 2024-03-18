@@ -1,0 +1,319 @@
+<%
+/****************************************
+    subject : 온라인교육
+    summary : 온라인교육 > 교육소개
+    author  : SANGS
+    date    : 2018-06-15
+****************************************/
+%>
+<%@ page language="java" contentType="text/html; charset=utf-8" pageEncoding="utf-8"%>
+<%@ include file="/WEB-INF/jsp/ccedu/inc/taglib_inc.jsp"%>
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+	<title>신용용어 사전 > 신용지식UP > 지식마당 > 신용회복위원회 </title>
+	<%@ include file="/WEB-INF/jsp/ccedu/inc/head_inc.jsp"%>
+<script type="text/javascript">
+	
+	var searchPassChk = true;
+
+	var aryPkey  = new Array;	
+	var aryAbcCd = new Array;
+	var aryPvalue = new Array;
+	
+
+	<c:forEach var="result" items="${mtCodeList}" varStatus="status">
+	    aryPkey.push('${result.P_KEY}');
+	    aryAbcCd.push('${result.ABC_CD}');
+	    aryPvalue.push('${result.P_VALUE}');
+	</c:forEach>
+
+	//document.ready
+	$(document).ready(function(){
+		
+		//신용용어 사전 버튼클릭
+		$(".key_button").click(function(){
+			$(".key_button").not($(this)).removeClass("active");
+			$(this).addClass("active");
+		});
+		//신용용어 사전 단어클릭
+		$(".vws_cont .vws_result li a").click(function(){
+			$(".vws_cont .vws_result li").removeClass("active");
+			$(this).parents("li").addClass("active");
+		});
+
+
+		//전체 검색
+		$('#searchWd').on('keyup',function(){
+			
+			var r = (($(this).val().charCodeAt(0) - parseInt('0xac00',16)) /28) / 21;
+			var hanString = String.fromCharCode(r + parseInt('0x1100',16));
+			
+			var data = "";
+
+			var strlength = $(this).val().length;
+			var str = $(this).val().substr(strlength-1,strlength);
+			var han = /[\u3131-\u314e|\u314f-\u3163|\uac00-\ud7a3]/g;
+			var eng = /^[A-Za-z]*$/;
+			var chk_eng = str.match(eng);
+			var chk_han = str.match(han);
+
+
+			if(chk_han){
+				if(hanString=="჊"){
+					data = $(this).val().substr(0,1);
+				} else {
+					data = hanString;
+				}
+			} else if(chk_eng) {
+				
+				data = $(this).val().substr(0,1);
+			} else {
+				$(this).val($(this).val().substr(0,strlength-1));
+			}
+
+			for(var i = 0; i < aryAbcCd.length ; i++){
+				if(data.toUpperCase() == aryPvalue[i]){
+					$('#mtCateCodeSearch').val(aryPkey[i]);
+					$('#abcCdSearch').val(aryAbcCd[i]);
+				}
+			}
+
+			if(event.keyCode == 13){
+				fnSearch();
+			}
+
+		});
+
+	});
+
+
+
+
+
+	//페이징
+	function move_page(cPage){
+		$('#cPage').val(cPage);
+		$('form[name=frm]').attr('action', '').submit();
+	} 
+
+	//ㄱ,ㄴ,ㄷ,ㄹ 눌렀을 경우 (PC)
+	function fnContChg(mtCateCode){
+		$('#searchWd').val('');
+		$('#mtCateCode').val(mtCateCode);
+		$('form[name=frm]').attr('action', '/ccedu/intellectual/creditTermDctnr.do').submit();
+	}
+
+	//ㄱ,ㄴ,ㄷ,ㄹ 눌렀을 경우 (MB)
+	function fnMbContChg(pthis){
+		$('#searchWd').val('');
+		$('#abcCdSearch').val($('#languageDiv').val());
+		$('#mtCateCode').val($(pthis).val());
+		$('form[name=frm]').attr('action', '/ccedu/intellectual/creditTermDctnr.do').submit();
+	}
+
+	//검색
+	function fnSearch(){
+		$('#cPage').val(1);
+		$('form[name=frm]').attr('action', '/ccedu/intellectual/creditTermDctnr.do').submit();
+	}
+
+	//글자유형 선택 변경
+	function selectCh(pthis){
+
+		var data = $(pthis).val();
+		$('#abcCdSearch').val(data);
+		$('#searchWd').val('');
+		if(data == 'kr'){
+			$('#mtCateCode').val('WO0001');	
+		} else {
+			$('#mtCateCode').val('WO0015');	
+		}
+		
+		$('form[name=frm]').attr('action', '/ccedu/intellectual/creditTermDctnr.do').submit();
+
+		// var append = '';
+
+		// for(var i = 0; i < aryAbcCd.length ; i++){
+		// 	if($(pthis).val() == aryAbcCd[i]){
+		// 		append += '<option value="'+aryPkey[i]+'"> '+aryPvalue[i]+'</option>';
+		// 	}
+		// }
+
+		// $('#lngType').find('option').remove();
+		// $('#lngType').append(append);
+
+	}
+
+</script>
+</head>
+
+<body>
+<!-- skip nav -->
+	<%@ include file="/WEB-INF/jsp/ccedu/inc/nav_inc.jsp"%>
+<!--// skip nav -->
+
+
+<div id="wrap">
+
+	<!-- header -->
+	<%@ include file="/WEB-INF/jsp/ccedu/inc/header_inc.jsp"%>
+	<!--// header -->
+
+	<!-- container -->
+	<div id="container">
+
+		<!-- location -->
+		<jsp:include page="/WEB-INF/jsp/ccedu/inc/location/loc_04_01.jsp"> 
+		  	<jsp:param name="menuNm" value="신용용어 사전"/> 
+		</jsp:include> 
+		<!--// location -->
+
+		<div class="con_center">
+
+			<!-- lnb -->
+			<div id="lnb">
+				<jsp:include page="/WEB-INF/jsp/ccedu/inc/lnb/lnb_04.jsp"> 
+				  	<jsp:param name="dep2" value="01"/>
+				  	<jsp:param name="dep3" value="01"/> 
+				</jsp:include>
+			</div>
+			<!--// lnb -->
+
+			<!-- content 본문 -->
+			<div id="content">
+				
+				<!-- 기존 START 2018-08-30  -->
+<!-- 				<h3 class="cont_titile">신용용어 사전</h3> -->
+				<!-- 기존 END 2018-08-30  -->
+				
+				<!-- 2018-08-28 김동인 작업 S --> 
+				<h3 class="cont_titile type04">신용용어 사전<span></span></h3>
+				<!-- 2018-08-28 김동인 작업 E -->
+
+				<!-- 본문내용 -->
+				<div class="cont_body">
+					<!-- start -->
+
+					<div class="c_section">
+						<form name="frm" id="frm" action="" method="post">
+							<input type="hidden" name="cPage" id="cPage" value="<c:out value="${REQUEST_DATA.cPage}"/>"/>
+							<input type="hidden" name="mtCateCode" id="mtCateCode" value="<c:out value="${REQUEST_DATA.mtCateCode}"/>"/>
+							<input type="hidden" name="mtCateCodeSearch" id="mtCateCodeSearch" value="<c:out value="${REQUEST_DATA.mtCateCodeSearch}"/>"/>
+							<input type="hidden" name="abcCdSearch" id="abcCdSearch" value="<c:out value="${REQUEST_DATA.abcCdSearch}"/>"/>
+
+							
+							<div class="c_search_section center">
+								<fieldset>
+									<legend>신용용어 검색영역</legend>
+									<input type="text" id="searchWd" name="searchWd" placeholder="검색어를 입력하세요." title="검색어를 입력하세요." value="<c:out value="${REQUEST_DATA.searchWd}"/>" />
+									<input type="text" id="searchAt" name="searchAt" style="display: none;" />
+									<button type="button" onclick="fnSearch();return false;" class="btn_search">검색하기</button>
+								</fieldset>
+							</div>
+
+							<div class="view_word_section">
+								<!-- pc버전전용 상단 -->
+								<div class="vws_head pc">
+									<p class="vws_noti">오른쪽 글자버튼을 클릭하시면 해당단어로 시작되는 신용용어들을 한 눈에 확인하실 수 있습니다.</p>
+									<ul class="key_button_list">
+										<c:forEach items="${mtCodeList}" var="result" varStatus="status">
+											<li>
+												<c:if test="${status.index eq 0 and REQUEST_DATA.mtCateCode eq '' }">
+													<button type="button" onclick="fnContChg('<c:out value="${result.P_KEY}"/>')" class="key_button <c:out value="${result.ABC_CD}"/> active" ><c:out value="${result.P_VALUE}"/></button>
+												</c:if>
+												<c:if test="${REQUEST_DATA.mtCateCode ne '' and REQUEST_DATA.mtCateCode eq result.P_KEY }">
+													<button type="button" onclick="fnContChg('<c:out value="${result.P_KEY}"/>')" class="key_button  <c:out value="${result.ABC_CD}"/> active" ><c:out value="${result.P_VALUE}"/></button>
+												</c:if>
+												<c:if test="${REQUEST_DATA.mtCateCode ne '' and REQUEST_DATA.mtCateCode ne result.P_KEY }">
+													<button type="button" onclick="fnContChg('<c:out value="${result.P_KEY}"/>')" class="key_button  <c:out value="${result.ABC_CD}"/>" ><c:out value="${result.P_VALUE}"/></button>
+												</c:if>
+											</li>
+										</c:forEach>
+									</ul>
+								</div>
+								<!--// pc버전전용 상단 -->
+
+								<!-- mobile버전전용 상단 -->
+								<div class="vws_head mobile">
+									<p class="vws_noti">원하는 글자를 선택하시면 해당단어로 시작되는 신용용어들을 한 눈에 확인하실 수 있습니다.</p>
+									<div class="vws_select_box">
+										<select id="languageDiv" onchange="selectCh(this)" title="글자유형 선택">
+											<option value="kr" <c:if test="${REQUEST_DATA.abcCdSearch eq 'kr' }">selected="selected"</c:if> >한글</option>
+											<option value="en" <c:if test="${REQUEST_DATA.abcCdSearch eq 'en' }">selected="selected"</c:if> >영문</option>
+										</select>
+										<select id="lngType" name="lngType" title="글자 선택" onchange="fnMbContChg(this);">
+											<c:forEach items="${mtCodeList}" var="result" varStatus="status">
+												<li>
+													<c:if test="${result.ABC_CD eq REQUEST_DATA.abcCdSearch }">
+														<c:if test="${status.index eq 0 and REQUEST_DATA.mtCateCode eq '' }">
+															<option value="<c:out value="${result.P_KEY}"/>" selected="selected"><c:out value="${result.P_VALUE}"/></option>
+														</c:if>
+														<c:if test="${REQUEST_DATA.mtCateCode ne '' and REQUEST_DATA.mtCateCode eq result.P_KEY }">
+															<option value="<c:out value="${result.P_KEY}"/>" selected="selected"><c:out value="${result.P_VALUE}"/></option>
+														</c:if>
+														<c:if test="${REQUEST_DATA.mtCateCode ne '' and REQUEST_DATA.mtCateCode ne result.P_KEY }">
+															<option value="<c:out value="${result.P_KEY}"/>"><c:out value="${result.P_VALUE}"/></option>
+														</c:if>
+													</c:if>	0
+												</li>
+											</c:forEach>
+										</select>
+									</div>
+								</div>
+								<!--// mobile버전전용 상단 -->
+								<c:if test="${ not empty listData}" >
+									<div class="vws_cont">
+										<div class="vws_result_box">
+											<ul class="vws_result">
+												<c:forEach items="${listData}" var="result" varStatus="status">
+													<li <c:if test="${status.index eq 0}"> class="active"</c:if> >
+														<a href="#none" title="상세보기"><c:out value="${result.TITLE}"/></a>
+														<div class="vws_detail">
+															<div class="inbox">
+																<h4><c:out value="${result.TITLE}" escapeXml="false" /></h4>
+																<p><c:out value="${result.CONTENT_REPLACE}" /></p>
+															</div>
+														</div>
+													</li>
+												</c:forEach>
+											</ul>
+										</div>
+										<c:if test="${not empty listData}">
+											<div class="paging">
+												<paging:page cpage="${REQUEST_DATA.cPage}" total="${resultCount}" pageSize="${REQUEST_DATA.rowCount}" link="javascript:move_page"/>
+											</div>
+										</c:if>
+									</div>
+								</c:if>
+								<c:if test="${empty listData}" >
+									<div class="result_cont_none">
+										<p>데이터가 없습니다.</p>
+									</div>
+								</c:if>
+							</div>
+
+						</form>
+					</div>
+
+					<!--// end -->
+				</div>
+				<!--// 본문내용 -->
+				
+			<!--  -->
+			</div>
+			<!--// content 본문 -->
+
+
+		</div>
+	</div>
+	<!--// container -->
+
+	<!-- foot -->
+	<%@ include file="/WEB-INF/jsp/ccedu/inc/footer_inc.jsp"%>
+	<!--// foot end -->
+
+</div>
+
+</body>
+</html>

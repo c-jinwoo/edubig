@@ -1,0 +1,120 @@
+<%
+/****************************************************
+	system	: 학교 검색
+	summary	:	
+	wdate	: 2018-06-21
+	writer	: sangs
+*****************************************************/
+%>
+<%@ page language="java" contentType="text/html; charset=utf-8" pageEncoding="utf-8"%>
+<script type="text/javascript">
+
+	$(document).ready(function() {
+		
+		// 엔터 검색
+		$('#searchTitle').bind('keydown', function(e) {
+            if (e.keyCode == 13) { // enter key
+            	searchMajor();
+                return false;
+            }
+        });
+		
+	})
+
+	function searchMajor() {
+		
+		if($("#gubun").val() == '') {
+			fnModalMsg("학교를 선택해주세요.");
+		} else if($("#searchTitle").val() == '') {
+			fnModalMsg("학과를 입력해주세요.");
+		} else if($("#gubun").val() != '' && $("#searchTitle").val() != '') {
+
+			$.ajax({
+				
+				type : "POST",
+				dataType : "json",
+				url : "/common/getMajorListAjax.do",
+				data :  
+					{ 
+						gubun : $('#gubun').val(),
+						searchTitle : $("#searchTitle").val()
+			        },
+			    success : function(data) 
+			    	{
+			    	
+			    		if($(data).find('totalCount').text() == '0') {
+			    			fnModalMsg("검색결과 없습니다. 검색어에 잘못된 철자가 없는지, 정확한 학교명인지 다시 한번 확인해 주세요.");
+							return false;
+			    		}
+						
+			    		$("#majorBody").html('');
+			    		if(data != null) {
+							var content = data.dataSearch.content;
+							
+							$(content).each(function(i) {
+								console.log("학과 : " + $(content).get(i).mClass);
+								
+								$("#majorBody").append('<tr scope="col"><td class="ts_th"><a href="#" onclick="choiceMajor(\''+$(content).get(i).mClass+'\'); return false;">'+$(content).get(i).mClass+'</a></td></tr>');
+							
+							})
+			    		}
+					} // function
+		 	}); // ajax
+		}
+	}
+	
+	
+	// 학과 검색 선택
+	/* function choiceMajor(major) {
+		$("#major").val(major);
+		$("#majorBody").html("");
+		$("#popMajor").find('#majorClose').click();
+	}
+ */
+</script>
+
+	
+<!-- layer pop 학과(전공) 검색 -->
+	<div class="layerpop search" id="popMajor" tabindex="0" data-tooltip-con="popsearch02" data-focus="popsearch02" data-focus-prev="popsearch02-close">
+		<div class="layer_mask tooltip-close"></div><!-- 블랙mask영역 -->
+		<div class="layer_cont">
+			<div class="lc_head">
+				<h4 class="lc_tit">학과(전공) 검색</h4>
+			</div>
+			<div class="lc_cont">
+
+				<div class="pop_con_search">
+					<p class="nt_tit">고등학교, 대학교 선택 후 원하시는 학과를 입력해 주세요.</p>
+					<fieldset>
+						<legend>학과(전공) 검색</legend>
+						<select id="gubun" name="gubun" title="학교분류 선택">
+							<option value="">선택</option>
+							<option value="high_list">고등학교</option>
+							<option value="univ_list">대학교</option>
+						</select>
+						<input type="text" name="searchTitle" id="searchTitle" value="" title="검색할 학과를 입력하세요." />
+						<button class="btn_graybg02" onclick="searchMajor(); return false;">찾기</button>
+					</fieldset> 					
+ 					<div class="result_box">
+ 						<table class="table_style_row02" id="zipTable">
+							<caption>학과를 보여줍니다.</caption>
+							<thead>
+								<tr>
+									<th scope="col" class="ts_th">학과</th>
+<!-- 									<th scope="col" class="ts_td">주소</th> -->
+								</tr>
+							</thead>
+							<tbody id="majorBody">
+								<tr>
+									<td class="ts_th" colspan="1">검색어를 입력하세요.</td>
+								</tr>
+							</tbody>
+						</table>
+ 					</div>
+				</div>
+			</div>
+		</div>
+		<button class="btn_close tooltip-close" id="majorClose" data-focus="popsearch02-close" data-focus-next="popsearch02">닫기</button>
+	</div>
+	<!--// layer pop -->
+	

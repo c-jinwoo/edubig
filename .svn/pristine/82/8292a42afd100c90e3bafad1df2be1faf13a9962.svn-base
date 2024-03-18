@@ -1,0 +1,504 @@
+package com.webapp.classdesk.ctrl;
+
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+
+import javax.annotation.Resource;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.RequestMapping;
+
+import com.sangs.session.UserSessionManager;
+import com.sangs.session.UserSessionVO;
+import com.sangs.support.ControllerParamManager;
+import com.sangs.support.DataMap;
+import com.sangs.support.EduMap;
+import com.sangs.support.FrontException;
+import com.sangs.support.SangsProperties;
+import com.sangs.util.DownloadServlet;
+import com.sangs.util.ParamUtil;
+import com.sangs.util.SangsFileUtil;
+import com.sangs.util.SangsUtil;
+import com.webapp.academy.service.MyClassService;
+import com.webapp.ccedu.service.OnlineEducationService;
+import com.webapp.classdesk.service.ClassdeskBoardService;
+import com.webapp.classdesk.service.ClassdeskTutorExamService;
+import com.webapp.classdesk.service.ClassdeskTutorMainService;
+import com.webapp.classdesk.service.ClassdeskUserExamService;
+import com.webapp.classdesk.service.ClassdeskUserPollService;
+import com.webapp.classdesk.service.ClassdeskUserProgressService;
+import com.webapp.common.service.CommonPollService;
+import com.webapp.common.service.CommonUserService;
+
+/**
+ * Description : 사용자 > 나의강의실 > 클래스데스크 메인
+ * 
+ * Modification Information
+ * 수정일          		수정자         수정내용
+ * -------      -----------------------------------
+ * 2016.09.01   이진영           최초작성
+ *
+ */
+
+@Controller
+public class ClassdeskMainController {
+
+	private Logger log = LogManager.getLogger(this.getClass());
+	
+    @Resource(name = "classdeskTutorMainService")
+    private ClassdeskTutorMainService classdeskTutorMainService;
+
+    @Resource(name = "classdeskBoardService")
+    private ClassdeskBoardService     classdeskBoardService;
+
+    @Resource(name = "commonUserService")
+    private CommonUserService commonUserService;
+    
+    @Resource(name = "classdeskUserExamService")
+    private ClassdeskUserExamService  classdeskUserExamService;
+    
+    @Resource(name = "classdeskUserProgressService")
+    private ClassdeskUserProgressService classdeskUserProgressService;
+    
+    @Resource(name = "classdeskUserPollService")
+    private ClassdeskUserPollService classdeskUserPollService;
+    
+    @Resource(name = "myClassService")
+    private MyClassService myClassService;
+    
+    @Resource(name = "classdeskTutorExamService")
+    private ClassdeskTutorExamService classdeskTutorExamService;
+    
+    @Resource(name = "commonPollService")
+    private CommonPollService commonPollService;
+    
+    @Resource(name = "onlineEducationService")
+    private OnlineEducationService onlineEducationService;
+    
+    /**
+     * 메인
+     * 
+     * @param request
+     * @param res
+     * @param rMap
+     * @return
+     * @throws FrontException
+     */
+    @RequestMapping({"/ccedu/myclass/learningClassList.do"})
+    public String main(HttpServletRequest request, HttpServletResponse res, DataMap rMap) throws FrontException {
+    	
+        try {
+        	
+        	UserSessionVO userSessionVO = UserSessionManager.getUserSessionVO(request);
+        	if ("N".equals(rMap.getString("SES_ISLOGIN")) || rMap.getInt("SES_USERNO") < 1) {// 로그인 안했다면
+        	    rMap.putString("$returnUrl", "/ccedu/myclass/learningClassList.do");
+        	    
+        	    DataMap removeDataMap = new DataMap();
+        	    removeDataMap = SangsUtil.dataMapRemoveScriptTag(rMap);
+        	    
+                request.setAttribute("paramInputs", ControllerParamManager.getParamHtmlFormConvert(removeDataMap));
+                request.setAttribute("msg", "로그인이 필요한 페이지 입니다.");
+                request.setAttribute("url", "/ccedu/common/login.do");
+                return "forward:/common/msgForward.do";
+            }
+        	
+        	int CSEQNO = 0;
+        	int COURSENO = 0;
+        	int CUSERNO = 0;
+        	String CLASSDESK = "";
+        	String SEQTITLE = "";
+        	String CNAME = "";
+        	String SCCODE = "";
+        	String SCNAME = "";
+        	String CCODE = "";
+        	String SAVFILE = "";
+        	int EVAL_EXAM_FINAL = 0;
+        	rMap.setString("eduInfoCode", SangsProperties.getProperty("Globals.mtCode_MT_CPSEDU_INFO_CODE"));//정규교육코드 기본세팅
+        	rMap.setString("schOnline" , SangsProperties.getProperty("Globals.mtCode_MT_CTYPE_CODE_ONLINE")); // 온라인 교육 기본 세팅
+        	List<EduMap> courseList =  classdeskTutorMainService.getCourseList(rMap);//강의중인 리스트             
+        	EduMap cseqnoInfo = myClassService.selectCourseInfo(rMap);
+        	
+        	EduMap studyInfo = new EduMap();
+        	if(courseList.size() == 0){//수강중인 과목 없을경우
+        		request.setAttribute("msg", "현재 수강중인 과정이 없습니다.");
+                request.setAttribute("url", "/ccedu/myclass/learningStatusList.do");
+                return "forward:/common/msgForward.do";
+        	}
+//        	else if(!("").equals(rMap.getString("paramcUserNo")) && !("").equals(rMap.getString("paramcSeqNo"))) {
+//        			
+////    	    		rMap.setString("seqTitle" , URLDecoder.decode(rMap.getString("seqTitle"), "UTF-8"));
+////    	    		rMap.setString("ctypeName" , URLDecoder.decode(rMap.getString("ctypeName"), "UTF-8"));
+////    	    		
+//    	    		CSEQNO = Integer.parseInt(rMap.getString("paramCourseNo"));
+//                    COURSENO = Integer.parseInt(rMap.getString("paramcSeqNo"));
+//                    CUSERNO = Integer.parseInt(rMap.getString("paramcUserNo"));
+//                    SCCODE = rMap.getString("paramcMtScCode");
+//                    CLASSDESK = rMap.getString("CLASSDESK");
+//                    
+//            }
+        	else if(!("").equals(rMap.getString("searchCseqno"))){ // 수강과목 변경해서 리로드 하는 값이 있는 경우 
+        		
+                CSEQNO = cseqnoInfo.getInt("CSEQNO");
+                COURSENO = cseqnoInfo.getInt("COURSENO");
+                CUSERNO = cseqnoInfo.getInt("CUSERNO");
+                CLASSDESK = cseqnoInfo.getString("CLASS_DESK");
+                SEQTITLE = cseqnoInfo.getString("SEQ_TITLE");
+                SCCODE = cseqnoInfo.getString("MT_SC_CODE");
+                SCNAME = cseqnoInfo.getString("MT_SC_NAME");
+                SAVFILE = cseqnoInfo.getString("SAVFILE");
+                EVAL_EXAM_FINAL = cseqnoInfo.getInt("EVAL_EXAM_FINAL");
+                
+                
+        	}
+        	else {//최초 접속시 수강중인 과목리스트의 첫번째 데이터를 로드
+        		studyInfo = (EduMap)courseList.get(0);
+                CSEQNO = studyInfo.getInt("CSEQNO");
+                COURSENO = studyInfo.getInt("COURSENO");
+                CUSERNO = studyInfo.getInt("CUSERNO");
+                CLASSDESK = studyInfo.getString("CLASS_DESK");
+                SEQTITLE = studyInfo.getString("SEQ_TITLE");
+                SCCODE = studyInfo.getString("MT_SC_CODE");
+                SCNAME = studyInfo.getString("MT_SC_NAME");
+                CNAME = studyInfo.getString("MT_CTYPE_NAME");
+                CCODE = studyInfo.getString("MT_CTYPE_CODE");
+                SAVFILE = studyInfo.getString("SAVFILE");
+                EVAL_EXAM_FINAL = cseqnoInfo.getInt("EVAL_EXAM_FINAL");	
+        	}
+        	
+            rMap.setString("paramCourseNo" , Integer.toString(COURSENO));
+            rMap.setString("paramcSeqNo" , Integer.toString(CSEQNO));
+            rMap.setString("courseno" , Integer.toString(COURSENO));
+            rMap.setString("cseqno" , Integer.toString(CSEQNO));
+            rMap.setString("paramcUserNo" , Integer.toString(CUSERNO));
+            rMap.setString("CLASSDESK" , CLASSDESK);
+            rMap.setString("seqTitle" , SEQTITLE);
+            rMap.setString("mtScCode" , SCCODE);
+            rMap.setString("mtScName" , SCNAME);
+            rMap.setString("SAVFILE" , SAVFILE);
+            rMap.setString("eduseqYn", cseqnoInfo.getString("EDUSEQ_YN"));
+            rMap.setString("classDesk",cseqnoInfo.getString("CLASS_DESK"));
+            rMap.setString("ONLINE_EDU",cseqnoInfo.getString("ONLINE_EDU"));
+        	rMap.setString("paramUserNo" , rMap.getString("SES_USERNO"));
+        	rMap.setString("evalExamFinal" , String.valueOf(EVAL_EXAM_FINAL));
+        	
+        	
+    		userSessionVO.setCourseNo(Integer.parseInt(rMap.getString("paramCourseNo")));
+    		userSessionVO.setcSeqNo(Integer.parseInt(rMap.getString("paramcSeqNo")));
+    		userSessionVO.setcUserNo(Integer.parseInt(rMap.getString("paramcUserNo")));
+    		userSessionVO.setUserNo(Integer.parseInt(rMap.getString("paramUserNo")));
+    		userSessionVO.setSeqTitle(rMap.getString("seqTitle"));
+    		userSessionVO.setSeqTitle(rMap.getString("ctypeName"));
+    		UserSessionManager.setUserSessionVO(request, userSessionVO);
+    		
+    		rMap.setInt("SES_USERNO", userSessionVO.getUserNo());
+            rMap.setString("SES_USERID", userSessionVO.getUserId());
+            rMap.setString("SES_USERNAME", userSessionVO.getUserName());
+            rMap.setInt("SES_GRADENO", userSessionVO.getGradeNum());
+            rMap.setString("SES_MOBILE", userSessionVO.getMobile());
+            rMap.setString("SES_EMAIL", userSessionVO.getEmail());
+            rMap.setString("SES_MBER_REG_GB", userSessionVO.getMberRegGb());
+            rMap.setString("SES_STATUS_GB", userSessionVO.getStatusGb());
+            // 등록된 강의실 세션 할당
+            rMap.setInt("SES_COURSENO", userSessionVO.getCourseNo());
+            rMap.setInt("SES_CUSERNO", userSessionVO.getcUserNo());
+            rMap.setInt("SES_CSEQNO", userSessionVO.getcSeqNo());
+            
+        	request.setAttribute("courseList", courseList);
+        	
+        	
+//        	// 과정별 리스트
+//            request.setAttribute("selectList", classdeskTutorMainService.getCourseList(rMap));
+//        	// 교육기간
+//            request.setAttribute("tchItem", classdeskTutorMainService.getCourseMainTchInfo(rMap));
+//            // 사용자별 교육기간
+//            request.setAttribute("cuserItem", classdeskTutorMainService.getCuserInfo(rMap));
+//            // 첨부파일
+//            request.setAttribute("fileList", classdeskTutorMainService.getFileList(rMap));
+//            // 교육 커리쿨럼
+//            request.setAttribute("curricuiumList", classdeskTutorMainService.getCurriculum(rMap));
+
+            
+            
+            //과정구분 콤보 박스 조회
+            List<EduMap> mtScCodeList = myClassService.selectMtScCodeList(rMap);
+            request.setAttribute("mtScCodeList", mtScCodeList);
+            
+            //과정명 콤보박스 조회
+            List<EduMap> seqList =myClassService.selectCourseSeqList(rMap);
+            request.setAttribute("seqList", seqList);
+            
+            // 온라인 교육
+            List<EduMap> resultList =  classdeskUserProgressService.getEdCourseTreeList(rMap); //classdeskTutorMainService.getCourseOnlineStudyInfo(rMap);
+        	request.setAttribute("onResultList", resultList); 
+        	
+            /*항시 수강*/ 
+            request.setAttribute("progExecYn", "Y");
+        	
+        	
+        	
+        	/*float progressVal = 0;
+        	float sumFrameSeq=0;
+        	float sumFrameCnt=0;
+        	SortedSet<Date> set = new TreeSet<Date>();
+        	
+        	SimpleDateFormat resultMaxEdate = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+        	
+        	String[] ResultProgressVal = new String[resultList.size()];
+        	
+        	
+        	for(int i = 0 ; i < resultList.size() ; i ++ ){
+        		sumFrameSeq = sumFrameSeq + resultList.get(i).getInt("FRAMESEQ");//학습한 페이지
+        		sumFrameCnt = sumFrameCnt + resultList.get(i).getInt("FRAMECNT");//각 차시의 전체페이지
+        		
+        			if(sumFrameSeq > 0){//학습했다면
+        				progressVal = sumFrameSeq / sumFrameCnt * 100;//진도율
+        				DecimalFormat result=new DecimalFormat("###.##");
+        				
+        				ResultProgressVal[i] = result.format(progressVal);
+        			} else {
+        				ResultProgressVal[i] = "0";
+        			}
+        		
+        			sumFrameSeq = 0;
+        			sumFrameCnt = 0;
+        	}
+ 
+    		request.setAttribute("progressVal", ResultProgressVal);*/
+
+            
+           // 시험
+           request.setAttribute("examListData", classdeskUserExamService.getUserLectExamList(rMap));
+           request.setAttribute("examRowData", classdeskUserExamService.getOpenTypeInfo(rMap));
+           
+           List<EduMap> examProgData = classdeskTutorMainService.getProgInfo2(rMap); 	
+           
+           request.setAttribute("examProgData", examProgData.get(0).get("PROG_PER")); 	
+           
+           //설문목록
+	       request.setAttribute("pollResultList", classdeskUserPollService.getLePoll(rMap));
+	       	
+	       //참여 이력 여부
+	       request.setAttribute("pollHistData", classdeskUserPollService.gethistData(rMap));
+	       List<EduMap> histData = classdeskUserPollService.gethistData(rMap);
+	       request.setAttribute("pollHistData2", histData.size());
+           
+           // 공지사항 / 자료실
+           rMap.setString("select", "list1");
+       	   rMap.putInt("bcateno", ParamUtil.getIntParam(SangsProperties.getProperty("Globals.bbsBcateClassNotice")));
+       		rMap.setString("title", SangsProperties.getProperty("Globals.bbsList1"));
+           	request.setAttribute("courselistData", classdeskBoardService.getCourseBbsList(rMap));
+            request.setAttribute("courselistCount", classdeskBoardService.getCourseBbsListCount(rMap));
+           
+            rMap.setString("select", "list2");
+            rMap.putInt("bcateno", ParamUtil.getIntParam(SangsProperties.getProperty("Globals.bbsBcateClassData")));
+            rMap.setString("title", SangsProperties.getProperty("Globals.bbsList2"));
+            request.setAttribute("courselistData2", classdeskBoardService.getCourseBbsList(rMap));
+            request.setAttribute("courselistCount2", classdeskBoardService.getCourseBbsListCount(rMap));
+    
+            request.setAttribute("REQUEST_DATA", rMap);
+            
+            List<EduMap> txtFileMap = onlineEducationService.getTxtFileInfoByCourseNo(rMap);
+            
+            if(txtFileMap != null){
+            	ArrayList<String> subtitle = new ArrayList<String>();
+            	for(int i = 0; i<txtFileMap.size(); i++){
+            		String filePath = (String) txtFileMap.get(i).get("SAVPATH")+ "/"+(String) txtFileMap.get(i).get("SAVFILE");
+            		subtitle= SangsFileUtil.readFile(filePath);
+            	}
+            	if(subtitle != null){
+            		request.setAttribute("subTitle", subtitle);
+            	}
+            }
+
+
+        } 
+        catch (Exception e) { 
+        	e.printStackTrace();
+            throw new FrontException(e);
+        }
+        return "ccedu/myclass/learning_class_list";
+    }
+    
+    @RequestMapping({"/classdesk/main/mainSelect.do"})
+    public String mainCategorySelect(DataMap rMap, Model model) throws Exception {
+    	
+    	rMap.setString("eduInfoCode", SangsProperties.getProperty("Globals.mtCode_MT_CPSEDU_INFO_CODE"));//정규교육코드 기본세팅
+    	
+    	model.addAttribute("result",classdeskTutorMainService.mainCategorySelect(rMap));
+		return "jsonView";
+    }
+    
+    @RequestMapping({"/classdesk/main/fileDown.do"})
+    public String Filedown(HttpServletRequest req, HttpServletResponse res, DataMap rMap) throws FrontException {
+
+        DownloadServlet filedown = new DownloadServlet();
+        boolean result;
+
+        try {
+            //rMap.setString("filename", "../6BAE7B3F1CBB415FBE6A15D65DB18BE7.xls");
+            rMap.setString("filename", SangsUtil.replaceAll(rMap.getString("filename"), "../", ""));
+            //상위경로 진입 방지
+
+            if(rMap.containsKey("sampleDown")){
+                req.setAttribute("REQUEST_DATA", rMap);
+                return "/common/file_down";
+            }
+            
+            EduMap map = classdeskTutorMainService.getFileInfo(rMap);
+            
+            result = filedown.downLoadFile(req, res, map);
+            
+            if (result) {
+                return null;
+            } else {
+                return "/common/cmmn_error";
+            }
+
+        } catch (Exception e) { log.debug(e.getMessage());
+            return "common/cmmn_error";
+        }
+    }
+    
+    /**
+     * 시험 양식 폼
+     * 
+     * @param request
+     * @param res
+     * @param rMap
+     * @return
+     * @throws FrontException
+     */
+    @RequestMapping(value = "/ccedu/myclass/learningExamForm.do")
+    public String learningExamForm(HttpServletRequest request, HttpServletResponse res, DataMap rMap) throws FrontException {
+
+        try {
+            EduMap examMap = classdeskTutorExamService.getLectExamItem(rMap);
+            EduMap userExamCntMap = classdeskUserExamService.getUserLectExamAppCnt(rMap);
+            
+            rMap.putString("examEdate" , rMap.getString("examEdate").substring(0,rMap.getString("examEdate").lastIndexOf("-")+3));
+            if (userExamCntMap.getInt("EXAM_APP_CNT") == 0) {
+                classdeskUserExamService.saveUserExamInfo(examMap, rMap);
+            }
+
+            /** 관리자 체점할때도 쓰이기때문에 일반 파라미터로 보냄 */
+            rMap.putInt("cUserNo", rMap.getInt("SES_CUSERNO"));
+            
+            // 문항 수
+            request.setAttribute("itemCnt", classdeskUserExamService.getItemCnt(rMap));
+            
+            /*세트/랜덤 구분*/
+            List<EduMap> listData = classdeskUserExamService.getUserLectExamRdmAppHistList(rMap);
+            
+           
+            if ("R".equals(examMap.getString("PUB_TYPE"))) {
+                //랜덤출제일경우 보기의 순서를 변경하는 기능
+                Collections.shuffle(listData);
+            }
+            rMap.setString("pubType", examMap.getString("PUB_TYPE"));
+            request.setAttribute("listData", listData);
+            /*request.setAttribute("menu_nm", "classdesk");
+            request.setAttribute("lnb_menu", "tutorexam");*/
+            request.setAttribute("menu_nm", "mypage");
+            request.setAttribute("lnb_menu", "myLecture");
+        } catch (Exception e) { log.debug(e.getMessage());
+            throw new FrontException(e);
+        }
+        rMap.setString("title", SangsProperties.getProperty("Globals.examList"));
+        request.setAttribute("REQUEST_DATA", rMap);
+
+        return "ccedu/myclass/learning_exam_form";
+    }
+    
+   
+    /**
+     * 시험 확인
+     * 
+     * @param request
+     * @param res
+     * @param rMap
+     * @return
+     * @throws FrontException
+     */
+    @RequestMapping(value = "/ccedu/myclass/learningExamReviewForm.do")
+    public String learningExamReviewForm(HttpServletRequest request, HttpServletResponse res, DataMap rMap) throws FrontException {
+
+        try {
+            
+            EduMap eMap = classdeskTutorExamService.getLectExamItem(rMap);
+            request.setAttribute("examData", eMap);
+            
+            rMap.putInt("cUserNo", rMap.getInt("SES_CUSERNO"));
+            
+            request.setAttribute("ListDataB", classdeskUserExamService.getUserLectExamRdmAppHistListB(rMap));
+            
+            request.setAttribute("listData", classdeskUserExamService.getUserLectExamRdmAppHistList(rMap));
+            
+            
+        } catch (Exception e) {
+            throw new FrontException(e);
+        }
+        
+        
+        request.setAttribute("REQUEST_DATA", rMap);
+        
+        return "ccedu/myclass/learning_exam_review_form";
+    }
+    
+    
+    /**
+     * 설문view
+     * 
+     * @param request
+     * @param res
+     * @param rMap
+     * @return
+     * @throws FrontException
+     */
+    @RequestMapping(value = "/ccedu/myclass/pollView.do")
+    public String pollView(HttpServletRequest request, HttpServletResponse res, DataMap rMap) throws FrontException {
+
+        try {
+            
+             request.setAttribute("menu_nm", "mypage");
+             request.setAttribute("lnb_menu", "myLecture");
+            
+            //모듈명
+            request.setAttribute("moduleList", classdeskUserPollService.getModuleList(rMap));
+            //질문 목록
+            request.setAttribute("questionList", classdeskUserPollService.getQuestionList(rMap));
+            //설문 내용
+            request.setAttribute("resultList", classdeskUserPollService.getSurveyModuleList(rMap));//복수응답가능
+            
+            //객관식 복수 응답 문항 validation
+            request.setAttribute("itemCntQno", classdeskUserPollService.getItemCnt(rMap));
+            //객관식 복수 응답 불가 문항 validation
+            request.setAttribute("itemCnt2", classdeskUserPollService.getItemCnt2(rMap));
+            
+            //객관식 || 주관식 
+            String JB = "JB";
+            rMap.setString("JB", JB);
+            request.setAttribute("mtSubCode", classdeskUserPollService.selectMtCpollCode(rMap));
+            rMap.setString("title", SangsProperties.getProperty("Globals.pollList"));
+            request.setAttribute("REQUEST_DATA", rMap);
+
+        } catch (Exception e) { log.debug(e.getMessage());
+            throw new FrontException(e);
+        }
+
+        request.setAttribute("REQUEST_DATA", rMap);
+
+        return "ccedu/myclass/poll_view";
+    }
+    
+    
+    
+    
+    
+    
+}

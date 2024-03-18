@@ -1,0 +1,59 @@
+package com.webapp.ccedu.ctrl;
+
+import javax.annotation.Resource;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+
+import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.RequestMapping;
+
+import com.sangs.support.DataMap;
+import com.sangs.support.EduMap;
+import com.sangs.support.FrontException;
+import com.webapp.academy.service.CommonService;
+import com.webapp.ccedu.service.OnlineReviewService;
+
+/**
+ * Description : 
+ *
+ * Modification Information
+ * 수정일			수정자			수정내용
+ * -------		-----------------------------------
+ * 2021.03.26	CSLAB		최초작성
+ *
+ */
+
+@Controller
+public class OnlineReviewController {
+    @Resource(name = "commonService")
+    private CommonService   commonService;
+    
+    @Resource(name = "onlineReviewService")
+    private OnlineReviewService onlineReviewService; 
+    
+    // TODO: 리뷰 > 리스트
+    @RequestMapping(value = "/review/main.do")
+    public String main(HttpServletRequest request, HttpServletResponse res, DataMap rMap) throws FrontException {
+		try{    
+			request.setAttribute("list_data",onlineReviewService.selectReviewList(rMap));
+			request.setAttribute("REQUEST_DATA", rMap);			
+		} 
+		catch(Exception e){
+		    throw new FrontException(e);
+		}		
+		return "/review/main";        
+    }  
+    
+    // TODO: 리뷰 > 작성
+    @RequestMapping(value = "/review/form.do")
+    public String form(HttpServletRequest request, HttpServletResponse res, DataMap rMap) throws FrontException{
+		try{
+			//request.setAttribute("review",
+			request.setAttribute("REQUEST_DATA", rMap);			
+		}
+		catch(Exception e){
+		    throw new FrontException(e);
+		}		
+		return "/book/view";        
+    }   
+}

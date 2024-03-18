@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes" ?>
+<list>
+  <index>
+    <topic>
+      <list title="main" page="1">소개하기</list>
+      <list title="sub" page="1">데이터 시각화 기법과 이해</list>
+
+      <list title="main" page="2">살펴보기</list>
+      <list title="sub" page="2">데이터 시각화란?</list>
+      <list title="sub" page="3">데이터 시각화의 절차</list>
+	  <list title="sub" page="4">데이터 시각화 방법 및 관련 기술</list>
+
+      <list title="main" page="5">정리하기</list>
+      <list title="sub" page="5">핵심평가</list>
+      <list title="sub" page="6">학습정리</list>
+    </topic>
+  </index>
+</list>

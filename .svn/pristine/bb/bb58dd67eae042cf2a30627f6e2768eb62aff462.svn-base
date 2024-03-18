@@ -1,0 +1,740 @@
+package com.webapp.academy.ctrl;
+
+import java.io.PrintWriter;
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.regex.Pattern;
+
+import javax.annotation.Resource;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.RequestMapping;
+
+import com.google.gson.Gson;
+import com.sangs.session.UserSessionManager;
+import com.sangs.session.UserSessionVO;
+import com.sangs.support.ControllerParamManager;
+import com.sangs.support.DataMap;
+import com.sangs.support.EduMap;
+import com.sangs.support.FrontException;
+import com.sangs.support.SangsProperties;
+import com.sangs.util.DownloadServlet;
+import com.sangs.util.SangsUtil;
+import com.webapp.academy.mapper.BoardMapper;
+import com.webapp.academy.service.BoardService;
+import com.webapp.academy.service.CommonService;
+import com.webapp.academy.service.TutorService;
+
+/**
+ * Description : 게시판 관련 컨트롤러
+ * 
+ * Modification Information
+ * 수정일			수정자			수정내용
+ * -------		-----------------------------------
+ * 2021.02.25	CSLAB		최초작성
+ *
+ */
+@Controller
+public class BoardController{ 	
+    @Resource(name = "boardService")
+    private BoardService boardService; 
+        
+    @Resource(name = "tutorService")
+    private TutorService  tutorService;
+    
+    @Resource(name = "commonService")
+    private CommonService commonService;
+    
+    @Resource(name = "boardMapper")
+    private BoardMapper boardMapper;
+
+    /**
+     * 합격후기 메인
+     * @param request
+     * @param model
+     * @param rMap
+     * @return
+     * @throws FrontException
+     */
+    @RequestMapping(value = "/bbs/pass/main.do")
+    public String passMain(HttpServletRequest request, HttpServletResponse res, DataMap rMap) throws FrontException{    	
+    	try{    
+			rMap.putString("bcateno", "14");	
+			
+            request.setAttribute("listData", boardService.getBoardList(rMap));            
+            request.setAttribute("resultCount", boardService.getBoardListCnt(rMap));    	    
+			request.setAttribute("REQUEST_DATA", rMap);		
+    	}
+    	catch(Exception e){
+            throw new FrontException(e);
+        }		    			
+    	return "/bbs/pass/main";
+    }
+
+    /**
+     * 합격후기 보기
+     * @param request
+     * @param model
+     * @param rMap
+     * @return
+     * @throws FrontException
+     */
+    @RequestMapping(value = "/bbs/pass/view.do")
+    public String passView(HttpServletRequest request, HttpServletResponse res, DataMap rMap) throws FrontException{    	
+    	try{    	    
+            EduMap boardMap = boardService.getBoardView(rMap);
+    	        	    
+	    	if(boardMap != null){
+            	rMap.setString("userInfoDiv","N");
+            	
+            	if(rMap.getInt("SES_USERNO") == boardMap.getInt("USERNO") || rMap.getInt("SES_USERNO") == 1){
+            		rMap.setString("userInfoDiv","Y");
+            	}
+		    	request.setAttribute("rowData", boardMap);
+		    	request.setAttribute("title", SangsUtil.removeScriptTag(stringToHtmlSign(boardMap.getString("TITLE"))));
+		    	request.setAttribute("content", SangsUtil.removeScriptTag(stringToHtmlSign(boardMap.getString("CONTENT"))));
+            	request.setAttribute("REQUEST_DATA", rMap); 
+    		}
+	    	else{
+    			request.setAttribute("msg", "해당 게시물이 존재하지 않습니다."); 
+    			request.setAttribute("url", "/bbs/pass/main.do"); 
+    			return "forward:/common/msgForward.do";
+    		}			
+    	}
+    	catch(Exception e){ 
+            throw new FrontException(e);
+        }
+    	return "/bbs/pass/view";    	
+    }
+    
+    /**
+     * 합격후기 작성
+     * @param request
+     * @param model
+     * @param rMap
+     * @return
+     * @throws FrontException
+     */
+    @RequestMapping(value = "/bbs/pass/form.do")
+    public String pssForm(HttpServletRequest request, HttpServletResponse response, DataMap rMap) throws FrontException {
+        try{        	
+        	if("N".equals(rMap.getString("SES_ISLOGIN")) || rMap.getInt("SES_USERNO") < 1){      
+                request.setAttribute("msg", "로그인이 필요한 페이지 입니다.");
+                request.setAttribute("url", "/user/login.do");
+                return "forward:/common/msgForward.do";
+            }        	
+        	
+        	if(rMap.getString("type").equals("update")){
+            	EduMap boardMap = boardService.getBoardView(rMap);
+            	
+                if(rMap.getInt("SES_USERNO") != boardMap.getInt("USERNO")){
+                	request.setAttribute("msg", "수정할 수 없습니다."); 
+                	request.setAttribute("url", "/bbs/pass/main.do"); 
+                	return "forward:/common/msgForward.do";
+                }                
+                request.setAttribute("rowData", boardMap);
+        	}        	
+        	request.setAttribute("REQUEST_DATA", rMap);        
+        } 
+        catch (Exception e){
+            throw new FrontException(e);
+        }       
+        return "/bbs/pass/form";
+    }
+
+    /**
+     * 합격후기 등록
+     * @param request
+     * @param model
+     * @param rMap
+     * @return
+     * @throws FrontException
+     */
+    @RequestMapping(value = "/bbs/pass/exec.do")
+    public String passExec(HttpServletRequest request, HttpServletResponse response, DataMap rMap) throws FrontException{        
+        String url = "";
+        
+        try{        	
+        	if("N".equals(rMap.getString("SES_ISLOGIN")) || rMap.getInt("SES_USERNO") < 1){
+                request.setAttribute("msg", "로그인이 필요한 페이지 입니다.");
+                request.setAttribute("url", "/user/login.do");
+                return "forward:/common/msgForward.do";
+            }      	    	      
+        	
+        	if("14".equals(rMap.getString("bcateno"))){
+        		url = "/bbs/pass/main.do";
+        	} 
+        	else{
+        		request.setAttribute("msg", "비정상적인 글쓰기 접근입니다.");
+                request.setAttribute("url", "/main/main.do");
+                return "forward:/common/msgForward.do";
+        	}
+        	
+        	// 수정
+        	if(rMap.getString("type").equals("update")){
+                boardService.updateBoardInfo(request, rMap);
+                request.setAttribute("REQUEST_DATA", rMap);
+        	}
+        	// 등록
+        	else{
+                boardService.insertBoardInfo(request, rMap);
+                request.setAttribute("REQUEST_DATA", rMap);
+        	}        	
+        }
+        catch(Exception e){
+            throw new FrontException(e);
+        }
+        
+        request.setAttribute("url", url);
+        return "forward:/common/msgForward.do";
+    }
+    
+    /**
+	  * 합격후기 삭제
+	  * @param url
+	  * @param msg
+	  * @param model
+	  * @return
+	  * @throws Exception
+	*/
+	@RequestMapping(value = "/bbs/pass/del.do")
+	public String passDel(HttpServletRequest request, HttpServletResponse res, DataMap rMap) throws Exception{
+		try{		   		
+			boardService.deleteBoardInfo(rMap);
+			request.setAttribute("msg", "등록하신 게시물이 삭제되었습니다.");
+			request.setAttribute("url", "/bbs/pass/main.do");
+		}	
+		catch(Exception e){
+		}   
+		return "forward:/common/msgForward.do";		
+	}  
+	
+    /**
+     * QnA 메인
+     * @param request
+     * @param model
+     * @param rMap
+     * @return
+     * @throws FrontException
+     */
+    // TODO: QnA 목록
+    @RequestMapping(value = "/bbs/qna/main.do")
+    public String qnaMain(HttpServletRequest request, HttpServletResponse res, DataMap rMap) throws FrontException{    	
+    	try{    
+			rMap.putString("bcateno", "13");	
+			
+            request.setAttribute("listData", boardService.getBoardList(rMap));            
+            request.setAttribute("resultCount", boardService.getBoardListCnt(rMap));    	    
+			request.setAttribute("REQUEST_DATA", rMap);		
+    	}
+    	catch(Exception e){
+            throw new FrontException(e);
+        }		    			
+    	return "/bbs/qna/main";
+    }
+    
+    /**
+     * QnA 보기
+     * @param request
+     * @param model
+     * @param rMap
+     * @return
+     * @throws FrontException
+     */
+    // TODO: QnA 상세보기
+    @RequestMapping(value = "/bbs/qna/view.do")
+    public String qnaView(HttpServletRequest request, HttpServletResponse res, DataMap rMap) throws FrontException{    	
+    	try{    	    
+            EduMap boardMap = boardService.getBoardView(rMap);
+    	        	    
+	    	if(boardMap != null){
+            	rMap.setString("userInfoDiv","N");
+                if((rMap.getInt("SES_USERNO") == boardMap.getInt("USERNO")) || rMap.getInt("SES_USERNO") == 1){	
+                	if(rMap.getInt("SES_USERNO") == boardMap.getInt("USERNO")){
+                		rMap.setString("userInfoDiv","Y");
+                	}
+			    	request.setAttribute("rowData", boardMap);
+			    	request.setAttribute("title", SangsUtil.removeScriptTag(stringToHtmlSign(boardMap.getString("TITLE"))));
+			    	request.setAttribute("content", SangsUtil.removeScriptTag(stringToHtmlSign(boardMap.getString("CONTENT"))));
+								    	
+			    	EduMap cmtRowData = boardService.getLmsEdBbsCmtInfo(rMap);	                
+	                if(cmtRowData != null){
+	                	cmtRowData.put("REPLY", SangsUtil.removeScriptTag(stringToHtmlSign(cmtRowData.getString("REPLY"))));
+		                request.setAttribute("cmtRowData", cmtRowData);
+	                }	                
+		    	}
+                else{
+					request.setAttribute("msg", "본 게시물은 작성자만 확인이 가능합니다."); 
+					request.setAttribute("url", "/bbs/qna/main.do"); 
+					return "forward:/common/msgForward.do";
+				}
+            	request.setAttribute("REQUEST_DATA", rMap); 
+    		}
+	    	else{
+    			request.setAttribute("msg", "해당 게시물이 존재하지 않습니다."); 
+    			request.setAttribute("url", "/bbs/qna/main.do"); 
+    			return "forward:/common/msgForward.do";
+    		}			
+    	}
+    	catch(Exception e){ 
+            throw new FrontException(e);
+        }
+    	return "/bbs/qna/view";    	
+    }   
+    
+    /**
+     * QnA 작성
+     * @param request
+     * @param model
+     * @param rMap
+     * @return
+     * @throws FrontException
+     */
+    @RequestMapping(value = "/bbs/qna/form.do")
+    public String qnaForm(HttpServletRequest request, HttpServletResponse response, DataMap rMap) throws FrontException {
+        try{        	
+        	if("N".equals(rMap.getString("SES_ISLOGIN")) || rMap.getInt("SES_USERNO") < 1){      
+                request.setAttribute("msg", "로그인이 필요한 페이지 입니다.");
+                request.setAttribute("url", "/user/login.do");
+                return "forward:/common/msgForward.do";
+            }        	
+        	
+        	if(rMap.getString("type").equals("update")){
+            	EduMap boardMap = boardService.getBoardView(rMap);
+            	
+                if(rMap.getInt("SES_USERNO") != boardMap.getInt("USERNO")){
+                	request.setAttribute("msg", "수정할 수 없습니다."); 
+                	request.setAttribute("url", "/bbs/qna/main.do"); 
+                	return "forward:/common/msgForward.do";
+                }                
+                request.setAttribute("rowData", boardMap);
+        	}        	
+        	request.setAttribute("REQUEST_DATA", rMap);        
+        } 
+        catch (Exception e){
+            throw new FrontException(e);
+        }       
+        return "/bbs/qna/form";
+    }
+    
+    /**
+     * QnA 등록
+     * @param request
+     * @param model
+     * @param rMap
+     * @return
+     * @throws FrontException
+     */
+    @RequestMapping(value = "/bbs/qna/exec.do")
+    public String qnaExec(HttpServletRequest request, HttpServletResponse response, DataMap rMap) throws FrontException{        
+        String url = "";
+        
+        try{        	
+        	if("N".equals(rMap.getString("SES_ISLOGIN")) || rMap.getInt("SES_USERNO") < 1){
+                request.setAttribute("msg", "로그인이 필요한 페이지 입니다.");
+                request.setAttribute("url", "/user/login.do");
+                return "forward:/common/msgForward.do";
+            }      	    	      
+        	
+        	if("13".equals(rMap.getString("bcateno"))){
+        		url = "/bbs/qna/main.do";
+        	} 
+        	else{
+        		request.setAttribute("msg", "비정상적인 글쓰기 접근입니다.");
+                request.setAttribute("url", "/main/main.do");
+                return "forward:/common/msgForward.do";
+        	}
+        	
+        	// 수정
+        	if(rMap.getString("type").equals("update")){
+                boardService.updateBoardInfo(request, rMap);
+                request.setAttribute("REQUEST_DATA", rMap);
+        	}
+        	// 등록
+        	else{
+                boardService.insertBoardInfo(request, rMap);
+                request.setAttribute("REQUEST_DATA", rMap);
+        	}        	
+        }
+        catch(Exception e){
+            throw new FrontException(e);
+        }
+        
+        request.setAttribute("url", url);
+        return "forward:/common/msgForward.do";
+    }
+    
+    /**
+	  * Q&A 삭제
+	  * @param url
+	  * @param msg
+	  * @param model
+	  * @return
+	  * @throws Exception
+	*/
+	@RequestMapping(value = "/bbs/qna/del.do")
+	public String qnaDel(HttpServletRequest request, HttpServletResponse res, DataMap rMap) throws Exception{
+		try{		   		
+			boardService.deleteBoardInfo(rMap);
+			request.setAttribute("msg", "등록하신 게시물이 삭제되었습니다.");
+			request.setAttribute("url", "/bbs/qna/main.do");
+		}	
+		catch(Exception e){
+		}   
+		return "forward:/common/msgForward.do";		
+	}    
+	
+	/**
+     * QnA 답변 등록
+     * @param request
+     * @param response
+     * @param rMap
+     * @return
+     * @throws IOException
+     */
+    @RequestMapping(value="/bbs/qna/replyIns.do")
+    public void insertReply(HttpServletRequest request, HttpServletResponse response, DataMap rMap) throws Exception{    	
+    	response.setContentType("text/html; charset=utf-8");
+        PrintWriter out = response.getWriter();
+        Gson gson = new Gson();
+        String json = null;
+        try{        	      	
+        	if("N".equals(rMap.getString("SES_ISLOGIN")) || rMap.getInt("SES_USERNO") < 1){
+				json = gson.toJson("FAIL");        	     
+				out.print(json);
+				out.flush();
+				out.close();
+            }        	 
+        	if(rMap.getInt("SES_USERNO") == 1){	  
+    			String status = "Y";
+    			rMap.putString("status",status);
+    			
+    			boardService.insertBoardReply(rMap);        		
+    			boardService.changeBoardReplyStatus(rMap);              		
+	            json = gson.toJson("SUCCESS"); 
+        	}       
+        	else{
+	            json = gson.toJson("FAIL"); 
+        	}
+        } 
+        catch (Exception ex){
+            json = gson.toJson("FAIL");
+        }
+
+        out.print(json);
+        out.flush();
+        out.close();    	
+    }
+    
+    /**
+     * QnA 답변 삭제
+     * @param request
+     * @param response
+     * @param rMap
+     * @return
+     * @throws IOException
+     */
+    @RequestMapping(value="/bbs/qna/replyDel.do")
+    public void deleteReply(HttpServletRequest request, HttpServletResponse response, DataMap rMap) throws Exception{    	
+    	response.setContentType("text/html; charset=utf-8");
+        PrintWriter out = response.getWriter();
+        Gson gson = new Gson();
+        String json = null;
+        try{        	
+            if("N".equals(rMap.getString("SES_ISLOGIN")) || rMap.getInt("SES_USERNO") != 1){
+                json = gson.toJson("FAIL");                
+                out.print(json);
+                out.flush();
+                out.close();
+            }
+            
+            if(rMap.getInt("SES_USERNO") == 1){
+    			String status = "N";
+    			rMap.putString("status",status);	
+    			
+                boardService.deleteBoardReply(rMap);
+    			boardService.changeBoardReplyStatus(rMap);    
+                json = gson.toJson("SUCCESS");           	
+            }
+            else{
+                json = gson.toJson("FAIL");            	
+            }            
+        }
+        catch (Exception ex){
+            json = gson.toJson("FAIL");
+        }
+        out.print(json);
+        out.flush();
+        out.close();    	
+    }
+    
+    /**
+     * 공지사항 메인
+     * @param request
+     * @param model
+     * @param rMap
+     * @return
+     * @throws FrontException
+     */
+    @RequestMapping(value = "/bbs/notice/main.do")
+    public String noticeMain(HttpServletRequest request, HttpServletResponse res, DataMap rMap) throws FrontException{    	
+    	try{    
+			rMap.putString("bcateno", "1");	
+			
+            request.setAttribute("listData", boardService.getBoardList(rMap));            
+            request.setAttribute("resultCount", boardService.getBoardListCnt(rMap));    	    
+			request.setAttribute("REQUEST_DATA", rMap);		
+    	}
+    	catch(Exception e){
+            throw new FrontException(e);
+        }		    			
+    	return "/bbs/notice/main";
+    }    
+    /**
+     * 공지사항 보기
+     * @param request
+     * @param model
+     * @param rMap
+     * @return
+     * @throws FrontException
+     */
+    @RequestMapping(value = "/bbs/notice/view.do")
+    public String noticeView(HttpServletRequest request, HttpServletResponse res, DataMap rMap) throws FrontException{    	
+    	try{   		
+    		boolean flag = Pattern.matches("^[0-9]*$", rMap.getString("bcateno"));    		
+    		if(flag == true) {    			
+	    		boardService.updateBoardViewCnt(rMap);
+		    	EduMap boardMap = boardService.getBoardView(rMap);
+		    	
+		    	if(boardMap != null) {
+			    	request.setAttribute("rowData", boardMap);
+					request.setAttribute("listData", boardService.getFileList(rMap.getInt("bbsNo")));
+					
+					int bbsnoPrev = boardMap.getInt("BBSNO_PREV");
+					int bbsnoNext = boardMap.getInt("BBSNO_NEXT");
+					
+					// 이전글
+					rMap.setInt("bbsNo", bbsnoPrev);
+					request.setAttribute("prevData", boardService.getBoardView(rMap));
+					
+					// 다음글
+					rMap.setInt("bbsNo", bbsnoNext);
+					request.setAttribute("nextData", boardService.getBoardView(rMap));
+		    	}				
+		    	else{
+	    			request.setAttribute("msg", "해당 게시물이 존재하지 않습니다."); 
+	    			request.setAttribute("url", "/bbs/notice/main.do"); 
+	    			return "forward:/common/msgForward.do";		    		
+		    	}
+				request.setAttribute("REQUEST_DATA", rMap);
+    		
+    		} 
+    		else{
+    			request.setAttribute("msg", "해당 게시물이 존재하지 않습니다."); 
+    			request.setAttribute("url", "/bbs/notice/main.do"); 
+    			return "forward:/common/msgForward.do";
+    		}
+			
+    	} 
+    	catch(Exception e){
+            throw new FrontException(e);
+        }    	
+    	return "/bbs/notice/view";    	
+    }    
+
+	/**
+	 * 공지사항 파일다운로드
+	 * @param url
+	 * @param msg
+	 * @param model
+	 * @return
+	 * @throws Exception
+	 */
+	@RequestMapping(value = "/bbs/notice/filedown.do")
+	public String noticeFiledown(HttpServletRequest req, HttpServletResponse res, DataMap rMap) throws FrontException {
+	    DownloadServlet filedown = new DownloadServlet();
+	    boolean result;
+	
+	    try{
+	         rMap.setString("filename", SangsUtil.replaceAll(rMap.getString("filename"), "/cmmn/", ""));
+	         //상위경로 진입 방지A	         
+	         EduMap boardMap = boardService.getBoardView(rMap);
+	         rMap.setString("secuyn", boardMap.getString("SECUYN"));
+	         EduMap bbsInfo = boardService.bbsUserInfoChkAjax(rMap);
+
+	         if(boardMap != null){	         	    	    
+	         	if(boardMap.getString("SECUYN").equals("Y") && bbsInfo == null){
+	             	req.setAttribute("msg", "본 게시물은 등록하신 분의 요청에 따라 <br/>게시자만 확인이 가능합니다."); 
+	                req.setAttribute("url", "/cc/cmtBoardList.do?" + rMap.getString("bcateno")); 
+	                return "forward:/common/msgForward.do";
+	         	}         
+	         }
+	
+	         rMap.setString("fileId", req.getParameter("fileId"));
+	         rMap.setString("bbsNo", req.getParameter("bbsNo"));
+	         rMap.setString("fileSeq", req.getParameter("fileSeq"));
+	         
+				result = filedown.downLoadFile(req, res, boardMapper.getFileInfo(rMap));
+				
+	         if(result){
+	             return null;
+	         }
+	         else{
+	             return "/common/cmmn_error";
+	         }	
+	     } 
+	    catch(Exception e){
+	         return "common/cmmn_error";
+	     }
+	}
+
+    /**
+     * 이벤트 메인
+     * @param request
+     * @param model
+     * @param rMap
+     * @return
+     * @throws FrontException
+     */
+    @RequestMapping(value = "/bbs/event/main.do")
+    public String event(HttpServletRequest request, HttpServletResponse res, DataMap rMap) throws FrontException{    	
+    	try{    
+			rMap.putString("bcateno", "6");	
+			
+            request.setAttribute("listData", boardService.getBoardList(rMap));            
+            request.setAttribute("resultCount", boardService.getBoardListCnt(rMap));    	    
+			request.setAttribute("REQUEST_DATA", rMap);		
+    	}
+    	catch(Exception e){
+            throw new FrontException(e);
+        }		    			
+    	return "/bbs/event/main";
+    }  
+    
+    /**
+     * 이벤트 보기
+     * @param request
+     * @param model
+     * @param rMap
+     * @return
+     * @throws FrontException
+     */
+    @RequestMapping(value = "/bbs/event/view.do")
+    public String boardView(HttpServletRequest request, HttpServletResponse res, DataMap rMap) throws FrontException{    	
+    	try{   		
+    		boolean flag = Pattern.matches("^[0-9]*$", rMap.getString("bcateno"));    		
+    		if(flag == true) {    			
+	    		boardService.updateBoardViewCnt(rMap);
+		    	EduMap boardMap = boardService.getBoardView(rMap);
+		    	
+		    	if(boardMap != null){
+			    	request.setAttribute("rowData", boardMap);
+					request.setAttribute("listData", boardService.getFileList(rMap.getInt("bbsNo")));
+		    	}	
+	    		else{
+	    			request.setAttribute("msg", "해당 게시물이 존재하지 않습니다."); 
+	    			request.setAttribute("url", "/bbs/event/main.do"); 
+	    			return "forward:/common/msgForward.do";
+	    		}			
+				request.setAttribute("REQUEST_DATA", rMap);    		
+    		} 
+    		else{
+    			request.setAttribute("msg", "해당 게시물이 존재하지 않습니다."); 
+    			request.setAttribute("url", "/bbs/event/main.do"); 
+    			return "forward:/common/msgForward.do";
+    		}			
+    	} 
+    	catch(Exception e){
+            throw new FrontException(e);
+        }    	
+    	return "/bbs/event/view";    	
+    }
+    
+	/**
+     * FAQ 메인
+	 * @param request
+	 * @param model
+	 * @param rMap
+	 * @return
+	 * @throws FrontException
+	 */
+    @RequestMapping(value = "/bbs/faq/main.do")
+	public String faq(HttpServletRequest request, HttpServletResponse response, DataMap rMap) throws FrontException{		
+		try{			
+			rMap.putString("bcateno", "5");	
+			
+            request.setAttribute("listData", boardService.getBoardList(rMap));            
+            request.setAttribute("resultCount", boardService.getBoardListCnt(rMap));    	    
+			request.setAttribute("REQUEST_DATA", rMap);
+		}
+		catch(Exception e){
+			throw new FrontException(e);
+		}		
+		return "/bbs/faq/main";		
+	} 
+    /**
+     * FAQ 보기
+     * @param request
+     * @param model
+     * @param rMap
+     * @return
+     * @throws FrontException
+     */
+    @RequestMapping(value = "/bbs/faq/view.do")
+    public String faqView(HttpServletRequest request, HttpServletResponse res, DataMap rMap) throws FrontException{    	
+    	try{   		
+    		boolean flag = Pattern.matches("^[0-9]*$", rMap.getString("bcateno"));    		
+    		if(flag == true) {    			
+	    		boardService.updateBoardViewCnt(rMap);
+		    	EduMap boardMap = boardService.getBoardView(rMap);
+		    	
+		    	if(boardMap != null) {
+			    	request.setAttribute("rowData", boardMap);
+					request.setAttribute("listData", boardService.getFileList(rMap.getInt("bbsNo")));
+					
+					int bbsnoPrev = boardMap.getInt("BBSNO_PREV");
+					int bbsnoNext = boardMap.getInt("BBSNO_NEXT");
+					
+					// 이전글
+					rMap.setInt("bbsNo", bbsnoPrev);
+					request.setAttribute("prevData", boardService.getBoardView(rMap));
+					
+					// 다음글
+					rMap.setInt("bbsNo", bbsnoNext);
+					request.setAttribute("nextData", boardService.getBoardView(rMap));
+		    	}				
+		    	else{
+	    			request.setAttribute("msg", "해당 게시물이 존재하지 않습니다."); 
+	    			request.setAttribute("url", "/bbs/faq/main.do"); 
+	    			return "forward:/common/msgForward.do";		    		
+		    	}
+				request.setAttribute("REQUEST_DATA", rMap);
+    		
+    		} 
+    		else{
+    			request.setAttribute("msg", "해당 게시물이 존재하지 않습니다."); 
+    			request.setAttribute("url", "/bbs/faq/main.do"); 
+    			return "forward:/common/msgForward.do";
+    		}
+			
+    	} 
+    	catch(Exception e){
+            throw new FrontException(e);
+        }    	
+    	return "/bbs/faq/view";    	
+    }   
+
+	private String stringToHtmlSign(String str){
+	    String data =  str.replaceAll("&amp;", "&").replaceAll("&lt;", "<").replaceAll("&gt;", ">").replaceAll("&quot;", "\"").replaceAll("&#39;", "\'");
+	    return data.replaceAll("<([pP]*)(\\s[a-zA-Z]*=[^>]*)?(\\s)*(/)?>","").replaceAll("</p>","<br/>");
+	}	
+}

@@ -1,0 +1,11 @@
+_this.$quizInfo = [
+	["다음 중 작업 평면의 유형에 대한 설명으로 <span style='color:#FF0000;'>틀린</span> 것은?","Offset(평면): 선택한 평면을 기준으로 간격을 둔 작업 평면을 생성한다.","Plane at Angle(경사 평면): 3D Model(모델)의 직선 모서리를 축으로 회전하는 작업 평면을 생성한다.","Tangent Plane(접선 평면): 곡면에 접선을 가지는 작업 평면을 생성한다.","Midplane(중간 평면): 선택한 두 개 점을 지나가는 작업 평면을 생성한다.",false],	
+	["다음 중 작업 평면의 유형에 대한 설명으로 <span style='color:#FF0000;'>틀린</span> 것은?","Plane Through Three Points(두 모서리를 지나는 평면): 세 개의 점을 통과하는 작업 평면을 생성한다.","Plane Along Path(세 점을 지나는 평면): 곡면에 접하는 작업 평면을 생성한다.","Tangent Plane(접선 평면): 참조 평면을 지정하여 나란하게 작업 평면을 생성할 수 있다.","Midplane(중간 평면): 기준면이 평행하지 않은 경우에도 작업 평면을 생성할 수 있다.",false],
+	["다음 중 Axis(축) 만들기 유형에 대한 설명으로 <span style='color:#FF0000;'>틀린</span> 것은?","Axis Through Two Planes(두 평면을 지나는 축): 선택한 평면의 연장 지점에 축을 생성한다.","Axis Through Two Points(두 점을 지나가는 축): 축 유형 중 두 정점을 지나가는 축을 생성한다.","Axis Perpendicular to Face At Point(면에 직각 방향의 축): 면에 나란한 방향으로 축을 생성한다.","Axis Through Edge(모서리를 지나가는 축): 3D Model의 모서리를 선택하여 축을 생성한다.",false]
+];
+
+_this.$quizAnsInfo = [
+	[4,"Midplane(중간 평면)은 두 개 점이 아닌 선택한 두 개 평면의 중간 지점에 작업 평면을 생성한다."],
+	[2,"Plane Along Path(세 점을 지나는 평면)은 3D Model(모델)의 모서리나 Sketch Curve(경로 선)을 이동하는 작업 평면을 생성한다."],
+	[3,"Axis Perpendicular to Face At Point(면에 직각 방향의 축)은 면에 직각 방향의 축을 생성한다."]
+];

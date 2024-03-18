@@ -1,0 +1,99 @@
+<%
+/****************************************
+    subject : 전체메뉴
+    summary : 전체메뉴 > 이용안내 > 사이트맵
+****************************************/
+%>
+<%@ page language="java" contentType="text/html; charset=utf-8" pageEncoding="utf-8"%>
+<%@ include file="/WEB-INF/jsp/ccedu/inc/taglib_inc.jsp"%>
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+	<%@ include file="/WEB-INF/jsp/ccedu/inc/head_inc.jsp"%>
+</head>
+<body>
+<div id="wrap">
+	<!-- header -->
+	<%@ include file="/WEB-INF/jsp/ccedu/inc/header_inc.jsp"%>
+	<!--// header -->
+	<!-- container -->
+	<div id="container">
+		<div class="con_center">
+			<!-- 메뉴 title -->
+			<div class="cont_title_wrapper">
+				<div class="wrapper">
+					<h3 class="cont_title">사이트맵</h3>
+				</div>			
+			</div>
+			<div id="content">
+				<div class="wrapper">
+					<!-- 본문내용 -->
+					<div class="cont_body">
+						<!-- start -->
+						<div class="sitemap_section">
+							<h4>과정소개</h4>
+							<ul class="sitemap_menu">
+								<li>
+									<a href="/ccedu/online/onlineEducationInfo.do">과정소개</a>
+								</li>
+							</ul>
+						</div>
+						
+						<div class="sitemap_section">
+							<h4>온라인서점</h4>
+							<ul class="sitemap_menu">							
+								<li>
+									<a href="/ccedu/book/main.do">온라인서점</a>
+								</li>
+							</ul>
+						</div>						
+	
+						<div class="sitemap_section">
+							<h4>고객센터</h4>
+							<ul class="sitemap_menu">							
+								<li>
+									<a href="/ccedu/bbs/notice.do">공지사항</a>
+								</li>
+								<li>
+									<a href="/ccedu/bbs/faq.do">자주묻는질문</a>
+								</li>
+							</ul>
+						</div>
+	
+						<!-- 로그인 상태 -->
+						<c:if test="${REQUEST_DATA.SES_USERNO > 0}">
+							<div class="sitemap_section">
+								<h4>나의강의실</h4>
+								<ul class="sitemap_menu">
+									<li>
+										<a href="/ccedu/myclass/learningStatusList.do">나의강의실</a>
+									</li>
+								</ul>
+							</div>	
+							<div class="sitemap_section">
+								<h4>마이페이지</h4>
+								<ul class="sitemap_menu">
+									<li>
+										<a href="/ccedu/mypage/modiCheck.do">개인정보관리</a>
+									</li>
+									<li>
+										<a href="/ccedu/mypage/payList.do">결제내역조회</a>
+									</li>
+								</ul>
+							</div>	
+						</c:if>
+						<!--// end -->
+					</div>
+					<!--// 본문내용 -->
+				</div>	
+			</div>
+			<!--// content 본문 -->
+		</div>	
+	</div>
+	<!--// container -->
+	<!-- foot -->
+	<%@ include file="/WEB-INF/jsp/ccedu/inc/footer_inc.jsp"%>
+	<!--// foot end -->
+</div>
+</body>
+</html>

@@ -1,0 +1,106 @@
+<%
+/****************************************
+    subject : 온라인교육
+    summary : 온라인교육 > 교육소개
+    author  : SANGS
+    date    : 2018-06-15
+****************************************/
+%>
+<%@ page language="java" contentType="text/html; charset=utf-8" pageEncoding="utf-8"%>
+<%@ include file="/WEB-INF/jsp/ccedu/inc/taglib_inc.jsp"%>
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+	<title>신용건강검진 ( 안내 ) > 지식마당 > 신용회복위원회 </title>
+	<%@ include file="/WEB-INF/jsp/ccedu/inc/head_inc.jsp"%>
+</head>
+
+<body>
+<!-- skip nav -->
+	<%@ include file="/WEB-INF/jsp/ccedu/inc/nav_inc.jsp"%>
+<!--// skip nav -->
+
+<div id="wrap">
+
+	<!-- header -->
+	<%@ include file="/WEB-INF/jsp/ccedu/inc/header_inc.jsp"%>
+	<!--// header -->
+
+	<!-- container -->
+	<div id="container">
+
+		<!-- location -->
+		<jsp:include page="/WEB-INF/jsp/ccedu/inc/location/loc_04_03.jsp"> 
+		  	<jsp:param name="menuNm" value="신용건강검진"/> 
+		</jsp:include> 
+		<!--// location -->
+
+		<div class="con_center">
+
+			<!-- lnb -->
+			<div id="lnb">
+				<jsp:include page="/WEB-INF/jsp/ccedu/inc/lnb/lnb_04.jsp"> 
+				  	<jsp:param name="dep2" value="04"/>
+				</jsp:include>
+			</div>
+			<!--// lnb -->
+
+			<!-- content 본문 -->
+			<div id="content">
+				
+				<!-- 기존 START 2018-08-30  -->
+<!-- 				<h3 class="cont_titile">신용건강검진</h3> -->
+				<!-- 기존 END 2018-08-30  -->
+				
+				<!-- 2018-08-28 김동인 작업 S --> 
+				<h3 class="cont_titile type04">신용건강검진<span></span></h3>
+				<!-- 2018-08-28 김동인 작업 E -->
+
+				<!-- 본문내용 -->
+				<div class="cont_body">
+					<!-- start -->
+
+					<div class="c_sub_introbox">
+						<div class="bgbox">
+							<h4>신용교육원은</h4>
+							<p>
+								여러분 스스로가 신용상태를 진단하고 신용문제에 대한 원인을 파악할 수 있도록 서울대학교 생활과학연구소와 공동으로 신용문제 진단 및 처방 프로그램인 신용건강검진을 개발하였습니다.<br />
+								<br />
+								본 프로그램은 누구든지 자신의 신용도를 스스로 측정하고 진단결과에 따른 처방도 받을 수 있으며, 아울러 자신의 신용문제 해결이 자가진단과 처방만으로 부족하다고 생각될 경우, 신용문제 해결에 도움을 줄 수 있는 전문가와 상담할 수 있는 기회를 드립니다.
+							</p>
+						</div>
+					</div>
+
+					<div class="c_section">
+						
+						<div class="new_tit_txt">
+							<h4>당신의 신용건강검진을 체크해 보세요~! </h4>
+							<p>신용문제가 얼마나 심각한지 나는 어느 단계에 있는지 알아봅시다.<br />결과에 따른 나의 처방전을 검토해보세요.</p>
+						</div>
+
+						<div class="c_btn_left_m_center">
+							<a href="/ccedu/intellectual/creditHealthCheckup.do" onclick="" class="c_btnstyle01"><span>진단하기</span></a>
+						</div>
+
+					</div>
+
+					<!--// end -->
+				</div>
+				<!--// 본문내용 -->
+				
+			<!--  -->
+			</div>
+			<!--// content 본문 -->
+
+		</div>
+	</div>
+	<!--// container -->
+
+	<!-- foot -->
+	<%@ include file="/WEB-INF/jsp/ccedu/inc/footer_inc.jsp"%>
+	<!--// foot end -->
+
+</div>
+
+</body>
+</html>

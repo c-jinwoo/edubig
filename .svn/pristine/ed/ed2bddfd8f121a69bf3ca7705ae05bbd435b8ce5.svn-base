@@ -1,0 +1,101 @@
+<%
+/****************************************
+    subject : 신용상담사
+    summary : 신용상담사 > 수료증진위확인여부
+    author  : SANGS
+    date    : 2018-06-15
+****************************************/
+%>
+<%@ page language="java" contentType="text/html; charset=utf-8" pageEncoding="utf-8"%>
+<%@ include file="/WEB-INF/jsp/ccedu/inc/taglib_inc.jsp"%>
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+	<title>결제</title>
+	<%@ include file="/WEB-INF/jsp/ccedu/inc/head_inc.jsp"%>
+	<script type="text/javascript">
+		
+	</script>
+</head>
+
+<body>
+<!-- skip nav -->
+	<%@ include file="/WEB-INF/jsp/ccedu/inc/nav_inc.jsp"%>
+<!--// skip nav -->
+
+
+<div id="wrap">
+
+	<!-- header -->
+	<%@ include file="/WEB-INF/jsp/ccedu/inc/header_inc.jsp"%>
+	<!--// header -->
+
+	<!-- container -->
+	<div id="container">
+
+		<!-- location -->
+		<jsp:include page="/WEB-INF/jsp/ccedu/inc/location/loc_13.jsp">
+			<jsp:param name="menuNm" value="결제"/>
+		</jsp:include>
+		<!--// location -->
+
+		<div class="con_center">
+
+			<!-- lnb -->
+			<div id="lnb">
+				<jsp:include page="/WEB-INF/jsp/ccedu/inc/lnb/lnb_13.jsp">
+					<jsp:param name="dep2" value="01"/>
+					<jsp:param name="menuNm" value="결제"/>
+				</jsp:include>
+			</div>
+			<!--// lnb -->
+			<h2><c:out value='${REQUEST_DATA.PAY_STAT}'/></h2>
+	            <input type="text" name="LGD_BUYERPHONE" value="<c:out value='${REQUEST_DATA.LGD_BUYERPHONE}'/>">
+				<input type="text" name="LGD_PAYDATE" value="<c:out value='${REQUEST_DATA.LGD_PAYDATE}'/>">
+				<input type="text" name="LGD_DISCOUNTUSEYN" value="<c:out value='${REQUEST_DATA.LGD_DISCOUNTUSEYN}'/>">
+				<input type="text" name="LGD_BUYEREMAIL" value="<c:out value='${REQUEST_DATA.LGD_BUYEREMAIL}'/>">
+				<input type="text" name="LGD_RECEIVER" value="<c:out value='${REQUEST_DATA.LGD_RECEIVER}'/>">
+				<input type="text" name="LGD_DELIVERYINFO" value="<c:out value='${REQUEST_DATA.LGD_DELIVERYINFO}'/>">
+				<input type="text" name="LGD_PAYTYPE" value="<c:out value='${REQUEST_DATA.LGD_PAYTYPE}'/>">
+				<input type="text" name="LGD_RECEIVERPHONE" value="<c:out value='${REQUEST_DATA.LGD_RECEIVERPHONE}'/>">
+				<input type="text" name="LGD_EXCHANGERATE" value="<c:out value='${REQUEST_DATA.LGD_EXCHANGERATE}'/>">
+				<input type="text" name="TAXFREEAMOUNT" value="<c:out value='${REQUEST_DATA.TAXFREEAMOUNT}'/>">
+				<input type="text" name="LGD_IFOS" value="<c:out value='${REQUEST_DATA.LGD_IFOS}'/>">
+				<input type="text" name="LGD_AFFILIATECODE" value="<c:out value='${REQUEST_DATA.LGD_AFFILIATECODE}'/>">
+				<input type="text" name="LGD_RESPMSG" value="<c:out value='${REQUEST_DATA.LGD_RESPMSG}'/>">
+				<input type="text" name="LGD_2TR_FLAG" value="<c:out value='${REQUEST_DATA.LGD_2TR_FLAG}'/>">
+				<input type="text" name="LGD_CARDNUM" value="<c:out value='${REQUEST_DATA.LGD_CARDNUM}'/>">
+				<input type="text" name="LGD_FINANCEAUTHNUM" value="<c:out value='${REQUEST_DATA.LGD_FINANCEAUTHNUM}'/>">
+				<input type="text" name="LGD_CARDNOINTEREST_YN" value="<c:out value='${REQUEST_DATA.LGD_CARDNOINTEREST_YN}'/>">
+				<input type="text" name="LGD_ESCROWYN" value="<c:out value='${REQUEST_DATA.LGD_ESCROWYN}'/>">
+				<input type="text" name="LGD_TRANSAMOUNT" value="<c:out value='${REQUEST_DATA.LGD_TRANSAMOUNT}'/>">
+				<input type="text" name="LGD_FINANCECODE" value="<c:out value='${REQUEST_DATA.LGD_FINANCECODE}'/>">
+				<input type="text" name="LGD_DISCOUNTUSEAMOUNT" value="<c:out value='${REQUEST_DATA.LGD_DISCOUNTUSEAMOUNT}'/>">
+				<input type="text" name="LGD_CARDGUBUN1" value="<c:out value='${REQUEST_DATA.LGD_CARDGUBUN1}'/>">
+				<input type="text" name="LGD_CARDGUBUN2" value="<c:out value='${REQUEST_DATA.LGD_CARDGUBUN2}'/>">
+				<input type="text" name="LGD_HASHDATA" value="<c:out value='${REQUEST_DATA.LGD_HASHDATA}'/>">
+				<input type="text" name="LGD_BUYERADDRESS" value="<c:out value='${REQUEST_DATA.LGD_BUYERADDRESS}'/>">
+				<input type="text" name="LGD_FINANCENAME" value="<c:out value='${REQUEST_DATA.LGD_FINANCENAME}'/>">
+				<input type="text" name="LGD_CARDNOINTYN" value="<c:out value='${REQUEST_DATA.LGD_CARDNOINTYN}'/>">
+				<input type="text" name="LGD_CARDACQUIRER" value="<c:out value='${REQUEST_DATA.LGD_CARDACQUIRER}'/>">
+				<input type="text" name="LGD_DEVICE" value="<c:out value='${REQUEST_DATA.LGD_DEVICE}'/>">
+				<input type="text" name="LGD_TIMESTAMP" value="<c:out value='${REQUEST_DATA.LGD_TIMESTAMP}'/>">
+				<input type="text" name="LGD_PCANCELSTR" value="<c:out value='${REQUEST_DATA.LGD_PCANCELSTR}'/>">
+				<input type="text" name="LGD_BUYER" value=<c:out value='${REQUEST_DATA.LGD_BUYER}'/>>
+				<input type="text" name="LGD_CARDINSTALLMONTH" value="<c:out value='${REQUEST_DATA.LGD_CARDINSTALLMONTH}'/>">
+				<input type="text" name="LGD_PRODUCTINFO" value="<c:out value='${REQUEST_DATA.LGD_PRODUCTINFO}'/>">
+				<input type="text" name="LGD_BUYERSSN" value="<c:out value='${REQUEST_DATA.LGD_BUYERSSN}'/>">
+				<input type="text" name="LGD_PRODUCTCODE" value="<c:out value='${REQUEST_DATA.LGD_PRODUCTCODE}'/>">
+	            <!-- 결제 테스트 결과 값  END -->
+		</div>
+	</div>
+	<!--// container -->
+
+	<!-- foot -->
+	<%@ include file="/WEB-INF/jsp/ccedu/inc/footer_inc.jsp"%>
+	<!--// foot end -->
+
+</div>
+
+</body>
+</html>

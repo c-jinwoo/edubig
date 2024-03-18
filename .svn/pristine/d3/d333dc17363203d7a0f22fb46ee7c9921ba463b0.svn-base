@@ -1,0 +1,194 @@
+<%
+/****************************************
+	subject	: 강사공간 게시판 목록
+	summary	: 
+	author	: 이진영
+	date	: 2017-06-04
+****************************************/
+%>
+<%@ page language="java" contentType="text/html; charset=utf-8" pageEncoding="utf-8"%>
+	<%@ include file="/WEB-INF/jsp/common/inc/taglib_inc.jsp"%>
+	<%@ include file="/WEB-INF/jsp/academy/cmmn/inc/top_inc.jsp"%>
+	<%@ include file="/WEB-INF/jsp/academy/cmmn/inc/header_inc.jsp"%>
+	
+	<script type="text/javascript">
+	function move_page(cPage){
+		$('#cPage').val(cPage);
+		$("#searchWord").val($("#searchText").val());
+		$('form[name=frm]').attr('action', '<c:out value="${ctx}"/>/academy/tutor/tutorBoardList.do').submit();
+	} 
+	
+	//검색
+	function searchWord(){
+		$('#cPage').val(1);
+		$("#searchWord").val($("#searchText").val());
+		$("#frm").attr("action" , "/academy/tutor/tutorBoardList.do").submit();
+	}
+	
+
+	function progExec(cuserno, treeno, sday, studytime, totalEduTime){
+
+        $.ajax({
+            url : "/academy/myclass/ajaxProgressCheck.do",
+            data : { cuserno : cuserno
+	               , treeno : treeno
+	               , studytime : studytime 
+	               , totalEduTime : totalEduTime
+	               , sday : sday
+            	   },
+            dataType : "json",
+            type : 'post',
+            success : function(res) { 		            	
+            	location.reload();
+            },
+            error : function(e) {
+                alert("error :" + e.responseText);
+            }
+        }); 
+    }
+
+
+
+	//상세보기
+	function fnView(idx){
+
+		var aryData1 = new Array;
+		var aryData2 = new Array;
+		var aryData3 = new Array;
+		var aryData4 = new Array;
+		var aryData5 = new Array;
+		var aryData6 = new Array;
+		
+		<c:forEach var="result" items="${listData}" varStatus="status">
+			aryData1.push('${result.FILE_PATH}');   // 경로
+			aryData2.push('${result.MEDIA_FILE}');  // mp4 파일명 
+			aryData3.push('${result.CUSERNO}');    // 수강코드
+			aryData4.push('${result.TREENO}');     // 목차코드
+			aryData5.push('${result.STUDYTIME}'); // 학습시간
+			aryData6.push('${result.SDAY}'); // 페이지
+		</c:forEach>
+		
+		
+		$('#filePath').val(aryData1[idx]);
+		$('#mediaFile').val(aryData2[idx]);
+		$('#cuserno').val(aryData3[idx]);
+		$('#treeno').val(aryData4[idx]);
+		$('#studytime').val(aryData5[idx]);
+		$('#sday').val(aryData6[idx]);
+		
+		window.open("http://localhost:8080/edu-data/contents/1001.html","mediaPop","width=1000,height=650");
+	}
+	
+	function form_page(){
+		$('#cPage').val(cPage);	
+		$("#searchWord").val($("#searchText").val());
+		<%--  frm.pageMode.value = "<%=SangsProperties.getProperty("Globals.PAGE_MODE_REG")%>"; --%>
+		$("#frm").attr("action", "/academy/tutor/tutorBoardForm.do").submit();
+	}
+	
+	
+</script>
+<div class="container" id="Subcontent">
+    <article class="subArea">
+        <div class="subCntWrap">
+		<%@ include file="/WEB-INF/jsp/academy/cmmn/inc/lnb_tutor.jsp" %>
+			<div class="path">
+           		<ul>
+               		<li><span class="home text-hide">홈</span></li>
+                    <li>학습현황</li>
+                    <li class="active"><c:out value="${categoryData.BCATENAME}"/></li>
+                </ul>
+            </div>
+			<div class="subConts" id="sub-content">
+				<section class="bgTop_cate06"><!--   카테고리별 이미지 추가  -->
+            		<div class="contTop">
+            			<h2 class="h2_tit"><c:out value="${categoryData.BCATENAME}"/></h2>
+            		</div>           	
+	            </section>
+			
+
+	
+					<form name="frm" id="frm" action="" method="post">
+						<input type="hidden" name="cPage" id="cPage" value="<c:out value="${REQUEST_DATA.cPage}"/>"/>
+						<input type="hidden" name="bbsNo" id="bbsNo" value=""/>
+						<input type="hidden" name="prevBbsNo" id="prevBbsNo" value=""/>
+						<input type="hidden" name="nextBbsNo" id="nextBbsNo" value=""/>
+						<input type="hidden" name="qu" id="qu" value="insert"/>
+						<input type="hidden" name="bcateno" id="bcateno" value="${REQUEST_DATA.bcateno}"/>
+						<input type="hidden" name="searchWord" id="searchWord" value=""/>
+						<input type="hidden" name="filePath" id="filePath" value=""/>
+						<input type="hidden" name="mediaFile" id="mediaFile" value=""/>
+						<input type="hidden" name="cuserno" id="cuserno" value=""/>
+						<input type="hidden" name="treeno" id="treeno" value=""/>
+						<input type="hidden" name="studytime" id="studytime" value=""/>
+						<input type="hidden" name="sday" id="sday" value=""/>
+					</form>
+					
+					<!-- table -->
+	                <section class="tableBox">
+	                	<div class="tblTop row">
+	                    	<div class="col-sm-6"></div>
+	                        <div class="col-sm-6 col-xs-12">
+	                        	<a href="#none" onclick="" class="btn_login Out">수강중인 강좌</a>
+	                        	<a href="#none" onclick="" class="btn_login Out">수강 완료 강좌</a>
+	                        </div>
+	                     </div>
+	                     <div class="tblWrap">
+	                     	<table class="boardList">
+	                        <colgroup>
+	                        	<col style="width:15%">
+	                            <col style="width:*">
+	                        </colgroup>
+	                        <tbody>
+	                        <c:forEach var="result" items="${listData}" varStatus="status">
+		                        <tr>
+									<td class="text-center">
+										<strong class="fnt16 po_C7">1</strong>
+										<input name="test" id="test" type="hidden" value="<c:out value="${REQUEST_DATA.bcateno}"/>" />
+									</td>
+									<td>
+					                	<dl class="dl_notice">
+					                    	<dt>
+					                        	<a href="#none" class="noti_tit" onclick="fnView(${status.index}); return false;">
+					                        		<c:out value="${result.SUBJECT}"/>
+					                        	</a>
+											</dt>
+											<dd>
+												<ul class="mrg_t5 noaddfile">
+													<li class="li_bar"><strong class="mrg_r10">마지막 수강일</strong> <span> <c:out value="${result.EDATE}"/></span></li>
+													<li class="li_bar"><strong class="mrg_r10">진도율</strong> <span> <c:out value="${result.VAL}"/> %</span></li>
+													<c:if test="${REQUEST_DATA.bcateno eq '1030'}">
+														<li class="li_bar"><strong class="mrg_r10">댓글수</strong> <span>20</span></li>
+													</c:if>
+													<c:if test="${result.FILECNT > 0}">
+														<li class="li_bar"><a href="" class="ico_file" title="파일명"><span class="sr-only">파일다운로드</span></a></li>
+													</c:if>
+												</ul>	
+											</dd>
+										</dl>
+									</td>
+								</tr>
+							</c:forEach>
+	                        </tbody>
+	                        </table>
+	                        <c:if test="${not empty listData}">
+								<paging:page cpage="${REQUEST_DATA.cPage}" total="${resultCount}" pageSize="${REQUEST_DATA.rowCount}" link="javascript:move_page"/>
+							</c:if>
+	                     </div>
+	                      <hr/>
+	                      <hr/>
+	                     <c:if test="${REQUEST_DATA.bcateno eq '1030'}">
+		                      <div class="btnAreaR board">
+		                     	<a href="#" onclick="form_page();" class="btn btn-blue btn-sm">글쓰기</a>
+		                     </div> 
+	                     </c:if>
+	                     
+	                </section><!--// table -->
+			</div><!-- //sub-contents -->
+
+		</div>
+	</article>
+</div>	 
+	 
+<!-- footer -->
+<%@ include file="/WEB-INF/jsp/academy/cmmn/inc/footer_inc.jsp"%>

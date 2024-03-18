@@ -1,0 +1,304 @@
+<%
+/****************************************
+	subject	: 수강  
+	summary	: 콘첸츠 학습 상세 [유튜브]
+	author	: SAGNS
+	date	: 2019-12-16
+****************************************/
+%>
+<%@ page language="java" contentType="text/html; charset=utf-8" pageEncoding="utf-8"%>
+<%@ include file="/WEB-INF/jsp/common/inc/taglib_inc.jsp"%>
+<%@ include file="/WEB-INF/jsp/ccedu/inc/top_inc.jsp"%>
+	
+<script type="text/javascript" src="/videojs/jquery-1.8.2.js"></script>	
+
+<link href="/videojs/video-js.css" rel="stylesheet">
+<link href="/videojs/addStyle.css" rel="stylesheet">
+<link href="/videojs/font-awesome.css" rel="stylesheet">  
+<script src="/videojs/video.min.js"></script>		
+	
+<script src="/videojs/Youtube.min.js"></script>
+<script src="/videojs/videojs-contrib-hls.js"></script>		
+<script type="text/javascript"> 
+
+
+//초 -> 시분초 변환
+function calcSecond(seconds) {
+	var hour = parseInt(seconds/3600);
+	var min = parseInt((seconds%3600)/60);
+	var sec = seconds%60;
+	if(hour < 10){ hour = "0"+hour; }
+	if(min < 10){ min = "0"+min; }
+	if(sec < 10){ sec = "0"+sec; }
+	return hour+":"+min+":"+sec;
+
+}
+//시분초 -> 초로 변환
+function timeCalc(time) {
+	var times = time.split(':');
+	var hours = Number(times[0]);
+	var minutes = Number(times[1]);
+	var sec = Number(times[2]);
+	if(hours > 0){ hours = hours*60*60;}
+	if(minutes > 0){ minutes = minutes*60;}
+	return hours+minutes+sec;
+ 
+}
+
+//진도 체크
+function fnRtprgs(ptprgsLrnHms , floorRemainingTime){
+	// 10초
+	
+	console.log(ptprgsLrnHms);
+	
+	var lrnHms = timeCalc(ptprgsLrnHms) + timeCalc(floorRemainingTime);
+	lrnHms = calcSecond(lrnHms);
+	$('#lrnHms').val(lrnHms); // 전체시간
+	
+	
+	// 전체시간 = 현재 플레이 시간 + 남은시간
+	
+	if(timeCalc($('#lrnHms').val()) > 0){
+		
+		$('#ptprgsLrnHms').val(ptprgsLrnHms); // 현재 내가 플레이한 시간
+		$('#lrnHms2').val(timeCalc($('#lrnHms').val())); // 계산 용도로 전체시간  -> 초로 변환 변수
+		$('#ptprgsLrnHms2').val(timeCalc(ptprgsLrnHms)); // 현재 내가 플레이한  -> 초로 변환  시간 변수
+		
+		$('#ptprgsScore').val(Math.ceil($('#ptprgsLrnHms2').val() / $('#lrnHms2').val() * 100)); // 진도 점수
+		
+		var total = Number($('#lrnHms2').val()); // 진도 전체 초
+		var ptprgs = Number($('#ptprgsLrnHms2').val()); // 현재 진행 초
+		
+		// 정책  - // 수료 처리 로직
+		if(--total <= ptprgs && $('#ptprgsScore').val() >= 90){
+			$('#comptAt').val('Y'); // 수료여부
+			$('#ptprgsScore').val(100); // 진도점수
+			$('#ptprgsLrnHms').val($('#lrnHms').val()); // 실제 db에 저장될 내가 플레이한 시간
+		}
+		
+	    // Get form
+	    var form = $('#lmsForm')[0]; // form ID
+	 
+		console.log('lrnHms ::: 동영상 전체 시간 :: ' +  $('#lrnHms').val());
+		console.log('ptprgsLrnHms ::: 내가 플레이한 시간 :: ' +  $('#ptprgsLrnHms').val());
+		console.log('ptprgsScore ::: 진도 점수 :: ' +  $('#ptprgsScore').val());
+	
+		console.log('########################################################');
+	    // Create an FormData object 
+	   /*  var data = new FormData(form);
+		
+		 $.ajax({
+				type: "POST",
+	            url: "/lms/crse/crsePtprgsProces.do",
+	            data: data,
+	            processData: false,
+	            contentType: false,
+	            cache: false,
+	            timeout: 600000,
+			    success: function(data) {
+			    	
+			    },
+	            error: function (e) {
+	              // fnCallBack('','일시적인 오류가 발생하였습니다.' ,2, '확인' , function(){ $('#pform').submit(); });
+		        }
+			
+		 }); 
+		 */
+		 
+		
+	}
+
+	
+}
+
+//이전 페이지 이벤트
+function fnBack(){
+	
+		
+	swal({
+	  title : '' ,
+	  text: '해당페이지를 벗어날 경우 진도체크가 정상적으로 되지않을 수 있습니다. 이동하시겠습니까?',
+	  icon: 'warning',
+	  buttons: ['취소','확인'],
+	  dangerMode: true,
+	}).then(function (then) {
+		var result = then;
+		if(result == null){result = false;}
+		if(result){
+			$('#lmsForm').attr('action','/lms/lctrum/lctrumCrseSbjectList.do').submit();
+		}
+	});
+	
+	
+}
+
+
+</script>
+<body>
+
+		<video id="myVideo"  playsinline="true" class="video-js vjs-default-skin vjs-big-play-centered" 
+			 data-setup='{ "playbackRates": [0.5, 1, 1.5, 2] , "techOrder": ["youtube"], "sources": [{ "type": "video/youtube", "src": "https://youtu.be/I3pU5h29Azw"}] }'
+			  controls width="1010px" height="685px">
+		</video>
+	
+		
+
+
+
+	<form id="lmsForm" id="lmsForm" action="/lms/crse/crsePtprgsProces.do"  method="post">
+		<input type="hidden" name="cntntsMastrNo" id="cntntsMastrNo" value ="" /> 
+		<input type="hidden" name="currentTime" id="currentTime" value ="" /> 
+		<input type="hidden" name="captionYn" id="captionYn" value ="" /> 
+		<input type="hidden" name="loopYn" id="loopYn" value ="N" /> 
+		<input type="hidden" name="prevNextYn" id="prevNextYn" value ="N" />
+		<input type="hidden" name="subTitleYn" id="subTitleYn" value ="" /> 
+		<input type="hidden" name="subTitleSrc" id="subTitleSrc" value ="" />
+		<input type="hidden" name="page" id="page" value ="0" />
+		
+		<input type="hidden" name="cmtAsstnCode" id="cmtAsstnCode" value ="<c:out value="${requestMap.cmtAsstnCode}"/>" />
+		<input type="hidden" name="itrdecoAt" id="itrdecoAt" value ="<c:out value="${requestMap.itrdecoAt}"/>" />
+		<input type="hidden" name="cmtLrnTyCode" id="cmtLrnTyCode_" value="<c:out value="${requestMap.cmtLrnTyCode}"/>" />
+		<input type="hidden" name="lrnMastrNo" id="lrnMastrNo_" value="<c:out value="${requestMap.lrnMastrNo}"/>" />
+		
+		
+		<input type="hidden" name="crseNo" id="crseNo" value ="<c:out value="${requestMap.crseNo}"/>" />
+		<input type="hidden" name="crseSbjectNo" id="crseSbjectNo" value ="<c:out value="${requestMap.crseSbjectNo}"/>" />
+		<input type="hidden" name="cntcNo" id="cntcNo" value ="<c:out value="${requestMap.cntcNo}"/>" />
+		<input type="hidden" name="atnlcNo" id="atnlcNo" value ="<c:out value="${requestMap.atnlcNo}"/>" />
+		<input type="hidden" name="sortOrdr" id="sortOrdr" value ="<c:out value="${requestMap.sortOrdr}"/>" />
+		
+		<!-- 진도점수 -->
+		<input type="hidden" name="ptprgsScore" id="ptprgsScore" value ="" />
+		<!-- -진도_페이지(현재 콘텐츠 페이지)-->
+		<input type="hidden" name="ptprgsPge" id="ptprgsPge" value ="" />
+		<!-- 진행 학습 시분초 -->
+		<input type="hidden" name="ptprgsLrnHms" id="ptprgsLrnHms" value ="" />
+		<!-- 진행 학습 시분초 > 초로 변환 -->
+		<input type="hidden" name="ptprgsLrnHms2" id="ptprgsLrnHms2" value ="" />
+		
+		<!-- 콘톈츠 여부 -->
+		<input type="hidden" name="eduCntnts" id="eduCntnts" value ="Y" />
+		<!-- 완료 여부 -->
+		<input type="hidden" name="comptAt" id="comptAt" value ="" />
+		
+		<!-- 전체 시분초 -->
+		<input type="text" name="lrnHms" id="lrnHms" value="" />
+		<!-- 전체 시분초  > 초로변혼-->
+		<input type="text" name="lrnHms2" id="lrnHms2" value="" />
+		
+		<!-- 전체 페이지 -->
+		<input type="hidden" name="comptPge" id="comptPge" value ="${fn:length(cntntsObjList) }" /> 
+		<input type="hidden" name="path" id="path" value ="${videoPath }" />
+		
+	</form>
+
+
+	
+	<script>
+	
+
+	var rtprgsLrnHms = '${empty atnlcInfo.rtprgsLrnHms ? 0 : atnlcInfo.rtprgsLrnHms}'; // 진행 학습 시간
+	var myPlayer ; // videojs
+	var currentTime;   // 재생시간
+	var endTime; //
+	var page = 0; // 기본 
+	var movCntntsHms ;   // 동영상 전체 시간
+	
+	$(document).ready(function() {
+		var rtprgsLrnHms = '${empty atnlcInfo.rtprgsLrnHms ? 0 : atnlcInfo.rtprgsLrnHms}'; // 진행 학습 시간
+		var comptAt = '${atnlcInfo.comptAt}';
+		$('#comptAt').val(comptAt);
+		if(timeCalc(rtprgsLrnHms) > 0 && comptAt == 'N'){
+			currentTime = timeCalc(rtprgsLrnHms);
+		}
+
+	});
+	
+
+	// 동영상 셋팅
+	function playerSetting(){
+		
+		// 현재 진행 페이지 [기본 0 이므로 +1 해야 함]
+		var ptprgsPge = page;
+		ptprgsPge++;
+		$('#ptprgsPge').val(ptprgsPge); 
+		// https://videojs.github.io/videojs-contrib-hls/
+		var player = videojs('myVideo');
+		//var poster = 'http://media.w3.org/2010/05/bunny/poster.png';
+			
+		
+		// DB에 저장된 유튜브 경로 셋팅
+		
+		player.src([{ type: 'video/youtube', src: src}]);
+	
+	  //  $('video').attr('poster', poster);    
+	
+		
+		
+	}
+		
+ 	if (document.getElementById("myVideo")) {
+	   videojs("myVideo").ready(function() {
+		   myPlayer = this;
+		  
+		   
+		   
+		   
+		   // 스크롤바 변경 제어 시작
+		   myPlayer.on("seeking", function(event) {
+		    	
+		      if(currentTime < myPlayer.currentTime()) {
+		       	 myPlayer.currentTime(currentTime);
+		      } 
+		    });
+	
+		    myPlayer.on("seeked", function(event) {
+		    	
+			      if (currentTime < myPlayer.currentTime()) {
+			        myPlayer.currentTime(currentTime);
+			      }
+		    });
+		   
+		   
+		  // playerSetting();
+		    // 2초 간격 진도체크 시작 [ 1초로 주면 인식 안됨]
+		   setInterval(function() {
+		    	
+			   
+			   
+			   
+		    	// 영상이 재생되고 있다(정지상태가 아님)
+		      if (!myPlayer.paused() ) {
+		    	  if(currentTime > myPlayer.currentTime()){
+		    		 myPlayer.currentTime(currentTime)
+		    	  }
+		    	  
+		    	  // 동영상 남은 시간
+		    	  currentTime = myPlayer.currentTime();
+		    	  var floorRemainingTime = Math.floor(myPlayer.remainingTime());
+		    	
+		    	  
+		    	 // 수료 기준
+		    	 if($('#comptAt').val() != 'Y'){
+			    	  fnRtprgs(calcSecond(Math.round(currentTime)) , calcSecond(floorRemainingTime));
+		    	 }
+		    	  
+		       }
+		    	
+		    }, 2000);
+		 	// 2초 간격 진도체크 종료
+		    
+		
+	  	
+		  	
+	  });// function
+	   
+	   
+	}// if
+		 
+	
+	
+	</script>
+	</body>
+</html>	
+<!-- //container -->

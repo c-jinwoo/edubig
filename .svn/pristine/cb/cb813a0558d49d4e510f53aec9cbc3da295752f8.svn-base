@@ -1,0 +1,163 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes" ?>
+<event>
+<!-- 강조빨간색칠하기-->
+<!-- &lt;span style="color:#ff3300"&gt;&lt;u&gt;않은&lt;&#47;span&gt;&lt;&#47;u&gt; -->
+<!-- 내려쓰기 -->
+<!-- &lt;br&gt; -->
+  <quiz flag="4" >
+      <page num="1" answer="2" type="multiple">
+          <question>
+              <alternate>문제 일.다음 중 다음 중 비즈니스 모델의 성공적 개발을 위한 
+고려사항으로 해당되지 않는 것은 ?  </alternate>
+			  <symbol>Q1.</symbol>
+              <text>다음 중 다음 중 비즈니스 모델의 성공적 개발을 위한 
+고려사항으로 해당되지 않는 것은 ?  </text>
+          </question>
+
+          <feedback>
+              <alternate>정답은 이번입니다. 이성공적인 모델 개발을 위해서는 다음과 같은 점을 
+고려하여야 한다. 첫째, 우리 제품과 서비스를 
+어떤 고객에게 제공할 것인가에 대한 세밀한 조사가 
+필요하다. 둘째, 분석된 고객 집단을 대상으로 
+어떤 제품과 서비스를 제공할 것인가에 대해서도 
+면밀히 검토되어야 한다. 셋째, 거래형태이다. 기존의 
+방문판매 형태에서 인터넷 등의 판매 채널을 활용하는 
+것이 포함된다. 넷째, 현재 고객에 대한 서비스를 어떤 
+방식으로 변화시켜 고객에게 서비스 차별화를 도모할 것인가의 문제이다. 마지막으로, 지금까지 정의한 네 가지 
+요소를 어떤 정보통신기술(ICT)을 기반으로 실현할 것인가 검토하여야 할 것이다.  </alternate>
+              <answer>
+                  <symbol>정답</symbol>
+                  <text>2</text>
+              </answer>
+              <explain>
+                  <symbol>2</symbol>
+                  <text>성공적인 모델 개발을 위해서는 다음과 같은 점을 
+고려하여야 한다. 첫째, 우리 제품과 서비스를 
+어떤 고객에게 제공할 것인가에 대한 세밀한 조사가 
+필요하다. 둘째, 분석된 고객 집단을 대상으로 
+어떤 제품과 서비스를 제공할 것인가에 대해서도 
+면밀히 검토되어야 한다. 셋째, 거래형태이다. 기존의 
+방문판매 형태에서 인터넷 등의 판매 채널을 활용하는 
+것이 포함된다. 넷째, 현재 고객에 대한 서비스를 어떤 
+방식으로 변화시켜 고객에게 서비스 차별화를 도모할 것인가의 문제이다. 마지막으로, 지금까지 정의한 네 가지 
+요소를 어떤 정보통신기술(ICT)을 기반으로 실현할 것인가 검토하여야 할 것이다. </text>
+              </explain>
+          </feedback>
+
+          <example num="1">
+              <alternate>보기 일번 제품이나 서비스를 제공할 고객 </alternate>
+              <symbol>Q1</symbol>
+              <text>제품이나 서비스를 제공할 고객  </text>
+          </example>
+          <example num="2">
+              <alternate>보기 이번 투자자와 주주</alternate>
+              <symbol>2</symbol>
+              <text>투자자와 주주</text>
+          </example>
+          <example num="3">
+              <alternate>보기 삼번 제품과 서비스의 유형</alternate>
+              <symbol>3</symbol>
+              <text>제품과 서비스의 유형</text>
+          </example>
+          <example num="4">
+              <alternate>보기 사번 거래형태</alternate>
+              <symbol>4</symbol>
+              <text>거래형태</text>
+          </example>
+      </page>
+
+      <page num="2" answer="2" type="multiple">
+          <question>
+              <alternate>문제 이. 다음 중 컨설팅 비즈니스 모델로 아닌 것은?</alternate>
+			  <symbol>Q2.</symbol>
+              <text>다음 중 컨설팅 비즈니스 모델로 아닌 것은?</text>
+          </question>
+
+          <feedback>
+              <alternate>정답은 이 번입니다. 컨설팅 관련 비즈니스의 모델은 개인의 신용카드 사용 
+데이터와 각종 금융정보(은행, 보험 등) 데이터를 이용한 
+개인별 종합 금융 컨설팅 또는 건강보험 데이터를 
+이용한 건강관리 컨설팅과 카드사들의 고객 결제정보 
+및 SNS 데이터를 활용한 상권 분석 컨설팅 또는 고객의 
+구매 패턴 정보를 활용한 제품 개발 컨설팅이 있다.</alternate>
+              <answer>
+                  <symbol>정답</symbol>
+                  <text>1</text>
+              </answer>
+              <explain>
+                  <symbol>Q2</symbol>
+                  <text>컨설팅 관련 비즈니스의 모델은 개인의 신용카드 사용 
+데이터와 각종 금융정보(은행, 보험 등) 데이터를 이용한 
+개인별 종합 금융 컨설팅 또는 건강보험 데이터를 
+이용한 건강관리 컨설팅과 카드사들의 고객 결제정보 
+및 SNS 데이터를 활용한 상권 분석 컨설팅 또는 고객의 
+구매 패턴 정보를 활용한 제품 개발 컨설팅이 있다.</text>
+
+              </explain>
+          </feedback>
+
+          <example num="1">
+              <alternate>보기 일번 개인별 종합 금융 컨설팅 </alternate>
+              <symbol>1</symbol>
+              <text>개인별 종합 금융 컨설팅 </text>
+          </example>
+          <example num="2">
+		  <alternate>보기 이번 네트워크관리 컨설팅</alternate>
+              <symbol>2</symbol>
+              <text>네트워크관리 컨설팅</text>
+          </example>
+          <example num="3">
+              <alternate>보기 삼번 상권분석 컨설팅</alternate>
+              <symbol>3</symbol>
+              <text>상권분석 컨설팅</text>
+          </example>
+          <example num="4">
+              <alternate>보기 사번 제품개발 컨설팅 </alternate>
+              <symbol>4</symbol>
+              <text>제품개발 컨설팅 </text>
+          </example>
+      </page>
+
+      <page num="3" answer="4" type="multiple">
+          <question>
+              <alternate>문제 삼. 성공적인 모델 개발을 위한 고려사항으로 옳지 않은 것을 고르세요.</alternate>
+			  <symbol>Q3.</symbol>
+              <text>성공적인 모델 개발을 위한 고려사항으로 옳지 않은 것을 고르세요.</text>
+          </question>
+
+          <feedback>
+              <alternate>정답일 일 번입니다. 제품과 서비스를 '어떻게 제공할 것인가'가 아닌 '어떤 고객에게 제공할 것인가'에 대한 검토가 필요하다. 그리고 이러한 필요 요소를 어떤 기술적 기반으로 실현할 것인가를 검토하는 것 또한 필요하다.</alternate>
+              <answer>
+                  <symbol>정답</symbol>
+                  <text>4</text>
+              </answer>
+              <explain>
+                  <symbol>4</symbol>
+                  <text>제품과 서비스를 '어떻게 제공할 것인가'가 아닌 '어떤 고객에게 제공할 것인가'에 대한 검토가 필요하다. 그리고 이러한 필요 요소를 어떤 기술적 기반으로 실현할 것인가를 검토하는 것 또한 필요하다.</text>
+
+              </explain>
+          </feedback>
+
+          <example num="1">
+              <alternate>보기 일번 분석된 고객 집단을 대상으로 어떤 제품과 서비스를 제공할 것인가에 대한 검토 필요</alternate>
+              <symbol>1</symbol>
+              <text>분석된 고객 집단을 대상으로 어떤 제품과 서비스를 제공할 것인가에 대한 검토 필요</text>
+          </example>
+          <example num="2">
+              <alternate>보기 이번 현재 고객에 대한 서비스를 어떤 방식으로 변화시켜 서비스의 차별화를 도모할 것인가의 중점적인 이슈화 필요</alternate>
+              <symbol>2</symbol>
+              <text>현재 고객에 대한 서비스를 어떤 방식으로 변화시켜 서비스의 차별화를 도모할 것인가의 중점적인 이슈화 필요</text>
+          </example>
+          <example num="3">
+              <alternate>보기 삼번 거래형태 중 기존의 형태에서 인터넷 등의 판매 채널 촬용 필요</alternate>
+              <symbol>3</symbol>
+              <text>거래형태 중 기존의 형태에서 인터넷 등의 판매 채널 촬용 필요</text>
+          </example>
+          <example num="4">
+              <alternate>보기 사번 제품과 서비스를 어떻게 제공할 것인가에 대한 세밀한 조사 필요</alternate>
+              <symbol>4</symbol>
+              <text>제품과 서비스를 어떻게 제공할 것인가에 대한 세밀한 조사 필요</text>
+          </example>
+      </page>
+  </quiz>
+</event>

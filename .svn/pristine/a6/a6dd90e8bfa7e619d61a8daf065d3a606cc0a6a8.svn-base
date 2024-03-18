@@ -1,0 +1,78 @@
+package com.webapp.ccedu.service.impl;
+
+import java.util.List;
+
+import javax.annotation.Resource;
+
+import org.springframework.stereotype.Service;
+
+import com.sangs.support.DataMap;
+import com.sangs.support.EduMap;
+import com.sangs.support.FrontException;
+import com.sangs.util.ParamUtil;
+import com.webapp.ccedu.mapper.OnlineBookMapper;
+import com.webapp.ccedu.service.OnlineBookService;
+import com.webapp.classdesk.service.ConvertJavaToProcedureService;
+/**
+ * Description : 
+ * 
+ * Modification Information
+ * 수정일			수정자			수정내용
+ * -------		-----------------------------------
+ * 2020.09.29	CSLAB		최초작성
+ *
+ */
+
+@Service("onlineBookService")
+public class OnlineBookServiceImpl implements OnlineBookService {
+	
+	@Resource(name = "onlineBookMapper")
+	private OnlineBookMapper onlineBookMapper;	 
+	
+	@Resource(name = "convertJavaToProcedureService")
+    private ConvertJavaToProcedureService convertJavaToProcedureService;
+	    	
+	public String selectBookType(String mtSubCode) throws Exception{
+		return onlineBookMapper.selectBookType(mtSubCode);
+	}
+
+	public List<EduMap> selectTotalBookList() throws Exception{
+		return onlineBookMapper.selectTotalBookList();
+	}
+	
+	public List<EduMap> selectCourseList(String mtCode) throws Exception{
+		return onlineBookMapper.selectCourseList(mtCode);
+	}
+	
+	public List<EduMap> selectBookList(String mtSubCode) throws Exception{
+		return onlineBookMapper.selectBookList(mtSubCode);
+	}
+	
+	public EduMap selectBookInfo(DataMap data) throws Exception{
+		return onlineBookMapper.selectBookInfo(data);
+	}
+	
+	public List<EduMap> selectClassList(String mtSubCode) throws Exception{
+		return onlineBookMapper.selectClassList(mtSubCode);
+	}
+	
+	public void insertPayment(DataMap data) throws Exception{
+		onlineBookMapper.insertPayment(data);
+	}
+	
+	public Integer getPaymentPrice(String orderno) throws Exception{
+		return onlineBookMapper.getPaymentPrice(orderno);
+	}
+	
+	public void insertBookInfo(DataMap data) throws Exception{
+		onlineBookMapper.insertBookInfo(data);
+	}
+	
+	public EduMap selectUserInfo(Integer userno) throws Exception{
+		return onlineBookMapper.selectUserInfo(userno);
+	}
+	
+    public EduMap getCourseBookInfo(DataMap rMap) throws Exception{
+    	return onlineBookMapper.getCourseBookInfo(rMap);
+    }
+}

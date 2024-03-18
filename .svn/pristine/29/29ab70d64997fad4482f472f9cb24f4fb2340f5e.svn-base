@@ -1,0 +1,122 @@
+<%
+/****************************************
+    subject : 신용상담사
+    summary : 신용상담사 : 원서접수 > 원서접수 > 원서접수 등록 > 완료
+    author  : SANGS
+    date    : 2018-06-15
+****************************************/
+%>
+<%@ page language="java" contentType="text/html; charset=utf-8" pageEncoding="utf-8"%>
+<%@ include file="/WEB-INF/jsp/ccedu/inc/taglib_inc.jsp"%>
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+	<title>자격소개 > 자격시험 > 신용상담사</title>
+	<%@ include file="/WEB-INF/jsp/ccedu/inc/head_inc.jsp"%>
+	<%@ include file="/WEB-INF/jsp/common/pop_post.jsp"%>
+	<script type="text/javascript" src="/academy/common/js/jquery.showLoading.js"></script>
+	
+	<script type="text/javascript">
+	
+		// 시험일정 더보기
+		function goAppliCheck() {
+			window.location.href="/ccedu/cc/applicationCheck.do";
+		}
+	</script>
+</head>
+
+<body>
+
+<!-- skip nav -->
+	<%@ include file="/WEB-INF/jsp/ccedu/inc/nav_inc.jsp"%>
+<!--// skip nav -->
+
+
+<div id="wrap">
+
+	<!-- header -->
+	<%@ include file="/WEB-INF/jsp/ccedu/inc/header_inc.jsp"%>
+	<!--// header -->
+
+	<!-- container -->
+	<div id="container">
+
+		<!-- location -->
+			<jsp:include page="/WEB-INF/jsp/ccedu/inc/location/loc_03_02.jsp">
+			  	<jsp:param name="menuNm" value="원서접수"/> 
+			</jsp:include>
+		<!--// location -->
+
+		<div class="con_center">
+
+			<!-- lnb -->
+			<div id="lnb">
+				<jsp:include page="/WEB-INF/jsp/ccedu/inc/lnb/lnb_03.jsp">  
+				  	<jsp:param name="dep2" value="02"/>
+				  	<jsp:param name="dep3" value="01"/> 
+				</jsp:include>
+			</div>
+			<!--// lnb -->
+			
+			<!-- content 본문 -->
+			<div id="content">
+
+				<!-- 기존 START 2018-08-30  -->
+<!-- 				<h3 class="cont_titile">원서접수</h3> -->
+				<!-- 기존 END 2018-08-30  -->
+				
+				<!-- 2018-08-28 김동인 작업 S --> 
+				<h3 class="cont_titile type03">원서접수<span></span></h3>
+				<!-- 2018-08-28 김동인 작업 E -->
+				
+				<!-- 본문내용 -->
+				<div class="cont_body">
+					<!-- start -->
+
+					<div class="c_msg_box">
+						<p class="img_cpt_talk"> <c:out value="${rowData.MT_ROUND_NAME}"/> 신용상담사 응시원서가 정상적으로 접수되었습니다. </p>
+						<c:if test="${REQUEST_DATA.LGD_PAYTYPE eq 'YT0040' }">
+							<p style="font-size: 18px;margin-left: 135px;">  
+								가상계좌로 원서가 접수되었습니다. 
+							</p>
+							<p style="font-size: 18px;margin-left: 135px;">  
+								아래 계좌로 입금이 확인되면 접수가 완료됩니다. 
+							</p>
+							<p style="font-size: 18px;margin-left: 135px;">  
+								은행형 : <c:out value="${REQUEST_DATA.LGD_FINANCENAME }"/> , 가상계좌 : <c:out value="${REQUEST_DATA.LGD_ACCOUNTNUM }"/>
+							</p>
+						</c:if>
+					</div>
+
+					<div class="c_btn_center">
+						<a href="#" onclick="goAppliCheck(); return false;" class="btn_bluebg03">접수조회/확인</a>
+					</div>
+
+					<!--// end -->
+				</div>
+				<!--// 본문내용 -->
+				
+			<!--  -->
+			</div>
+			<!--// content 본문 -->	
+		
+		
+		
+		
+		
+		
+		
+		<!-- con_center end -->
+		</div>
+	
+	</div>
+	<!--// container -->
+
+	<!-- foot -->
+	<%@ include file="/WEB-INF/jsp/ccedu/inc/footer_inc.jsp"%>
+	<!--// foot end -->
+
+</div>
+
+</body>
+</html>

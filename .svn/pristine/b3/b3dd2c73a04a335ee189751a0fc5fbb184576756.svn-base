@@ -1,0 +1,133 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes" ?>
+<event>
+<!-- 강조빨간색칠하기-->
+<!-- &lt;span style="color:#ff3300"&gt;&lt;u&gt;않은&lt;&#47;span&gt;&lt;&#47;u&gt; -->
+<!-- 내려쓰기 -->
+<!-- &lt;br&gt; -->
+  <quiz flag="4" >
+      <page num="1" answer="2" type="multiple">
+          <question>
+              <alternate>문제 일.다음 중 회계에 관한 설명으로 올바르지 않은 것은?</alternate>
+			  <symbol>Q1.</symbol>
+              <text>다음 중 회계에 관한 설명으로 올바르지 않은 것은?</text>
+          </question>
+
+          <feedback>
+              <alternate>정답은 이번입니다. 회계란 경제적 의사결정을 하는 이용자의 의사결정을 돕기 위해 유용한 경영활동 정보를 수치로 제공하기 위한 일련의 과정으로, 이 과정은 경영활동 결과를 식별, 측정, 보고하는 절차로 이루어져 있다. </alternate>
+              <answer>
+                  <symbol>정답</symbol>
+                  <text>2</text>
+              </answer>
+              <explain>
+                  <symbol>2</symbol>
+                  <text>회계란 경제적 의사결정을 이는 이용자의 의사결정을 돕기 위해 유용한 경영활동 정보를 수치로 제공하기 위한 일련의 과정으로, 이 과정은 경영활동 결과를 식별, 측정, 보고하는 절차로 이루어져 있다.</text>
+              </explain>
+          </feedback>
+
+          <example num="1">
+              <alternate>보기 일번 회계란 경제적 의사결정을 하는 이용자의 의사결정을 돕기 위해 유용한 경영활동 정보를 수치로 제공하는 일련의 과정이다.</alternate>
+              <symbol>Q1</symbol>
+              <text>회계란 경제적 의사결정을 하는 이용자의 의사결정을 돕기 위해 유용한 경영활동 정보를 수치로 제공하는 일련의 과정이다.</text>
+          </example>
+          <example num="2">
+              <alternate>보기 이번 회계는 경영활동 결과를 식별, 분석하는 절차로만 이루어져 있다.</alternate>
+              <symbol>2</symbol>
+              <text>회계는 경영활동 결과를 식별, 분석하는 절차로만 이루어져 있다.</text>
+          </example>
+          <example num="3">
+              <alternate>보기 삼번 회계의 정보는 화폐액으로 표현된다.</alternate>
+              <symbol>3</symbol>
+              <text>회계의 정보는 화폐액으로 표현된다.</text>
+          </example>
+          <example num="4">
+              <alternate>보기 사번 회계정보를 이용하여 의사결정하는 이용자는 주주, 채권자, 경영자, 정부, 노동자 등 기업 내외부에 걸쳐 광범위하고 다양하다.</alternate>
+              <symbol>4</symbol>
+              <text>회계정보를 이용하여 의사결정하는 이용자는 주주, 채권자, 경영자, 정부, 노동자 등 기업 내외부에 걸쳐 광범위하고 다양하다.</text>
+          </example>
+      </page>
+
+      <page num="2" answer="2" type="multiple">
+          <question>
+              <alternate>문제 이. 다음 중 자본의 흐름과 관련한 자금관리와 함께 이익계획과 이익통제의 실행을 의미하는 용어는? </alternate>
+			  <symbol>Q2.</symbol>
+              <text>다음 중 자본의 흐름과 관련한 자금관리와 함께 이익계획과 이익통제의 실행을 의미하는 용어는? </text>
+          </question>
+
+          <feedback>
+              <alternate>정답은 이 번입니다. 재무관리 중 재무계획이란 자본의 흐름과 관련한 자금관리와 함께 이익계획과 이익통제의 실행을 의미한다.</alternate>
+              <answer>
+                  <symbol>정답</symbol>
+                  <text>2</text>
+              </answer>
+              <explain>
+                  <symbol>2</symbol>
+                  <text>재무관리 중 재무계획이란 자본의 흐름과 관련한 자금관리와 함께 이익계획과 이익통제의 실행을 의미한다.</text>
+
+              </explain>
+          </feedback>
+
+          <example num="1">
+              <alternate>보기 일번 시나리오</alternate>
+              <symbol>1</symbol>
+              <text>시나리오</text>
+          </example>
+          <example num="2">
+		  <alternate>보기 이번 재무계획</alternate>
+              <symbol>2</symbol>
+              <text>재무계획</text>
+          </example>
+          <example num="3">
+              <alternate>보기 삼번 수익모델</alternate>
+              <symbol>3</symbol>
+              <text>수익모델</text>
+          </example>
+          <example num="4">
+              <alternate>보기 사번 재무통제</alternate>
+              <symbol>4</symbol>
+              <text>재무통제</text>
+          </example>
+      </page>
+
+      <page num="3" answer="2" type="multiple">
+          <question>
+              <alternate>문제 삼. 경영자의 의사결정에 가장 객관적인 판단 근거에 해당하는 정보는?</alternate>
+			  <symbol>Q3.</symbol>
+              <text>경영자의 의사결정에 가장 객관적인 판단 근거에 해당하는 정보는?</text>
+          </question>
+
+          <feedback>
+              <alternate>정답일 일 번입니다. 경영자의 의사결정에 가장 객관적인 판단 근거는 회계, 재무, 인적자원 정보라 할 수 있다.</alternate>
+              <answer>
+                  <symbol>정답</symbol>
+                  <text>2</text>
+              </answer>
+              <explain>
+                  <symbol>2</symbol>
+                  <text>경영자의 의사결정에 가장 객관적인 판단 근거는 회계, 재무, 인적자원 정보라 할 수 있다.</text>
+
+              </explain>
+          </feedback>
+
+          <example num="1">
+              <alternate>보기 일번 심층 고객데이터</alternate>
+              <symbol>1</symbol>
+              <text>심층 고객데이터</text>
+          </example>
+          <example num="2">
+              <alternate>보기 이번 회계, 재무, 인적자원 정보</alternate>
+              <symbol>2</symbol>
+              <text>회계, 재무, 인적자원 정보</text>
+          </example>
+          <example num="3">
+              <alternate>보기 삼번 치밀한 제품 설계 초안</alternate>
+              <symbol>Q3</symbol>
+              <text>치밀한 제품 설계 초안</text>
+          </example>
+          <example num="4">
+              <alternate>보기 사번 세세한 거래처리 데이터</alternate>
+              <symbol>4</symbol>
+              <text>세세한 거래처리 데이터</text>
+          </example>
+      </page>
+  </quiz>
+</event>

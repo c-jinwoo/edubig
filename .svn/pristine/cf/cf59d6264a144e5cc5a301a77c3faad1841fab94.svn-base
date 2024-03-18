@@ -1,0 +1,533 @@
+<%
+/****************************************
+    subject : 온라인교육
+    summary : 온라인교육 > 과정 상세
+    author  : SANGS
+    date    : 2018-06-15
+****************************************/
+%>
+<%@ page language="java" contentType="text/html; charset=utf-8" pageEncoding="utf-8"%>
+<%@ include file="/WEB-INF/jsp/ccedu/inc/taglib_inc.jsp"%>
+<%@ include file="/WEB-INF/jsp/ccedu/inc/top_inc.jsp"%>
+<% pageContext.setAttribute("newline", "\n"); %>
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+	<title>교육과정 > ${rowData.MT_SC_NAME}</title>
+	<%@ include file="/WEB-INF/jsp/ccedu/inc/head_inc.jsp"%>
+	
+
+<script type="text/javascript">
+$(document).ready(function(){
+	$('.modal-backdrop').click(function(){
+		$('.modal-backdrop').hide();
+		$('#layer_01').attr('style','display:none;');
+		$('#layer_02').attr('style','display:none;');
+	})
+});
+$(document).ready(function(){	
+});
+
+function ftn_reject(){
+	fnModalMsg('수강신청 기간이 아닙니다.');
+}
+//결제
+function ftn_approval(){
+	if($("#courseOpen").val() == "D"){
+		if($("#courseAble").val() == "N"){
+			fnModalMsg('수강신청 기간이 아닙니다.');
+			return;				
+		}
+	}	
+	$("#frm").attr("action", "/ccedu/online/onlinePayment.do");
+	$("#frm").submit();
+}
+
+// 결과값 반환( receive 페이지에서 호출 )
+function result_submit(result_cd,result_msg,enc_data) {
+	// 결제창 자동종료 체크 종료
+	AllatPay_Closechk_End();
+	if( result_cd != '0000'){
+		fnModalMsg("결제에 실패했습니다.");
+	} else {
+		fm.allat_enc_data.value = enc_data;
+		fm.action = "/ccedu/online/onlinePayApprove.do";
+		fm.method = "post";
+		fm.target = "_self";
+		fm.submit();
+	}
+}
+
+
+function fnList() {
+	$("#cseqno").val("");
+	$("#courseno").val("");
+	$('#frm').attr('target', '_self').attr('action', '/ccedu/online/onlineDetailList.do').submit();
+}
+
+function fnLogin(){
+	$('#returnUrl').val("/ccedu/online/onlineDetailForm.do");
+	$('form[name=frm]').attr('action', '/ccedu/common/login.do').submit();
+}
+
+//파일다운로드
+function filedown(fileid, fileseq){
+	$('#fileid').val(fileid);
+	$('#fileseq').val(fileseq);
+	$('form[name=frm]').attr('action', '/academy/course/filedown.do').submit();
+}
+
+//자막파일다운로드
+function txtFiledown(fileid, fileseq){
+	$('#fileid').val(fileid);
+	$('#fileseq').val(fileseq);
+	$('form[name=frm]').attr('action', '/academy/course/txtFiledown.do').submit();
+}
+
+//수강신청ajax
+var submitted = false;
+function fnSaveAjax(pthis){
+
+	if($('#logUserNo').val() == 0 && $('#logUserId').val() == ""){
+		fnModalMsg("로그인이 필요합니다.");
+	} else if($('#applyYn').val() == 'Y'){
+		$("#frm").attr("action", "/ccedu/myclass/learningStatusList.do");
+		$("#frm").submit();
+	} else {
+		$(window).bind('touchmove',function(e){e.preventDefault()});
+
+		if(submitted == true) { 
+			fnModalMsg('수강신청 처리중 입니다. 잠시만 기다려주세요.');
+			return; 
+		}
+		
+		if($("#courseOpen").val() == "D"){
+			if($("#courseAble").val() == "N"){
+				fnModalMsg('수강신청 기간이 아닙니다.');
+				return;				
+			}
+		}	
+		fnConfirm("수강신청 하시겠습니까?",function(result){
+			if(result){
+				$.ajax({
+		    		url : '/ccedu/online/common/apply_ajaxExec.do',
+		    		type : 'post',
+		    		data : $('form[name=frm]').serialize(),
+		    		dataType : 'json',
+		    		success : function(data) {		    				
+			    			if(data.classDiv == 'Y'){
+			    				$("#frm").attr("action", "/ccedu/myclass/learningStatusList.do");
+								$("#frm").submit();
+			    			} else {
+			    				$("#frm").attr("action", "/ccedu/myclass/learningStatusList.do");
+								$("#frm").submit();
+								$('#applyYn').val('Y');
+			    		    	submitted = false;
+			    			}
+		    		}
+		    	}); 
+			}
+		});
+	}
+}
+
+//햇살론 검토
+/* function fnGuarSaveAjax(pthis){
+
+	if($('#logUserNo').val() == 0 && $('#logUserId').val() == ""){
+		fnModalMsg("로그인이 필요합니다.");
+	} else if($('#applyYn').val() == 'Y'){
+		$("#frm").attr("action", "/ccedu/myclass/learningClassList.do");
+		$("#frm").submit();
+	} else {
+		$(window).bind('touchmove',function(e){e.preventDefault()});
+
+		if(submitted == true) { 
+			fnModalMsg('수강신청 처리중 입니다. 잠시만 기다려주세요.');
+			return; 
+		}
+
+		fnConfirm("수강신청 하시겠습니까?",function(result){
+			if(result){
+				$.ajax({
+		    		url : '/ccedu/online/common/applyGuarChkAjax.do',
+		    		type : 'post',
+		    		data : $('form[name=frm]').serialize(),
+		    		dataType : 'json',
+		    		success : function(data) {
+		    				if(data.classDiv == 'Q'){
+		    					fnModalMsg("입력정보를 확인해주세요.");
+		    				} else if(data.classDiv == 'Y'){
+			    				$("#frm").attr("action", "/ccedu/myclass/learningClassList.do");
+								$("#frm").submit();
+			    			} else {
+			    				$("#frm").attr("action", "/ccedu/myclass/learningClassList.do");
+								$("#frm").submit();
+								$('#applyYn').val('Y');
+			    		    	submitted = false;
+			    			}
+		    		}
+		    	}); 
+			}
+		});
+	}
+} */
+
+function fnDataSet(){
+	$('#brthdy').val('');
+	$('#guarPttnNo1').val('');
+	$('#guarPttnNo2').val('');
+}
+
+function fnCourseSampleMovie(){
+	
+	
+	window.open("/edudata/contents/1001.html","mediaPop","width=1000,height=650");
+}
+
+function pC(){
+	$('.modal-backdrop').hide();
+	$('body').css({overflow:'unset'}).unbind('touchmove');
+	return false;
+}
+</script>
+
+
+</head>
+
+<body>
+<!-- skip nav -->
+	<%@ include file="/WEB-INF/jsp/ccedu/inc/nav_inc.jsp"%>
+<!--// skip nav -->
+
+
+<div id="wrap">
+
+	<!-- header -->
+	<%@ include file="/WEB-INF/jsp/ccedu/inc/header_inc.jsp"%>
+	<!--// header -->
+
+	<!-- container -->
+	<div id="container">
+
+		<!-- location -->
+		<jsp:include page="/WEB-INF/jsp/ccedu/inc/location/loc_01_02.jsp"> 
+		  	<jsp:param name="menuNm" value="${rowData.MT_SC_NAME}"/> 
+		</jsp:include> 
+		<!--// location -->
+
+		<div class="con_center">
+
+			<!-- lnb -->
+			<div id="lnb">
+
+				<jsp:include page="/WEB-INF/jsp/ccedu/inc/lnb/lnb_02.jsp">
+				  	<jsp:param name="dep2" value="0${fn:substring(REQUEST_DATA.mtScCode,2,3)+1}"/>
+				  	<jsp:param name="dep3" value="0${fn:substring(REQUEST_DATA.mtScCode,5,6)}"/>
+				</jsp:include> 
+
+				
+			</div>
+			<!--// lnb -->
+
+			<!-- content 본문 -->
+			<div id="content">
+			
+				<!-- 기존 START 2018-08-30  -->
+<!-- 				<h3 class="cont_titile">교육소개</h3> -->
+				<!-- 기존 END 2018-08-30  -->
+
+				<h3 class="cont_titile type01">${rowData.MT_SC_NAME}<span></span></h3>
+				<!-- 본문내용 -->
+				<div class="cont_body">
+					<form name="frm" id="frm" action="/ccedu/myclass/learningClassList.do" method="post">						
+						<input type="hidden" name="returnUrl" id="returnUrl" value=""/>
+						<input type="hidden" name="goodname" id="goodname" value="<c:out value="${rowData.SEQ_TITLE}"/>"/>
+						<input type="hidden" name="mtScName" id="mtScName" value="<c:out value="${rowData.MT_SC_NAME}"/>"/>
+						<input type="hidden" name="searchWord" id="searchWord" value=""/> 
+						<input type="hidden" name="cseqno" id="cseqno"  value="<c:out value="${rowData.CSEQNO}"/>"/>
+						<input type="hidden" name="searchCseqno" id="searchCseqno"  value="<c:out value="${rowData.CSEQNO}"/>"/>
+						<input type="hidden" name="courseno" id="courseno"  value="<c:out value="${rowData.COURSENO}"/>"/>
+						<input type="hidden" name="cuserno" id="cuserno"  value="<c:out value="${rowData.CUSERNO}"/>"/>
+						<input type="hidden" name="targetYn" id="targetYn"  value="<c:out value="${rowData.TARGETYN}"/>"/>
+						<input type="hidden" name="mtScCode" id="mtScCode" value="<c:out value='${REQUEST_DATA.mtScCode}'/>"/>
+						<input type="hidden" name="mtCtypeCode" id="mtCtypeCode" value="<c:out value="${REQUEST_DATA.mtCtypeCode}"/>"/>
+						<input type="hidden" name="ref1" id="ref1" value="<c:out value="${REQUEST_DATA.ref1}"/>"/>
+						<input type="hidden" name="applyChk" id="applyChk" value="N"/><!-- 과정 중복수강방지 -->
+						<input type="hidden" name="multipleCancelYn" id="multipleCancelYn" value="N" />
+						<input type="hidden" name="startDate"  id="startDate" value="<c:out value="${rowData.STUDY_SDATE}"/>">
+						<input type="hidden" name="endDate"  id="endDate" value="<c:out value="${rowData.STUDY_EDATE}"/>">
+						<input type="hidden" name="fileid"  id="fileid" value="">
+						<input type="hidden" name="fileseq"  id="fileseq" value="">
+						<input type="hidden" name="applyYn"  id="applyYn" value="<c:out value="${rowData.APPLY_YN}"/>">
+						<input type="hidden" name="courseOpen"  id="courseOpen" value="<c:out value="${rowData.OPENTYPE}"/>">
+						<input type="hidden" name="courseAble"  id="courseAble" value="<c:out value="${applyAb}"/>">
+						
+						<input type="hidden" name="logUserNo" id="logUserNo"  value="<c:out value="${REQUEST_DATA.SES_USERNO}"/>"/>
+						<input type="hidden" name="logUserId" id="logUserId"  value="<c:out value="${REQUEST_DATA.SES_USERID}"/>"/>
+						
+						<!-- 강의실 이동 -->
+						<input type="hidden" name="paramcSeqNo" id="paramcSeqNo"  value="<c:out value="${rowData.CSEQNO}"/>"/>
+						<input type="hidden" name="paramCourseNo" id="paramCourseNo"  value="<c:out value="${rowData.COURSENO}"/>"/>
+						<input type="hidden" name="paramcUserNo" id="paramcUserNo"  value="<c:out value="${rowData.CUSERNO}"/>"/>
+						<input type="hidden" name="CLASSDESK" id="CLASSDESK"  value="<c:out value="${rowData.CLASS_DESK}"/>"/>
+						<input type="hidden" name="paramcMtScCode" id="paramcMtScCode"  value="<c:out value="${rowData.MT_SC_CODE}"/>"/>
+						
+						<input type="hidden" id="fileSubmitYn" value="<c:out value="${rowData.FILE_SUBMIT_YN}"/>"/>
+						
+						<!-- 미디어 -->
+                 		<input type="hidden" name="filePath" id="filePath" value="<c:out value="${REQUEST_DATA.FILE_PATH}"/>"/>
+						<input type="hidden" name="mediaFile" id="mediaFile" value="<c:out value="${REQUEST_DATA.MEDIA_FILE}"/>"/>
+						<input type="hidden" name="progressChk" id="progressChk" value="false"/>
+						<input type="hidden" name="mediaPath" id="mediaPath" value="<c:out value="${rowData.COURSENO}"/>">		
+						
+													
+					<%--<div class="c_section">
+						 <div class="detial_c_table">
+							<div class="img">
+								<img src="/att_file/course/<c:out value="${rowData.SAVFILE}"/>" alt="<c:out value="${rowData.SEQ_TITLE}"/>" />
+							</div> --%>				
+					<div class="c_section">
+						<h4 class="c_tit">과정기본정보</h4>
+						<div class="table_style_row">
+							<table>
+								<caption>교육소개, 교육대상, 교육기간, 평가방법, 수료기준점수, 커리큘럼, 첨부파일, 자막등 항목을 보여줍니다.</caption>
+								<colgroup>
+									<col class="col2_1" />
+									<col />
+								</colgroup>
+								<tr>
+									<th scope="row">교육명</th>
+									<td><c:out value="${rowData.SEQ_TITLE}"/></td>
+								</tr>
+								<tr>
+									<th scope="row">교육대상</th>
+									<td><c:out value="${rowData.ATARGET}"/></td>
+								</tr>
+								<c:if test="${rowData.OPENTYPE eq 'A'}">									
+									<tr>
+										<th scope="row">교육진행방식</th>
+										<td>상시운영</td>
+									</tr>							
+									<tr>
+										<th scope="row">학습일수</th>
+										<td>${rowData.EDUDAY_DEL}일</td>
+									</tr>
+								</c:if>	
+								<c:if test="${rowData.OPENTYPE eq 'D'}">								
+									<tr>
+										<th scope="row">교육진행방식</th>
+										<td>기간운영</td>
+									</tr>
+									<tr>
+										<th scope="row">신청기간</th>
+										<td>${rowData.APPLY_SDATE} ~ ${rowData.APPLY_EDATE}</td>
+									</tr>								
+									<tr>
+										<th scope="row">교육기간</th>
+										<td>${rowData.STUDY_SDATE} ~ ${rowData.STUDY_EDATE}</td>
+									</tr>
+								</c:if>		
+							</table>
+						</div>
+
+						<%-- <div class="left_btn">
+							<!-- 회원 -->
+							<c:if test = "${ REQUEST_DATA.SES_USERID ne '' }">
+								<button type="button" class="btn_ico_play" onclick="fnSaveAjax();return false;" >학습하기</button>
+							</c:if>
+						</div> 
+							</div>
+						</div>--%>
+					</div>
+					
+					<div class="c_section" style="margin-top:100px;">
+						<h4 class="c_tit">과정상세정보</h4>
+						<div class="table_style_row">
+							<table>
+								<caption>교육소개, 교육대상, 교육기간, 평가방법, 수료기준점수, 커리큘럼, 첨부파일, 자막등 항목을 보여줍니다.</caption>
+								<colgroup>
+									<col class="col2_1" />
+									<col />
+								</colgroup>
+								<tr>
+									<th scope="row">과정명</th>
+									<td><c:out value="${rowData.MT_SC_NAME}"/></td>
+								</tr>
+								<tr>
+									<th scope="row">과정소개</th>
+									<td><c:out value="${fn:replace(rowData.RESULT_DESCRIPTION, newline, '<br>')}" escapeXml="false"/></td>
+								</tr>
+								<tr>
+									<th scope="row">평가방법</th>
+									<td><c:out value="${rowData.COMPLETION}"/></td>
+								</tr>
+								<tr>
+									<th scope="row">수료기준</th>
+									<td><c:out value="${rowData.COMP_VAL}"/>점</td>
+								</tr>
+								<tr>
+									<th scope="row">수강료</th>
+									<td>
+										<c:if test="${rowData.PRICE_FK > 0}">
+											<span style="text-decoration:line-through;">
+												<c:choose>
+													<c:when test="${not empty bookInfo.PRICE_REAL}">
+														<c:out value="${rowData.PRICE_DEL + bookInfo.PRICE_REAL}"/>원
+													</c:when>
+													<c:otherwise>
+														<c:out value="${rowData.PRICE_DEL}"/>원
+													</c:otherwise>
+												</c:choose>
+											</span>
+										</c:if>
+										<span style="color:red;font-weight:bold;">
+											<c:choose>
+												<c:when test="${not empty bookInfo.PRICE_REAL}">
+													<c:out value="${rowData.PRICE_DEL + bookInfo.PRICE_REAL - rowData.PRICE_FK}"/>원(교재포함)
+													<input type="hidden" name="price" value="<c:out value="${rowData.PRICE_DEL + bookInfo.PRICE_REAL - rowData.PRICE_FK}"/>"/>
+												</c:when>
+												<c:otherwise>
+													<c:out value="${rowData.PRICE_DEL - rowData.PRICE_FK}"/>원
+													<input type="hidden" name="price" value="<c:out value="${rowData.PRICE_DEL - rowData.PRICE_FK}"/>"/>
+												</c:otherwise>
+											</c:choose>
+										</span>
+									</td>
+								</tr>							
+								<tr>
+									<th scope="row">커리큘럼</th>
+									<td>
+										<ol>
+											<li><c:out value="${fn:replace(rowData.RESULT_EX_DESCRIPTION, newline, '<br>')}" escapeXml="false"/></li>
+										</ol>
+									</td>
+								</tr>
+								<tr>
+									<th scope="row">첨부파일</th>
+									<td>
+										<c:if test="${not empty fileMap }">
+											<c:forEach var="file" items="${fileMap}" varStatus="status">
+												<a href="#none" onclick="filedown('<c:out value="${file.FILE_ID}"/>', '<c:out value="${file.FILE_SEQ}"/>');" class="btn-down" title="첨부파일 다운로드">${file.ORGFILE}</a>
+											</c:forEach>
+										</c:if>
+										<c:if test="${empty fileMap }"><c:out value="첨부파일이 없습니다."/></c:if>
+									</td>
+								</tr>
+								<%-- <tr>
+									<th scope="row">자막</th>
+									<td>
+										<c:if test="${not empty txtFileMap }">
+											<c:forEach var="file" items="${txtFileMap}" varStatus="status">
+                                  				<button type="button" class="btn_graybg02 radius_none" onclick="filedown('<c:out value="${file.FILE_ID}"/>', '<c:out value="${file.FILE_SEQ}"/>');">자막 다운로드</button>
+		                                  	</c:forEach>
+										</c:if>
+										<c:if test="${empty txtFileMap }"><c:out value="자막파일이 없습니다."/></c:if>
+										
+									</td>
+								</tr> --%>
+							</table>
+						</div>
+					</div>
+					<!-- 교재정보 200521 추가 -->
+					<c:if test="${not empty bookInfo.TITLE}">					
+						<div class="c_section" style="margin-top:100px;">
+							<h4 class="c_tit">교재정보</h4>
+							<div class="table_style_row">
+								<table>
+									<caption>교재 정보를 보여줍니다.</caption>
+									<colgroup>
+										<col class="col2_1" />
+										<col />
+									</colgroup>
+									<tr>
+										<th scope="row">교재이미지</th>
+										<td style="text-align:center;">
+											<img src="/att_file/book/<c:out value="${bookInfo.SAVFILE}"/>" alt="<c:out value="${bookInfo.TITLE}"/>" style="max-width:80%;height:auto;"/>
+										</td>
+									</tr>
+									<tr>
+										<th scope="row">교재명</th>
+										<td><c:out value="${bookInfo.TITLE}"/></td>
+									</tr>
+									<tr>
+										<th scope="row">교재소개</th>
+										<td>${bookInfo.BOOKCONTENT}</td>
+									</tr>
+								</table>
+							</div>
+						</div>
+					</c:if>
+
+					<div class="c_btn_center">
+						<!-- 회원 -->
+					    <c:if test = "${ REQUEST_DATA.SES_USERID ne '' }">
+						    <c:choose>
+								<c:when  test="${rowData.APPLY_YN eq 'Y'}">
+									<button type="button" class="btn_greenbg03" onclick="fnSaveAjax();return false;">강의실 이동</button>
+								</c:when>
+								<c:otherwise>				   				
+									<c:choose>
+										<c:when test="${applyAb eq 'A'}">
+							   				<c:if test = "${rowData.PRICE_DEL < 1000}">
+												<button type="button" class="btn_bluebg03" onclick="fnSaveAjax();return false;" >신청하기</button>
+											</c:if>				   				
+							   				<c:if test = "${rowData.PRICE_DEL >= 1000}">
+												<button type="button" class="btn_bluebg03" onclick="ftn_approval();return false;" >신청하기</button>
+											</c:if>
+										</c:when>
+										<c:otherwise>
+											<button type="button" class="btn_bluebg03" onclick="ftn_reject();return false;" >신청하기</button>
+										</c:otherwise>
+									</c:choose>															
+								</c:otherwise> 
+							</c:choose>
+					    </c:if>					    
+						<!-- 비회원 -->
+						<c:if test = "${REQUEST_DATA.SES_USERID eq '' }">
+							<button type="button" class="btn_bluebg03" data-tooltip="alertpop01">신청하기</button>
+						</c:if>						
+						<button type="button" class="btn_blueline03" onclick="fnList(); return false;" title="목록">목록</button>
+					</div>
+
+					<!-- layer pop -->
+					<div class="layerpop alertpop01" tabindex="0" data-tooltip-con="alertpop01" data-focus="alertpop01" data-focus-prev="alertpop01-close">
+						<div class="layer_mask tooltip-close"></div><!-- 블랙mask영역 -->
+						<div class="layer_cont">
+							<div class="lc_head"></div>
+							<div class="lc_cont">
+
+								<p class="alert_txt">학습을 수강하시려면 로그인이 필요합니다.<br />로그인 페이지로 이동하시겠습니까?</p>
+
+								<div class="p_btn_center">
+									<a href="#none" class="btn_graybg02 tooltip-close">취소</a>
+									<a href="#none" onclick="fnLogin();return false;" class="btn_bluebg02">확인</a>
+								</div>
+
+							</div>
+						</div>
+						<button class="btn_close tooltip-close" data-focus="alertpop01-close" data-focus-next="alertpop01">닫기</button>
+					</div>
+					<!--// layer pop -->
+
+					<!--// end -->
+					</form>
+				</div>
+				<!--// 본문내용 -->
+				
+			<!--  -->
+			</div>
+			<!--// content 본문 -->
+			
+		</div>
+	</div>
+	<!--// container -->
+
+	<!-- foot -->
+	<%@ include file="/WEB-INF/jsp/ccedu/inc/footer_inc.jsp"%>
+	<!--// foot end -->
+
+</div>
+
+</body>
+</html>

@@ -1,0 +1,143 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes" ?>
+<event>
+<!-- 강조빨간색칠하기-->
+<!-- &lt;span style="color:#ff3300"&gt;&lt;u&gt;않은&lt;&#47;span&gt;&lt;&#47;u&gt; -->
+<!-- 내려쓰기 -->
+<!-- &lt;br&gt; -->
+  <quiz flag="8" >
+      <page num="1" answer="2" type="multiple">
+          <question>
+              <alternate>문제 일.다음 중 엑셀의 데이터 입력과 분석에 대한 설명 중 
+옳지 않은 것은?</alternate>
+			  <symbol>Q1.</symbol>
+              <text>다음 중 엑셀의 데이터 입력과 분석에 대한 설명 중 
+옳지 않은 것은?</text>
+          </question>
+
+          <feedback>
+              <alternate>정답은 이번입니다. 다른 분석툴이 데이터를 입력하기 위해 다양한 명령어를 사용해야 하는 것과 달리 엑셀은 데이터 입력을 하기 위해 복잡한 명령어 없이 사용자가 직접 해당 셀에 원하는 
+데이터를 입력 할 수 있다. </alternate>
+              <answer>
+                  <symbol>정답</symbol>
+                  <text>2</text>
+              </answer>
+              <explain>
+                  <symbol>2</symbol>
+                  <text>다른 분석툴이 데이터를 입력하기 위해 다양한 명령어를 사용해야 하는 것과 달리 엑셀은 데이터 입력을 하기 위해 복잡한 명령어 없이 사용자가 직접 해당 셀에 원하는 
+데이터를 입력 할 수 있다.</text>
+              </explain>
+          </feedback>
+
+          <example num="1">
+              <alternate>보기 일번 다른 분석툴에 비해 사용이 비교적 쉽다.</alternate>
+              <symbol>Q1</symbol>
+              <text>다른 분석툴에 비해 사용이 비교적 쉽다.</text>
+          </example>
+          <example num="2">
+              <alternate>보기 이번 다른 분석툴에 비해 다양한 명령어를 사용해야 한다.</alternate>
+              <symbol>2</symbol>
+              <text>다른 분석툴에 비해 다양한 명령어를 사용해야 한다.</text>
+          </example>
+          <example num="3">
+              <alternate>보기 삼번 ‘데이터’ 리본메뉴에서 제공되는 
+다양한 방법을 마우스 클릭을 통해 사용할 수 있다.</alternate>
+              <symbol>3</symbol>
+              <text>‘데이터’ 리본메뉴에서 제공되는 
+다양한 방법을 마우스 클릭을 통해 사용할 수 있다.</text>
+          </example>
+          <example num="4">
+              <alternate>보기 사번 기존에 존재하는 데이터를 불러와 
+수정, 사용하는 방법이 있어 사용자의 
+상황에 따라 선택적 사용이 가능하다.</alternate>
+              <symbol>4</symbol>
+              <text>기존에 존재하는 데이터를 불러와 
+수정, 사용하는 방법이 있어 사용자의 
+상황에 따라 선택적 사용이 가능하다.</text>
+          </example>
+      </page>
+
+      <page num="2" answer="2" type="multiple">
+          <question>
+              <alternate>문제 이. R에 관한 설명으로 옳지 않은 것은?</alternate>
+			  <symbol>Q2.</symbol>
+              <text>R에 관한 설명으로 옳지 않은 것은?</text>
+          </question>
+
+          <feedback>
+              <alternate>정답은 이 번입니다. 데이터 시각화도 가능하다.</alternate>
+              <answer>
+                  <symbol>정답</symbol>
+                  <text>2</text>
+              </answer>
+              <explain>
+                  <symbol>2</symbol>
+                  <text>데이터 시각화도 가능하다.</text>
+
+              </explain>
+          </feedback>
+
+          <example num="1">
+              <alternate>보기 일번 통계분석이 가능하다.</alternate>
+              <symbol>1</symbol>
+              <text>통계분석이 가능하다.</text>
+          </example>
+          <example num="2">
+		  <alternate>보기 이번 데이터 시각화 툴은 제공하지 않는다.</alternate>
+              <symbol>2</symbol>
+              <text>데이터 시각화 툴은 제공하지 않는다.</text>
+          </example>
+          <example num="3">
+              <alternate>보기 삼번 오픈소스 프로그램이다.</alternate>
+              <symbol>3</symbol>
+              <text>오픈소스 프로그램이다.</text>
+          </example>
+          <example num="4">
+              <alternate>보기 사번 다양한 통계기법이 빠르게 적용된다.</alternate>
+              <symbol>4</symbol>
+              <text>다양한 통계기법이 빠르게 적용된다.</text>
+          </example>
+      </page>
+
+      <page num="3" answer="2" type="multiple">
+          <question>
+              <alternate>문제 삼. 다음 중 SPSS에 대한 설명으로 옳지 않은 것은?</alternate>
+			  <symbol>Q3.</symbol>
+              <text>다음 중 SPSS에 대한 설명으로 옳지 않은 것은?</text>
+          </question>
+
+          <feedback>
+              <alternate>정답일 이 번입니다. ②번은 R에 관련된 설명이다.</alternate>
+              <answer>
+                  <symbol>정답</symbol>
+                  <text>2</text>
+              </answer>
+              <explain>
+                  <symbol>2</symbol>
+                  <text>②번은 R에 관련된 설명이다.</text>
+
+              </explain>
+          </feedback>
+
+          <example num="1">
+              <alternate>보기 일번 데이터 획득에서부터 리포팅(reporting)까지 전 과정을 메뉴와 대화 상자를 통해 수행 가능하다.</alternate>
+              <symbol>1</symbol>
+              <text>데이터 획득에서부터 리포팅(reporting)까지 전 과정을 메뉴와 대화 상자를 통해 수행 가능하다.</text>
+          </example>
+          <example num="2">
+              <alternate>보기 이번 오픈 소스 프로그램으로 여러 가지 분석 패키지들을 무료로 다운받을 수 있다.</alternate>
+              <symbol>2</symbol>
+              <text>오픈 소스 프로그램으로 여러 가지 분석 패키지들을 무료로 다운받을 수 있다.</text>
+          </example>
+          <example num="3">
+              <alternate>보기 삼번 변수보기 창에서 변수의 측도를 지정해 주어야 한다.</alternate>
+              <symbol>Q3</symbol>
+              <text>변수보기 창에서 변수의 측도를 지정해 주어야 한다.</text>
+          </example>
+          <example num="4">
+              <alternate>보기 사번 데이터 입력법으로는 스프레드식 입력법과 불러오기 방법이 있다.</alternate>
+              <symbol>4</symbol>
+              <text>데이터 입력법으로는 스프레드식 입력법과 불러오기 방법이 있다.</text>
+          </example>
+      </page>
+  </quiz>
+</event>

@@ -1,0 +1,11 @@
+_this.$quizInfo = [
+	["다음 중 Measure(측정)에 대한 설명으로 <span style='color:#FF0000;'>틀린</span> 것은?","구성 요소에 대한 길이, 각도, 면적, 반지름 등의 측정값을 표시한다.","측정 구성 요소로는 정점, 모서리, 면 등이 있다.","측정값에 대한 정밀도를 조정할 수 있다.","3D Model(모델) 간의 간섭을 검토한다.",false],	
+	["다음 중 분석 기능에 대한 설명으로 <span style='color:#FF0000;'>틀린</span> 것은?","Zebra Analysis(지브라 분석): 면의 곡률을 평가하기 위해 얼룩 줄무늬를 반사시켜 분석한다","Draft Analysis(드래프트 분석): 3D Model(모델)의 곡률 양을 분석한다.","Curvature Comb Analysis(곡률 분석): 선택한 3D Model간의 간섭에 대한 정보를 표시한다.","Curvature Map Analysis(곡률 맵 분석): 3D Model의 구성면에 곡률의 양을 색상으로 표시한다.",false],
+	["다음 중 분석 기능에 대한 설명으로 <span style='color:#FF0000;'>틀린</span> 것은?","Minimum Radius Analysis(최소 반지름 지정): 최소 반지름의 기준을 정하여 그 이하 영역을 화면표시 한다.","Section Analysis(단면 검토): 3D Model(모델)을 단면으로 표시하고 2D Sketch로 내보내기 한다.","Center of Mass(질량 중심): 선택한 3D Model에 대해 질량 중심 위치를 기호로 표시한다.","Accessibility Analysis(접근성 분석): CAM 등을 이용하여 제작할 경우 공구의 접근성을 분석한다.",false]
+];
+
+_this.$quizAnsInfo = [
+	[4,"3D Model(모델) 간의 간섭을 체크, 검토하는 기능은 Interference(간섭 검사)이다."],
+	[2,"Draft Analysis(드래프트 분석)은 3D Model(모델)의 경사도를 분석한다."],
+	[2,"Section Analysis(단면 검토)는 3D Model(모델) 또는 조립품 내부를 단면으로 관측한다."],
+];

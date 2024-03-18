@@ -1,0 +1,619 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.webapp.academy.mapper.CourseMapper">
+
+    <resultMap id="clobMap" type="emap">
+        <result property="INFO_PROFILE" column="INFO_PROFILE" jdbcType="CLOB" javaType="java.lang.String"/>
+    </resultMap>
+
+    <!--
+    쿼리명 : 일반 과정 리스트(academy.user.course.getCourseList)
+    설명 :  신청할수 있는 과정 을 강의형태별로 조회한다.
+
+          수정일			수정자			 수정내용
+    ==============================================================
+    2013-08-30			김민규			생성 / 질의 패턴 수정
+    -->
+
+
+	<!-- 창업대출 교육과정 -->
+	<select id="getCpseduCourseList" resultType="emap" parameterType="dmap">
+        SELECT
+            A.COURSETITLE
+            , MT_CTYPE_CODE
+            , B.CSEQNO
+            , B.COURSENO
+            , B.SEQ
+            , B.SEQ_TITLE
+            , B.OPENTYPE
+            , B.EDUDAY
+            , B.STUDYTIME
+            , B.STUDYTIME_TOT
+            , B.SHORT_DESCRIPTION
+            , B.DESCRIPTION
+            , B.SUBJECT
+            , B.PROGRESS
+            , B.TARGET
+            , B.COMPLETION
+            , B.EX_DESCRIPTION
+            , B.PRICE
+            , B.COMP_VAL
+            , B.EVAL_ATTEND
+            , TO_CHAR(B.APPLY_SDATE, 'YYYY-MM-DD') AS APPLY_SDATE
+            , TO_CHAR(B.APPLY_EDATE, 'YYYY-MM-DD') AS APPLY_EDATE
+            , TO_CHAR(B.STUDY_SDATE, 'YYYY-MM-DD') AS STUDY_SDATE
+            , TO_CHAR(B.STUDY_EDATE, 'YYYY-MM-DD') AS STUDY_EDATE
+            , B.FIX_CNT
+            , B.MAX_CNT
+            , (SELECT COUNT(*) FROM LMS_LE_COURSE_USER U WHERE U.CSEQNO = B.CSEQNO AND U.USEYN != 'N') AS COURSE_USER_CNT
+            , B.MT_CSEQ_STATUS_CODE
+            , B.MT_STUDY_LIMIT_CODE
+            , (CASE WHEN (TO_CHAR (SYSDATE, 'YYYYMMDD') BETWEEN TO_CHAR (APPLY_SDATE, 'YYYYMMDD') AND TO_CHAR (APPLY_EDATE, 'YYYYMMDD') ) 
+  				THEN 'Y'    
+  				WHEN B.OPENTYPE = 'A'
+  				THEN 'Y' 
+  				WHEN TO_CHAR(SYSDATE, 'YYYYMMDD') <![CDATA[<]]> TO_CHAR(APPLY_SDATE, 'YYYYMMDD')
+  				THEN 'S'                   
+             	ELSE 'N'
+       			END) AS CANCEL_YN
+         FROM LMS_ED_COURSE A, LMS_ED_COURSE_SEQ B
+        WHERE A.USEYN = 'Y'
+        AND A.COURSENO = B.COURSENO
+        AND A.MT_SC_CODE = #{mtScCode}
+        AND (
+        	( B.OPENTYPE != 'A'
+           		AND TO_CHAR(APPLY_EDATE , 'YYYY-MM-DD') <![CDATA[>= ]]> TO_CHAR(SYSDATE , 'YYYY-MM-DD')
+           		AND TO_CHAR(APPLY_SDATE , 'YYYY-MM-DD') <![CDATA[<= ]]> TO_CHAR(SYSDATE , 'YYYY-MM-DD')
+           		
+             )
+            OR (
+               B.OPENTYPE = 'A'
+               AND MT_CSEQ_STATUS_CODE <![CDATA[= ]]> #{mtCseqStatusEnd}
+               
+            )
+            OR( B.OPENTYPE != 'A'
+           		AND TO_CHAR(STUDY_EDATE , 'YYYY-MM') <![CDATA[>= ]]> TO_CHAR(SYSDATE , 'YYYY-MM')
+           		AND TO_CHAR(STUDY_SDATE , 'YYYY-MM') <![CDATA[<= ]]> TO_CHAR(SYSDATE , 'YYYY-MM')
+           		
+             )
+        )
+        <if test="cseqno != null and cseqno != ''">
+            AND B.CSEQNO = #{cseqno}
+        </if>
+        <if test="courseno != null and courseno != ''">
+            AND B.COURSENO = #{courseno}
+        </if>
+        <if test="schSeqTitle != null and schSeqTitle != ''">
+        	AND B.SEQ_TITLE LIKE '%' || #{schSeqTitle} || '%'
+        </if>
+        ORDER BY B.CSEQNO DESC
+    </select>
+
+    <!--
+    쿼리명 : e-러닝 과정  차수 신청 리스트(academy.user.course.getCourseSeqAppList)
+    설명 :  신청할수 있는 차수 신청목록 을 조회한다.
+
+          수정일			수정자			 수정내용
+    ==============================================================
+    2013-08-30			김민규			생성 / 질의 패턴 수정
+    -->
+    
+
+
+    <!--
+    쿼리명 : 온라인 테스트과정  차수 신청 리스트(academy.user.course.getTestCourseSeqAppList)
+    설명 :  신청할수 있는 차수 신청목록 을 조회한다.
+
+          수정일			수정자			 수정내용
+    ==============================================================
+    2014-03-07			김학규			생성 / 질의 패턴 수정(페이징추가)
+    -->
+    <select id="getTestCourseSeqAppList" resultType="emap" parameterType="dmap">
+         SELECT * FROM
+            (SELECT a.*, ROWNUM AS RNUM FROM
+                (
+                            SELECT
+                       B.CSEQNO
+                      , A.COURSENO
+                      , B.SEQ
+                      , B.SEQ_TITLE
+                      , B.PRICE
+                      , B.APPLY_SDATE
+                      , B.APPLY_EDATE
+                      , B.STUDY_SDATE
+                      , B.STUDY_EDATE
+                      , B.OPENTYPE    			 <!-- D(기간과정), A(상시운영) -->
+                      , A.MT_CTYPE_CODE
+                      , TO_CHAR(B.STUDY_SDATE, 'YYYY-MM-DD') AS STR_STUDY_SDATE
+                      , TO_CHAR(B.STUDY_EDATE, 'YYYY-MM-DD') AS STR_STUDY_EDATE
+                      , CASE
+                                WHEN TO_CHAR (SYSDATE, 'YYYYMMDD')  <![CDATA[<]]>  TO_CHAR (B.APPLY_SDATE, 'YYYYMMDD')
+                                 THEN 'OPEN'
+                             WHEN TO_CHAR (SYSDATE, 'YYYYMMDD') BETWEEN TO_CHAR (B.APPLY_SDATE, 'YYYYMMDD') AND TO_CHAR (B.APPLY_EDATE, 'YYYYMMDD')
+                                 THEN 'APPLY'
+                             WHEN TO_CHAR (SYSDATE, 'YYYYMMDD')  <![CDATA[>]]>  TO_CHAR (B.APPLY_EDATE, 'YYYYMMDD')
+                                 THEN 'END'
+                             ELSE 'N'
+                         END AS APPLY_YN
+                      , CASE WHEN  (SELECT COUNT(1) FROM LMS_LE_COURSE_USER WHERE CSEQNO = B.CSEQNO AND USERNO = #{SES_USERNO} AND USEYN <![CDATA[>]]> 'N')  > 0 THEN 'Y'
+                        ELSE 'N'
+                        END AS COMP_YN
+                    FROM LMS_ED_COURSE A, LMS_ED_COURSE_SEQ B
+                    WHERE A.COURSENO = B.COURSENO
+                    AND   A.MT_CTYPE_CODE = #{mtCtypeCode}
+                    AND   TO_CHAR(ADD_MONTHS(SYSDATE, -2),'YYYYMM') <![CDATA[<=]]> TO_CHAR(B.STUDY_SDATE,'YYYYMM')
+                    AND   TO_CHAR(ADD_MONTHS(SYSDATE, +2),'YYYYMM') <![CDATA[>=]]> TO_CHAR(B.STUDY_SDATE,'YYYYMM')
+                    AND   B.MT_CSEQ_STATUS_CODE <![CDATA[<>]]>  'DEDA00' <!-- 폐강이 아닌과정만 추출 -->
+                    ORDER BY B.STUDY_SDATE
+
+                    ) a
+                    WHERE 1=1
+                    <if test="searchKeyword != null and searchKeyword != ''">
+                    AND B.SEQ_TITLE LIKE '%'||#{searchKeyword}||'%'
+                    </if>
+                    <if test="selectApplyYn != null and selectApplyYn != ''">
+                    AND APPLY_YN =  #{selectApplyYn}
+                    </if>
+            )
+            WHERE 1=1
+        <if test="startNo != null and startNo != ''">
+            AND RNUM BETWEEN #{startNo} AND #{endNo}
+        </if>
+    </select>
+    <!-- 	쿼리명 : 온라인 테스트과정  차수 신청 리스트(academy.user.course.getTestCourseSeqAppList)
+    설명 :  신청할수 있는 차수 신청목록 Count 을 조회한다.
+
+          생성일			생성자
+    ==============================================================
+    2014-03-07			김학규
+     -->
+    <select id="getTestCourseSeqAppListCount" resultType="int" parameterType="dmap">
+        SELECT COUNT(*) FROM
+            (SELECT a.*, ROWNUM AS RNUM FROM
+                (
+                            SELECT
+                       B.CSEQNO
+                      , A.COURSENO
+                      , B.SEQ
+                      , B.SEQ_TITLE
+                      , B.PRICE
+                      , B.APPLY_SDATE
+                      , B.APPLY_EDATE
+                      , B.STUDY_SDATE
+                      , B.STUDY_EDATE
+                      , B.OPENTYPE    			 <!-- D(기간과정), A(상시운영) -->
+                      , A.MT_CTYPE_CODE
+                      , TO_CHAR(B.STUDY_SDATE, 'YYYY-MM-DD') AS STR_STUDY_SDATE
+                      , TO_CHAR(B.STUDY_EDATE, 'YYYY-MM-DD') AS STR_STUDY_EDATE
+                      , CASE
+                                WHEN TO_CHAR (SYSDATE, 'YYYYMMDD')  <![CDATA[<]]>  TO_CHAR (B.APPLY_SDATE, 'YYYYMMDD')
+                                 THEN 'OPEN'
+                             WHEN TO_CHAR (SYSDATE, 'YYYYMMDD') BETWEEN TO_CHAR (B.APPLY_SDATE, 'YYYYMMDD') AND TO_CHAR (B.APPLY_EDATE, 'YYYYMMDD')
+                                 THEN 'APPLY'
+                             WHEN TO_CHAR (SYSDATE, 'YYYYMMDD')  <![CDATA[>]]>  TO_CHAR (B.APPLY_EDATE, 'YYYYMMDD')
+                                 THEN 'END'
+                             ELSE 'N'
+                         END AS APPLY_YN
+                      , CASE WHEN  (SELECT COUNT(1) FROM LMS_LE_COURSE_USER WHERE CSEQNO = B.CSEQNO AND USERNO = #{SES_USERNO} AND USEYN <![CDATA[>]]> 'N')  > 0 THEN 'Y'
+                        ELSE 'N'
+                        END AS COMP_YN
+                    FROM LMS_ED_COURSE A, LMS_ED_COURSE_SEQ B
+                    WHERE A.COURSENO = B.COURSENO
+
+                    AND   A.MT_CTYPE_CODE = #{mtCtypeCode}
+                    AND   TO_CHAR(ADD_MONTHS(SYSDATE, -2),'YYYYMM') <![CDATA[<=]]> TO_CHAR(B.STUDY_SDATE,'YYYYMM')
+                    AND   TO_CHAR(ADD_MONTHS(SYSDATE, +2),'YYYYMM') <![CDATA[>=]]> TO_CHAR(B.STUDY_SDATE,'YYYYMM')
+                    AND   B.MT_CSEQ_STATUS_CODE <![CDATA[<>]]>  'DEDA00' <!-- 폐강이 아닌과정만 추출 -->
+                    ORDER BY B.STUDY_SDATE
+                    ) a
+                    WHERE 1=1
+                    <if test="searchKeyword != null and searchKeyword != ''">
+                    AND B.SEQ_TITLE LIKE '%'||#{searchKeyword}||'%'
+                    </if>
+                    <if test="selectApplyYn != null and selectApplyYn != ''">
+                    AND APPLY_YN =  #{selectApplyYn}
+                    </if>
+            )
+            WHERE 1=1
+
+    </select>
+
+        <!--
+    쿼리명 : 여행사 과정  차수 신청 리스트(academy.user.course.getOfflineCourseSeqAppList)
+    설명 :  신청할수 있는 차수 신청목록 을 조회한다.
+
+          수정일			수정자			 수정내용
+    ==============================================================
+    2013-08-30			김민규			생성 / 질의 패턴 수정
+    -->
+    <select id="getOfflineCourseSeqAppList" resultType="emap" parameterType="dmap">
+        SELECT
+           B.CSEQNO
+          , A.COURSENO
+          , B.SEQ
+          , B.SEQ_TITLE
+          , B.PRICE
+          , B.APPLY_SDATE
+          , B.APPLY_EDATE
+          , B.STUDY_SDATE
+          , B.STUDY_EDATE
+          , B.OPENTYPE    			 <!-- D(기간과정), A(상시운영) -->
+          , A.MT_CTYPE_CODE
+          , TO_CHAR(B.STUDY_SDATE, 'YYYY-MM-DD') AS STR_STUDY_SDATE
+          , TO_CHAR(B.STUDY_EDATE, 'YYYY-MM-DD') AS STR_STUDY_EDATE
+          , CASE
+                  WHEN MT_CSEQ_STATUS_CODE <![CDATA[<]]> 'DEAB00'   <!-- 예정 -->
+                    THEN 'OPEN'
+                WHEN MT_CSEQ_STATUS_CODE = 'DEAB00'   <!-- 신청과정만 추출 -->
+                    THEN 'APPLY'
+                WHEN MT_CSEQ_STATUS_CODE <![CDATA[>]]> 'DEAB00' <!-- 신청중인과정보다 상태가 크면 마감 -->
+                    THEN 'END'
+                ELSE 'N'
+            END AS APPLY_YN
+          , CASE WHEN  (SELECT COUNT(1) FROM LMS_LE_COURSE_USER WHERE CSEQNO = B.CSEQNO AND USERNO = #{SES_USERNO} AND USEYN <![CDATA[>]]> 'N')  > 0 THEN 'Y'
+            ELSE 'N'
+            END AS COMP_YN
+        FROM LMS_ED_COURSE A, LMS_ED_COURSE_SEQ B
+        WHERE A.COURSENO = B.COURSENO
+        AND   A.COURSENO = #{courseno}
+        AND   TO_CHAR(ADD_MONTHS(SYSDATE, -2),'YYYYMM') <![CDATA[<=]]> TO_CHAR(B.STUDY_SDATE,'YYYYMM')
+        AND   TO_CHAR(ADD_MONTHS(SYSDATE, +2),'YYYYMM') <![CDATA[>=]]> TO_CHAR(B.STUDY_SDATE,'YYYYMM')
+        AND B.MT_CSEQ_STATUS_CODE <![CDATA[<>]]>  'DEDA00' <!-- 여행사과정 폐강이 아닌과정만 추출 -->
+        <if test="cseqno != null and cseqno != ''">
+        AND B.CSEQNO = #{cseqno}
+        </if>
+        ORDER BY B.STUDY_SDATE
+    </select>
+
+    
+
+
+   
+
+    
+
+     <!-- 회원정보 호출 -->
+    <select id="selectUserInfo" parameterType="hmap" resultType="emap">
+         SELECT A.*
+         FROM
+        	(SELECT
+                UNITY_MBERNO USERNO
+                , UNITY_ID USERID
+                , EMAIL 
+                , MBERNM as USERNAME
+                , TELNO as TEL
+                , MOBLPHON as MOBILE
+                , EMAIL_RECPTN_AT
+                , SMS_RECPTN_AT
+                , SEX
+            FROM LMS_CT_UNITY_MBER A
+            WHERE UNITY_MBERNO = #{P_USERNO}) A
+    </select>
+    
+    <!-- 일반과정 신청취소 -->
+    <update id="lmsCancelExec"  parameterType="hmap">
+        UPDATE LMS_LE_COURSE_USER 
+        SET USEYN = 'N'
+        		, CANCEL_REQDATE = SYSDATE
+				, CANCEL_REGDATE = SYSDATE
+        WHERE CUSERNO = #{CUSERNO}
+        	AND USERNO = #{P_USERNO}
+    </update>
+
+	<insert id="payCourFileApplyExec" parameterType="dmap">
+		INSERT INTO LMS_LE_COURSE_USER_FILE
+		(
+			FILE_ID
+			,CUSERNO
+			,FILE_SEQ
+			,ORGFILE
+			,SAVFILE
+			,FILE_SIZE
+			,SAVPATH
+			,FTYPE
+			,REG_DATE 
+		)
+		VALUES (
+			(SELECT NVL(MAX(FILE_ID) , 0)+1 FROM LMS_LE_COURSE_USER_FILE)
+			, #{cuserno}
+			, (SELECT NVL(MAX(FILE_SEQ),0)+1 FROM LMS_LE_COURSE_USER_FILE WHERE CUSERNO = #{cuserno})
+			, #{uploadFileOrgName}
+			, #{uploadFileSaveName}
+			, #{uploadFileSize}
+			, #{uploadFileFulltPath}
+			, #{uploadFileExt}
+			, SYSDATE 
+		)
+    </insert>
+
+    <!-- 일반 입금신청 -->
+    <update statementType="CALLABLE" id="payCourApplyExec" parameterType="hmap">
+        <!-- { 과 CALL 사이에 TAB 사용하면 에러 -->
+    { CALL LMS_COURSE_APPLY_EXEC (
+                #{P_PAYMENT_UID, jdbcType=VARCHAR, mode=IN},
+                #{P_USERNO, jdbcType=INTEGER, mode=IN},
+                #{P_PAYMENT_PRC, jdbcType=INTEGER, mode=IN},
+                #{P_ETC, jdbcType=VARCHAR, mode=IN},
+                #{P_MT_PM_STATUS_CODE, jdbcType=CHAR, mode=IN},
+                #{P_PMNO, jdbcType=INTEGER, mode=IN},
+                #{P_MT_PM_PAY_CODE, jdbcType=CHAR, mode=IN},
+                #{P_PAYMENT_INPUTNAME, jdbcType=VARCHAR, mode=IN},
+                #{P_PAYMENT_DATE, jdbcType=VARCHAR, mode=IN},
+                #{P_PGSYS_OID, jdbcType=VARCHAR, mode=IN},
+                #{P_PAY_ACCNO, jdbcType=VARCHAR, mode=IN},
+                #{P_MT_PM_FREE_CODE, jdbcType=CHAR, mode=IN},
+                #{P_COMNAME, jdbcType=VARCHAR, mode=IN},
+                #{P_BIZNO, jdbcType=VARCHAR, mode=IN},
+                #{P_MT_PM_BILL_CODE, jdbcType=VARCHAR, mode=IN},
+                #{P_PMUID, jdbcType=VARCHAR, mode=IN},
+                #{P_PMUSRCD, jdbcType=VARCHAR, mode=IN},
+                #{L_IS_PASS, jdbcType=CHAR, mode=IN},
+                #{L_DEPT_NAME, jdbcType=VARCHAR, mode=IN},
+                #{L_POSITION_NAME, jdbcType=VARCHAR, mode=IN},
+                #{L_SEX, jdbcType=CHAR, mode=IN},
+                #{L_SES_MOBILE, jdbcType=VARCHAR, mode=IN},
+                #{L_MOBLPHON, jdbcType=VARCHAR, mode=IN},
+                #{R_RESULT, jdbcType=VARCHAR, mode=OUT}
+            )
+        }
+    </update>
+
+    <!-- 일반과정 수강신청 > 개인정보수집 정보 등록처리 : 2013.12.11 by song ho hyun -->
+    <update id="saveUserApplyInfoExt"  parameterType="dmap">
+    UPDATE LMS_LE_COURSE_USER SET
+          CPI_01_YN 	= DECODE(#{cpi01Yn}, 'Y', 'Y', 'N')
+        , CPI_01_DATE 	= DECODE(#{cpi01Yn}, 'Y',  SYSDATE, NULL)
+        , CPI_02_YN 	= DECODE(#{cpi02Yn}, 'Y', 'Y', 'N')
+        , CPI_02_DATE 	= DECODE(#{cpi02Yn}, 'Y',  SYSDATE, NULL)
+        , CPI_03_YN 	= DECODE(#{cpi03Yn}, 'Y', 'Y', 'N')
+        , CPI_03_DATE 	= DECODE(#{cpi03Yn}, 'Y',  SYSDATE, NULL)
+    WHERE PAYMENT_UID = #{paymentUid}
+    </update>
+
+    <!-- PG승인내역 조회 -->
+    <select id="getCardDataInfo" resultType="emap" parameterType="dmap" >
+        SELECT
+            TID
+            , RESULT_CODE
+            , APPL_NUM
+            , TOP_PRICE
+            , APPL_DATE
+            , APPL_TIME
+            , (SELECT COUNT(*) FROM PM_PAYMENT WHERE PGSYS_OID = T.TID) CNT
+        FROM  PM_CARD_DATA T
+        WHERE T.TID = #{tid}
+    </select>
+
+
+    
+    <!-- 과정에 딸린 파일 정보 -->
+    <select id="getFileInfoByCourseInfo" resultType="emap" parameterType="dmap">
+        SELECT FILE_ID
+        		, FILE_SEQ
+               , ORGFILE
+               , SAVFILE
+               , SAVPATH
+          FROM LMS_ED_COURSE_FILE
+         WHERE COURSENO = #{courseno}
+         	AND FILE_ID = #{fileid}
+    </select>
+    
+    <!-- 집합교육 일정표(신청일) -->
+    <select id="getSateList" parameterType="dmap" resultType="emap">
+    		SELECT TO_CHAR( A.APPLY_SDATE, 'YYYY-MM') AS APPLY_SDATE	
+				, A.APPLY_SDAY
+				, DECODE(TO_CHAR(TRUNC(A.APPLY_SDATE),'d'),'1','일요일','2','월요일','3','화요일','4','수요일','5','목요일','6','금요일','7','토요일') AS EDU_WEEK
+			FROM 
+				(
+					SELECT 
+						A.APPLY_SDATE
+						, TO_CHAR(A.APPLY_SDATE , 'DD') AS APPLY_SDAY
+					FROM LMS_ED_COURSE_SEQ A , LMS_ED_COURSE B
+					WHERE A.COURSENO = B.COURSENO
+					AND B.USEYN = 'Y'
+					AND A.COURSENO IN (SELECT COURSENO FROM LMS_ED_COURSE WHERE MT_CTYPE_CODE = #{mtCtypeCode})
+					AND TO_CHAR(A.APPLY_SDATE, 'YYYYMM') = #{year} || #{selectMonth}
+				)A
+				ORDER BY A.APPLY_SDAY
+    </select>
+
+	<!-- 집합교육 일정표(교육일) -->
+    <select id="getStudyList" parameterType="dmap" resultType="emap">
+    		SELECT TO_CHAR( A.STUDY_SDATE, 'YYYY-MM') AS  STUDY_SDATE
+				, A.STUDY_SDAY
+				, DECODE(TO_CHAR(TRUNC(A.STUDY_SDATE),'d'),'1','일요일','2','월요일','3','화요일','4','수요일','5','목요일','6','금요일','7','토요일') AS EDU_WEEK
+			FROM 
+				(
+					SELECT 
+						A.STUDY_SDATE
+						, TO_CHAR(A.STUDY_SDATE , 'DD') STUDY_SDAY
+					FROM LMS_ED_COURSE_SEQ A , LMS_ED_COURSE B
+					WHERE A.COURSENO = B.COURSENO
+					AND B.USEYN = 'Y'
+					AND A.COURSENO IN (SELECT COURSENO FROM LMS_ED_COURSE WHERE MT_CTYPE_CODE = #{mtCtypeCode})
+					AND TO_CHAR(A.STUDY_SDATE, 'YYYYMM') = #{year} || #{selectMonth}
+				)A
+				ORDER BY A.STUDY_SDAY
+    </select>
+    
+    <!-- 집합교육 일정(신청일) -->
+    <select id="getApplyStudyList" parameterType="dmap" resultType="emap">
+		SELECT A.RNUM
+		   	, A.CSEQNO
+		   	, A.COURSENO
+		   	, A.SEQ_TITLE
+		   	, CASE A.MT_FIELD_CODE WHEN 'FDAC00' THEN '1'
+				WHEN 'FDAD00' THEN '2'
+				ELSE '0'
+			  END AS MT_FIELD_CODE
+		   	, TO_CHAR( A.APPLY_SDATE , 'YYYY-MM-DD') AS APPLY_SDATE
+		   	, TO_CHAR( A.APPLY_EDATE , 'YYYY-MM-DD') AS APPLY_EDATE
+		   	, DECODE(TO_CHAR(TRUNC(A.APPLY_SDATE),'d'),'1','일요일','2','월요일','3','화요일','4','수요일','5','목요일','6','금요일','7','토요일') AS EDU_WEEK
+		FROM
+			(
+				SELECT ROW_NUMBER() OVER(ORDER BY A.CSEQNO DESC) RNUM
+					, A.CSEQNO
+					, A.COURSENO
+					, A.SEQ_TITLE
+					, A.APPLY_SDATE
+					, A.APPLY_EDATE
+					, B.USEYN
+					, A.MT_FIELD_CODE
+				FROM LMS_ED_COURSE_SEQ A ,  LMS_ED_COURSE B
+				WHERE A.COURSENO = B.COURSENO
+				AND A.COURSENO IN (SELECT COURSENO FROM LMS_ED_COURSE WHERE MT_CTYPE_CODE = #{mtCtypeCode} )
+				AND B.USEYN = 'Y'
+				AND TO_CHAR(A.APPLY_SDATE, 'MM') =  #{selectMonth}
+				AND TO_DATE(#{year}||#{selectMonth}||TO_CHAR(TO_DATE(LPAD(#{day} , '2' , '0'), 'DD'), 'DD') , 'YYYYMMDD') BETWEEN TO_CHAR( A.APPLY_SDATE, 'YYYYMMDD') AND TO_CHAR( A.APPLY_EDATE, 'YYYYMMDD')
+				ORDER BY A.CSEQNO DESC
+			)A
+			WHERE A.RNUM BETWEEN  #{startNo} AND #{endNo}
+    </select>
+    
+    <!-- 집합교육 일정 조회수(신청일) -->
+    <select id="getApplyStudyCnt" parameterType="dmap" resultType="int">
+		SELECT COUNT(*)
+		FROM
+			(
+			
+				SELECT ROW_NUMBER() OVER(ORDER BY A.CSEQNO DESC) RNUM
+					, A.CSEQNO
+					, A.SEQ_TITLE
+					, A.APPLY_SDATE
+					, A.APPLY_EDATE
+					, B.USEYN
+				FROM LMS_ED_COURSE_SEQ A ,  LMS_ED_COURSE B
+				WHERE A.COURSENO = B.COURSENO
+				AND A.COURSENO IN (SELECT COURSENO FROM LMS_ED_COURSE WHERE MT_CTYPE_CODE = #{mtCtypeCode} )
+				AND B.USEYN = 'Y'
+				AND TO_CHAR(A.APPLY_SDATE, 'MM') =  #{selectMonth}
+				AND TO_DATE(#{year}||#{selectMonth}||TO_CHAR(TO_DATE(LPAD(#{day} , '2' , '0'), 'DD'), 'DD') , 'YYYYMMDD') BETWEEN TO_CHAR( A.APPLY_SDATE, 'YYYYMMDD') AND TO_CHAR( A.APPLY_EDATE, 'YYYYMMDD')
+				ORDER BY A.CSEQNO DESC
+			)A
+    </select>
+    
+
+	<!-- 집합교육 일정(교육일) -->
+    <select id="getApplyEduList" parameterType="dmap" resultType="emap">
+		SELECT A.RNUM
+		   	, A.CSEQNO
+		   	, A.COURSENO
+		   	, CASE A.MT_FIELD_CODE WHEN 'FDAC00' THEN '1'
+				WHEN 'FDAD00' THEN '2'
+				ELSE '0'
+			  END AS MT_FIELD_CODE
+		   	, TO_CHAR( A.STUDY_SDATE , 'YYYY-MM-DD') AS STUDY_SDATE
+		   	, TO_CHAR( A.STUDY_EDATE , 'YYYY-MM-DD') AS STUDY_EDATE
+		   	, A.SEQ_TITLE
+		   	, DECODE(TO_CHAR(TRUNC(A.STUDY_EDATE),'d'),'1','일요일','2','월요일','3','화요일','4','수요일','5','목요일','6','금요일','7','토요일') AS EDU_WEEK
+		FROM
+			(
+				SELECT ROW_NUMBER() OVER(ORDER BY A.CSEQNO DESC) RNUM
+					, A.CSEQNO
+					, A.COURSENO
+					, A.STUDY_SDATE
+					, A.STUDY_EDATE
+					, A.SEQ_TITLE
+					, B.USEYN 
+					, A.MT_FIELD_CODE
+				FROM LMS_ED_COURSE_SEQ A, LMS_ED_COURSE B
+				WHERE A.COURSENO = B.COURSENO  
+				AND A.COURSENO IN (SELECT COURSENO FROM LMS_ED_COURSE WHERE MT_CTYPE_CODE = #{mtCtypeCode} )
+				AND B.USEYN = 'Y'
+				AND TO_CHAR(A.STUDY_SDATE, 'MM') = #{selectMonth}
+				AND TO_DATE(#{year}||#{selectMonth}||TO_CHAR(TO_DATE(#{day}, 'DD'), 'DD') , 'YYYYMMDD') BETWEEN TO_CHAR( A.STUDY_SDATE, 'YYYYMMDD') AND TO_CHAR(A.STUDY_EDATE, 'YYYYMMDD')
+				ORDER BY A.CSEQNO DESC
+			)A
+			WHERE A.RNUM BETWEEN  #{startNo} AND #{endNo}
+    </select>
+    
+    <!-- 집합교육 일정 조회수(교육일) -->
+    <select id="getApplyEduCnt" parameterType="dmap" resultType="int">
+		SELECT COUNT(*)
+		FROM
+			(
+				SELECT ROW_NUMBER() OVER(ORDER BY A.CSEQNO DESC) RNUM
+					, A.CSEQNO
+					, A.STUDY_SDATE
+					, A.STUDY_EDATE
+					, A.SEQ_TITLE
+					, B.USEYN 
+				FROM LMS_ED_COURSE_SEQ A, LMS_ED_COURSE B
+				WHERE A.COURSENO = B.COURSENO  
+				AND A.COURSENO IN (SELECT COURSENO FROM LMS_ED_COURSE WHERE MT_CTYPE_CODE = #{mtCtypeCode} )
+				AND B.USEYN = 'Y'
+				AND TO_CHAR(A.STUDY_SDATE, 'MM') = #{selectMonth}
+				AND TO_DATE(#{year}||#{selectMonth}||TO_CHAR(TO_DATE(#{day}, 'DD'), 'DD') , 'YYYYMMDD') BETWEEN TO_CHAR( A.STUDY_SDATE, 'YYYYMMDD') AND TO_CHAR(A.STUDY_EDATE, 'YYYYMMDD')
+				ORDER BY A.CSEQNO DESC
+			)A
+    </select>
+    
+    <!-- 특강 신청취소 -->
+    <update id="specialLectureCancelExec"  parameterType="hmap">
+        UPDATE LMS_ED_LECTURE 
+        SET USEYN = 'N'
+        		, UPDT_DT = SYSDATE
+				, UPDT_NO = #{SES_USERNO}
+        WHERE SLNO = #{slno}
+        	AND APPLY_NO = #{SES_USERNO}
+    </update>
+    
+    <delete id="specialLectureCancelDate" parameterType="hmap">
+    	DELETE FROM
+    		LMS_ED_LECTURE_DATE
+    	WHERE SLNO = #{slno}
+    </delete>
+    
+    <!-- 강사공간 특강신청 여부 정보 -->
+    <select id="getSpecialLectureAppUserInfo" parameterType="dmap" resultType="emap">
+    	SELECT 
+            B.TUTOR_USERNO
+            , B.SLNO
+            , B.FINAL_AT
+            , B.REGIST_NO
+            , B.REGIST_DT
+            , B.UPDT_NO
+            , B.UPDT_DT
+            , B.USEYN    
+        FROM LMS_ED_LECTURE A ,LMS_ED_LECTURE_TUTOR B 
+            WHERE A.SLNO = B.SLNO 
+            AND B.TUTOR_USERNO=#{SES_USERNO} 
+            AND B.USEYN = 'Y' 
+            AND A.SLNO = #{slno}
+    </select>
+    
+    <!-- 특강 강사배정 신청 -->
+    <update id="specialLectureApply"  parameterType="dmap">
+        MERGE INTO LMS_ED_LECTURE_TUTOR A
+        USING DUAL
+            ON ( A.SLNO = #{slno}
+                AND A.TUTOR_USERNO = #{SES_USERNO}
+        )
+        WHEN MATCHED THEN
+         UPDATE SET
+            USEYN = 'Y'
+            , UPDT_NO = #{SES_USERNO}
+			, UPDT_DT = SYSDATE
+        WHEN NOT MATCHED THEN
+         INSERT (SLNO, TUTOR_USERNO, FINAL_AT, USEYN, REGIST_NO, REGIST_DT, UPDT_NO,UPDT_DT)
+         VALUES (
+             #{slno}
+             , #{SES_USERNO}
+             , 'N'
+             , 'Y'
+             , #{SES_USERNO}
+             , SYSDATE
+             , #{SES_USERNO}
+             , SYSDATE
+              )
+    </update>
+    
+    <!-- 강사공간 강사배정 특강 상태 변경 -->
+    <update id="specialLectureApplyState"  parameterType="dmap">
+    	UPDATE LMS_ED_LECTURE SET 
+		    MT_LEC_STATUS_CODE = 'LE0003' 
+		WHERE SLNO = #{slno} 
+		AND MT_LEC_STATUS_CODE = 'LE0002'
+    </update>
+</mapper>

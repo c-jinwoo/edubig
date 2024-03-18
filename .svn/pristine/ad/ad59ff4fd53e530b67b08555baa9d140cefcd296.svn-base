@@ -1,0 +1,37 @@
+<%
+/****************************************
+    subject : 좌측 메뉴
+    summary : 좌측 메뉴 : 기타(13)
+    author  : SANGS
+    date    : 2018-06-12
+****************************************/
+%>
+<%@ page language="java" contentType="text/html; charset=utf-8" pageEncoding="utf-8"%>
+<%
+	String dep2 = (String)request.getParameter("dep2"); 
+	String dep3 = (String)request.getParameter("dep3");
+%>
+<%
+	if(request.getParameter("menuTitle") == null){
+		if(request.getParameter("menuNm") == "합격자 정보 추가 입력") {
+%>
+<h2>합격자조회</h2>
+<%
+		} else {
+%>
+<h2>기타</h2>
+<%			
+		}
+%>
+<%
+	}else{
+%>
+<h2><%=request.getParameter("menuTitle") %></h2>
+<%
+	}
+%>
+	 <ul class="lnb_menu">
+		<li <%if("01".equals(dep2)) out.print("class=\"on\""); %>>
+			<a href="#none" ><span><%=request.getParameter("menuNm") %></span></a>
+		</li>
+	</ul>

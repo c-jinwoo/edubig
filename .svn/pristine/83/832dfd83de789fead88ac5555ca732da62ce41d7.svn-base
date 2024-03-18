@@ -1,0 +1,773 @@
+package com.webapp.academy.ctrl;
+
+import java.io.PrintWriter;
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
+import java.util.Date;
+import java.util.List;
+import java.util.regex.Pattern;
+
+import javax.annotation.Resource;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.RequestMapping;
+
+import com.google.gson.Gson;
+import com.sangs.session.UserSessionManager;
+import com.sangs.session.UserSessionVO;
+import com.sangs.support.ControllerParamManager;
+import com.sangs.support.DataMap;
+import com.sangs.support.EduMap;
+import com.sangs.support.FrontException;
+import com.sangs.support.SangsProperties;
+import com.sangs.util.DownloadServlet;
+import com.sangs.util.SangsUtil;
+import com.webapp.academy.mapper.BoardMapper;
+import com.webapp.academy.service.BoardService;
+import com.webapp.academy.service.CommonService;
+import com.webapp.academy.service.TutorService;
+
+/**
+ * Description : 게시판 관련 컨트롤러
+ * 
+ * Modification Information
+ * 수정일			수정자			수정내용
+ * -------		-----------------------------------
+ * 2020.09.29	CSLAB		최초작성
+ *
+ */
+
+@Controller
+public class BoardController { 
+
+	private Logger log = LogManager.getLogger(this.getClass());
+	
+    @Resource(name = "boardService")
+    private BoardService boardService; 
+        
+    @Resource(name = "tutorService")
+    private TutorService  tutorService;
+    
+    @Resource(name = "commonService")
+    private CommonService commonService;
+    
+    @Resource(name = "boardMapper")
+    private BoardMapper boardMapper;
+
+    /**
+     * @param request
+     * @param model
+     * @param rMap
+     * @return
+     * @throws FrontException
+     */
+    // TODO: NOTICE
+    @RequestMapping(value = "/ccedu/bbs/notice.do")
+    public String notice(HttpServletRequest request, HttpServletResponse res, DataMap rMap) throws FrontException{    	
+    	try{    
+			rMap.putString("bcateno", "1");	
+    	    request.setAttribute("categoryData", boardService.getBoardCategoryList(rMap));
+            request.setAttribute("listData", boardService.getBoardList(rMap));            
+            request.setAttribute("resultCount", boardService.getBoardListCnt(rMap));    	    
+			request.setAttribute("REQUEST_DATA", rMap);		
+    	}
+    	catch(Exception e){
+            throw new FrontException(e);
+        }		    			
+    	return "ccedu/board/notice";
+    }
+    
+	/**
+	 * @param request
+	 * @param model
+	 * @param rMap
+	 * @return
+	 * @throws FrontException
+	 */
+	// TODO: FAQ
+	@RequestMapping("/ccedu/bbs/faq.do")
+	public String faq(HttpServletRequest request, HttpServletResponse response, DataMap rMap) throws FrontException{		
+		try{			
+			rMap.putString("bcateno", "5");	
+			if("1".equals(rMap.getString("tabNo"))){
+				rMap.set("cateCode", "SF0001");
+			} 
+			else if(rMap.getInt("tabNo") == 2){
+				rMap.set("cateCode", "SF0002");
+			} 
+			else if(rMap.getInt("tabNo") == 3){
+				rMap.set("cateCode", "SF0003");
+			} 
+			else if(rMap.getInt("tabNo") == 4){
+				rMap.set("cateCode", "SF0004");
+			} 
+			else {
+				rMap.setInt("tabNo",0);
+			}
+			String mtCode = "";
+			mtCode = SangsProperties.getProperty("Globals.mtCode_MT_NOTICE_FAQ_CODE");
+			rMap.setString("mtCode", mtCode);
+			request.setAttribute("codeList", commonService.selectMtCodeSub(rMap));			
+			rMap.setString("topYn", "N");
+			
+			List <EduMap> listData = boardService.getFaqBoardList(rMap);
+			
+			for(int i = 0; i < listData.size(); i++ ) {
+				listData.get(i).put("CONTENT", SangsUtil.removeScriptTag(stringToHtmlSign(listData.get(i).getString("CONTENT"))));
+			}
+			
+			request.setAttribute("listData", listData);			
+			request.setAttribute("categoryData", boardService.getBoardCategoryList(rMap));
+			request.setAttribute("REQUEST_DATA", rMap);			
+		}
+		catch(Exception e){
+			throw new FrontException(e);
+		}		
+		return "ccedu/board/faq";		
+	}
+
+    /**
+     * @param request
+     * @param model
+     * @param rMap
+     * @return
+     * @throws FrontException
+     */
+    // TODO: EVENT
+    @RequestMapping(value = "/ccedu/bbs/event.do")
+    public String event(HttpServletRequest request, HttpServletResponse res, DataMap rMap) throws FrontException{    	
+    	try{    
+			rMap.putString("bcateno", "6");	
+    	    request.setAttribute("categoryData", boardService.getBoardCategoryList(rMap));
+            request.setAttribute("listData", boardService.getBoardList(rMap));            
+            request.setAttribute("resultCount", boardService.getBoardListCnt(rMap));    	    
+			request.setAttribute("REQUEST_DATA", rMap);		
+    	}
+    	catch(Exception e){
+            throw new FrontException(e);
+        }		    			
+    	return "ccedu/board/event";
+    }
+	
+    /**
+     * @param request
+     * @param model
+     * @param rMap
+     * @return
+     * @throws FrontException
+     */
+    // TODO: 일반 게시판 (신용상담사(공지사항 / Q&A / 자료실), 알림마당)
+    @RequestMapping(value = "/ccedu/*/boardList.do")
+    public String boardList(HttpServletRequest request, HttpServletResponse res, DataMap rMap) throws FrontException {
+    	
+    	try{
+    	    
+    	    request.setAttribute("categoryData", boardService.getBoardCategoryList(rMap));
+            request.setAttribute("listData", boardService.getBoardList(rMap));
+            
+            request.setAttribute("resultCount", boardService.getBoardListCnt(rMap));
+    	    
+			request.setAttribute("REQUEST_DATA", rMap);
+			
+			
+    	} catch (Exception e) { log.debug(e.getMessage());
+            throw new FrontException(e);
+        }		
+    			
+    	return "ccedu/board/board_list";
+    }
+    
+    
+    /**
+     * 일반 게시판 (신용상담사(공지사항 / 자료실), 알림마당) 상세보기
+     * @param request
+     * @param model
+     * @param rMap
+     * @return
+     * @throws FrontException
+     */
+    // TODO: 일반 게시판 (신용상담사(공지사항 / 자료실), 알림마당) 상세보기
+    @RequestMapping(value = "/ccedu/*/boardView.do")
+    public String boardView(HttpServletRequest request, HttpServletResponse res, DataMap rMap) throws FrontException {
+    	
+    	try{
+    		
+    		
+    		boolean flag = Pattern.matches("^[0-9]*$", rMap.getString("bcateno"));
+    		
+    		if(flag == true) {
+    			
+	    		boardService.updateBoardViewCnt(rMap);
+		    	EduMap boardMap = boardService.getBoardView(rMap);
+		    	
+		    	if(boardMap != null) {
+			    	request.setAttribute("rowData", boardMap);
+					request.setAttribute("listData", boardService.getFileList(rMap.getInt("bbsNo")));
+					
+					int bbsnoPrev = boardMap.getInt("BBSNO_PREV");
+					int bbsnoNext = boardMap.getInt("BBSNO_NEXT");
+					
+					// 이전글
+					rMap.setInt("bbsNo", bbsnoPrev);
+					request.setAttribute("prevData", boardService.getBoardView(rMap));
+					
+					// 다음글
+					rMap.setInt("bbsNo", bbsnoNext);
+					request.setAttribute("nextData", boardService.getBoardView(rMap));
+		    	}
+				
+	    		request.setAttribute("categoryData", boardService.getBoardCategoryList(rMap));
+				request.setAttribute("REQUEST_DATA", rMap);
+    		
+    		} else {
+    			request.setAttribute("msg", "해당 게시물이 존재하지 않습니다."); 
+    			request.setAttribute("url", "/ccedu/cc/boardList.do"); 
+    			return "forward:/common/msgForward.do";
+    		}
+			
+    	} catch (Exception e) { log.debug(e.getMessage());
+            throw new FrontException(e);
+        }
+    	
+    	return "ccedu/board/board_view";
+    	
+    }
+    
+	
+	
+	
+    /**
+     * 일반 게시판 (신용상담사(Q&A), 자유게시판) 
+     * @param request
+     * @param model
+     * @param rMap
+     * @return
+     * @throws FrontException
+     */
+    // TODO: 일반 게시판 (신용상담사(Q&A), 자유게시판)
+    @RequestMapping(value = "/ccedu/*/cmtBoardList.do")
+    public String cmtBoardList(HttpServletRequest request, HttpServletResponse res, DataMap rMap) throws FrontException {
+    	
+    	try{
+    		
+			request.setAttribute("categoryData", boardService.getBoardCategoryList(rMap));
+			
+			List<EduMap> listData = boardService.getBoardList(rMap);
+			request.setAttribute("listData", listData);
+			
+			
+			
+			request.setAttribute("listData", boardService.getBoardList(rMap));
+			request.setAttribute("resultCount", boardService.getBoardListCnt(rMap));
+			
+			request.setAttribute("REQUEST_DATA", rMap);
+			
+			
+    	} catch (Exception e) { log.debug(e.getMessage());
+            throw new FrontException(e);
+        }		
+    			
+    	return "ccedu/board/board_cmt_list";
+    }
+    
+    
+    
+    /**
+     * 일반 게시판 (신용상담사(Q&A) 상세보기
+     * @param request
+     * @param model
+     * @param rMap
+     * @return
+     * @throws FrontException
+     */
+    // TODO: 일반 게시판 (신용상담사(공지사항 / 자료실), 알림마당) 상세보기
+    @RequestMapping(value = "/ccedu/*/boardCmtView.do")
+    public String boardCmtView(HttpServletRequest request, HttpServletResponse res, DataMap rMap) throws FrontException {
+    	
+    	try{
+    	    
+    	    rMap.setString("userInfoDiv", "Y");
+    	    rMap.setString("loginDiv", "Y");
+    	    rMap.setString("cmtTitle", "댓글을 입력해주세요.");
+            
+            boardService.updateBoardViewCnt(rMap);
+            EduMap boardMap = boardService.getBoardView(rMap);
+            EduMap bbsInfo = boardService.bbsUserInfoChkAjax(rMap);
+    	    
+    	    if ("N".equals(rMap.getString("SES_ISLOGIN")) || rMap.getInt("SES_USERNO") < 1) {// 로그인 안했다면
+    	        rMap.setString("loginDiv", "N");
+    	        rMap.setString("cmtTitle", "로그인 해주세요.");
+            }
+    	    
+    	    
+	    	if(boardMap != null) {
+	    		rMap.setString("secuyn", boardMap.getString("SECUYN"));
+	    		
+	    		
+	    		  	if(boardMap.getString("SECUYN").equals("Y") && bbsInfo == null){
+	    	             request.setAttribute("msg", "본 게시물은 등록하신 분의 요청에 따라 <br/>게시자만 확인이 가능합니다."); 
+	                     request.setAttribute("url", "/ccedu/cc/cmtBoardList.do?bcateno=13"); 
+	                     return "forward:/common/msgForward.do";
+	 	    	 }
+	    		
+	    	    //게시글 작성자 여부 체크값
+	    	    if(bbsInfo == null){
+	    	        rMap.setString("userInfoDiv", "N");
+	    	    }
+	    	    
+		    	request.setAttribute("rowData", boardMap);
+		    	request.setAttribute("title", SangsUtil.removeScriptTag(stringToHtmlSign(boardMap.getString("TITLE"))));
+		    	request.setAttribute("content", SangsUtil.removeScriptTag(stringToHtmlSign(boardMap.getString("CONTENT"))));
+				request.setAttribute("listData", boardService.getFileList(rMap.getInt("bbsNo")));
+				
+				// Q&A 답변 내용
+				if(rMap.getString("bcateno").equals("13")){
+				 
+	                rMap.setInt("bbsNo", rMap.getInt("bbsNo"));
+	                EduMap cmtRowData = boardService.getLmsEdBbsCmtInfo(rMap);
+	                
+	                if(cmtRowData != null){
+	                	cmtRowData.put("REPLY", SangsUtil.removeScriptTag(stringToHtmlSign(cmtRowData.getString("REPLY"))));
+	                }
+	                
+	                request.setAttribute("cmtRowData", cmtRowData);
+	                
+	            // 자유게시판 답변 내용
+				} else if(rMap.getString("bcateno").equals("10")) {
+				    request.setAttribute("cmtListReply", boardService.getListReply(rMap));
+				} else if(rMap.getString("bcateno").equals("7")) { 
+				    request.setAttribute("cmtListReply", boardService.getListReply(rMap));
+				}
+				
+				int bbsnoPrev = boardMap.getInt("BBSNO_PREV");
+				int bbsnoNext = boardMap.getInt("BBSNO_NEXT");
+				
+				// 이전글
+				rMap.setInt("bbsNo", bbsnoPrev);
+				request.setAttribute("prevData", boardService.getBoardView(rMap));
+				
+				// 다음글
+				rMap.setInt("bbsNo", bbsnoNext);
+				request.setAttribute("nextData", boardService.getBoardView(rMap));
+				
+				request.setAttribute("categoryData", boardService.getBoardCategoryList(rMap));
+				request.setAttribute("REQUEST_DATA", rMap);   
+
+    		
+    		}
+	    	else {
+    			request.setAttribute("msg", "해당 게시물이 존재하지 않습니다."); 
+    			request.setAttribute("url", "/ccedu/cc/cmtBoardList.do?bcateno=13"); 
+    			return "forward:/common/msgForward.do";
+    		}
+			
+    	} catch (Exception e) { 
+    		log.debug(e.getMessage());
+    		System.out.println(e.toString());
+            throw new FrontException(e);
+        }
+    	
+    	return "ccedu/board/board_cmt_view";
+    	
+    }
+    
+    
+	 /**
+     * 신용상담사 > Q&A > 게시글 등록폼
+     * @param request
+     * @param model
+     * @param rMap
+     * @return
+     * @throws FrontException
+     */
+    @RequestMapping(value = "/ccedu/*/bbsForm.do")
+    public String bbsForm(HttpServletRequest request, HttpServletResponse response, DataMap rMap) throws FrontException {
+        try {
+        	
+        	if ("N".equals(rMap.getString("SES_ISLOGIN")) || rMap.getInt("SES_USERNO") < 1) {// 로그인 안했다면
+        	    
+        	    
+        	    rMap.putString("$bcateno", rMap.getString("bcateno"));
+        	    rMap.putString("$returnUrl", "/ccedu/intellectual/cmtBoardList.do");
+        	    
+        	    DataMap removeDataMap = new DataMap();
+        	    removeDataMap = SangsUtil.dataMapRemoveScriptTag(rMap);
+        	    
+        	    request.setAttribute("paramInputs", ControllerParamManager.getParamHtmlFormConvert(removeDataMap));
+                request.setAttribute("msg", "로그인이 필요한 페이지 입니다.");
+                request.setAttribute("url", "/ccedu/common/login.do");
+                return "forward:/common/msgForward.do";
+            }
+        	
+        	EduMap bbsInfo = new EduMap();
+        	EduMap boardMap = boardService.getBoardView(rMap);
+        	
+        	// 신규 등록 
+        	if(rMap.getString("type").equals("insert")){
+        	
+        	// 수정
+        	} else { 
+        	    if(boardMap != null && boardMap.getString("SECUYN").equals("Y")){
+                    rMap.setString("secuyn", boardMap.getString("SECUYN"));
+
+
+                    /*
+                     * 수정 내용 : 답변 내용이 있어도 수정 및 삭제 가능 하게 변경
+                     * 수정일    : 2018-07-04 
+                     *
+                    // Q&A 답변 내용
+                    rMap.setInt("bbsNo", rMap.getInt("bbsNo"));
+                    EduMap cmtRowData = boardService.getLmsEdBbsCmtInfo(rMap);
+                    
+                    
+                   if(cmtRowData != null ){
+                       request.setAttribute("msg", "수정할 수 없습니다."); 
+                       request.setAttribute("url", "/ccedu/cc/cmtBoardList.do?bcateno=13"); 
+                       return "forward:/common/msgForward.do";
+                   }
+                   */
+                   
+                   
+                }
+        	    
+                bbsInfo = boardService.bbsUserInfoChkAjax(rMap);
+                
+                if(bbsInfo == null){
+                    request.setAttribute("msg", "수정할 수 없습니다."); 
+                    request.setAttribute("url", "/ccedu/cc/cmtBoardList.do?bcateno=13"); 
+                    return "forward:/common/msgForward.do";
+                }
+                
+                // 2018-12-27 취약점 보완
+                if(rMap.getInt("SES_USERNO") != boardMap.getInt("USERNO")) {
+                	request.setAttribute("msg", "수정할 수 없습니다."); 
+                	request.setAttribute("url", "/ccedu/cc/cmtBoardList.do?bcateno=13"); 
+                	return "forward:/common/msgForward.do";
+                }
+                
+                request.setAttribute("rowData", boardMap);
+                request.setAttribute("listData", boardService.getFileList(rMap.getInt("bbsNo")));
+        	}
+        	        	
+        	
+        	request.setAttribute("REQUEST_DATA", rMap);
+        
+        } catch (Exception e) { log.debug(e.getMessage());
+            throw new FrontException(e);
+        }
+        
+        
+        return "ccedu/board/cmt_board_form";
+    }
+	
+    
+	 /**
+     * 신용상담사 > Q&A > 게시글 등록
+     * @param request
+     * @param model
+     * @param rMap
+     * @return
+     * @throws FrontException
+     */
+    @RequestMapping(value = "/ccedu/*/bbsExec.do")
+    public String bbsExec(HttpServletRequest request, HttpServletResponse response, DataMap rMap) throws FrontException {
+        
+        String url = "";
+        
+        try {
+        	
+        	rMap.set("content", rMap.getString("content").replace("&lt;script&gt;", ""));
+        	rMap.set("content", rMap.getString("content").replace("&lt;/script&gt;", ""));
+        	rMap.set("title", rMap.getString("title").replace("&lt;script&gt;", ""));
+        	rMap.set("title", rMap.getString("title").replace("&lt;/script&gt;", ""));
+        	
+        	
+        	if ("N".equals(rMap.getString("SES_ISLOGIN")) || rMap.getInt("SES_USERNO") < 1) {// 로그인 안했다면
+                request.setAttribute("msg", "로그인이 필요한 페이지 입니다.");
+                request.setAttribute("url", "/academy/common/login.do");
+                return "forward:/common/msgForward.do";
+            }
+        	
+        	
+        	        	
+        	Calendar calendar = Calendar.getInstance();
+            java.util.Date date = calendar.getTime();
+            String today = (new SimpleDateFormat("yyyyMMddHHmmss").format(date)); 
+            
+            UserSessionVO reqVo = UserSessionManager.getUserSessionVO(request);
+            
+            SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMddHHmmss");
+            Date chnageSessionWdate = new Date();
+            if(reqVo.getSessionWdate() != null && !"".equals(reqVo.getSessionWdate())) {
+            	chnageSessionWdate = sdf.parse(reqVo.getSessionWdate());
+            }
+            
+            
+            if(!"13".equals(rMap.getString("bcateno")) && rMap.getString("secuYn").equals("Y")){
+            	 rMap.setString("secuYn","Y");
+            }
+            
+        	//카테고리 13 : Q&A, 10 : 자유게시판
+        	if("13".equals(rMap.getString("bcateno"))){
+        		url = "/ccedu/cc/cmtBoardList.do?bcateno="+ rMap.getString("bcateno");
+        	} else if("10".equals(rMap.getString("bcateno"))) {
+        		url = "/ccedu/intellectual/cmtBoardList.do?bcateno="+ rMap.getString("bcateno");
+        	}
+        	else{
+        		request.setAttribute("msg", "비정상적인 글쓰기 접근입니다.");
+                request.setAttribute("url", "/ccedu/main/main.do");
+                return "forward:/common/msgForward.do";
+        	}
+        	
+        	
+        	if(rMap.getString("execFlag").equals("UPDATE")){
+        	    //수정
+                boardService.updateBoardInfo(request, rMap);
+                request.setAttribute("REQUEST_DATA", rMap);
+        	} else {
+        		long min= (date.getTime() - chnageSessionWdate.getTime()) / (60 * 1000); // 분
+        		if( !(reqVo.getSessionWdate() != null && !"".equals(reqVo.getSessionWdate()) )||  1 <= min){
+    				
+        			//세션 값이 없으면 true
+        			//세션 값과 현재 시간이 1분이상 차이나면 true
+	        		// 마지막 글 작성 년월일시분 세팅
+	            	
+	            	reqVo.setSessionWdate(today);
+	                UserSessionManager.setUserSessionVO(request, reqVo);
+	        		
+	        	    //등록
+	                boardService.insertBoardInfo(request, rMap);
+	                request.setAttribute("REQUEST_DATA", rMap);
+        		}
+        	}
+        	
+        } catch (Exception e) { log.debug(e.getMessage());
+            throw new FrontException(e);
+        }
+        
+        request.setAttribute("url", url);
+        return "forward:/common/msgForward.do";
+        
+    }
+    
+    	
+	private String stringToHtmlSign(String str){
+	    String data =  str.replaceAll("&amp;", "&").replaceAll("&lt;", "<").replaceAll("&gt;", ">").replaceAll("&quot;", "\"").replaceAll("&#39;", "\'");
+//	    return data.replaceAll("<p>","").replaceAll("</p>","<br/>");
+	    return data.replaceAll("<([pP]*)(\\s[a-zA-Z]*=[^>]*)?(\\s)*(/)?>","").replaceAll("</p>","<br/>");
+	}	
+	
+	/**
+     * 신용상담사 > 고객센터 > Q&A > 파일삭제
+     *
+     * @param request
+     * @param res
+     * @param rMap
+     * @return
+     * @throws Exception
+     */
+    @RequestMapping(value = "/ccedu/qna/bbsFileDeleteAjax.do")
+    public void bbsFileDeleteAjax(HttpServletRequest request, DataMap rMap, HttpServletResponse response) throws Exception {
+        
+        response.setContentType("text/html; charset=utf-8");
+        Gson gson = new Gson();
+        String json = null;
+        PrintWriter out = response.getWriter();
+        try {
+
+            //수정
+            boardService.deleteQnaFile(request, rMap);
+            
+            json =  gson.toJson(rMap);
+            
+        } catch (Exception e) {
+            json = gson.toJson("FAIL");
+        }
+
+        out.print(json);
+        out.flush();
+        out.close();
+    }
+	
+	
+	  /**
+	  * 파일다운로드
+	  * @param url
+	  * @param msg
+	  * @param model
+	  * @return
+	  * @throws Exception
+	  */
+	 @RequestMapping(value = "/ccedu/noticeFiledown.do")
+	 public String noticeFiledown(HttpServletRequest req, HttpServletResponse res, DataMap rMap) throws FrontException {
+	
+	     DownloadServlet filedown = new DownloadServlet();
+	     boolean result;
+	
+	     try {
+	         //rMap.setString("filename", "/cmmn/6BAE7B3F1CBB415FBE6A15D65DB18BE7.xls");
+	         rMap.setString("filename", SangsUtil.replaceAll(rMap.getString("filename"), "/cmmn/", ""));
+	         //상위경로 진입 방지A
+	         
+	        
+	         
+	         
+	         EduMap boardMap = boardService.getBoardView(rMap);
+	         rMap.setString("secuyn", boardMap.getString("SECUYN"));
+	         EduMap bbsInfo = boardService.bbsUserInfoChkAjax(rMap);
+
+
+
+	         if(boardMap != null) {
+	         	    	    
+	         	if(boardMap.getString("SECUYN").equals("Y") && bbsInfo == null){
+	             	req.setAttribute("msg", "본 게시물은 등록하신 분의 요청에 따라 <br/>게시자만 확인이 가능합니다."); 
+	                req.setAttribute("url", "/ccedu/cc/cmtBoardList.do?" + rMap.getString("bcateno")); 
+	                return "forward:/common/msgForward.do";
+	         	}
+	         
+	         
+	         }
+	         
+	         
+	         
+	         
+	
+	         rMap.setString("fileId", req.getParameter("fileId"));
+	         rMap.setString("bbsNo", req.getParameter("bbsNo"));
+	         rMap.setString("fileSeq", req.getParameter("fileSeq"));
+	         
+				result = filedown.downLoadFile(req, res, boardMapper.getFileInfo(rMap));
+				
+	         if (result) {
+	             return null;
+	         } else {
+	             return "/common/cmmn_error";
+	         }
+	
+	     } catch (Exception e) { log.debug(e.getMessage());
+	         return "common/cmmn_error";
+	     }
+	 }
+	 
+	 
+	 
+	 /**
+	  * 썸네일 형식 게시판 (사이트관리 -> 생생교육현장)
+	  * @param url
+	  * @param msg
+	  * @param model
+	  * @return
+	  * @throws Exception
+	  */
+	 @RequestMapping(value = "/ccedu/*/thumBoardList.do")
+	 public String thumBoardList(HttpServletRequest request, HttpServletResponse res, DataMap rMap) throws FrontException {
+	  
+		 
+		 try {
+		
+		     rMap.setInt("bbsCount", 6);
+			 request.setAttribute("categoryData", boardService.getBoardCategoryList(rMap));
+	         request.setAttribute("listData", boardService.getBoardList(rMap));
+			 request.setAttribute("REQUEST_DATA", rMap);
+			 
+		} catch (Exception e) {
+			// TODO: handle exception
+			throw new FrontException(e);
+		}
+		 
+		 return "ccedu/board/thum_bord_list";
+	 }
+	 
+	 
+	 /**
+	  * 썸네일 형식 게시판 > 더보기  
+	  * @param url
+	  * @param msg
+	  * @param model
+	  * @return
+	  * @throws Exception
+	  */
+    @RequestMapping(value = "/ccedu/notice/ajaxthumDetailList.do")
+    public void ajaxthumDetailList(HttpServletRequest request, HttpServletResponse res, DataMap rMap) throws Exception {
+        res.setContentType("text/html; charset=utf-8");
+        PrintWriter out = res.getWriter();
+        Gson gson = new Gson();
+        String json = null ;
+     
+        
+        try {
+            rMap.setInt("bbsCount", 6);
+            json =  gson.toJson(boardService.getBoardList(rMap));
+            
+        }catch (Exception ex) {
+            json =  gson.toJson("FAIL");
+        }
+        out.print(json);
+        out.flush();
+        out.close();
+
+    }
+    
+    
+    /**
+	  * Q&A 게시판 삭제
+	  * @param url
+	  * @param msg
+	  * @param model
+	  * @return
+	  * @throws Exception
+	  */
+   @RequestMapping(value = "/ccedu/*/deleteBoardInfo.do")
+   public String deleteBoardInfo(HttpServletRequest request, HttpServletResponse res, DataMap rMap) throws Exception {
+   
+	   
+	   try {
+		   		
+		   	   boardService.deleteBoardInfo(rMap);
+	           request.setAttribute("msg", "등록하신 게시물이 삭제되었습니다.");
+	           if("13".equals(rMap.getString("bcateno"))) {
+	        	   request.setAttribute("url", "/ccedu/notice/cmtBoardList.do?bcateno=13");
+	           } else if("10".equals(rMap.getString("bcateno"))) {
+	        	   request.setAttribute("url", "/ccedu/notice/cmtBoardList.do?bcateno=10");
+	           }
+	           
+		
+		} catch (Exception e) {
+			// TODO: handle exception
+		}
+	   
+	   return "forward:/common/msgForward.do";
+	   
+   }
+
+	@RequestMapping(value = "/ccedu/*/ccEduFiledown.do")
+	public String ccEduFiledown(HttpServletRequest req, HttpServletResponse res, DataMap rMap) throws FrontException {
+
+		DownloadServlet filedown = new DownloadServlet();
+		boolean result;
+
+		try {
+			//rMap.setString("filename", "/cmmn/6BAE7B3F1CBB415FBE6A15D65DB18BE7.xls");
+			rMap.setString("filename", SangsUtil.replaceAll(rMap.getString("filename"), "/cmmn/", ""));
+			//상위경로 진입 방지
+
+
+			result = filedown.downLoadFile(req, res,  boardService.getDownloadFile(rMap));
+
+			if (result) {
+				return null;
+			} else {
+				return "/common/cmmn_error";
+			}
+
+		} catch (Exception e) { log.debug(e.getMessage());
+			return "common/cmmn_error";
+		}
+	}
+    
+}

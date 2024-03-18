@@ -1,0 +1,146 @@
+<%
+/****************************************************
+	system	: 학교 검색
+	summary	:	
+	wdate	: 2018-06-21
+	writer	: sangs
+*****************************************************/
+%>
+<%@ page language="java" contentType="text/html; charset=utf-8" pageEncoding="utf-8"%>
+<script type="text/javascript">
+
+	$(document).ready(function() {
+		
+		// 엔터 검색
+		$('#searchSchulNm').bind('keydown', function(e) {
+            if (e.keyCode == 13) { // enter key
+            	searchSchool();
+                return false;
+            }
+        });
+		
+	})
+
+	function searchSchool() {
+		
+// 		$("#currentPage").val(currentPage);
+			
+		if($("#gubun").val() == '') {
+			fnModalMsg("학교를 선택해주세요.");
+		}
+		 else if( $("#searchSchulNm").val() == '') {
+					fnModalMsg("학교명을 입력해주세요.");
+				}
+		else if($("#gubun").val() != '' && $("#searchSchulNm").val() != '') {
+			
+// 			$('#zipTable').showLoading();
+			$.ajax({
+			
+				type : "POST",
+				dataType : "json",
+				url : "/common/getSchoolListAjax.do",
+				data :  
+					{ 
+						gubun : $('#gubun').val(),
+						searchSchulNm : $("#searchSchulNm").val()
+			        },
+			    success : function(data) 
+			    	{
+			    	
+				    	if($(data).find('totalCount').text() == '0') {
+							fnModalMsg("검색결과 없습니다. 검색어에 잘못된 철자가 없는지, 정확한 학교명인지 다시 한번 확인해 주세요.");
+							return false;
+						}
+				    	if(data != null) {
+				    		
+							var content = data.dataSearch.content;
+								
+							$("#zipBody").html('');
+							$(content).each(function(i) {
+								console.log("학교이름 : " + $(content).get(i).schoolName +" / 학교주소 : " + $(content).get(i).adres);
+// 									var addr = $(content).get(i).schoolName + ' / ' + $(content).get(i).adres;
+									$("#zipBody").append('<tr><td scope="col" class="ts_th" style="width:230px"><a href="#" onclick="choiceSchool(\''+$(content).get(i).schoolName+'\'); return false;">'+$(content).get(i).schoolName+'</a></td><td scope="col" class="ts_td">' + $(content).get(i).adres + '</td></tr>');
+									
+								});
+						}
+					}	// success
+		 	}); 
+		}
+	}
+	
+	
+	
+	/* function choiceSchool(schoolName) {
+		alert("2222222222222");
+		
+		$("#finSchool").val(schoolName);
+		$("#zipBody").html("");
+		$("#popSchool").find('#schoolClose').click();
+		
+		var elemIndex = $("#finSchool").val().indexOf("초");
+		var middIndex = $("#finSchool").val().indexOf("중");
+		if(elemIndex == -1 || middIndex == -1) {
+			alert('초중 없슴');
+			
+			$(".major").show();
+		} else {
+			alert('초중 있');
+			
+			$(".major").hide();
+		}
+		
+	}
+ */
+
+</script>
+
+<!-- layer pop 학교검색 -->
+<div class="layerpop post" id="popSchool" tabindex="0" data-tooltip-con="popschool01" data-focus="popschool01" data-focus-prev="popschool01-close">
+	<div class="layer_mask tooltip-close"></div><!-- 블랙mask영역 -->
+	<div class="layer_cont">
+		<div class="lc_head">
+			<h4 class="lc_tit">학교 검색</h4>
+		</div>
+		<div class="lc_cont">
+
+			<div class="pop_con_search">
+				<p class="nt_tit">초등학교, 중학교, 고등학교, 대학교를 선택 후 학교명을 입력해 주세요.</p>
+				<fieldset>
+					<legend>학교 검색</legend>
+					<select name="gubun" id="gubun" title="학교분류 선택">
+						<option value="">선택</option>
+						<option value="elem_list">초등학교</option>
+						<option value="midd_list">중학교</option>
+						<option value="high_list">고등학교</option>
+						<option value="univ_list">대학교</option>
+						<option value="seet_list">특수/기타학교</option>
+       					<option value="alte_list">대안학교</option>
+					</select>
+					<input type="text" name="searchSchulNm" id="searchSchulNm" title="검색할 학교명을 입력하세요." />
+					<button type="button" class="btn_graybg02" onclick="searchSchool(); return false;">찾기</button>
+				</fieldset>
+				<div class="result_box">
+					<table class="table_style_row02" id="zipTable">
+						<caption>학교명, 주소 검색결과를 보여줍니다.</caption>
+						<thead>
+							<tr>
+								<th scope="col" class="ts_th" style="width:230px">학교명</th>
+								<th scope="col" class="ts_td">주소</th>
+							</tr>
+						</thead>
+						<tbody id="zipBody">
+							<tr>
+								<td class="ts_th" colspan="2">검색어를 입력하세요.</td>
+							</tr>
+						</tbody>
+					</table>
+				</div>
+			</div>
+
+		</div>
+	</div>
+	<button class="btn_close tooltip-close" id="schoolClose" data-focus="popschool01-close" data-focus-next="popschool01">닫기</button>
+</div>
+<!--// layer pop -->
+	
+	

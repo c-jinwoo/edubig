@@ -1,0 +1,85 @@
+<%
+/****************************************
+    subject : 전체메뉴
+    summary : 전체메뉴 > 이용안내 > 이용약관
+****************************************/
+%>
+<%@ page language="java" contentType="text/html; charset=utf-8" pageEncoding="utf-8"%>
+<%@ include file="/WEB-INF/jsp/ccedu/inc/taglib_inc.jsp"%>
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+	<%@ include file="/WEB-INF/jsp/ccedu/inc/head_inc.jsp"%>
+</head>
+
+<body>
+
+<!-- skip nav -->
+	<%@ include file="/WEB-INF/jsp/ccedu/inc/nav_inc.jsp"%>
+<!--// skip nav -->
+
+
+<div id="wrap">
+
+	<!-- header -->
+	<%@ include file="/WEB-INF/jsp/ccedu/inc/header_inc.jsp"%>
+	<!--// header -->
+
+	<!-- container -->
+	<div id="container">
+
+		<!-- location -->
+		<jsp:include page="/WEB-INF/jsp/ccedu/inc/location/loc_14.jsp"> 
+		  	<jsp:param name="menuNm" value="이메일무단수집거부"/> 
+		</jsp:include> 
+		<!--// location -->
+
+		<div class="con_center">
+
+			<!-- lnb -->
+			<div id="lnb">
+				<jsp:include page="/WEB-INF/jsp/ccedu/inc/lnb/lnb_14.jsp">
+					<jsp:param name="dep2" value="04"/>
+				</jsp:include>
+			</div>
+			<!--// lnb -->
+			
+			
+			<!-- content 본문 -->
+			<div id="content">
+				<h3 class="cont_titile type07">이메일무단수집거부<span></span></h3>
+
+				<!-- 본문내용 -->
+				<div class="cont_body">
+					<!-- start -->
+
+					<div class="c_section">
+					
+						<div class="agreement height" tabindex="0">
+							<h4 class="c_tit pc_mobile mb30">이메일무단수집거부</h4>
+							<p><br/>
+								웹사이트에 게시된 이메일 주소가 전자우편 수집 프로그램이나 그 밖의 기술적 장치를 이용하여 무단으로 수집되는 것을 거부하며, 이를 위반 시 정보통신망법에 의해 형사처벌 됨을 유념해주시기 바랍니다.
+								<br/>
+								</br/>
+								게시일 2021.02.19
+							</p>
+
+
+						</div>
+					</div>
+				</div>
+			</div>
+			
+		</div>
+	
+	</div>
+	<!--// container -->
+
+	<!-- foot -->
+	<%@ include file="/WEB-INF/jsp/ccedu/inc/footer_inc.jsp"%>
+	<!--// foot end -->
+
+</div>
+
+</body>
+</html>

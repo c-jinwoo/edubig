@@ -1,0 +1,47 @@
+<%
+/****************************************
+    subject : 회원가입
+    summary : 회원가입 : 연령선택
+****************************************/
+%>
+<%@ page language="java" contentType="text/html; charset=utf-8" pageEncoding="utf-8"%>
+<%@ include file="/WEB-INF/jsp/ccedu/inc/taglib_inc.jsp"%>
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+	<%@ include file="/WEB-INF/jsp/ccedu/inc/head_inc.jsp"%>
+</head>
+<body>
+	<!-- header -->
+	<%@ include file="/WEB-INF/jsp/ccedu/inc/header_inc.jsp"%>
+	<!--// header -->
+	
+	<!-- container -->
+	<div id="container">
+		<div class="con_center">
+			<div class="cont_title_wrapper">
+				<div class="wrapper">
+					<h3 class="cont_title">SNS 연동</h3>
+				</div>			
+			</div>
+			<div id="content">
+				<form name="frm" id="frm" action="/ccedu/user/memberJoinStep01.do" method="post">
+					<input type="hidden" id="snsType" name="snsType" value=""/>
+					<div class="wrapper">
+						<div class="cont_body">
+							<div class="c_section">	
+							
+							</div>
+						</div>	
+					</div>
+				</form>
+			</div>		
+		</div>	
+	</div>
+	<!--// container -->
+
+	<!-- foot -->
+	<%@ include file="/WEB-INF/jsp/ccedu/inc/footer_inc.jsp"%>
+	<!--// foot end -->
+</body>
+</html>

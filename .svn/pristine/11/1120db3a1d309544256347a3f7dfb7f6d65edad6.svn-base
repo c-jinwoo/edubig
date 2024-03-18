@@ -1,0 +1,45 @@
+package com.sangs.interceptor;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import org.springframework.web.servlet.ModelAndView;
+import org.springframework.web.servlet.ModelAndViewDefiningException;
+import org.springframework.web.servlet.handler.HandlerInterceptorAdapter;
+import com.sangs.session.SessionManager;
+
+/**
+ * Description : 사용자페이지 인터셉터
+ */
+public class InterceptorForFront extends HandlerInterceptorAdapter{
+    @Override
+    public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) throws Exception{        
+        // 중복로그인체크        
+        SessionManager sessionManager = SessionManager.getInstance();
+        int sessionResult = sessionManager.executeFrontSessionCheck(request);
+        if (sessionResult == SessionManager.SESS_RCODE_DOUBLE) {
+            ModelAndView modelAndView = new ModelAndView("forward:/common/msgForward.do");
+            modelAndView.addObject("msg", "중복로그인으로 자동 로그아웃되었습니다");
+            modelAndView.addObject("url", "/main/main.do");
+            throw new ModelAndViewDefiningException(modelAndView);
+        }   
+        return true;
+    }
+
+    /**
+     * view로 포워드되기전 처리 
+     */
+    @Override
+	public void postHandle(HttpServletRequest req, HttpServletResponse response, Object handler, ModelAndView modelAndView) throws Exception{
+		try {
+		    // 접속 이력 저장 로그 메인 쪽 업무
+			//String uri = req.getRequestURI();
+			    /*
+			if(uri.indexOf(".jsp") == -1) 
+			    accessLogService.insertFrontAccessLogInfo(req);
+			*/
+		}
+		catch(Exception e){ 
+			/*log.debug(e.getMessage());*/        	 
+		}
+	}
+}

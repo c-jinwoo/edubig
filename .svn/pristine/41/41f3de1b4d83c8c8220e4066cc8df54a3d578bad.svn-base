@@ -1,0 +1,59 @@
+<%@ page language="java" contentType="text/html; charset=utf-8" pageEncoding="utf-8"%>
+<%
+/****************************************
+	subject	: [공통] > 방문 교육 > LEFT 영역
+	summary	: LEFT 영역
+	author	: SANGS
+	date	: 2015-06-01
+****************************************/
+%>
+<script type="text/javascript">
+    $(document).ready(function(){
+		$('.ul_gnb').find('.gnb_<c:out value="${menu_nm}"/>').addClass('on');
+// 		$('.leftNavi').find('.lnb_<c:out value="${lnb_menu}"/> a').addClass('active');
+    });
+</script>
+<div class="leftMn">
+    <h1 class="ltTitle">
+        <span class="bold">신용상담사</span> 
+    </h1>
+    <nav>
+        <ul class="leftNavi">
+        	<li class="lnb_lectureInfo">
+        		<a href="/academy/course/lectureInfo.do" title="자격시험">자격시험</a>
+        		<a href="/ccedu/cceduInfo/ccEduIntro.do" title="자격소개" class="lnb_2dep">자격소개</a>
+        		<a href="/ccedu/cceduInfo/ccEduExamInfo.do" title="시험안내" class="lnb_2dep">시험안내</a>
+        		<a href="/ccedu/cceduInfo/ccEduSchedule.do" title="시험(일정)공고" class="lnb_2dep">시험(일정)공고</a>
+       		</li>
+        	
+            <li class="lnb_lecture">
+            	<a href="/ccedu/cceduExam/applicationApply.do" title="원서접수">원서접수</a>
+            	<a href="/ccedu/cceduExam/applicationApply.do" title="원서접수" class="lnb_2dep">원서접수</a>
+        		<a href="/ccedu/cceduExam/applicationCheck.do" title="접수조회/수정" class="lnb_2dep">접수조회/수정</a>
+        		<a href="/ccedu/cceduExam/identifiList.do" title="수험표 출력" class="lnb_2dep">수험표 출력</a>
+           	</li>
+           	
+           	<li class="lnb_lecture">
+            	<a href="/ccedu/cceduExam/examPassYnList.do" title="합격자조회/자격증신청">합격자조회/자격증신청</a>
+            	<a href="/ccedu/cceduExam/examPassYnList.do" title="합격자 조회" class="lnb_2dep">합격자 조회</a>
+        		<a href="/ccedu/cceduExam/licenceForm.do" title="자격증 발급신청" class="lnb_2dep">자격증 발급신청</a>
+        		<a href="/ccedu/cceduExam/ccLicenseList.do" title="자격증 발급조회/수정" class="lnb_2dep">자격증 발급조회/수정</a>
+           	</li>
+           	
+           	<li class="lnb_lecture">
+            	<a href="/ccedu/cceduExam/refreTrainingInfo.do" title="보수교육">보수교육</a>
+            	<a href="/ccedu/cceduExam/refreTrainingInfo.do" title="교육안내" class="lnb_2dep">교육안내</a>
+        		<a href="/ccedu/cceduExam/refreTraining.do" title="수강하기" class="lnb_2dep">수강하기</a>
+           	</li>
+           	
+           	<li class="lnb_lecture">
+            	<a href="/ccedu/cceduInfo/boardDataList.do?bcateno=11" title="고객센터">고객센터</a>
+            	<a href="/ccedu/cceduInfo/boardDataList.do?bcateno=11" title="공지사항" class="lnb_2dep">공지사항</a>
+        		<a href="/ccedu/cceduInfo/faqList.do" title="FAQ" class="lnb_2dep">FAQ</a>
+        		<a href="/ccedu/cceduInfo/boardDataList.do?bcateno=13" title="Q&A" class="lnb_2dep">Q&A</a>
+        		<a href="/ccedu/cceduInfo/boardDataList.do?bcateno=14" title="자료실" class="lnb_2dep">자료실</a>
+           	</li>
+           	
+        </ul>
+    </nav>
+</div>

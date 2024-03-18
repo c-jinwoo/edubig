@@ -1,0 +1,451 @@
+@import url(./font.css);
+
+body {
+  width: 100%;
+  height: 100%;
+  background: url(../img/loading.gif) no-repeat;
+  background-size: 100% 100%;
+  overflow:hidden;
+  margin:0px;
+  padding:0px;
+}
+
+.content {
+  position: absolute;
+  left: 0px;
+  top: 0px;
+  width: 1012px;
+  height: 630px;
+}
+
+.content > .video1 {
+  position: absolute;
+  width: 100%;
+  height: auto;
+  z-index: 100;
+}
+
+.content > .controlBar {
+  position: absolute;
+  bottom : 0px;
+  z-index: 200;
+/*   background: hsla(0, 10%, 0%, 0.6); */
+  background: #001219;
+/*   padding-bottom: 40px; */
+  padding-top: 0px;
+  width: 1012px;
+  right:0px;
+  transition-duration: 0.4s;
+/*   border-top-left-radius: 20px; */
+
+
+
+}
+
+
+.content > .controlBar .button> button:hover,
+.content > .controlBar .button> button:focus{
+    background-position: -40px 0px;
+}
+
+.content > .controlBar > .button> button.toggle{
+    background-position: -0px -40px;
+}
+
+.content > .controlBar > .button > button.toggle:hover,
+.content > .controlBar > .button > button.toggle:focus{
+    background-position: -40px -40px;
+}
+
+
+
+
+.content > .controlBar > .button {
+  border: 0px;
+  cursor: pointer;
+  position: absolute;
+  width: 40px;
+  height: 40px;
+  font-family: KoPub DotumLight;
+  color: #ffffff
+}
+.content > .controlBar > .digClock {
+  top : 14px;
+  color: #ffffff;
+  font-family: KoPub DotumLight;
+  font-size: 13px;
+}
+.content > .controlBar > .curTime {
+  right : 462px;
+}
+.content > .controlBar > .slash {
+  right : 424px;
+}
+.content > .controlBar > .totalTime {
+  right : 412px;
+}
+
+.content > .controlBar > .etc1 {
+  left: 210px;
+}
+.content > .controlBar > .etc2 {
+  left : 248px;
+}
+.content > .controlBar > .etc3 {
+  left : 173px;
+}
+
+.content > .controlBar > .button > button {
+  border: 0px;
+  width: 100%;
+  height: 100%;
+  cursor: pointer;
+}
+.content > .controlBar > .logo {
+    background: url(../img/logo.png) no-repeat;
+    margin-left: 3px;
+    width: 126px;
+    height: 40px;
+    float: left;
+}
+
+.content > .controlBar > .data_down > button{
+    background: url(../img/databtn.png) no-repeat;
+    margin-left: 44px;
+    width: 90px;
+    height: 40px;
+    float: left;
+    border:0px;
+    cursor: pointer;
+}
+
+.content > .controlBar > .data_down > button:hover {
+    background: url(../img/databtn_over.png) no-repeat;
+}
+
+.content > .controlBar > .etc1 > button {
+  background: url(../img/etc1.png) no-repeat;
+}
+.content > .controlBar > .etc2 > button {
+  background: url(../img/etc2.png) no-repeat;
+}
+.content > .controlBar > .etc3 > button {
+  background: url(../img/etc3.png) no-repeat;
+}
+
+.content > .controlBar > .line{
+	height:20px; 
+	width:0px;
+	border-right:0px;
+	border-left: 1px solid #8c8c8c;
+	float:left;
+/* 	left:400px; */
+	margin-left: 80px;
+}
+.content > .controlBar > .line_2{
+	height:20px; 
+	width:0px;
+	border-right:0px;
+	border-left: 1px solid #8c8c8c;
+	float:left;
+/* 	left:400px; */
+	margin-left: 37px;
+}
+
+.content > .controlBar > .line_3{
+	height:20px; 
+	width:0px;
+	border-right:0px;
+	border-left: 1px solid #8c8c8c;
+	float:left;
+	margin-left: 393px;
+}
+
+.content > .controlBar > .line_4{
+	height:20px; 
+	width:0px;
+	border-right:0px;
+	border-left: 1px solid #8c8c8c;
+	float:left;
+/* 	left:400px; */
+	margin-left: 41px;
+}
+
+.content > .controlBar > .line_5{
+	height:20px; 
+	width:0px;
+	border-right:0px;
+	border-left: 1px solid #8c8c8c;
+	float:left;
+/* 	left:400px; */
+	margin-left: 43px;
+}
+
+.content > .controlBar > .play {
+  right: 359px;
+}
+
+.content > .controlBar > .pause {
+  right: 359px;
+}
+
+.content > .controlBar > .replay {
+  right : 315px;
+}
+
+.content > .controlBar > .trackBtn {
+  right : 272px;
+}
+
+.content > .controlBar > .fullScreen {
+  right : 160px;
+}
+
+.content > .controlBar > .play > button {
+  background: url(../img/play.png) no-repeat;
+}
+.content > .controlBar > .pause > button {
+  background: url(../img/pause.png) no-repeat;
+}
+.content > .controlBar > .replay > button {
+  background: url(../img/replay.png) no-repeat;
+}
+.content > .controlBar > .trackBtn > button {
+  background: url(../img/script.png) no-repeat;
+}
+.content > .controlBar > .fullScreen > button {
+  background: url(../img/fullscreen.png) no-repeat;
+}
+
+.content > .controlBar > .curPage {
+    right: 93px;
+    font-size: 24px;
+    top: 6px;
+    color:#35B7E8;
+/*     font-weight: 700; */
+}
+
+.content > .controlBar > .pageSlash {
+	right: 62px;
+    top: 8px;
+    font-size: 20px;
+    color: #666666;
+}
+.content > .controlBar > .totalPage {
+    right: 51px;
+    color: #ffffff;
+    top: 6px;
+    font-size: 24px;
+
+}
+
+
+.content > .controlBar > .movePrev {
+  right : 125px;
+}
+.content > .controlBar > .movePrev > button {
+  background: url(../img/prev.png) no-repeat;
+}
+.content > .controlBar > .moveNext {
+  right : 32px;
+}
+.content > .controlBar > .moveNext > button {
+  background: url(../img/next.png) no-repeat;
+}
+
+.content > .controlBar > .sound {
+  right: 233px;
+}
+
+.content > .controlBar > .sound > button {
+
+  background: url(../img/mute.png) no-repeat;
+}
+
+/* .soundHead{ */
+/* 	width: 20px; */
+/*     height: 20px; */
+/*     background: url(../img/dot.png) no-repeat; */
+/*     position: relative; */
+/*     z-index: 500; */
+/*     left: 775.5px; */
+/*     top: 10px; */
+/* } */
+
+
+.content > .controlBar > .nextAlert {
+  position: absolute;
+  width: 145px;
+  height: 32px;
+  right: 35px;
+  bottom: 38px;
+  transition-duration: 1.0s;
+  background: url(../img/moveAlert.png) no-repeat;
+  display: none;
+}
+
+
+.content > .controlBar > .timeLine {
+  position: absolute;
+/*   background: hsla(0, 10%, 10%, 0.3); */
+  background: #444444;
+  width: 21%;
+  padding-top: 9px;
+  top: 17px;
+  z-index: 250;
+  right: 512px;
+/*   border-radius: 20px; */
+}
+
+.content > .controlBar > .timeLine > .progress {
+  background: #35b7e8;
+  width: 0%;
+  position: absolute;
+  padding-top: 9px;
+  top: -0px;
+/*   border-radius: 20px; */
+}
+
+
+.content > .controlBar > .timeLine.hover{
+/*   background-color: hsla(0, 50%, 100%, 0.5); */
+  padding-top: 9px;
+}
+
+
+.content > .controlBar > .timeLine > .progress.hover {
+/*   background-color: hsl(173.6, 100%, 50%); */
+  padding-top: 9px;
+  top: -0px;
+}
+
+.content > .controlBar > .soundLine {
+  position: absolute;
+  background: #444444;
+  width: 45px;
+  padding-top : 6px;
+  right : 197px;
+  top: 17px;
+/*   border-radius: 20px; */
+}
+
+.content > .controlBar > .soundLine > .soundProgress {
+  background: #35b7e8;
+  width: 50%;
+/*   width: 45px; */
+  position: absolute;
+  padding-top: 6px;
+  top: -0px;
+/*   border-radius: 20px; */
+}
+
+.content > .controlBar > .soundLine:hover {
+/*   background-color: hsla(0, 50%, 100%, 0.5); */
+}
+
+.content > .printBtn {
+  right: 315px;
+  position: absolute;
+  right : 5%;
+  top : 10%;
+  width: 13%;
+  height: 18%;
+  background: url(../img/printBtn.png) no-repeat;
+  background-size: 100% 100%;
+  z-index: 300;
+  display: none;
+}
+
+
+@media screen and (max-width:870px) {
+  .content > .controlBar > .digClock {
+    font-size : 13px;
+    top : 12px;
+  }
+  .content > .controlBar > .setSpeed{
+    display: none;
+  }
+
+  .content > .controlBar > .speed1 {
+    display: none;
+  }
+
+  .content > .controlBar > .speed2 {
+    display: none;
+  }
+
+  .content > .controlBar > .speed3 {
+    display: none;
+  }
+
+  .content > .controlBar > .speed4 {
+    display: none;
+  }
+}
+
+
+.content > .controlBar > div > .tooltips.hover {
+	position: relative;
+}
+
+.content > .controlBar > div > .tooltips {
+	-webkit-transition: bottom .3s ease-in-out, opacity .3s ease-in-out;
+	-moz-transition: bottom .3s ease-in-out, opacity .3s ease-in-out;
+	transition: bottom .3s ease-in-out, opacity .3s ease-in-out;
+
+/* 	background-color: rgba(0, 0, 0, 0.8); */
+	background-color: #35B7E8;
+
+  -webkit-box-shadow: 0px 0px 3px 1px rgba(50, 50, 50, 0.4);
+	-moz-box-shadow: 0px 0px 3px 1px rgba(50, 50, 50, 0.4);
+	box-shadow: 0px 0px 3px 1px rgba(50, 50, 50, 0.4);
+
+  -webkit-border-radius: 5px;
+	-moz-border-radius: 5px;
+	border-radius: 5px;
+
+  color: #ffffff;
+	font-size: 12px;
+	margin-bottom: 10px;
+	padding: 7px 12px;
+	position: absolute;
+	width: auto;
+	min-width: 60px;
+	max-width: 300px;
+	word-wrap: break-word;
+
+	z-index: 9999;
+
+	opacity: 0;
+	left: -9999px;
+	top: -9999px;
+	width: 55px;
+	text-align: center;
+
+
+}
+
+
+.content > .controlBar > div > .tooltips::after
+{
+    
+    content: "";
+    position: absolute;
+    top: 100%;
+    left: 50%;
+    margin-left: -5px;
+    border-width: 5px;
+    border-style: solid;
+    border-color: #35B7E8 transparent transparent transparent;
+
+
+}
+
+
+
+
+.content > .controlBar > div > .tooltips.hover {
+  top: -70px;
+	left: -20px;
+	opacity: 1;
+}

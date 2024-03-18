@@ -1,0 +1,104 @@
+<%
+/****************************************
+    subject : 강사 > 메인
+****************************************/
+%>
+<%@ page language="java" contentType="text/html; charset=utf-8" pageEncoding="utf-8"%>
+<%@ include file="/WEB-INF/jsp/ccedu/inc/taglib_inc.jsp"%>
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+	<%@ include file="/WEB-INF/jsp/ccedu/inc/head_inc.jsp"%>
+	<!-- 이미지맵 반응형 -->
+	<script src="/cmmn/js/jquery.rwdImageMaps.min.js"></script>
+	<script type="text/javascript">	
+		$(document).ready(function(){
+			$('img[usemap]').rwdImageMaps();		
+		});
+		function fnSubmit(type, val){			
+			$("#mtSubCode").val(val);
+			
+			if(type == "course"){
+				$("#frm").attr("action","/ccedu/online/onlineEducationInfo.do");				
+			}
+			else if(type == "apply"){
+				$("#frm").attr("action","/ccedu/online/onlineDetailList.do");				
+			}
+			$("#frm").submit();
+		}
+	</script>
+</head>
+<body>
+	<!-- header -->
+	<%@ include file="/WEB-INF/jsp/ccedu/inc/header_inc.jsp"%>
+	<!--// header -->
+	
+	<form name="frm" id="frm" method="post" action="">
+		<input type="hidden" id="mtSubCode" name="mtSubCode" value=""/>
+	</form>		
+	<!-- container -->
+	<div id="container">
+		<div class="con_center">	
+			<div class="cont_title_wrapper">
+				<div class="wrapper">
+					<h3 class="cont_title">강사소개</h3>
+				</div>			
+			</div>
+			
+			<div id="content">
+				<div class="wrapper">			
+					<div class="cont_body">
+						<div class="course_wrapper">
+							<h3 class="cont_title">경영빅데이터분석사</h3>
+							<div class="tutor_list_box">
+								<ul class="tutor_list">
+									<li class="img_box">
+										<img src="/cmmn/images/bigdata_info01.png" alt="강사" usemap="#map1">
+										<map id="map1" name="map1">
+											<area class="tutor_btn_area" shape="rect" alt="" title="" coords="100,100,200,200" onclick="fnSubmit('course','SC1001')" target=""><!-- 과정소개 -->
+											<area class="tutor_btn_area" shape="rect" alt="" title="" coords="300,300,400,400" onclick="fnSubmit('apply','SC1001')" target=""><!-- 수강신청 -->
+										</map>										
+									</li>
+								</ul>
+							</div>
+						</div>
+						<div class="course_wrapper">
+							<h3 class="cont_title" style="margin-top:75px;">IEQ인터넷윤리지도사</h3>
+							<div class="tutor_list_box">
+								<ul class="tutor_list">
+									<li class="img_box">
+										<img src="/cmmn/images/bigdata_info02.png" alt="강사" usemap="#map2">
+										<map id="map2" name="map2">
+											<area class="tutor_btn_area" shape="rect" alt="" title="" coords="100,100,200,200" onclick="fnSubmit('course','SC1002')" target=""><!-- 과정소개 -->
+											<area class="tutor_btn_area" shape="rect" alt="" title="" coords="300,300,400,400" onclick="fnSubmit('apply','SC1002')" target=""><!-- 수강신청 -->
+										</map>										
+									</li>
+								</ul>
+							</div>
+						</div>
+						<div class="course_wrapper">
+							<h3 class="cont_title" style="margin-top:75px;">3D프린팅모델링</h3>
+							<div class="tutor_list_box">
+								<ul class="tutor_list">
+									<li class="img_box">
+										<img src="/cmmn/images/bigdata_info03.png" alt="강사" usemap="#map3">
+										<map id="map3" name="map3">
+											<area class="tutor_btn_area" shape="rect" alt="" title="" coords="100,100,200,200" onclick="fnSubmit('course','SC1003')" target=""><!-- 과정소개 -->
+											<area class="tutor_btn_area" shape="rect" alt="" title="" coords="300,300,400,400" onclick="fnSubmit('apply','SC1003')" target=""><!-- 수강신청 -->
+										</map>										
+									</li>
+								</ul>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>	
+		</div>
+	</div>
+	<!--// container -->
+	
+	<!-- foot -->
+	<%@ include file="/WEB-INF/jsp/ccedu/inc/footer_inc.jsp"%>
+	<!--// foot end -->
+</body>
+</html>

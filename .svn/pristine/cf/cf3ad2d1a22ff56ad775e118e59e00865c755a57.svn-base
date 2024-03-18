@@ -1,0 +1,2164 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.webapp.academy.mapper.TutorMapper">
+	<resultMap id="clobMap" type="emap">
+        <result property="bbsDesc" column="BBS_DESC" jdbcType="CLOB" javaType="java.lang.String"/>
+        <result property="SUMMARY" column="CONTENT" jdbcType="CLOB" javaType="java.lang.String"/>
+        <result property="CONTENT" column="CONTENT" jdbcType="CLOB" javaType="java.lang.String"/>
+        <result property="AN_CONTENT" column="AN_CONTENT" jdbcType="CLOB" javaType="java.lang.String"/>
+    </resultMap>
+	
+	<select id="getTutorCourseList" resultType="emap" parameterType="dmap" >
+	  SELECT 
+	  		A.*
+	  		, ((TOTALCNT - RNUM)+1) AS NUM
+	  FROM(
+		  SELECT 
+		        A.COURSENO
+		        , B.CSEQNO
+		        , A.MT_CTYPE_CODE
+		        , GET_MTCODE_NAME(A.MT_CTYPE_CODE) AS MT_CTYPE_NM
+		        , A.MT_CGRP_CODE
+		        , GET_MTCODE_NAME(A.MT_CGRP_CODE) AS MT_CGRP_NM  
+		        , B.SEQ_TITLE 
+		        , B.STUDY_SDATE
+		        , B.STUDY_EDATE
+		        , B.OPENTYPE
+		        , B.SEQ
+		        , (SELECT COUNT(1) FROM LMS_LE_COURSE_USER WHERE CSEQNO = B.CSEQNO AND USEYN = 'Y') AS  USER_CNT
+		        <!-- , ROW_NUMBER() OVER (ORDER BY STUDY_SDATE DESC) AS RNUM
+	            , COUNT(1) OVER() TOTALCNT --> 
+	            , ROWNUM AS RNUM
+		   FROM LMS_ED_COURSE A, LMS_ED_COURSE_SEQ B
+		   WHERE A.COURSENO = B.COURSENO
+		   AND B.MT_CSEQ_STATUS_CODE <![CDATA[<>]]> 'DEDA00'
+		   
+		   <if test="selectCtype != null and selectCtype != ''">
+		   AND A.MT_CTYPE_CODE = #{selectCtype}
+		   </if>
+           <if test="selectCgrp != null and selectCgrp != ''">
+		   AND A.MT_CGRP_CODE = #{selectCgrp}
+		   </if> 
+           <if test="searchWord != null and searchWord != ''">
+		   AND B.SEQ_TITLE LIKE '%'|| #{searchWord} ||'%'
+		   </if>
+		   <if test="searchSdate != null and searchSdate != ''">
+		   AND TO_CHAR(B.STUDY_SDATE, 'YYYYMMDD') BETWEEN  REPLACE(#{searchSdate}, '-', '') AND REPLACE(#{searchEdate}, '-', '')
+		   </if>
+			ORDER BY STUDY_SDATE DESC
+	   ) A
+	   WHERE 1=1
+       <if test="startNo != null and startNo != ''">
+       AND RNUM BETWEEN #{startNo} AND #{endNo}
+       </if> 
+	  
+	</select> 
+
+	<select id="getEdCourseSeqInfo" parameterType="dmap" resultType="emap">
+		SELECT
+	        A.STUDYTIME, 
+	        GET_MTCODE_NAME(B.MT_CGRP_CODE) MT_CGRP_NAME, MT_CGRP_CODE, 
+	        GET_MTCODE_NAME( B.MT_CTYPE_CODE) MT_CTYPE_NAME, MT_CTYPE_CODE,    
+	        GET_MTCODE_NAME(A.MT_CSEQ_STATUS_CODE) MT_CSEQ_STATUS_NAME, MT_CSEQ_STATUS_CODE, 
+	        A.EVAL_REPORT, A.EVAL_EXAM_MT, A.EVAL_EXAM_FINAL, A.EVAL_PROGRESS, A.EVAL_ATTEND, A.CSEQNO, A.COURSENO,
+	        A.DESCRIPTION, A.SHORT_DESCRIPTION , A.EX_DESCRIPTION,
+	        A.TARGET, A.PRICE, 
+	        TO_CHAR(A.STUDY_SDATE,'YYYY-MM-DD')STUDY_SDATE,
+	        TO_CHAR(A.STUDY_EDATE,'YYYY-MM-DD')STUDY_EDATE, 
+	        TO_CHAR(A.APPLY_SDATE,'YYYY-MM-DD')APPLY_SDATE,
+	        TO_CHAR(A.APPLY_EDATE,'YYYY-MM-DD')APPLY_EDATE,
+	        A.FIX_CNT, A.COMPLETION, A.COMP_VAL, A.EDUSEQ_YN, 
+	        A.MAX_CNT, A.SEQ_TITLE AS TITLE, A.SEQ,
+	        A.FEDATE, A.ATTEND_DES_DAY ,  NVL(A.ATTEND_DES_YN, 'N')  ATTEND_DES_YN, A.CLASS_DESK,
+	        A.PROGRESS, A.SUBJECT,  A.USEYN, A.OPENTYPE, A.EDUDAY, A.SITENO, A.REVIEWDAY,
+	    FROM  LMS_ED_COURSE_SEQ A , LMS_ED_COURSE B      
+	    WHERE A.COURSENO = B.COURSENO 
+		AND  CSEQNO=#{cseqno}
+	</select>
+	
+		<update id="updateEdCourseSeq" parameterType="dmap">
+		UPDATE LMS_ED_COURSE_SEQ SET MT_CSEQ_STATUS_CODE  = #{mtCseqStatusCode}
+		WHERE CSEQNO = #{cseqno} 
+	</update>
+	
+	<select id="getUpdateTutorInfo" resultType="emap" parameterType="dmap">
+		SELECT 
+		    USERNO, USERNAME, USERID, EMAIL, MOBILE, MT_TUTOR_CODE, 
+		    TUTOR_LEC_PRC, TUTOR_ETC_PRC, TUTOR_OJT_PRC, MT_GRADE_CODE
+		FROM VW_LMS_CT_USER
+		WHERE USERNO = #{SES_USERNO}  
+	</select>
+
+	<!-- 목록조회 -->
+	<select id="getCmmntyList" parameterType="dmap" resultMap="clobMap">
+		SELECT A.*
+		FROM(	
+			SELECT ROWNUM AS  RNUM	 	
+				, BBSNO
+				, BBS_NAME
+				, BBS_ANSWER_AT
+				, BBS_NOTICE_AT
+				, BBS_DESC
+				, USE_AT
+				, REGIST_ID
+				, TO_CHAR(REGIST_DATE , 'YYYY-MM-DD HH24:MI:SS') AS REGIST_DATE
+			FROM LMS_TT_BBS_MANAGE
+			WHERE 1=1 
+			<choose>
+				<when test=" useYn != null and useYn != '' ">
+					AND USE_AT = #{useYn}
+				</when>
+				<otherwise>
+					AND USE_AT = 'Y'
+				</otherwise>
+			</choose>
+			<if test=" searchWord != null and searchWord != ''">  
+				<if test=" searchMode == 'bName' ">
+					AND BBS_NAME LIKE '%'||#{searchWord}||'%'
+				</if>
+				<if test=" searchMode == 'regiId' ">
+					AND REGIST_ID LIKE '%'||#{searchWord}||'%'
+				</if>
+			</if>
+			ORDER BY BBSNO ASC
+			)A
+		<!-- WHERE RNUM BETWEEN  #{startNo} AND #{endNo} -->
+	</select>
+	
+	<!-- 게시판 카운트  -->	
+	<select id="getCmmntySubListCount" parameterType="dmap" resultType="emap" >
+		SELECT COUNT(*) AS totalCount 
+		FROM LMS_TT_BBS_NTT 
+		WHERE BBSNO = #{bbsNo}
+		<if test= " searchWord != null and searchWord != '' ">
+		 	AND TO_CHAR(REGIST_DATE , 'YYYY-MM-DD') BETWEEN  #{sdate} AND #{edate}
+		 	<if test= " searchMode == 'bName' ">
+		 		AND REGIST_ID LIKE '%'||#{searchWord}||'%'
+		 	</if>
+		 	<if test=" searchMode == 'title' ">
+				AND TITLE LIKE '%'||#{searchWord}||'%'
+			</if>
+		</if>
+	</select>
+	
+	<!-- 목록조회 -->
+	<select id="getCmmntySubTopList"  parameterType="dmap" resultType="emap">
+		SELECT A.*
+		FROM (
+			SELECT  ROWNUM AS RNUM
+				, A.*
+			FROM 
+				(
+				 SELECT A.*
+				 FROM	
+					(
+					 SELECT NTTNO
+						, BBSNO
+						, NTT_DEPTH
+						, PBBSNO
+						, TITLE
+						, RCNT
+						, REGIST_ID
+						, REGIST_NM
+						, NVL(NOTICE_AT , 'N')AS NOTICE_AT
+						, USE_AT
+						, TO_CHAR(REGIST_DATE , 'YYYY-MM-DD') AS REGIST_DATE
+						, ROUND(SYSDATE - REGIST_DATE) AS DATE_DIFF
+						<!-- , DATEDIFF(SYSDATE , TO_CHAR(REGIST_DATE,'yyyy-mm-dd') ) AS DATE_DIFF --> 
+					 FROM LMS_TT_BBS_NTT
+					 WHERE BBSNO = #{bbsNo}
+					 
+					 ORDER BY NOTICE_AT DESC , REGIST_DATE DESC 
+					 )A
+					 START WITH PBBSNO IS NULL
+					 CONNECT BY PRIOR NTTNO = PBBSNO
+					 ORDER SIBLINGS BY NOTICE_AT DESC
+				 )A
+				 WHERE 1=1
+				 <if test="sdate != null and sdate != '' and edate != null and edate != '' ">
+				 	AND REGIST_DATE BETWEEN  #{sdate} AND TO_DATE(#{edate} , 'YYYY-MM-DD')+1
+				 	<!-- AND TO_CHAR(REGIST_DATE , 'YYYY-MM-DD') BETWEEN  #{sdate} AND TO_DATE(#{edate} , 'YYYY-MM-DD')+1 -->
+				 </if>
+				 <if test= " searchWord != null and searchWord != '' ">
+				 	<if test= " searchMode == 'bName' ">
+				 		AND REGIST_NM LIKE '%'||#{searchWord}||'%'
+				 	</if>
+				 	<if test=" searchMode == 'title' ">
+						AND TITLE LIKE '%'||#{searchWord}||'%'
+					</if>
+				 </if>
+			 )A
+		WHERE A.RNUM BETWEEN #{startNo} AND #{endNo}
+		
+	</select>
+	
+	<!-- 목록조회 -->
+	<select id="getCmmntySubList"  parameterType="dmap" resultType="emap">
+		SELECT A.*
+		FROM (
+			SELECT  ROWNUM AS RNUM
+				, A.*
+			FROM 
+				(
+				 SELECT A.*
+				 FROM	
+					(
+					 SELECT NTTNO
+						, BBSNO
+						, NTT_DEPTH
+						, PBBSNO
+						, TITLE
+						, RCNT
+						, REGIST_ID
+						, REGIST_NM
+						, NOTICE_AT
+						, USE_AT
+						, TO_CHAR(REGIST_DATE , 'YYYY-MM-DD') AS REGIST_DATE
+						, ROUND(SYSDATE - REGIST_DATE) AS DATE_DIFF
+						<!-- , DATEDIFF(SYSDATE , TO_CHAR(REGIST_DATE,'yyyy-mm-dd') ) AS DATE_DIFF --> 
+					 FROM LMS_TT_BBS_NTT
+					 WHERE BBSNO = #{bbsNo}
+					 
+					 ORDER BY NOTICE_AT DESC , REGIST_DATE DESC 
+					 )A
+					 START WITH PBBSNO IS NULL
+					 CONNECT BY PRIOR NTTNO = PBBSNO
+				 )A
+				 WHERE 1=1
+				 <if test="sdate != null and sdate != '' and edate != null and edate != '' ">
+				 	AND REGIST_DATE BETWEEN  #{sdate} AND TO_DATE(#{edate} , 'YYYY-MM-DD')+1
+				 	<!-- AND TO_CHAR(REGIST_DATE , 'YYYY-MM-DD') BETWEEN  #{sdate} AND TO_DATE(#{edate} , 'YYYY-MM-DD')+1 -->
+				 </if>
+				 <if test= " searchWord != null and searchWord != '' ">
+				 	<if test= " searchMode == 'bName' ">
+				 		AND REGIST_NM LIKE '%'||#{searchWord}||'%'
+				 	</if>
+				 	<if test=" searchMode == 'title' ">
+						AND TITLE LIKE '%'||#{searchWord}||'%'
+					</if>
+				 </if>
+			 )A
+		WHERE A.RNUM BETWEEN #{startNo} AND #{endNo}
+	</select>
+	
+	<!-- 상세보기 -->
+	<select id="getCmmntyDetailSubInfo" parameterType="dmap" resultMap="clobMap">
+		SELECT NTTNO
+			, BBSNO
+			, NTT_DEPTH
+			, TITLE
+			, RCNT
+			, REGIST_ID
+			, USE_AT
+			, NVL(NOTICE_AT, 'N') NOTICE_AT
+			, CONTENT
+			, REGIST_ID
+			, REGIST_NM
+			, TO_CHAR(REGIST_DATE,'YYYY-MM-DD HH24:MI:SS')AS REGIST_DATE 
+		FROM LMS_TT_BBS_NTT
+		WHERE NTTNO = #{nttNo}
+	</select>
+	
+	<!-- 조회수증가 -->
+    <update id="updateCmmntyRcnt" parameterType="dmap">
+        UPDATE LMS_TT_BBS_NTT
+           SET RCNT = RCNT+1
+     	WHERE NTTNO = #{nttNo}
+    </update>
+    
+    <!-- 커뮤니티코드관리 삭제 비활성화 -->
+    <select id="selectReplyInfo" parameterType="dmap" resultType="int">
+        SELECT COUNT(*) FROM LMS_TT_BBS_NTT
+		WHERE BBSNO = #{bbsNo}
+		AND PBBSNO = #{nttNo}
+		AND USE_AT = 'Y'
+    </select>
+    
+    
+    <select id="getFileList" parameterType="dmap" resultType="emap">
+		SELECT FILE_ID
+			,FILE_SEQ
+			,FILE_NAME
+			,FILE_SIZE
+			,FILE_MASK
+			,DOWNLOAD_COUNT
+			,DOWNLOAD_EXPIRE_DATE
+			,DOWNLOAD_LIMIT_COUNT
+			,BBSNO
+			,NTTNO
+			,FTYPE
+			,SAVPATH
+			,ORGFILE
+			,SAVFILE
+			,DELETE_YN
+			,REG_DATE
+		FROM LMS_TT_BBS_FILE
+		WHERE BBSNO = #{bbsNo}
+		AND NTTNO = #{nttNo}
+	</select>
+	
+	<!-- 게시글 삭제 -->
+	<update id="deleteCmmntySubInfo" parameterType="dmap">
+		UPDATE LMS_TT_BBS_NTT 
+			SET USE_AT = 'N'
+		WHERE NTTNO = #{nttNo}
+	</update>
+	
+	<!-- 등록 -->
+	<insert id="insertCmmntySubInfo" parameterType="dmap">
+		INSERT INTO LMS_TT_BBS_NTT(
+			NTTNO
+			, BBSNO
+			, NTT_DEPTH
+			, TITLE
+			, CONTENT
+			, NOTICE_AT
+			, USE_AT
+			, REGIST_ID
+			, REGIST_NM
+			, REGIST_DATE
+			, RCNT
+			)
+			VALUES (
+			 (SELECT NVL(MAX(NTTNO),0)+1 FROM LMS_TT_BBS_NTT)
+			 , #{bbsNo}
+			 , 1
+			 , #{title}
+			 , #{summary}
+			 , #{noticeAt}
+			 , #{useAt}
+			 , #{SES_USERID}
+			 , #{SES_USERNAME}
+			 , SYSDATE
+			 , 0
+			)
+	</insert>
+	
+	<!-- 커뮤니티관리 서브파일 등록 -->
+	<insert id="insertCmmntySubFileInfo" parameterType="dmap">
+		INSERT INTO LMS_TT_BBS_FILE(
+			FILE_ID
+			, BBSNO
+			, NTTNO
+			, FILE_SEQ
+			, ORGFILE
+			, SAVFILE
+			, FILE_SIZE
+			, SAVPATH
+			, FTYPE
+			, REG_DATE
+		)
+		VALUES (
+			(SELECT NVL(MAX(FILE_ID) , 0)+1 FROM LMS_TT_BBS_FILE)
+			, #{bbsNo}
+			, #{nttNo}
+			, (SELECT NVL(MAX(FILE_SEQ),0)+1 FROM LMS_TT_BBS_FILE WHERE BBSNO = #{bbsNo} AND NTTNO = #{nttNo})
+			, #{uploadFileOrgName}
+			, #{uploadFileSaveName}
+			, #{uploadFileSize}
+			, #{uploadFileFulltPath}
+			, #{uploadFileExt}
+			, SYSDATE
+		)
+	</insert>
+	
+	<select id="getNewNttNo" parameterType="dmap" resultType="String">
+		SELECT MAX(NTTNO)
+		FROM LMS_TT_BBS_NTT
+	</select>
+	
+	<!-- 파일정보 업데이트  -->
+	<update id="updateCmmntySubFileInfo" parameterType="dmap">
+		UPDATE LMS_TT_BBS_FILE SET
+			BBSNO = #{bbsNo}
+			<if test="nttNo != null and nttNo != '' "> , NTTNO = #{nttNo} </if>
+		WHERE FILE_ID = #{fileId}
+	</update>
+	
+	<!-- 답글등록 -->
+	<insert id="insertCmmntySubReplyInfo" parameterType="dmap">
+		INSERT INTO LMS_TT_BBS_NTT(
+			NTTNO
+			, BBSNO
+			, PBBSNO
+			, NTT_DEPTH
+			, TITLE
+			, CONTENT
+			, NOTICE_AT
+			, USE_AT
+			, REGIST_ID
+			, REGIST_NM
+			, REGIST_DATE
+			, RCNT
+			)
+			VALUES (
+			 (SELECT NVL(MAX(NTTNO),0)+1 FROM LMS_TT_BBS_NTT)
+			 , #{bbsNo}
+			 , #{nttNo}
+			 , #{nttDepth}+1
+			 , #{title}
+			 , #{summary}
+			 , #{noticeAt}
+			 , #{useAt}
+			 , #{SES_USERID}
+			 , #{SES_USERNAME}
+			 , SYSDATE
+			 , 0
+			)
+	</insert>
+	
+	<update id="updateCmmnthSubInfo" parameterType="dmap">
+		UPDATE LMS_TT_BBS_NTT SET
+			TITLE = #{title}
+			, NOTICE_AT = #{noticeAt}
+			, CONTENT = #{summary}
+		WHERE BBSNO = #{bbsNo}
+		AND NTTNO = #{nttNo}
+	</update>
+	
+	<update id="updateCmmnthSubReplyInfo" parameterType="dmap">
+		UPDATE LMS_TT_BBS_NTT SET
+			NOTICE_AT = #{noticeAt}
+		WHERE PBBSNO = #{nttNo}
+		AND NTT_DEPTH = #{nttDepth}+1
+	</update>
+	
+	<!-- 커뮤니티관리 소분류 파일카운트 증가 -->
+	<update id="updateCmmntySubFileCount" parameterType="dmap">
+		UPDATE LMS_TT_BBS_FILE SET
+			DOWNLOAD_COUNT = (SELECT NVL(MAX(DOWNLOAD_COUNT) , 0)+1 FROM LMS_TT_BBS_FILE WHERE BBSNO = #{bbsNo} AND NTTNO = #{nttNo} AND FILE_ID = #{fileId})
+		WHERE BBSNO = #{bbsNo} 
+		AND NTTNO = #{nttNo}
+		AND FILE_ID = #{fileId}
+	</update>
+	
+	<!-- 권한코드 리스트 -->
+	<select id="getMtSubCodeList" parameterType="dmap" resultType="emap">
+	     SELECT MT_CODE
+            , MT_SUB_CODE
+            , MT_SUB_NAME
+            , NUM_CD
+            , ABC_CD
+            , ORDR
+            , USEYN
+        FROM LMS_CD_MT_SUB
+        WHERE MT_CODE=#{mtCode}  
+        AND USEYN ='Y'
+        <if test="abcCd != null and abcCd != ''">
+        	AND ABC_CD = #{abcCd}
+        </if>
+        <if test="ref1 != null and ref1 != ''">
+        	AND REF1 = #{ref1}
+        </if>
+        <if test="ref2 != null and ref2 != ''">
+        	AND REF2 = #{ref2}
+        </if>
+        <if test="ref3 != null and ref3 != ''">
+        	AND REF3 = #{ref3}
+        </if>
+        ORDER BY ORDR, MT_SUB_CODE ASC
+    </select>
+    
+    <!-- 강사 상세 조회 -->
+	<select id="getTutorDetail" parameterType="dmap" resultType="emap">
+		SELECT /*tutor.getTutorDetail*/
+            TM.USERNO  
+            ,(SELECT MT_SUB_NAME  FROM LMS_CD_MT_SUB A WHERE A.MT_SUB_CODE = TM.MT_TUTOR_SE_CODE) AS MT_TUTOR_SE_NAME                 
+            ,(SELECT MT_SUB_NAME  FROM LMS_CD_MT_SUB A WHERE A.MT_SUB_CODE = TM.MT_FIELD_CODE) AS MT_FILED_NAME
+            ,(SELECT MT_SUB_NAME  FROM LMS_CD_MT_SUB A WHERE A.MT_SUB_CODE = TM.MT_AREA1_CODE) AS MT_AREA1_NAME
+            ,(SELECT MT_SUB_NAME  FROM LMS_CD_MT_SUB A WHERE A.MT_SUB_CODE = TM.MT_AREA2_CODE) AS MT_AREA2_NAME
+            ,(SELECT MT_SUB_NAME  FROM LMS_CD_MT_SUB A WHERE A.MT_SUB_CODE = TM.MT_ACDMCR_CODE) AS MT_ACDMCR_NAME
+            , TM.SCHUL
+            , TM.MAJOR
+            , TM.CRQFC
+            , TM.KO_ABLTY
+            , TM.PPT_ABLTY
+            , TM.EXCEL_ABLTY
+            , TM.WORD_ABLTY
+            , TM.REGIST_DT
+            , TM.CANCEL_YN
+            , CUM.UNITY_ID
+            , CUM.SEX
+            , CUM.MBERNM /*이름*/
+            , CUM.EMAIL /*이메일*/
+            , CUM.TELNO /*전화번호*/
+            , CUM.MOBLPHON
+            , (SELECT MT_SUB_NAME  FROM LMS_CD_MT_SUB A WHERE A.MT_SUB_CODE = CUM.MT_GRADE_CODE) AS MT_GRADE_NAME
+		FROM
+			LMS_CT_UNITY_MBER CUM,
+			LMS_TT_MBER_MANAGE TM
+		WHERE
+		CUM.UNITY_MBERNO = TM.USERNO
+		AND CUM.UNITY_MBERNO = #{SES_USERNO}
+	</select>
+	
+	<!-- 강사 상세 조회 -->
+	<select id="getTutorDetail2" parameterType="dmap" resultType="emap">
+		SELECT /*tutor.getTutorDetail*/
+			TM.USERNO  
+			,(SELECT MT_SUB_NAME  FROM LMS_CD_MT_SUB A WHERE A.MT_SUB_CODE = CUM.MT_TUTOR_CODE) AS MT_TUTOR_FIELD_NAME  
+            ,(SELECT MT_SUB_NAME  FROM LMS_CD_MT_SUB A WHERE A.MT_SUB_CODE = TM.MT_TUTOR_SE_CODE) AS MT_TUTOR_SE_NAME                 
+            ,(SELECT MT_SUB_NAME  FROM LMS_CD_MT_SUB A WHERE A.MT_SUB_CODE = TM.MT_FIELD_CODE) AS MT_FIELD_NAME
+            ,(SELECT MT_SUB_NAME  FROM LMS_CD_MT_SUB A WHERE A.MT_SUB_CODE = TM.MT_AREA1_CODE) AS MT_AREA1_NAME
+            ,(SELECT MT_SUB_NAME  FROM LMS_CD_MT_SUB A WHERE A.MT_SUB_CODE = TM.MT_AREA2_CODE) AS MT_AREA2_NAME
+            ,(SELECT MT_SUB_NAME  FROM LMS_CD_MT_SUB A WHERE A.MT_SUB_CODE = TM.MT_ACDMCR_CODE) AS MT_ACDMCR_NAME
+            , TM.SCHUL
+            , TM.MAJOR
+            , TM.CRQFC
+            , TM.KO_ABLTY
+            , TM.PPT_ABLTY
+            , TM.EXCEL_ABLTY
+            , TM.WORD_ABLTY
+            , TM.REGIST_DT
+            , TM.CANCEL_YN
+            , CUM.UNITY_ID
+            , CUM.SEX
+            , CUM.MBERNM /*이름*/
+            , CUM.EMAIL /*이메일*/
+            , CUM.TELNO /*전화번호*/
+            , CUM.MOBLPHON
+            , (SELECT MT_SUB_NAME  FROM LMS_CD_MT_SUB A WHERE A.MT_SUB_CODE = CUM.MT_GRADE_CODE) AS MT_GRADE_NAME
+            , TM.WORK_AFTER
+            , TM.SCHOOL_OUT_DT
+            , TM.WORK_IN_DT
+            , TM.DEPT_NM
+            , TM.POSITION_NM
+            , CUM.BRTHDY
+            , LNM_ADRES1
+            , LNM_ADRES2
+		FROM
+			LMS_CT_UNITY_MBER CUM,
+			LMS_TT_MBER_MANAGE TM
+		WHERE
+		CUM.UNITY_MBERNO = TM.USERNO
+		AND CUM.UNITY_MBERNO = #{SES_USERNO}
+	</select>
+	
+	<select id="getTutorEntRstList" parameterType="dmap" resultType="emap">
+		SELECT /*tutor.getTutorEntRstList*/
+		 	USERNO  
+            ,(SELECT MT_SUB_NAME  FROM LMS_CD_MT_SUB A WHERE A.MT_SUB_CODE = MT_TUTOR_SE_CODE) AS MT_TUTOR_NAME                 
+            ,(SELECT MT_SUB_NAME  FROM LMS_CD_MT_SUB A WHERE A.MT_SUB_CODE = MT_FIELD_CODE) AS MT_FILED_NAME
+            ,(SELECT MT_SUB_NAME  FROM LMS_CD_MT_SUB A WHERE A.MT_SUB_CODE = MT_AREA1_CODE) AS MT_AREA1_NAME
+            ,(SELECT MT_SUB_NAME  FROM LMS_CD_MT_SUB A WHERE A.MT_SUB_CODE = MT_AREA2_CODE) AS MT_AREA2_NAME
+            ,(SELECT MT_SUB_NAME  FROM LMS_CD_MT_SUB A WHERE A.MT_SUB_CODE = MT_ACDMCR_CODE) AS MT_ACDMCR_NAME
+            , SCHUL
+            , MAJOR
+            , CRQFC
+            , KO_ABLTY
+            , PPT_ABLTY
+            , EXCEL_ABLTY
+            , WORD_ABLTY
+            , REGIST_DT
+            , CANCEL_YN
+		FROM
+			LMS_TT_MBER_MANAGE
+		WHERE USERNO = #{SES_USERNO}
+	</select>
+	
+	<select id="getTutorEntRstYearList" parameterType="dmap" resultType="emap">
+		SELECT  
+			REGIST_DT
+		FROM
+			LMS_TT_MBER_MANAGE
+		WHERE USERNO = #{SES_USERNO}
+		AND MT_FIELD_CODE= #{mtFieldCode}
+	</select>
+	
+	<select id="getMtFieldNameList" parameterType="dmap" resultType="emap">
+		SELECT  
+			MT_FIELD_CODE
+			,(SELECT MT_SUB_NAME  FROM LMS_CD_MT_SUB  WHERE MT_SUB_CODE = MT_FIELD_CODE) AS MT_FIELD_NAME  
+		FROM
+			LMS_TT_MBER_MANAGE
+		WHERE USERNO = #{SES_USERNO}
+		GROUP BY MT_FIELD_CODE
+		ORDER BY MT_FIELD_CODE ASC
+	</select>
+	
+	<update id="updateTutorInfo" parameterType="dmap">
+		UPDATE LMS_TT_MBER_MANAGE SET
+			MT_TUTOR_SE_CODE = #{mtTutorSeCode}
+			, MT_FIELD_CODE = #{mtFieldCode}
+			, MT_AREA1_CODE = #{mtArea1Code}
+			, MT_AREA2_CODE = #{mtArea2Code}
+			, MT_ACDMCR_CODE = #{mtAcdmcrCode}
+			, SCHOOL_OUT_DT = #{school_out_dt}
+			, SCHUL = #{schul}
+			, MAJOR = #{major}
+			, WORK_AFTER = #{workAfter}
+			, WORK_IN_DT = #{work_in_dt}
+			, DEPT_NM = #{dept_nm}
+			, POSITION_NM = #{position_nm}
+			, CRQFC = #{crqfc}
+		WHERE USERNO = #{userno}
+	</update>
+	
+	 <!-- 강사 정보 전직장 최대번호 -->
+    <select id="getMaxBoardNo" resultType="int" >
+        SELECT NVL(MAX(WORK_HIS_SEQ),0)+1 FROM LMS_TT_MBER_WORK_HIS
+    </select>
+	
+	<!-- 강사 전직장 삭제-->
+	<delete id="deleteTutorInfo" parameterType="dmap">
+		DELETE FROM 
+			LMS_TT_MBER_WORK_HIS
+			WHERE USERNO = #{userno}
+	</delete>
+	
+	
+	<!-- 강사 정보 전직장 -->
+	<insert id="updateTutorInfo2" parameterType="dmap">
+		MERGE INTO LMS_TT_MBER_WORK_HIS
+        USING DUAL
+            ON ( USERNO = #{userno} AND WORK_HIS_SEQ = #{work_his_seq}
+        )
+        WHEN MATCHED THEN
+         UPDATE SET
+           WORK_NM = #{work_nm}
+			, WORK_IN_DT = #{work_in_dt}
+			, WORK_OUT_DT = #{work_out_dt}
+			, DEPT_INFO = #{dept_info}
+        WHEN NOT MATCHED THEN
+         INSERT (WORK_HIS_SEQ,WORK_NM,WORK_IN_DT,WORK_OUT_DT,DEPT_INFO,USERNO)
+         VALUES (
+             #{work_his_seq}, #{work_nm}, #{work_in_dt}, #{work_out_dt}
+             , #{dept_info}, #{userno})
+	</insert>
+	
+	
+	<!-- 강사 이력 리스트 -->
+	<select id="getTutorHisList" parameterType="dmap" resultType="emap">
+		SELECT 
+			HISNO
+			, THEMA
+			, USERNO
+			, START_DT
+			, END_DT
+			, TARGET
+			, APPLY_ORGAN
+			, PERSON_CNT
+			, COUNT(*) OVER() AS TOTAL_CNT
+		FROM
+			LMS_TT_MBER_HIS
+		WHERE USERNO = #{userno}
+		ORDER BY HISNO	
+	</select>
+	
+	<!-- 강사이력 수정 -->
+	<update id="updateTutorHis" parameterType="dmap">
+		UPDATE 
+			LMS_TT_MBER_HIS
+		SET
+			START_DT = #{startDt}
+			, END_DT = #{endDt}
+			, TARGET = #{target}
+			, THEMA = #{thema}
+			, PERSON_CNT = #{personCnt} 
+			, APPLY_ORGAN = #{applyOrgan}
+		WHERE HISNO = #{hisno}
+		AND USERNO = #{userno}
+			
+	</update>
+	
+	<!-- 강사이력 등록 -->
+	<insert id="insertTutorHis" parameterType="dmap">
+		INSERT INTO 
+			LMS_TT_MBER_HIS (
+				HISNO
+				, THEMA
+				, USERNO
+				, START_DT
+				, END_DT
+				, TARGET
+				, APPLY_ORGAN
+				, PERSON_CNT
+				, REGIST_DT
+			) VALUES (
+				(SELECT NVL(MAX(HISNO),0)+1 FROM LMS_TT_MBER_HIS)
+				, #{thema}
+				, #{userno}
+				, #{startDt}
+				, #{endDt}
+				, #{target}
+				, #{applyOrgan}
+				, #{personCnt}
+				, SYSDATE
+			)
+	</insert>
+	
+	<!-- 강사이력 삭제 -->
+	<delete id="deleteTutorHis" parameterType="dmap">
+		DELETE FROM LMS_TT_MBER_HIS WHERE HISNO = #{hisno}
+	</delete>
+	
+	<!-- 커뮤니티 파일 삭제 -->
+	<delete id="deleteCmmntyFile" parameterType="dmap">
+		DELETE FROM LMS_TT_BBS_FILE WHERE FILE_ID = #{fileId}
+	</delete>
+	
+	<!-- 정규교육 강의목록조회 -->
+    <select id="getLectureList" resultType="emap" parameterType="dmap">
+         SELECT * FROM (
+             	SELECT
+                    ROWNUM AS RNUM 
+                    , A.*
+                    , NVL((SELECT 
+                                ROUND(AVG(ITEMSEQ),2)
+                            FROM LMS_LE_POLL_HIST c,LMS_LE_POLL_QUIZ d
+                            WHERE c.POLLCSEQNO = d.POLLCSEQNO
+                            AND c.QNO = d.QNO 
+                            AND d.CSEQNO =  A.CSEQNO
+                            AND d.PERIOD = A.PERIOD),0) AS AVG_POINT
+                 FROM 
+                (SELECT 
+                aa.PERIOD
+                , aa.LIBNO
+                , aa.TUTOR_USERNO
+                , bb.* 
+                FROM LMS_ED_COURSE_TUTOR aa,(
+                    SELECT 
+                        a.COURSENO
+                        , a.MT_SC_CODE 
+                        , (SELECT MT_SUB_NAME FROM LMS_CD_MT_SUB WHERE MT_SUB_CODE = a.MT_SC_CODE) AS MT_SC_NAME
+                        , a.MT_CGRP_CODE  
+                        , (SELECT MT_SUB_NAME FROM LMS_CD_MT_SUB WHERE MT_SUB_CODE = a.MT_CGRP_CODE) AS MT_CGRP_NAME
+                        , a.MT_CTYPE_CODE     
+                        , (SELECT MT_SUB_NAME FROM LMS_CD_MT_SUB WHERE MT_SUB_CODE = a.MT_CTYPE_CODE) AS MT_CTYPE_NAME
+                        , a.COURSETITLE
+                        , b.CSEQNO
+                        , b.SEQ
+                        , b.SEQ_TITLE           
+                        , TO_CHAR(b.STUDY_SDATE,'YYYY-MM-DD') AS EDU_SDATE
+                        , TO_CHAR(b.STUDY_EDATE,'YYYY-MM-DD') AS EDU_EDATE
+                    FROM LMS_ED_COURSE a,LMS_ED_COURSE_SEQ b
+                    WHERE a.COURSENO = b.COURSENO) bb
+                WHERE aa.CSEQNO = bb.CSEQNO
+                AND TUTOR_USERNO = #{SES_USERNO}
+                ORDER BY EDU_SDATE DESC) A)
+         	 WHERE RNUM BETWEEN #{startNo} AND #{endNo}     
+    </select>
+	
+	<!-- 정규교육 강의이력 (데이터 총 갯수) -->
+    <select id="getLectureListCount" resultType="int" parameterType="dmap">
+		SELECT count(*) FROM
+            (
+	         SELECT ROWNUM AS RNUM,A.*,B.AVG_POINT FROM (
+            SELECT 
+			    aa.PERIOD
+			    , aa.LIBNO
+			    , aa.TUTOR_USERNO
+			    , bb.* 
+			FROM LMS_ED_COURSE_TUTOR aa,(
+				SELECT 
+				    a.COURSENO
+				    , a.MT_SC_CODE 
+				    , (SELECT MT_SUB_NAME FROM LMS_CD_MT_SUB WHERE MT_SUB_CODE = a.MT_SC_CODE) AS MT_SC_NAME
+				    , a.MT_CGRP_CODE  
+				    , (SELECT MT_SUB_NAME FROM LMS_CD_MT_SUB WHERE MT_SUB_CODE = a.MT_CGRP_CODE) AS MT_CGRP_NAME
+				    , a.MT_CTYPE_CODE     
+				    , (SELECT MT_SUB_NAME FROM LMS_CD_MT_SUB WHERE MT_SUB_CODE = a.MT_CTYPE_CODE) AS MT_CTYPE_NAME
+				    , a.COURSETITLE
+				    , b.CSEQNO
+				    , b.SEQ
+				    , b.SEQ_TITLE           
+				    , TO_CHAR(b.STUDY_SDATE,'YYYY-MM-DD') AS EDU_SDATE
+					, TO_CHAR(b.STUDY_EDATE,'YYYY-MM-DD') AS EDU_EDATE
+				FROM LMS_ED_COURSE a,LMS_ED_COURSE_SEQ b
+				WHERE a.COURSENO = b.COURSENO) bb
+			WHERE aa.CSEQNO = bb.CSEQNO
+			AND TUTOR_USERNO = #{SES_USERNO}) A,(
+				SELECT 
+					AVG(d.ITEMSEQ) AS AVG_POINT
+					, c.CSEQNO
+					, c.PERIOD 
+				FROM LMS_LE_POLL_QUIZ c,LMS_LE_POLL_HIST d
+				WHERE c.POLLCSEQNO = d.POLLCSEQNO
+				AND c.QNO = d.QNO
+				GROUP BY (c.CSEQNO,c.PERIOD)) B
+				WHERE A.CSEQNO = B.CSEQNO
+				AND A.PERIOD = B.PERIOD
+	         ) A
+	         WHERE 1=1
+    </select>
+    
+    <!-- 특강정보 -->
+    <select id="getLectureInfo" resultType="emap" parameterType="dmap">
+       SELECT 
+		    A.SLNO
+		    , A.APPLY_NO
+		    , A.APPLY_NM
+		    , A.APPLY_ORGAN_NM
+		    , A.SIDO_CODE
+		    , A.GU_CODE
+		    , A.DONG_CODE
+		    , A.LE_LNM_ADRES1
+		    , A.LE_LNM_ADRES2
+		    , A.APPLY_ORGAN_ADDR
+		    , A.APPLY_TEL
+		    , A.APPLY_PHONE
+		    , A.APPLY_EMAIL
+		    , A.EDU_AREA
+		    , A.MT_LEC_TARGET_CODE
+		    , (SELECT MT_SUB_NAME FROM LMS_CD_MT_SUB WHERE MT_SUB_CODE = A.MT_LEC_TARGET_CODE) AS LEC_TARET_NAME
+		    , A.TARGET_ETC
+		    , A.PERSON_CNT
+		    , TO_CHAR(A.EDU_SDATE,'YYYY-MM-DD') AS EDU_SDATE
+		    , TO_CHAR(A.EDU_SDATE,'YYYY-MM-DD') AS EDU_EDATE
+		    , A.MT_LCTRE_CODE
+		    , A.EDU_CONTENTS
+		    , A.MT_LEC_STATUS_CODE
+		    , TO_CHAR(A.DS_SDATE,'YYYY-MM-DD') AS DS_SDATE
+		    , TO_CHAR(A.DS_EDATE,'YYYY-MM-DD') AS DS_EDATE
+		    , A.PAY
+		    , A.COM_CONTENT
+		    , A.COM_CNT
+		    , A.APPLY_SCORE
+		    , A.ORGAN_SCORE
+		    , A.PTRPS
+		    , A.USEYN
+		FROM LMS_ED_LECTURE A , LMS_ED_LECTURE_TUTOR B 
+		    WHERE A.SLNO = B.SLNO
+		    AND B.SLNO = #{slno}
+		    AND B.FINAL_AT = 'Y'
+		    AND B.USEYN = 'Y'
+    </select>
+	
+	<!-- 특강 신청일시 -->
+    <select id="getSpecialLectureTime" resultType="emap" parameterType="dmap">
+		SELECT
+			A.SLNO
+			, A.EDU_DATE
+			, DECODE(TO_CHAR(TRUNC(TO_DATE(A.EDU_DATE, 'YYYY-MM-DD')),'d'),'1','일','2','월','3','화','4','수','5','목','6','금','7','토') AS EDU_WEEK
+			, LPAD(A.EDU_SDATE_HOUR ,'2','0') AS EDU_SDATE_HOUR
+			, LPAD(A.EDU_SDATE_MINUTE,'2','0') AS EDU_SDATE_MINUTE
+			, LPAD(A.EDU_EDATE_HOUR ,'2','0') AS EDU_EDATE_HOUR
+			, LPAD(A.EDU_EDATE_MINUTE ,'2','0') AS EDU_EDATE_MINUTE
+			, LEC_USERNM
+			, LEC_PHONE
+			, ETC AS LEC_ETC
+		FROM LMS_ED_LECTURE_TUTOR A
+		WHERE A.SLNO = #{slno}
+	</select>
+	
+	<!-- 특강 신청일시 -->
+    <select id="getSpecialLectureTimeInfo" resultType="emap" parameterType="dmap">
+		SELECT
+			A.SLNO
+			, A.EDU_DATE
+			, DECODE(TO_CHAR(TRUNC(TO_DATE(A.EDU_DATE, 'YYYY-MM-DD')),'d'),'1','일','2','월','3','화','4','수','5','목','6','금','7','토') AS EDU_WEEK
+			, LPAD(A.EDU_SDATE_HOUR ,'2','0') AS EDU_SDATE_HOUR
+			, LPAD(A.EDU_SDATE_MINUTE,'2','0') AS EDU_SDATE_MINUTE
+			, LPAD(A.EDU_EDATE_HOUR ,'2','0') AS EDU_EDATE_HOUR
+			, LPAD(A.EDU_EDATE_MINUTE ,'2','0') AS EDU_EDATE_MINUTE
+			, LEC_USERNM
+			, LEC_PHONE
+			, ETC AS LEC_ETC
+		FROM LMS_ED_LECTURE_TUTOR A
+		WHERE A.SLNO = #{slno}
+		<if test="sltno != null and sltno != ''">
+			AND A.SLNO = #{sltno}
+		</if>
+	</select>
+	
+	<!-- 강사 리스트 -->	
+	<select id="getLecTutorList" parameterType="dmap" resultType="emap">
+	 	/*lecture.getLecTutorList*/
+		SELECT * FROM 
+			(
+			SELECT 
+				ROW_NUMBER() OVER (ORDER BY MBERNM DESC) AS RNUM
+				, COUNT(*) OVER() AS TOTAL_CNT
+				, AA.*
+			FROM
+			(
+			SELECT 
+					A.UNITY_MBERNO
+					, B.REGIST_DT
+					, B.ENTRST_DATE
+					, B.MT_TUTOR_CODE
+					, B.LECNO
+					, (SELECT MT_SUB_NAME FROM LMS_CD_MT_SUB CM WHERE CM.MT_SUB_CODE = TRIM(B.MT_TUTOR_CODE)) AS MT_TUTOR_NAME
+					, B.MT_FIELD_CODE
+					, (SELECT MT_SUB_NAME FROM LMS_CD_MT_SUB CM WHERE CM.MT_SUB_CODE = TRIM(B.MT_FIELD_CODE)) AS MT_FIELD_NAME
+					, B.MT_AREA_CODE
+					, (SELECT MT_SUB_NAME FROM LMS_CD_MT_SUB CM WHERE CM.MT_SUB_CODE = TRIM(B.MT_AREA_CODE)) AS MT_AREA_NAME
+					, A.MBERNM
+					, A.EMAIL
+					, NVL(A.MOBLPHON, A.TELNO) AS TELNO
+					, TO_CHAR(A.LAST_ENTRST_DATE, 'YYYY-MM-DD') AS LAST_ENTRST_DATE
+					, TRIM(A.TUTOR_AT) AS TUTOR_AT
+					, (SELECT CTC.COMNAME FROM LMS_CT_COMPANY CTC WHERE A.UNITY_MBERNO=CTC.COMNO) AS COMNAME
+			FROM 
+				(
+					SELECT A.* 
+					FROM LMS_CT_UNITY_MBER A 
+					WHERE A.UNITY_MBERNO IN 
+						(
+							SELECT DISTINCT USERNO 
+							FROM 
+								(
+									SELECT UNITY_MBERNO AS USERNO FROM LMS_CT_UNITY_MBER WHERE TUTOR_AT ='Y'
+									UNION ALL
+									SELECT USERNO FROM LMS_TT_MBER_MANAGE
+								)
+						)
+				) A
+				LEFT OUTER JOIN 		
+				(
+					SELECT * FROM LMS_TT_MBER_MANAGE
+					WHERE REGIST_DT||USERNO IN 
+						(
+							SELECT MAX(REGIST_DT)||USERNO FROM LMS_TT_MBER_MANAGE
+							GROUP BY USERNO
+						)
+				) B
+				ON A.UNITY_MBERNO = B.USERNO  
+			) AA
+			WHERE 1=1
+			<if test="mtTutorCode != null and mtTutorCode != ''">
+				AND MT_TUTOR_CODE = #{mtTutorCode}
+			</if>
+			<if test="mtAreaCodePop != '' and mtAreaCodePop != null">
+				AND MT_AREA_CODE = #{mtAreaCodePop}
+			</if>
+			<if test="mtFieldCode != '' and mtFieldCode != null">
+				AND MT_FIELD_CODE = #{mtFieldCode}
+			</if>
+			 <if test="searchWord != null and searchWord != ''">
+				<!-- <if test="searchType != null and searchType == 'FIELD'"> AND MT_FIELD_NAME LIKE '%'||#{searchWord}||'%'</if>
+				<if test="searchType != null and searchType == 'AREA'"> AND MT_AREA_NAME LIKE '%'||#{searchWord}||'%'</if> -->
+				<if test="searchType != null and searchType == 'NAME'"> AND MBERNM LIKE '%'||#{searchWord}||'%'</if>
+				<if test="searchType != null and searchType == 'PHONE'"> AND TELNO LIKE '%'||#{searchWord}||'%'</if>
+			</if>	
+			)
+		WHERE RNUM BETWEEN #{startNo} AND #{endNo}
+	</select>
+	
+	<!-- 강사 리스트 카운트 -->	
+	<select id="getLecTutorCount" parameterType="dmap" resultType="int">
+		SELECT
+			COUNT(*)AS TOTALCNT
+		FROM (	
+			SELECT
+			*
+		FROM (	
+			SELECT 
+				A.*
+				, ROW_NUMBER() OVER (ORDER BY MBERNM DESC) AS RNUM
+			FROM (
+				SELECT 
+					 TM.USERNO
+					, TM.REGIST_DT
+					, TM.ENTRST_DATE
+					, CUM.MT_TUTOR_CODE /*강사*/
+					, (SELECT MT_SUB_NAME  FROM LMS_CD_MT_SUB A WHERE A.MT_SUB_CODE = CUM.MT_TUTOR_CODE) AS MT_TUTOR_NAME
+					, TM.MT_FIELD_CODE /*분야*/
+					, (SELECT MT_SUB_NAME  FROM LMS_CD_MT_SUB A WHERE A.MT_SUB_CODE = TM.MT_FIELD_CODE) AS MT_FIELD_NAME
+					, TM.MT_AREA_CODE /*지역*/
+					, (SELECT MT_SUB_NAME  FROM LMS_CD_MT_SUB A WHERE A.MT_SUB_CODE = TM.MT_AREA_CODE) AS MT_AREA_NAME
+					, CUM.MBERNM /*이름*/
+					, CUM.EMAIL /*이메일*/
+					, NVL(CUM.MOBLPHON, CUM.TELNO) AS TELNO /*전화번호*/
+					, TO_CHAR(CUM.LAST_ENTRST_DATE, 'YYYY-MM-DD') AS LAST_ENTRST_DATE  /*최근위촉일*/
+					, (SELECT CC.COMNAME FROM LMS_CT_COMPANY CC WHERE CC.COMNO = CUM.COMNO) COMNAME
+					, COUNT(*) OVER() AS TOTAL_CNT
+				FROM
+					LMS_TT_MBER_MANAGE TM,
+					LMS_CT_UNITY_MBER CUM
+				WHERE TM.USERNO = CUM.UNITY_MBERNO 
+<!-- 				AND CUM.TUTOR_AT = 'Y' -->
+				AND TM.MT_TUTOR_CODE = #{mtTutorCode}
+			) A
+			WHERE 1=1
+		<!-- 	<if test="mtTutorCode != null and mtTutorCode != ''">
+				AND MT_TUTOR_CODE = #{mtTutorCode}
+			</if>-->
+			<if test="mtAreaCodePop != '' and mtAreaCodePop != null">
+				AND MT_AREA_CODE = #{mtAreaCodePop}
+			</if>
+			<if test="mtFieldCode != '' and mtFieldCode != null">
+				AND MT_FIELD_CODE = #{mtFieldCode}
+			</if>
+			 <if test="searchWord != null and searchWord != ''">
+				<if test="searchType != null and searchType == 'FIELD'"> AND MT_FIELD_NAME LIKE '%'||#{searchWord}||'%'</if>
+				<if test="searchType != null and searchType == 'AREA'"> AND MT_AREA_NAME LIKE '%'||#{searchWord}||'%'</if>
+				<if test="searchType != null and searchType == 'NAME'"> AND MBERNM LIKE '%'||#{searchWord}||'%'</if>
+				<if test="searchType != null and searchType == 'PHONE'"> AND TELNO LIKE '%'||#{searchWord}||'%'</if>
+			</if>	 
+			
+		) B
+		) B
+	</select>
+	
+	<!-- 특강 강사첨부파일 -->
+    <select id="getSpecialLectureFile" resultType="emap" parameterType="dmap">
+		SELECT
+			SLNO
+			,FILENO
+			,ORGFILE
+			,SAVFILE
+			,FSIZE
+			,FTYPE
+			,SAVPATH
+			, MT_TUTOR_FILE_CODE
+		FROM LMS_ED_LECTURE_FILE A
+		WHERE A.SLNO = #{slno}
+	</select>
+	
+	<!-- 강사정보 첨부파일 -->
+    <select id="getSpecialLectureFile2" resultType="emap" parameterType="dmap">
+		SELECT
+			REPORTNO
+			,SEND_YN
+			,SEND_DATE
+			,ORGFILE
+			,SAVEFILE
+			,SAVEPATH
+			,FSIZE
+			,USERNO
+		FROM LMS_TT_REPORT_HIS
+		WHERE USERNO = #{SES_USERNO}
+	</select>
+	
+	<!-- 강사 전직장 정보 -->
+	<select id="getLectureJobInfo" resultType="emap" parameterType="dmap">
+		SELECT
+			WORK_HIS_SEQ
+			,USERNO
+			,WORK_NM
+			,WORK_IN_DT
+			,WORK_OUT_DT
+			,DEPT_INFO
+		FROM LMS_TT_MBER_WORK_HIS
+		WHERE USERNO = #{SES_USERNO}	
+	</select>
+	<!-- 강사 파일정보 -->
+    <select id="getFileInfo" resultType="emap" parameterType="dmap">
+    	SELECT SAVEPATH AS SAVPATH
+			, ORGFILE
+			, SAVEFILE AS SAVFILE
+		FROM LMS_TT_REPORT_HIS
+		WHERE ORGFILE = #{filename}
+    </select>
+	
+	
+	<!-- 강사 결과보고 파일정보 -->
+    <select id="lecturePersonalFiledown" resultType="emap" parameterType="dmap">
+    	SELECT SAVPATH
+			, ORGFILE
+			, SAVFILE
+		FROM LMS_ED_LECTURE_FILE
+		WHERE ORGFILE = #{filename}
+    </select>
+	<!-- 특강관리 max key -->
+	<select id="getMaxSlnoInfo" resultType="int" parameterType="dmap">
+		SELECT NVL(MAX(SLNO),0)+1 FROM LMS_ED_LECTURE
+	</select> 
+	
+	<!-- 특강관리 max key -->
+	<select id="getMaxSltnoInfo" resultType="int" parameterType="dmap">
+		SELECT NVL(MAX(SLNO),0)+1 FROM LMS_ED_LECTURE_TUTOR
+	</select> 
+	
+	<!-- 특강관리 등록  -->
+    <insert id="insertLecture" parameterType="dmap">
+		INSERT INTO LMS_ED_LECTURE (
+			SLNO
+			, MT_AREA_CODE
+			, TITLE
+			, EDU_AREA
+			, EDU_TARGET
+			, EDU_TIME
+			, PERSON_CNT
+			, APPLY_ORGAN_ZIPNO
+			, APPLY_ORGAN_ADDR
+			, APPLY_ORGAN_ADDR2
+			, LEC_PAY
+			, APPLY_NO
+			, APPLY_NM
+			, APPLY_PHONE
+			, ETC
+			, REGNO
+			, REGIST_DT
+			, MT_SC_CODE
+			, EDU_FAC_CODE
+			, USEYN
+			, STATUS
+			, APPLY_ORGAN_NM
+			, APPLY_EMAIL
+			, EDU_FAC_CONTENT
+			, USEYN
+			, USERNO
+			, PAY_YN
+		)
+			VALUES
+		(
+			#{slno}
+			, #{mtAreaCode}
+			, #{title}
+			, #{eduArea}
+			, #{eduTarget}
+			, #{eduTime}
+			, #{personCnt}
+			, #{applyOrganZipno}
+			, #{applyOrganAddr}
+			, #{applyOrganAddr2}
+			, #{lecPay}
+			, #{SES_USERNO}
+			, #{applyNm}
+			, #{applyPhone}
+			, #{etc}
+			, #{SES_USERNO}
+			, SYSDATE
+			, #{mtScCode}
+			, #{eduFacCodeArr}
+			, 'Y'
+			, '1'
+			, #{applyOrganNm}
+			, (SELECT EMAIL FROM LMS_CT_UNITY_MBER WHERE UNITY_MBERNO = #{SES_USERNO})
+			, #{eduFacContent}
+			, #{useYn}
+			, #{SES_USERNO}
+			, #{payYn}
+		)
+    </insert>
+    
+    <!-- 등록정보조회  -->
+    <select id="getLectureInsertInfo" resultType="int" parameterType="dmap">
+    	SELECT COUNT(*) 
+    	FROM LMS_ED_LECTURE A
+		LEFT OUTER JOIN LMS_ED_LECTURE_TUTOR B ON A.SLNO = B.SLNO
+		WHERE A.REGNO = #{SES_USERNO}
+		AND A.MT_SC_CODE = #{mtScCode}
+		AND A.MT_AREA_CODE = #{mtAreaCode}
+		AND B.EDU_DATE = #{multiEduDate}
+		AND B.EDU_SDATE_HOUR = #{multiEduSdateHour}
+		AND B.EDU_SDATE_MINUTE = #{multiEduSdateMinute}
+		AND B.EDU_EDATE_HOUR = #{multiEduEdateHour}
+		AND B.EDU_EDATE_MINUTE = #{multiEduEdateMinute}
+    </select>
+    
+    <!-- 특강관리 교육일시 등록  -->
+    <insert id="insertLectureTime" parameterType="dmap">
+		INSERT INTO LMS_ED_LECTURE_TUTOR (
+			SLNO
+			, SLNO
+			, EDU_DATE
+			, EDU_SDATE_HOUR
+			, EDU_SDATE_MINUTE
+			, EDU_EDATE_HOUR
+			, EDU_EDATE_MINUTE
+			, TUTOR_USERNO
+			, LEC_USERNM
+			, ETC
+			, LEC_PHONE
+			, MT_TUTOR_CODE
+			, MT_FIELD_CODE
+			<choose>
+				<when test="entrstYear != null and entrstYear != '' ">
+					, ENTRST_YEAR
+				</when>
+				<otherwise>
+					, ENTRST_YEAR
+				</otherwise>
+			</choose>
+			, MT_LEC_STATUS_CODE
+		)
+		VALUES
+		(
+			#{slno}
+			, (SELECT NVL(MAX(SLNO),0)+1 FROM LMS_ED_LECTURE_TUTOR)
+			, #{multiEduDate}
+			, #{multiEduSdateHour}
+			, #{multiEduSdateMinute}
+			, #{multiEduEdateHour}
+			, #{multiEduEdateMinute}
+			, #{lecUserno}
+			, #{lecUserName}
+			, #{lecEtc}
+			, (SELECT MOBLPHON FROM LMS_CT_UNITY_MBER WHERE UNITY_MBERNO = #{lecUserno})
+			, #{mtTutorCode}
+			, #{mtFieldCode}
+			<choose>
+				<when test="entrstYear != null and entrstYear != '' ">
+					, #{entrstYear}
+				</when>
+				<otherwise>
+					, TO_CHAR(SYSDATE , 'YYYY')
+				</otherwise>
+			</choose>
+			, '1'
+		)
+    </insert>
+    
+    <!-- 강의이력 파일등 -->
+    <insert id="insertFileInfo" parameterType="dmap">
+    	INSERT INTO LMS_ED_LECTURE_FILE
+		(
+			FILENO
+			, SLNO
+			, FSIZE
+			, SAVFILE
+			, ORGFILE
+			, SAVPATH	
+			, MT_TUTOR_FILE_CODE
+		)
+		VALUES (
+			(SELECT NVL(MAX(FILENO) , 0)+1 FROM LMS_ED_LECTURE_FILE)
+			, #{slno}
+			, #{uploadFileSize}
+			, #{uploadFileSaveName}
+			, #{uploadFileOrgName}
+			, #{uploadFileFulltPath}
+			, #{MT_TUTOR_FILE_CODE}
+		)
+    </insert>
+    
+    <!-- 강사 정보관리 파일등록 -->
+    <insert id="insertFileInfo2" parameterType="dmap">
+    	INSERT INTO LMS_TT_REPORT_HIS
+		(
+			REPORTNO
+			,SEND_YN
+			,SEND_DATE
+			,ORGFILE
+			,SAVEFILE
+			,SAVEPATH
+			,FSIZE
+			,USERNO
+		)
+		VALUES (
+			SEQ_RPTNO.NEXTVAL
+			, 'Y'
+			, SYSDATE
+			, #{uploadFileOrgName}
+			, #{uploadFileSaveName} 
+			, #{uploadFileFulltPath}
+			, #{uploadFileSize}
+			, #{userNo}
+		)
+    </insert>
+    
+    
+    <!-- 강의이력 파일수정 -->
+    <update id="updateFileInfo" parameterType="dmap">
+    	UPDATE LMS_ED_LECTURE_FILE SET
+			FSIZE = #{uploadFileSize}
+			, SAVFILE = #{uploadFileSaveName}
+			, ORGFILE = #{uploadFileOrgName}
+			, SAVPATH = #{uploadFileFulltPath}
+			, MT_TUTOR_FILE_CODE = #{MT_TUTOR_FILE_CODE}
+		WHERE SLTNO = #{sltno}
+			AND SLNO = #{slno}
+			AND MT_TUTOR_FILE_CODE = #{MT_TUTOR_FILE_CODE}
+    </update>
+    
+    <!-- 평가 강의이력 리스트 -->
+    <select id="getEvaluationList" parameterType="dmap" resultType="emap">
+    	SELECT REPORTNO
+			, MT_TUTOR_FILE_CODE
+			, MT_REPORT_TYPE_CODE
+			, USERNO
+			, ENTRST_YEAR
+			, SAVEFILE
+			, ORGFILE
+			, SAVEPATH
+			, FSIZE
+			, FTYPE
+			, SEND_YN
+			, TO_CHAR(SEND_DATE , 'YYYY.MM.DD')AS SEND_DATE
+		FROM LMS_TT_REPORT_HIS
+		WHERE USERNO = #{SES_USERNO}
+		AND MT_REPORT_TYPE_CODE LIKE '%' || #{mtReportTypeCode} || '%'
+    </select>
+    
+    <!-- 평가 강의이력 강의교안 -->
+    <select id="getEvaluationFirst" parameterType="dmap" resultType="emap">
+    	SELECT REPORTNO
+			, MT_TUTOR_FILE_CODE
+			, MT_REPORT_TYPE_CODE
+			, USERNO
+			, ENTRST_YEAR
+			, SAVEFILE
+			, ORGFILE
+			, SAVEPATH
+			, FSIZE
+			, FTYPE
+			, SEND_YN
+			, TO_CHAR(SEND_DATE , 'YYYY.MM.DD')AS SEND_DATE
+			, MT_FIELD_CODE
+		FROM LMS_TT_REPORT_HIS
+		WHERE USERNO = #{SES_USERNO}
+		AND MT_TUTOR_FILE_CODE = 'TF0001'
+		AND MT_REPORT_TYPE_CODE LIKE '%' || #{mtReportTypeCode} || '%'
+    </select>
+    
+    <!-- 평가 강의이력 강의계획 -->
+    <select id="getEvaluationSecond" parameterType="dmap" resultType="emap">
+    	SELECT REPORTNO
+			, MT_TUTOR_FILE_CODE
+			, MT_REPORT_TYPE_CODE
+			, USERNO
+			, ENTRST_YEAR
+			, SAVEFILE
+			, ORGFILE
+			, SAVEPATH
+			, FSIZE
+			, FTYPE
+			, SEND_YN
+			, TO_CHAR(SEND_DATE , 'YYYY.MM.DD')AS SEND_DATE
+		FROM LMS_TT_REPORT_HIS
+		WHERE USERNO = #{SES_USERNO}
+		AND MT_TUTOR_FILE_CODE = 'TF0002'
+		AND MT_REPORT_TYPE_CODE LIKE '%' || #{mtReportTypeCode} || '%'
+    </select>
+    
+    <!-- 평가 강의이력 설문 -->
+    <select id="getEvaluationThird" parameterType="dmap" resultType="emap">
+    	SELECT REPORTNO
+			, MT_TUTOR_FILE_CODE
+			, MT_REPORT_TYPE_CODE
+			, USERNO
+			, ENTRST_YEAR
+			, SAVEFILE
+			, ORGFILE
+			, SAVEPATH
+			, FSIZE
+			, FTYPE
+			, SEND_YN
+			, TO_CHAR(SEND_DATE , 'YYYY.MM.DD')AS SEND_DATE
+		FROM LMS_TT_REPORT_HIS
+		WHERE USERNO = #{SES_USERNO}
+		AND MT_TUTOR_FILE_CODE = 'TF0006'
+		AND MT_REPORT_TYPE_CODE LIKE '%' || #{mtReportTypeCode} || '%'
+    </select>
+    
+    <!-- 평가 강의이력 에세이 -->
+    <select id="getEvaluationFourth" parameterType="dmap" resultType="emap">
+    	SELECT REPORTNO
+			, MT_TUTOR_FILE_CODE
+			, MT_REPORT_TYPE_CODE
+			, USERNO
+			, ENTRST_YEAR
+			, SAVEFILE
+			, ORGFILE
+			, SAVEPATH
+			, FSIZE
+			, FTYPE
+			, SEND_YN
+			, TO_CHAR(SEND_DATE , 'YYYY.MM.DD')AS SEND_DATE
+		FROM LMS_TT_REPORT_HIS
+		WHERE USERNO = #{SES_USERNO}
+		AND MT_TUTOR_FILE_CODE = 'TF0003'
+		AND MT_REPORT_TYPE_CODE LIKE '%' || #{mtReportTypeCode} || '%'
+    </select>
+    
+    <insert id="insertReportFileInfo" parameterType="dmap">
+    	INSERT INTO LMS_TT_REPORT_HIS
+		(
+			REPORTNO
+			, SEND_YN
+			, SEND_DATE
+			, ORGFILE
+			, SAVEFILE
+			, SAVEPATH
+			, FSIZE
+			, MT_REPORT_TYPE_CODE
+			, USERNO
+			, ENTRST_YEAR
+			, MT_TUTOR_FILE_CODE
+			, MT_FIELD_CODE
+		)
+		VALUES (
+			(SELECT NVL(MAX(REPORTNO),0)+1 FROM LMS_TT_REPORT_HIS)
+			, 'Y'
+			, SYSDATE
+			, #{uploadFileOrgName}
+			, #{uploadFileSaveName}
+			, #{uploadFileFulltPath}
+			, #{uploadFileSize}
+			, #{mtReportTypeCode}
+			, #{userNo}
+			, #{entrstYear}
+			, #{mtTutorFileCode}
+			, #{mtFieldCode}
+		)
+    </insert>
+    
+    <!-- 보고서 제출 파일 수정 폼 -->
+    <select id="getReportData" parameterType="dmap" resultType="emap">
+    	SELECT REPORTNO
+			, MT_TUTOR_FILE_CODE
+			, MT_REPORT_TYPE_CODE
+			, USERNO
+			, ENTRST_YEAR
+			, SAVEFILE
+			, ORGFILE
+			, SAVEPATH
+			, FSIZE
+			, FTYPE
+			, SEND_YN
+			, TO_CHAR(SEND_DATE , 'YYYY.MM.DD')AS SEND_DATE
+		FROM LMS_TT_REPORT_HIS
+		WHERE USERNO = #{SES_USERNO}
+		AND MT_REPORT_TYPE_CODE = #{mtReportTypeCode}
+		<if test="mtTutorFileCode != null and mtTutorFileCode != ''">
+			AND MT_TUTOR_FILE_CODE = #{mtTutorFileCode}
+		</if>
+    </select>
+    
+    <!-- 보고서 제출 파일 수정 -->
+    <update id="updateReportFileInfo" parameterType="dmap">
+    	UPDATE LMS_TT_REPORT_HIS SET
+			ORGFILE = #{uploadFileOrgName}
+			, SAVEFILE  = #{uploadFileSaveName}
+			, SAVEPATH = #{uploadFileFulltPath}
+			, FSIZE = #{uploadFileSize}
+		WHERE REPORTNO = #{reportNo}
+		AND MT_REPORT_TYPE_CODE = #{mtReportTypeCode}
+		AND USERNO = #{userNo}
+    </update>
+    
+    <!-- 보고서 제출 삭제 -->
+    <delete id="deleteReportFile" parameterType="dmap">
+    	DELETE FROM LMS_TT_REPORT_HIS
+    	WHERE REPORTNO = #{reportNo}
+    	AND USERNO = #{SES_USERNO}
+    	AND SAVEFILE = #{saveFileNm}
+    	AND ORGFILE = #{orgFileNm}
+    </delete>
+    
+     <!-- 평가 이력관리 파일 수정 -->
+    <update id="updateEvalFileInfo" parameterType="dmap">
+    	UPDATE LMS_TT_REPORT_HIS SET
+			ORGFILE = #{uploadFileOrgName}
+			, SAVEFILE  = #{uploadFileSaveName}
+			, SAVEPATH = #{uploadFileFulltPath}
+			, FSIZE = #{uploadFileSize}
+		WHERE REPORTNO = #{reportNo}
+		AND MT_REPORT_TYPE_CODE = #{MT_REPORT_TYPE_CODE}
+		AND USERNO = #{userNo}
+    </update>
+    
+    <select id="getMtSubName" parameterType="dmap" resultType="emap">
+    	SELECT MT_CODE
+            , MT_SUB_CODE
+            , MT_SUB_NAME
+            , NUM_CD
+            , ABC_CD
+            , ORDR
+            , USEYN
+        FROM LMS_CD_MT_SUB
+        WHERE MT_SUB_CODE = #{target}
+    </select>
+    
+    <select id="getCheckInfo" parameterType="dmap" resultType="emap">
+    	SELECT SLNO FROM LMS_ED_LECTURE_TUTOR
+		WHERE SLNO = #{slno}
+		AND TUTOR_USERNO=#{SES_USERNO}
+    </select>
+    
+    <delete id="deleteFileInfo" parameterType="dmap">
+    	DELETE FROM LMS_ED_LECTURE_FILE
+		WHERE FILENO = #{fileNo}
+		AND SLNO = #{slno}
+		AND SLTNO = #{sltno}
+    </delete>
+    
+    <!-- 특강관리 -->
+    <update id="updateLectureInfo" parameterType="dmap">
+    	UPDATE LMS_ED_LECTURE SET
+			ETC = #{etc}     
+			<if test='tutorHisYn != null and tutorHisYn != "N"'>      
+				, MT_AREA_CODE      = #{mtAreaCode}
+				, TITLE             = #{title}
+				, EDU_AREA          = #{eduArea}
+				, EDU_TIME          = #{eduTime}
+				, EDU_TARGET        = #{eduTarget}
+				, PERSON_CNT        = #{personCnt}
+				, LEC_PAY           = #{lecPay}
+				, APPLY_ORGAN_NM    = #{applyOrganNm}
+				, APPLY_ORGAN_ZIPNO = #{applyOrganZipno}
+				, APPLY_ORGAN_ADDR  = #{applyOrganAddr}
+				, APPLY_ORGAN_ADDR2 = #{applyOrganAddr2}
+				, APPLY_EMAIL		= #{applyEmail}
+				, EDU_FAC_CODE      = #{eduFacCode}
+				, EDU_FAC_CONTENT   = #{eduFacContent}
+			</if>
+			, UPDNO = #{SES_USERNO}
+			, UPDDT = SYSDATE
+		WHERE SLNO = #{slno}
+    </update>
+    
+    <!-- 특강관리 시간 수정  -->
+    <update id="updateLectureTimeInfo" parameterType="dmap">
+    	UPDATE LMS_ED_LECTURE_TUTOR SET
+    		ETC = #{lecEtc}
+    	WHERE SLNO = #{sltno}
+    	AND SLNO = 	#{slno}
+    </update>
+    
+    <!-- 특강관리 교육일시 수정 -->
+    <update id="updateLectureTime" parameterType="dmap">
+		UPDATE  LMS_ED_LECTURE_TUTOR SET
+			UPDNO = #{SES_USERNO}
+			, UPDDT = SYSDATE
+			<if test='tutorHisYn != null and tutorHisYn != "Y"'>
+				, EDU_DATE          = #{multiEduDate}
+				, EDU_SDATE_HOUR  	= #{multiEduSdateHour}
+				, EDU_SDATE_MINUTE 	= #{multiEduSdateMinute}
+				, EDU_EDATE_HOUR   	= #{multiEduEdateHour}
+				, EDU_EDATE_MINUTE 	= #{multiEduEdateMinute}
+			</if>
+		WHERE SLNO = #{slno}
+			AND SLNO = #{sltno}
+    </update>
+    
+    <!-- 평가이력 보고서제출 파일삭제 -->
+    <delete id="deleteReportFileInfo"  parameterType="dmap">
+    	DELETE FROM LMS_TT_REPORT_HIS
+		WHERE REPORTNO = #{reportNo}
+		AND MT_REPORT_TYPE_CODE = #{mtReportTypeCode}
+    </delete>
+    
+    <!-- 강사여부확인 -->
+    <select id="getTutorGradeCnt" resultType="int" parameterType="dmap">
+    	SELECT COUNT(*) FROM LMS_TT_MBER_MANAGE
+    	WHERE USERNO = #{SES_USERNO}
+    		<!-- AND MT_TUTOR_CODE IN ('JGAC00') -->
+    </select>
+    
+    <!-- 평가이력관리 파일삭제 -->
+    <delete id="deleteEvaluationInfo" parameterType="dmap">
+    	DELETE FROM LMS_TT_REPORT_HIS
+		WHERE REPORTNO = #{reportNo}
+		AND MT_REPORT_TYPE_CODE = #{mtReportTypeCode}
+		AND MT_TUTOR_FILE_CODE = #{mtTutorFileCode}
+		AND USERNO = #{userno}
+		AND SAVEFILE = #{saveFileNm}
+    </delete>
+    
+    <!-- 위원회관리 파일삭제 -->
+    <delete id="deleteLectureCommitteeInfo" parameterType="dmap">
+    	DELETE FROM LMS_ED_LECTURE_FILE
+		WHERE SLNO = #{slno}
+		AND MT_TUTOR_FILE_CODE = #{mtTutorFileCode} 
+		AND SAVFILE = #{saveFile}
+    </delete>
+    
+     <!-- 강사소통 파일삭제 -->
+    <delete id="deleteTutorBoardFile" parameterType="dmap">
+    	DELETE FROM LMS_ED_DATA_FILE
+		WHERE FILE_ID = #{fileId}
+		AND FILE_SEQ = #{fileSeq} 
+		AND SAVFILE = #{saveFile}
+    </delete>
+    
+       <!-- 강사소통 게시글 삭제시 + 파일삭제 -->
+    <delete id="tutorBoardFileDelete" parameterType="dmap">
+    	DELETE FROM LMS_ED_DATA_FILE
+		WHERE BBSNO = #{bbsNo}
+    </delete>
+
+    
+    <!-- 강사정보 파일삭제 -->
+    <delete id="deleteLecture" parameterType="dmap">
+    	DELETE FROM LMS_TT_REPORT_HIS
+		WHERE USERNO = #{SES_USERNO}
+		AND SAVEFILE = #{saveFile}
+    </delete>
+    
+    
+    
+
+
+    <!-- 게시판VIEW COUNT 갱신 -->
+    <update id="updateTutorBoardViewCnt" parameterType="dmap">
+        UPDATE LMS_ED_BBS
+           SET RCNT = RCNT+1
+     WHERE BBSNO = #{bbsNo}
+    </update>
+    
+    <!-- 게시글 상세 -->
+    <select id="getLectureNoticeView" resultType="emap" parameterType="dmap">
+        	SELECT A.*
+			FROM 
+			(
+				SELECT BBSNO
+					 , USERNO
+					 , WRITER
+			       	 , TO_CHAR(WDATE,'yyyy-mm-dd') AS WDATE
+					 , TITLE
+					 , DBMS_LOB.SUBSTR(CONTENT, DBMS_LOB.GETLENGTH(CONTENT), 1)AS CONTENT
+					 , RCNT
+					 , GRPNO
+					 , REFLEVEL
+					 , REFSTEP
+					 , BCATENO
+					 , PWD
+					 , ETC_INFO01
+					 , TOPYN
+					 , ORDTM_AT
+					 , OPEN_AT
+					 , DSCSN_SDATE
+					 , DSCSN_EDATE
+					 , CONNECT_IP
+					 , UPDT_ID
+					 , UPDT_DATE
+					 , CATENO
+			         , (SELECT NVL(UNITY_ID,'-') FROM LMS_CT_UNITY_MBER WHERE UNITY_MBERNO = A.USERNO) AS USERID
+			         , (SELECT BCATENAME FROM LMS_ED_BBS_CATEGORY WHERE A.BCATENO = BCATENO) AS BCATENAME
+			         , (SELECT COUNT(*) FROM LMS_ED_BBS_FILE B WHERE B.BBSNO = A.BBSNO) AS FILECNT    
+		             , LEAD(BBSNO,1) OVER( ORDER BY GRPNO DESC, REFSTEP ASC) AS BBSNO_PREV
+					 , LAG(BBSNO,1) OVER(ORDER BY GRPNO DESC, REFSTEP ASC) AS BBSNO_NEXT
+		       FROM LMS_ED_BBS A
+		       WHERE BCATENO = #{bcateno}
+		       <if test="searchWord != null and searchWord != '' ">
+					AND TITLE LIKE '%' || #{searchWord} || '%'
+				</if>
+		     )A
+		     WHERE BBSNO = #{bbsNo}
+	</select>	     
+		  
+    <select id="selectTutorBoardView" resultMap="clobMap" parameterType="dmap">
+	      	SELECT A.* 
+	      	FROM 
+				(
+					SELECT BBSNO
+						 , USERNO
+						 , WRITER
+				       	 , TO_CHAR(WDATE,'yyyy-mm-dd') AS WDATE
+				       	 , WDATE AS WDATETIME
+						 , TITLE
+						 , CONTENT
+						 , RCNT
+						 , GRPNO
+						 , REFLEVEL
+						 , REFSTEP
+						 , BCATENO
+						 , PWD
+						 , ETC_INFO01
+						 , TOPYN
+						 , ORDTM_AT
+						 , OPEN_AT
+						 , DSCSN_SDATE
+						 , DSCSN_EDATE
+						 , CONNECT_IP
+						 , UPDT_ID
+						 , UPDT_DATE
+						 , CATENO
+				         , (SELECT NVL(UNITY_ID,'-') FROM LMS_CT_UNITY_MBER WHERE UNITY_MBERNO = A.USERNO) AS USERID
+				         , (SELECT BCATENAME FROM LMS_ED_BBS_CATEGORY WHERE A.BCATENO = BCATENO) AS BCATENAME
+				         , (SELECT COUNT(*) FROM LMS_ED_DATA_FILE B WHERE B.BBSNO = A.BBSNO) AS FILECNT    
+			             , LEAD(BBSNO,1) OVER( ORDER BY TOPYN DESC) AS BBSNO_PREV
+						 , LAG(BBSNO,1) OVER(ORDER BY TOPYN DESC) AS BBSNO_NEXT
+			       FROM LMS_ED_BBS A
+			       WHERE OPEN_AT = 'Y' 
+			       AND BCATENO = #{bcateno}
+	       <if test="searchWord != null and searchWord != '' ">
+				AND TITLE LIKE '%' || #{searchWord} || '%'
+		   </if>
+		   ORDER BY TOPYN DESC, WDATETIME DESC
+	     )A
+	     WHERE BBSNO = #{bbsNo}
+    </select>
+		     
+	<!-- 강사 게시판 파일목록 -->
+	<select id="getTutorBoardFileList" resultType="emap" parameterType="int">
+        SELECT FILE_ID
+			, FILE_SEQ 
+			, FILE_SIZE
+			, SAVFILE
+	        , ORGFILE
+	        , SAVPATH
+            , BBSNO
+        FROM LMS_ED_DATA_FILE
+        WHERE BBSNO = #{bbsNo}
+    </select>
+    
+    <select id="getLectureNoticeFileInfo" resultType="emap" parameterType="dmap">
+        SELECT FILE_ID
+			, FILE_SEQ 
+			, FILE_SIZE
+			, SAVFILE
+	        , ORGFILE
+	        , SAVPATH
+            , BBSNO
+        FROM LMS_ED_DATA_FILE
+        WHERE BBSNO = #{bbsNo}
+        AND FILE_ID = #{fileId}
+        AND FILE_SEQ = #{fileSeq}
+    </select>
+    
+    <!-- 특강관리 목록조회 -->
+    <select id="getSpecialLectureList" resultType="emap" parameterType="dmap">
+          SELECT A.*
+          FROM(
+          	SELECT a.*, ROWNUM AS RNUM FROM
+	                (
+	                	SELECT
+						    A.SLNO
+						    , A.APPLY_NO
+						    , A.APPLY_NM
+						    , A.APPLY_ORGAN_NM
+						    , A.SIDO_CODE
+						    , A.GU_CODE
+						    , A.DONG_CODE
+						    , A.APPLY_ORGAN_ADDR
+						    , A.APPLY_TEL
+						    , A.APPLY_PHONE
+						    , A.APPLY_EMAIL
+						    , A.EDU_AREA
+						    , A.MT_LEC_TARGET_CODE
+						    , A.TARGET_ETC
+						    , A.PERSON_CNT
+						    , TO_CHAR(A.EDU_SDATE,'YYYY-MM-DD') AS EDU_SDATE
+							, TO_CHAR(A.EDU_SDATE,'YYYY-MM-DD') AS EDU_EDATE
+						    , A.MT_LCTRE_CODE
+						    , A.EDU_CONTENTS
+						    , A.MT_LEC_STATUS_CODE
+						    , TO_CHAR(A.DS_SDATE,'YYYY-MM-DD HH:MI') AS DS_SDATE
+							, TO_CHAR(A.DS_EDATE,'YYYY-MM-DD HH:MI') AS DS_EDATE
+						    , A.PAY
+						    , A.COM_CONTENT
+						    , A.COM_CNT
+						    , A.PTRPS
+						    , A.APPLY_SCORE
+						    , A.ORGAN_SCORE
+						    , A.USEYN
+						    , A.REGIST_NO
+						    , A.REGIST_DT
+						    , A.UPDT_NO
+						    , A.UPDT_DT
+						    , (SELECT MT_SUB_NAME FROM LMS_CD_MT_SUB WHERE MT_SUB_CODE = A.MT_LCTRE_CODE) AS LCTRE_NAME
+						    , (SELECT MT_SUB_NAME FROM LMS_CD_MT_SUB WHERE MT_SUB_CODE = A.MT_LEC_TARGET_CODE) AS TARGET_NAME 
+						FROM LMS_ED_LECTURE A , LMS_ED_LECTURE_TUTOR B
+						    WHERE A.SLNO = B.SLNO
+						    AND B.USEYN = 'Y' 
+						    AND B.TUTOR_USERNO = #{SES_USERNO}
+						    AND B.FINAL_AT='Y'
+						    ORDER BY SLNO DESC
+	                )  a
+                WHERE 1=1) A 
+            WHERE 1=1
+            AND RNUM BETWEEN #{startNo} AND #{endNo}
+    </select>
+	
+	<!-- 특강관리 (데이터 총 갯수) -->
+    <select id="getSpecialLectureListCount" resultType="int" parameterType="dmap">
+		SELECT count(*) FROM
+            (
+	         SELECT
+				A.SLNO
+				, A.APPLY_NO
+				, A.APPLY_NM
+				, A.APPLY_ORGAN_NM
+				, A.SIDO_CODE
+				, A.GU_CODE
+				, A.DONG_CODE
+				, A.APPLY_ORGAN_ADDR
+				, A.APPLY_TEL
+				, A.APPLY_PHONE
+				, A.APPLY_EMAIL
+				, A.EDU_AREA
+				, A.MT_LEC_TARGET_CODE
+				, A.TARGET_ETC
+				, A.PERSON_CNT
+				, TO_CHAR(A.EDU_SDATE,'YYYY-MM-DD') AS EDU_SDATE
+				, TO_CHAR(A.EDU_SDATE,'YYYY-MM-DD') AS EDU_EDATE
+				, A.MT_LCTRE_CODE
+				, A.EDU_CONTENTS
+				, A.MT_LEC_STATUS_CODE
+				, TO_CHAR(A.DS_SDATE,'YYYY-MM-DD') AS DS_SDATE
+				, TO_CHAR(A.DS_EDATE,'YYYY-MM-DD') AS DS_EDATE
+				, A.PAY
+				, A.COM_CONTENT
+			    , A.COM_CNT
+			    , A.PTRPS
+			    , A.APPLY_SCORE
+			    , A.ORGAN_SCORE
+			    , A.USEYN
+			    , A.REGIST_NO
+			    , A.REGIST_DT
+			    , A.UPDT_NO
+			    , A.UPDT_DT
+			    , (SELECT MT_SUB_NAME FROM LMS_CD_MT_SUB WHERE MT_SUB_CODE = A.MT_LCTRE_CODE) AS LCTRE_NAME
+			    , (SELECT MT_SUB_NAME FROM LMS_CD_MT_SUB WHERE MT_SUB_CODE = A.MT_LEC_TARGET_CODE) AS TARGET_NAME 
+			FROM LMS_ED_LECTURE A , LMS_ED_LECTURE_TUTOR B
+		    WHERE A.SLNO = B.SLNO 
+			AND B.USEYN = 'Y' 
+		    AND B.TUTOR_USERNO = #{SES_USERNO}
+			AND B.FINAL_AT='Y'
+		    ORDER BY SLNO DESC
+	         ) A
+	         WHERE 1=1
+    </select>
+    
+    <!-- 진행중인 특강 리스트 -->
+    <select id="getSpecialLectureAll" resultType="emap" parameterType="dmap">
+    	SELECT  A.SLNO
+                , A.APPLY_NO
+                , A.APPLY_NM
+                , A.APPLY_ORGAN_NM
+                , A.EDU_AREA
+                , A.MT_LEC_TARGET_CODE
+                , A.PERSON_CNT
+                , TO_CHAR(A.EDU_SDATE,'YYYY-MM-DD HH24:MI') AS EDU_SDATE
+                , TO_CHAR(A.EDU_SDATE,'YYYY-MM-DD HH24:MI') AS EDU_EDATE
+                , A.MT_LCTRE_CODE
+                , TO_CHAR(A.DS_SDATE,'YYYY-MM-DD HH24:MI') AS DS_SDATE
+                , TO_CHAR(A.DS_EDATE,'YYYY-MM-DD HH24:MI') AS DS_EDATE
+                , A.MT_LEC_STATUS_CODE
+                , B.MT_SUB_NAME AS LEC_TARGET_NAME 
+                , (CASE WHEN (TO_CHAR (SYSDATE, 'YYYYMMDD') BETWEEN TO_CHAR (A.DS_SDATE, 'YYYYMMDD') AND TO_CHAR (A.DS_EDATE, 'YYYYMMDD') ) 
+                      THEN 'Y'                       
+                     ELSE 'N'
+                       END) AS CANCEL_YN
+                   , (CASE WHEN((SELECT COUNT(*) FROM LMS_ED_LECTURE_TUTOR WHERE USEYN='Y' AND TUTOR_USERNO=#{SES_USERNO} AND SLNO = A.SLNO)!=0)
+                   THEN 'Y'
+                   ELSE 'N'
+                   END) AS APPLY_YN
+        FROM LMS_ED_LECTURE A ,LMS_CD_MT_SUB B
+        WHERE 1 = 1 
+        AND A.USEYN = 'Y' 
+        AND A.MT_LEC_TARGET_CODE = B.MT_SUB_CODE
+        AND A.MT_LEC_STATUS_CODE = #{lecStatusCode}
+        <if test="searchType == 'all' ">
+    		AND (A.APPLY_ORGAN_NM LIKE '%' || #{schSeqTitle} || '%' OR A.EDU_AREA LIKE '%' || #{schSeqTitle} || '%' OR B.MT_SUB_NAME LIKE '%' || #{schSeqTitle} || '%' OR A.MT_LCTRE_CODE LIKE '%' || (SELECT MT_SUB_CODE FROM LMS_CD_MT_SUB WHERE MT_CODE = 'HP' AND MT_SUB_NAME LIKE '%' || #{schSeqTitle} || '%') ||'%')
+    	</if>
+		<if test="searchType == 'applyOrganNm' ">
+ 			AND A.APPLY_ORGAN_NM LIKE '%' || #{schSeqTitle} || '%'
+ 		</if>
+ 		<if test="searchType == 'eduArea' ">
+ 			AND A.EDU_AREA LIKE '%' || #{schSeqTitle} || '%'
+ 		</if>
+ 		<if test="searchType == 'lecTargetName' ">
+ 			AND B.MT_SUB_NAME LIKE '%' || #{schSeqTitle} || '%'
+ 		</if>
+ 		<if test="searchType == 'lecLctreName' ">
+ 			AND A.MT_LCTRE_CODE LIKE '%' || (SELECT MT_SUB_CODE FROM LMS_CD_MT_SUB WHERE MT_CODE = 'HP' AND MT_SUB_NAME LIKE '%' || #{schSeqTitle} || '%') ||'%'
+        </if>
+        ORDER BY A.SLNO ASC
+    </select>
+    
+     <!-- 희망주제 코드 네임 -->
+    <select id="getMtLctreName" resultType="String" parameterType="String">
+    	SELECT 
+    		MT_SUB_NAME 
+    	FROM LMS_CD_MT_SUB 
+    	WHERE MT_CODE = 'HP'
+    	AND MT_SUB_CODE = #{mtLctreName}
+    </select>
+    
+      <!-- 교육시설 코드 네임 -->
+    <select id="getMtFcltsName" resultType="String" parameterType="String">
+    	SELECT 
+    		MT_SUB_NAME 
+    	FROM LMS_CD_MT_SUB 
+    	WHERE MT_CODE = 'FA'
+    	AND MT_SUB_CODE = #{mtFcltsName}
+    </select>
+    
+    
+     <!-- 진행중인 특강 상세보기 -->
+    <select id="getSpecialLectureAllView" resultType="emap" parameterType="dmap">
+    	SELECT  A.SLNO
+		        , A.APPLY_NO
+		        , A.APPLY_NM
+		        , A.APPLY_ORGAN_NM
+		        , A.SIDO_CODE
+		        , A.GU_CODE
+		        , A.DONG_CODE
+		        , (SELECT SIDO_NAME FROM LMS_CD_SIDO WHERE SIDO_CODE = A.SIDO_CODE) AS SIDO_NAME
+			    , (SELECT GU_NAME FROM LMS_CD_GU WHERE GU_CODE = A.GU_CODE) AS GU_NAME
+			    , (SELECT DONG_NAME FROM LMS_CD_DONG WHERE DONG_CODE = A.DONG_CODE) AS DONG_NAME
+		        , A.APPLY_ORGAN_ADDR
+		        , A.APPLY_TEL
+		        , A.APPLY_PHONE
+		        , A.APPLY_EMAIL
+		        , A.EDU_AREA
+		        , A.MT_LEC_TARGET_CODE
+		        , (SELECT MT_SUB_NAME FROM LMS_CD_MT_SUB WHERE MT_SUB_CODE = A.MT_LEC_TARGET_CODE) AS LEC_TARET_NAME
+		        , A.TARGET_ETC
+		        , A.PERSON_CNT
+		        , TO_CHAR(A.EDU_SDATE,'YYYY-MM-DD HH24:MI') AS EDU_SDATE
+				, TO_CHAR(A.EDU_SDATE,'YYYY-MM-DD HH24:MI') AS EDU_EDATE
+		        , A.MT_LCTRE_CODE
+		        , A.EDU_CONTENTS
+		        , A.MT_LEC_STATUS_CODE
+		        , TO_CHAR(A.DS_SDATE,'YYYY-MM-DD HH24:MI') AS DS_SDATE
+				, TO_CHAR(A.DS_EDATE,'YYYY-MM-DD HH24:MI') AS DS_EDATE
+		        , A.PAY
+		        , A.COM_CONTENT
+		        , A.COM_CNT
+		        , A.PTRPS
+		        , A.USEYN
+		FROM LMS_ED_LECTURE A
+		WHERE 1=1 
+		AND USEYN = 'Y'
+		AND SLNO = #{slno}
+    </select>
+    
+    <!-- 특강신청정보 리스트 -->
+    <select id="getSpecialLectureInfo" resultType="emap" parameterType="dmap">
+    	SELECT 
+            A.SLNO
+            , A.APPLY_NO
+            , A.APPLY_NM
+            , A.APPLY_ORGAN_NM
+            , (SELECT SIDO_NAME FROM LMS_CD_SIDO WHERE SIDO_CODE = A.SIDO_CODE) AS SIDO_NAME
+            , (SELECT GU_NAME FROM LMS_CD_GU WHERE GU_CODE = A.GU_CODE) AS GU_NAME
+            , (SELECT DONG_NAME FROM LMS_CD_DONG WHERE DONG_CODE = A.DONG_CODE) AS DONG_NAME
+            , A.APPLY_ORGAN_ADDR
+            , A.APPLY_TEL
+            , A.APPLY_PHONE
+            , A.APPLY_EMAIL
+            , A.EDU_AREA
+            , B.MT_SUB_NAME AS LEC_TAGET_NAME
+            , A.TARGET_ETC
+            , A.PERSON_CNT
+            , TO_CHAR(A.EDU_SDATE,'YYYY-MM-DD HH24:MI') AS EDU_SDATE
+            , TO_CHAR(A.EDU_EDATE,'YYYY-MM-DD HH24:MI') AS EDU_EDATE
+            , A.MT_LCTRE_CODE
+            , A.EDU_CONTENTS
+            , A.MT_LEC_STATUS_CODE
+            , TO_CHAR(A.DS_SDATE,'YYYY-MM-DD HH24:MI') AS DS_SDATE
+            , TO_CHAR(A.DS_EDATE,'YYYY-MM-DD HH24:MI') AS DS_EDATE
+            , A.PAY
+            , A.COM_CONTENT
+            , A.COM_CNT
+            , A.PTRPS
+            , A.APPLY_SCORE
+            , A.ORGAN_SCORE
+            , A.USEYN
+            , A.REGIST_NO
+            , A.REGIST_DT
+            , A.UPDT_NO
+            , A.UPDT_DT  
+            , (CASE WHEN (TO_CHAR (SYSDATE, 'YYYYMMDD') BETWEEN TO_CHAR (A.DS_SDATE, 'YYYYMMDD') AND TO_CHAR (A.DS_EDATE, 'YYYYMMDD') ) 
+                      THEN 'Y'                       
+                     ELSE 'N'
+                       END) AS CANCEL_YN
+               , (CASE WHEN (TO_CHAR (SYSDATE, 'YYYYMMDD') BETWEEN TO_CHAR (A.EDU_SDATE, 'YYYYMMDD') AND TO_CHAR (A.EDU_EDATE, 'YYYYMMDD') ) 
+                      THEN 'ING'
+                      WHEN (TO_CHAR (SYSDATE, 'YYYYMMDD') > TO_CHAR (A.EDU_EDATE, 'YYYYMMDD') ) 
+                      THEN 'END'                       
+                     ELSE 'WATING'
+                       END) AS EDU_STATE
+        FROM  LMS_ED_LECTURE A, LMS_CD_MT_SUB B,LMS_ED_LECTURE_TUTOR C
+            WHERE A.SLNO = C.SLNO      
+            AND A.USEYN='Y'
+            AND C.TUTOR_USERNO = 5
+            AND C.USEYN = 'Y'     
+            AND A.MT_LEC_TARGET_CODE = B.MT_SUB_CODE 
+		    <if test="searchType == 'all' ">
+	    		AND (A.APPLY_ORGAN_NM LIKE '%' || #{schSeqTitle} || '%' OR A.EDU_AREA LIKE '%' || #{schSeqTitle} || '%' OR B.MT_SUB_NAME LIKE '%' || #{schSeqTitle} || '%' OR A.MT_LCTRE_CODE LIKE '%' || (SELECT MT_SUB_CODE FROM LMS_CD_MT_SUB WHERE MT_CODE = 'HP' AND MT_SUB_NAME LIKE '%' || #{schSeqTitle} || '%') ||'%')
+	    	</if>
+			<if test="searchType == 'applyOrganNm' ">
+	 			AND A.APPLY_ORGAN_NM LIKE '%' || #{schSeqTitle} || '%'
+	 		</if>
+	 		<if test="searchType == 'eduArea' ">
+	 			AND A.EDU_AREA LIKE '%' || #{schSeqTitle} || '%'
+	 		</if>
+	 		<if test="searchType == 'lecTargetName' ">
+	 			AND B.MT_SUB_NAME LIKE '%' || #{schSeqTitle} || '%'
+	 		</if>
+	 		<if test="searchType == 'lecLctreName' ">
+	 			AND A.MT_LCTRE_CODE LIKE '%' || (SELECT MT_SUB_CODE FROM LMS_CD_MT_SUB WHERE MT_CODE = 'HP' AND MT_SUB_NAME LIKE '%' || #{schSeqTitle} || '%') ||'%'
+	        </if>
+		    ORDER BY A.SLNO DESC
+    </select>
+    
+    <!-- 특강 신청정보 상세보기-->
+    <select id="getSpecialLectureInfoView" resultType="emap" parameterType="dmap">
+    	SELECT 
+		    A.SLNO
+		    , A.APPLY_NO
+		    , A.APPLY_NM
+		    , A.APPLY_ORGAN_NM
+		    , (SELECT SIDO_NAME FROM LMS_CD_SIDO WHERE SIDO_CODE = A.SIDO_CODE) AS SIDO_NAME
+		    , (SELECT GU_NAME FROM LMS_CD_GU WHERE GU_CODE = A.GU_CODE) AS GU_NAME
+		    , (SELECT DONG_NAME FROM LMS_CD_DONG WHERE DONG_CODE = A.DONG_CODE) AS DONG_NAME
+		    , A.APPLY_ORGAN_ADDR
+		    , A.APPLY_TEL
+		    , A.APPLY_PHONE
+		    , A.APPLY_EMAIL
+		    , A.EDU_AREA
+		    , (SELECT MT_SUB_NAME FROM LMS_CD_MT_SUB WHERE MT_SUB_CODE = A.MT_LEC_TARGET_CODE) AS LEC_TAGET_NAME
+		    , A.MT_LEC_TARGET_CODE
+		    , A.TARGET_ETC
+		    , A.PERSON_CNT
+		    , TO_CHAR(A.EDU_SDATE,'YYYY-MM-DD HH24:MI') AS EDU_SDATE
+			, TO_CHAR(A.EDU_EDATE,'YYYY-MM-DD HH24:MI') AS EDU_EDATE
+		    , A.MT_LCTRE_CODE
+		    , A.EDU_CONTENTS
+		    , (SELECT MT_SUB_NAME FROM LMS_CD_MT_SUB WHERE MT_SUB_CODE = A.MT_LEC_STATUS_CODE) AS LEC_STATUS_NAME
+		    , TO_CHAR(A.DS_SDATE,'YYYY-MM-DD HH24:MI') AS DS_SDATE
+			, TO_CHAR(A.DS_EDATE,'YYYY-MM-DD HH24:MI') AS DS_EDATE
+		    , A.PAY
+		    , A.COM_CONTENT
+		    , A.COM_CNT
+		    , A.PTRPS
+		    , A.APPLY_SCORE
+		    , A.ORGAN_SCORE
+		    , A.USEYN
+		    , A.REGIST_NO
+		    , TO_CHAR(A.REGIST_DT,'YYYY-MM-DD HH24:MI') AS REGIST_DT
+		    , A.UPDT_NO
+		    , TO_CHAR(A.UPDT_DT,'YYYY-MM-DD HH24:MI') AS UPDT_DT
+		FROM  LMS_ED_LECTURE A,LMS_ED_LECTURE_TUTOR B
+		    WHERE A.SLNO = B.SLNO
+		    AND B.TUTOR_USERNO = #{SES_USERNO}
+		    AND B.FINAL_AT = 'Y'
+		    AND A.SLNO = #{slno}
+    </select>
+    
+    <!-- 강사배정취소 -->
+    <update id="CancelExec"  parameterType="hmap">
+        UPDATE LMS_ED_LECTURE_TUTOR 
+		SET FINAL_AT = 'N'
+			, USEYN = 'N'
+			, UPDT_DT = SYSDATE
+			, UPDT_NO = #{SES_USERNO}
+		WHERE SLNO = #{slno} 
+			AND TUTOR_USERNO = #{SES_USERNO}
+    </update>
+    
+	<!-- 특강 강사 결과 보고 -->
+    <update id="updateTutorLectureResult"  parameterType="hmap">
+        UPDATE LMS_ED_LECTURE SET 
+		    COM_CNT = #{comCnt}
+		    , PTRPS = #{ptrps}
+		    , APPLY_SCORE = #{applyScore}
+		    , ORGAN_SCORE = #{organScore}
+		    , UPDT_NO = #{SES_USERNO}
+		    , UPDT_DT = SYSDATE
+		WHERE SLNO = #{slno}
+    </update>
+    
+     <!-- 강사공간 강사배정 취소 상태 변경 -->
+    <update id="specialLectureCancelChange"  parameterType="dmap">
+    	UPDATE LMS_ED_LECTURE SET 
+		    MT_LEC_STATUS_CODE = #{lecStatusCode} 
+		WHERE SLNO = #{slno}
+    </update>
+    
+    <!-- 답글코드 로드 -->
+    <select id="selectBoardReplyRpyno" parameterType="dmap" resultType="int">
+    	SELECT 
+		    NVL(MAX(RPYNO),0)+1 AS RPYNO
+		FROM LMS_ED_BBS_CMT
+		WHERE CMTNO = #{cmtNo}
+    </select>
+    
+    <!-- 강사공간 댓글등록 -->
+	<insert id="insertBoardReplySubmit" parameterType="dmap">
+		INSERT INTO LMS_ED_BBS_CMT(
+		    CMTNO
+<!-- 		    , RPYNO -->
+		    , BBSNO
+		    , WRITER
+		    , WDATE
+		    , CONTENT
+		    , USERNO
+		    , USEYN
+		    ) VALUES (
+		    SEQ_CMTNO.NEXTVAL
+		    , '1'
+		    , #{bbsNo}
+		    , #{SES_USERNAME}
+		    , SYSDATE
+		    , #{content}
+		    , #{SES_USERNO}
+		    , 'Y'
+		    )
+	</insert>
+	
+	<!-- 강사소통공간 댓글 리스트-->
+    <select id="getTutorBoardReplyList" resultType="emap" parameterType="dmap">
+    	SELECT 
+		    CMTNO
+<!-- 		    , RPYNO -->
+		    , BBSNO
+		    , WRITER
+		    , TO_CHAR(WDATE,'YYYY-MM-DD HH24:MI') AS WDATE
+		    , CONTENT
+		    , USERNO
+		    , USEYN
+		    , UPDT_NO
+		    , TO_CHAR(UPDT_DATE,'YYYY-MM-DD HH24:MI') AS UPDT_DATE
+		FROM LMS_ED_BBS_CMT
+		    WHERE BBSNO = #{bbsNo}
+		    AND USEYN = 'Y'
+<!-- 		    ORDER BY CMTNO DESC,RPYNO ASC -->
+		    ORDER BY CMTNO DESC
+	</select>
+	
+	 <!-- 강사소통공간 댓글 상태 변경 -->
+    <update id="tutorBoardReplyDelete"  parameterType="dmap">
+    	UPDATE LMS_ED_BBS_CMT SET 
+		    USEYN = 'N'
+		    , UPDT_NO = #{SES_USERNO}
+		    , UPDT_DATE = SYSDATE 
+		WHERE CMTNO = #{cmtNo}
+		<if test="rpyNo != 1">
+		   AND RPYNO = #{rpyNo}
+		</if>
+    </update>
+    
+    <!-- 강사소통공간 댓글 수정 -->
+    <update id="tutorBoardReplyModify"  parameterType="dmap">
+    	UPDATE LMS_ED_BBS_CMT SET 
+		    CONTENT = #{modifyContent}
+		    , UPDT_NO = #{SES_USERNO}
+		    , UPDT_DATE = SYSDATE 
+		WHERE CMTNO = #{cmtNo}	
+<!-- 		AND RPYNO = #{rpyNo} -->
+    </update>
+    
+    <select id="getTutorBoardReplyAjaxList" parameterType="dmap" resultType="map" >
+    	SELECT 
+		    CMTNO
+<!-- 		    , RPYNO -->
+		    , BBSNO
+		    , WRITER
+		    , TO_CHAR(WDATE,'YYYY-MM-DD HH24:MI') AS WDATE
+		    , CONTENT
+		    , USERNO
+		    , USEYN
+		    , UPDT_NO
+		    , TO_CHAR(UPDT_DATE,'YYYY-MM-DD HH24:MI') AS UPDT_DATE
+		FROM LMS_ED_BBS_CMT
+		    WHERE BBSNO = #{bbsNo}
+		    AND USEYN = 'Y'
+<!-- 		    ORDER BY CMTNO DESC,RPYNO ASC -->
+		    ORDER BY CMTNO DESC
+    </select>
+    
+     <!-- 강사공간 답글등록 -->
+	<insert id="tutorBoardCmtReplySubmit" parameterType="dmap">
+		INSERT INTO LMS_ED_BBS_CMT(
+		    CMTNO
+<!-- 		    , RPYNO -->
+		    , BBSNO
+		    , WRITER
+		    , WDATE
+		    , CONTENT
+		    , USERNO
+		    , USEYN
+		    ) VALUES (
+		    #{cmtNo}
+<!-- 		    , #{rpyNo} -->
+		    , #{bbsNo}
+		    , #{SES_USERNAME}
+		    , SYSDATE
+		    , #{cmtReplyContent}
+		    , #{SES_USERNO}
+		    , 'Y'
+		    )
+	</insert>
+	
+
+</mapper>

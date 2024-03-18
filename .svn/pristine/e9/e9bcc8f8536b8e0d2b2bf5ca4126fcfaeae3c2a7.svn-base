@@ -1,0 +1,11 @@
+_this.$quizInfo = [
+	["다음 중 스피커 외장 만들기의 구성으로 <span style='color:#FF0000;'>아닌</span> 것은?","Fusion 360 프로그램을 이용해 문제 도면을 해독하고 이를 모델링 한다.","주어진 stl 파일을 참조하여 3D Model을 작성한다.","주어진 dxf 파일을 Profile(프로파일)로 활용하여 3D Model을 작성한다.","세 개의 3D Model을 조립(Assemble)하고 이를 영상으로 저장한다.",false],	
+	["다음 중 ㉮ 모델을 작성하는 방법에 대한 설명으로 <span style='color:#FF0000;'>틀린</span> 것은?","Box(상자) 형상의 내부를 비우기 할 때는 Shell(쉘)을 이용하는 것이 효과적이다.","3D Model(모델)의 모서리 편집은 Fillet(모깎기)를 이용해 라운딩 모서리로 편집한다.","Box(상자)의 중심 Plane(평면)은 Construct(참조 형상)의 Plane Along Path(경로를 따라가는 평면)을 이용한다.","Slot Sketch Profile(슬롯 스케치 프로파일)은 Thicken(두께)을 이용해 두께를 적용한다.",false],
+	["다음 중 Assemble(조립)후 저장 및 내보내기 하는 파일 포맷으로 <span style='color:#FF0000;'>틀린</span> 것은?","수험번호. F3d","수험번호.iam","수험번호.gcode","수험번호.stl",false]
+];
+
+_this.$quizAnsInfo = [
+	[4,"세 개의 3D Model(모델)을 Assemble(조립)하고 이를 *.f3d, *.stl 파일로 저장한다."],
+	[4,"Slot Sketch Profile(슬롯 스케치 프로파일)은 Extrude(돌출)을 이용해 두께를 적용한다."],
+	[3,"Gcode 파일은 Cura 프로그램을 이용해 슬라이싱 설정을 완료한 후 저장하는 파일 포맷이다."],
+];

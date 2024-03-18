@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.webapp.ccedu.mapper.CcEduInfoMapper">
+
+
+	<!-- 시험(일정) 공고 -->
+	<select id="getEduScheduleList" resultType="emap" parameterType="dmap">
+	/* getEduScheduleList */
+	<![CDATA[
+		SELECT 
+		       CC_NO
+		     , YEAR
+		     , MT_APP_TYPE
+		     , ROUND_NM
+		     , FN_GET_CMMN_CODE_NM('CT', MT_APP_TYPE) AS MT_APP_NAME
+		     , MT_ROUND
+		     , APP_S_DT
+		     , APP_E_DT
+		     , EXAM_DT
+		     , EXAM_S_HOUR
+		     , EXAM_S_MIN
+		     , EXAM_E_HOUR
+		     , EXAM_E_MIN
+		     , (SELECT NUM_CD FROM LMS_CD_MT_SUB B WHERE B.MT_SUB_CODE = MT_ROUND) AS ROUND
+		     , SUBSTR(APP_S_DT, 6, 2)AS SMONTH
+	     	 , SUBSTR(APP_S_DT, 9, 2)AS SDAY
+	     	 , SUBSTR(APP_E_DT, 6, 2)AS EMONTH
+	     	 , SUBSTR(APP_E_DT, 9, 2)AS EDAY
+	     	 , TO_CHAR(TO_DATE(APP_S_DT, 'YYYY-MM-DD'), 'YYYY"년 "MM"월 "DD"일"')AS APP_S_DT_KO
+	     	 , TO_CHAR(TO_DATE(APP_E_DT, 'YYYY-MM-DD'), 'YYYY"년 "MM"월 "DD"일"')AS APP_E_DT_KO
+	     	 , TO_CHAR(TO_CHAR(TO_DATE(APP_S_DT, 'YYYY-MM-DD'), 'DY', 'NLS_DATE_LANGUAGE=KOREAN'))AS S_DAY
+	     	 , TO_CHAR(TO_CHAR(TO_DATE(APP_E_DT, 'YYYY-MM-DD'), 'DY', 'NLS_DATE_LANGUAGE=KOREAN'))AS E_DAY
+	     	 , CASE WHEN TO_DATE(APP_S_DT,'YYYY-MM-DD') >= SYSDATE
+                        THEN 'Y'
+                        ELSE 'N'
+                         END AS FUTURE_POSSIBLEYN 
+                      
+                          , CASE WHEN TO_CHAR(SYSDATE,'RRRR-MM-DD')  BETWEEN TO_DATE(APP_S_DT,'YYYY-MM-DD') AND TO_DATE(APP_E_DT,'YYYY-MM-DD')
+	     	 	 THEN 'Y'
+                    ELSE 'N'
+                     END AS POSSIBLEYN
+             , SAVPATH
+             , ORGFILE
+             , SAVFILE
+             , CASE WHEN (SELECT COUNT(*) FROM CC_APPLY WHERE PASS_YN = 'Y' AND USEYN = 'Y' AND UNITY_MBERNO = #{SES_USERNO}) > 0
+                THEN 'Y'
+                ELSE 'N' END ISPASS
+		 FROM CC_MST
+		 WHERE 1=1
+		 AND USEYN = 'Y'
+     ]]>
+		 <if test="mtAppType != null and mtAppType != '' ">
+        	 AND MT_APP_TYPE = #{mtAppType}
+         </if>
+<!-- 	     ORDER BY YEAR DESC, EXAM_DT DESC -->
+	     ORDER BY EXAM_DT DESC
+	     
+	</select>
+	
+	
+	<!-- 시험공고일정(완화 / 신규) 갯수 -->
+	<select id="getEduScheduleListCnt" resultType="int" parameterType="dmap">
+	/* getEduScheduleListCnt */
+		
+		SELECT COUNT(*) FROM CC_MST
+		WHERE MT_APP_TYPE = #{mtAppType}
+
+		
+	</select>
+
+	
+</mapper>

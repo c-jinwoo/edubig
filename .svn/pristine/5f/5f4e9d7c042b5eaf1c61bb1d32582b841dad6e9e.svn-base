@@ -1,0 +1,23 @@
+<%
+/****************************************
+    subject : 좌측 메뉴
+    summary : 좌측 메뉴 : 온라인교육(01)
+    author  : SANGS
+    date    : 2018-06-12
+****************************************/
+%>
+<%@ page language="java" contentType="text/html; charset=utf-8" pageEncoding="utf-8"%>
+<%
+	String dep2 = (String)request.getParameter("dep2"); 
+	String dep3 = (String)request.getParameter("dep3");
+%>
+
+
+<h2>교육안내</h2>
+	 <ul class="lnb_menu">
+		<li <%if("01".equals(dep2)) out.print("class=\"on\""); %>>
+			<a href="/ccedu/online/onlineEducationInfo.do" ><span>교육소개</span></a>
+		</li>
+	</ul>
+<!-- 	dfdmfkadfmkdsm
+ -->

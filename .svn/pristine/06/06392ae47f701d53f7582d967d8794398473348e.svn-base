@@ -1,0 +1,131 @@
+<%
+/****************************************
+    subject : 신용상담사
+    summary : 신용상담사 > 수료증진위확인여부
+    author  : SANGS
+    date    : 2018-06-15
+****************************************/
+%>
+<%@ page language="java" contentType="text/html; charset=utf-8" pageEncoding="utf-8"%>
+<%@ include file="/WEB-INF/jsp/ccedu/inc/taglib_inc.jsp"%>
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+	<title>결제</title>
+	<%@ include file="/WEB-INF/jsp/ccedu/inc/head_inc.jsp"%>
+	<script type="text/javascript">
+	
+		$(document).ready(function() {
+			
+			fnModalMsg("<c:out value='${REQUEST_DATA.LGD_RESPMSG}'/>",function(){
+				$('input[name=LGD_BUYERPHONE]', opener.document).val("<c:out value='${REQUEST_DATA.LGD_BUYERPHONE}'/>");
+				$('input[name=LGD_PAYDATE]', opener.document).val("<c:out value='${REQUEST_DATA.LGD_PAYDATE}'/>");
+				$('input[name=LGD_DISCOUNTUSEYN]', opener.document).val("<c:out value='${REQUEST_DATA.LGD_DISCOUNTUSEYN}'/>");
+				$('input[name=LGD_BUYEREMAIL]', opener.document).val("<c:out value='${REQUEST_DATA.LGD_BUYEREMAIL}'/>");
+				$('input[name=LGD_RECEIVER]', opener.document).val("<c:out value='${REQUEST_DATA.LGD_RECEIVER}'/>");
+				$('input[name=LGD_DELIVERYINFO]', opener.document).val("<c:out value='${REQUEST_DATA.LGD_DELIVERYINFO}'/>");
+				$('input[name=LGD_PAYTYPE]', opener.document).val("<c:out value='${REQUEST_DATA.LGD_PAYTYPE}'/>");
+				$('input[name=LGD_RECEIVERPHONE]', opener.document).val("<c:out value='${REQUEST_DATA.LGD_RECEIVERPHONE}'/>");
+				$('input[name=LGD_EXCHANGERATE]', opener.document).val("<c:out value='${REQUEST_DATA.LGD_EXCHANGERATE}'/>");
+				$('input[name=TAXFREEAMOUNT]', opener.document).val("<c:out value='${REQUEST_DATA.TAXFREEAMOUNT}'/>");
+				$('input[name=LGD_IFOS]', opener.document).val("<c:out value='${REQUEST_DATA.LGD_IFOS}'/>");
+				$('input[name=LGD_AFFILIATECODE]', opener.document).val("<c:out value='${REQUEST_DATA.LGD_AFFILIATECODE}'/>");
+				$('input[name=LGD_2TR_FLAG]', opener.document).val("<c:out value='${REQUEST_DATA.LGD_2TR_FLAG}'/>");
+				$('input[name=LGD_CARDNUM]', opener.document).val("<c:out value='${REQUEST_DATA.LGD_CARDNUM}'/>");
+				$('input[name=LGD_FINANCEAUTHNUM]', opener.document).val("<c:out value='${REQUEST_DATA.LGD_FINANCEAUTHNUM}'/>");
+				$('input[name=LGD_CARDNOINTEREST_YN]', opener.document).val("<c:out value='${REQUEST_DATA.LGD_CARDNOINTEREST_YN}'/>");
+				$('input[name=LGD_ESCROWYN]', opener.document).val("<c:out value='${REQUEST_DATA.LGD_ESCROWYN}'/>");
+				$('input[name=LGD_TRANSAMOUNT]', opener.document).val("<c:out value='${REQUEST_DATA.LGD_TRANSAMOUNT}'/>");
+				$('input[name=LGD_FINANCECODE]', opener.document).val("<c:out value='${REQUEST_DATA.LGD_FINANCECODE}'/>");
+				$('input[name=LGD_DISCOUNTUSEAMOUNT]', opener.document).val("<c:out value='${REQUEST_DATA.LGD_DISCOUNTUSEAMOUNT}'/>");
+				$('input[name=LGD_CARDGUBUN1]', opener.document).val("<c:out value='${REQUEST_DATA.LGD_CARDGUBUN1}'/>");
+				$('input[name=LGD_CARDGUBUN2]', opener.document).val("<c:out value='${REQUEST_DATA.LGD_CARDGUBUN2}'/>");
+				$('input[name=LGD_HASHDATA]', opener.document).val("<c:out value='${REQUEST_DATA.LGD_HASHDATA}'/>");
+				$('input[name=LGD_BUYERADDRESS]', opener.document).val("<c:out value='${REQUEST_DATA.LGD_BUYERADDRESS}'/>");
+				$('input[name=LGD_FINANCENAME]', opener.document).val("<c:out value='${REQUEST_DATA.LGD_FINANCENAME}'/>");
+				$('input[name=LGD_CARDNOINTYN]', opener.document).val("<c:out value='${REQUEST_DATA.LGD_CARDNOINTYN}'/>");
+				$('input[name=LGD_CARDACQUIRER]', opener.document).val("<c:out value='${REQUEST_DATA.LGD_CARDACQUIRER}'/>");
+				$('input[name=LGD_DEVICE]', opener.document).val("<c:out value='${REQUEST_DATA.LGD_DEVICE}'/>");
+				$('input[name=LGD_TIMESTAMP]', opener.document).val("<c:out value='${REQUEST_DATA.LGD_TIMESTAMP}'/>");
+				$('input[name=LGD_PCANCELSTR]', opener.document).val("<c:out value='${REQUEST_DATA.LGD_PCANCELSTR}'/>");
+				$('input[name=LGD_BUYER]', opener.document).val("<c:out value='${REQUEST_DATA.LGD_BUYER}'/>");
+				$('input[name=LGD_CARDINSTALLMONTH]', opener.document).val("<c:out value='${REQUEST_DATA.LGD_CARDINSTALLMONTH}'/>");
+				$('input[name=LGD_PRODUCTINFO]', opener.document).val("<c:out value='${REQUEST_DATA.LGD_PRODUCTINFO}'/>");
+				$('input[name=LGD_BUYERSSN]', opener.document).val("<c:out value='${REQUEST_DATA.LGD_BUYERSSN}'/>");
+				$('input[name=LGD_PRODUCTCODE]', opener.document).val("<c:out value='${REQUEST_DATA.LGD_PRODUCTCODE}'/>");
+
+				$('input[name=LGD_TID]', opener.document).val("<c:out value='${REQUEST_DATA.LGD_TID}'/>");
+				$('input[name=LGD_OID]', opener.document).val("<c:out value='${REQUEST_DATA.LGD_OID}'/>");
+				$('input[name=LGD_RESPCODE]', opener.document).val("<c:out value='${REQUEST_DATA.LGD_RESPCODE}'/>");
+				$('input[name=LGD_RESPMSG]', opener.document).val("<c:out value='${REQUEST_DATA.LGD_RESPMSG}'/>");
+				$('input[name=LGD_AMOUNT]', opener.document).val("<c:out value='${REQUEST_DATA.LGD_AMOUNT}'/>");
+				$('input[name=LGD_ACCOUNTNUM]', opener.document).val("<c:out value='${REQUEST_DATA.LGD_ACCOUNTNUM}'/>");
+				$('input[name=LGD_PAYER]', opener.document).val("<c:out value='${REQUEST_DATA.LGD_PAYER}'/>");
+				
+				
+				
+				
+				
+				self.close();
+			});			
+			
+			$('#modal-window').css('background-color','#909090');
+			
+		});
+		
+		
+		function onExit(){
+			parent.opener.fnSubmit();
+        }
+		
+		
+	</script>
+</head>
+
+<body onunload="onExit();">
+
+<!-- skip nav -->
+	<%@ include file="/WEB-INF/jsp/ccedu/inc/nav_inc.jsp"%>
+<!--// skip nav -->
+
+
+<div id="wrap">
+
+	<!-- header -->
+	<%@ include file="/WEB-INF/jsp/ccedu/inc/header_inc.jsp"%>
+	<!--// header -->
+
+	<!-- container -->
+	<div id="container">
+
+		<!-- location -->
+		<jsp:include page="/WEB-INF/jsp/ccedu/inc/location/loc_13.jsp">
+			<jsp:param name="menuNm" value="결제"/>
+		</jsp:include>
+		<!--// location -->
+
+		<div class="con_center">
+
+			<!-- lnb -->
+			<div id="lnb">
+				<jsp:include page="/WEB-INF/jsp/ccedu/inc/lnb/lnb_13.jsp">
+					<jsp:param name="dep2" value="01"/>
+					<jsp:param name="menuNm" value="결제"/>
+				</jsp:include>
+			</div>
+			<!--// lnb -->
+			<h2> 결제 진행 중입니다. </h2>
+			<h2> 잠시만 기다려주세요. </h2>
+		</div>
+	
+	</div>
+	<!--// container -->
+
+	<!-- foot -->
+	<%@ include file="/WEB-INF/jsp/ccedu/inc/footer_inc.jsp"%>
+	<!--// foot end -->
+
+</div>
+
+</body>
+</html>

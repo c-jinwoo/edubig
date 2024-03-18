@@ -1,0 +1,105 @@
+<%
+/****************************************
+    subject : 찾아가는 교육
+    summary : 찾아가는 교육 > 교육신청
+    author  : SANGS
+    date    : 2018-06-15
+****************************************/
+%>
+<%@ page language="java" contentType="text/html; charset=utf-8" pageEncoding="utf-8"%>
+<%@ include file="/WEB-INF/jsp/ccedu/inc/taglib_inc.jsp"%>
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+	<title>교육소개 > 찾아가는교육</title>
+	<%@ include file="/WEB-INF/jsp/ccedu/inc/head_inc.jsp"%>
+	<script type="text/javascript">
+	
+		function lectureResult() {
+			$("#frm").submit();
+		}
+
+	</script>
+</head>
+
+<body>
+
+<!-- skip nav -->
+	<%@ include file="/WEB-INF/jsp/ccedu/inc/nav_inc.jsp"%>
+<!--// skip nav -->
+
+
+<div id="wrap">
+
+	<!-- header -->
+	<%@ include file="/WEB-INF/jsp/ccedu/inc/header_inc.jsp"%>
+	<!--// header -->
+
+	<!-- container -->
+	<div id="container">
+
+		<!-- location -->
+		<jsp:include page="/WEB-INF/jsp/ccedu/inc/location/loc_02_02.jsp"> 
+			<jsp:param name="menuNm" value="교육신청"/> 
+		</jsp:include> 
+		<!--// location -->
+
+		<div class="con_center">
+
+			<!-- lnb -->
+			<div id="lnb">
+				<jsp:include page="/WEB-INF/jsp/ccedu/inc/lnb/lnb_02.jsp">
+					<jsp:param name="dep2" value="02"/>
+				</jsp:include>
+			</div>
+			<!--// lnb -->
+			
+			<form id="frm" name="frm" action="/ccedu/visit/lectureCheckForm.do" method="post">
+			<!-- content 본문 -->
+			<div id="content">
+				<!-- 기존 START 2018-08-30  -->
+<!-- 				<h3 class="cont_titile">교육신청</h3> -->
+				<!-- 기존 END 2018-08-30  -->
+					
+				<!-- 2018-08-28 김동인 작업 S --> 
+				<h3 class="cont_titile type02">교육신청<span></span></h3>
+				<!-- 2018-08-28 김동인 작업 E -->
+
+				<!-- 본문내용 -->
+				<div class="cont_body">
+					<!-- start -->
+
+					<div class="c_msg_box column">
+						<div class="img_cpt_talk">
+							<strong>찾아가는교육 신청이 완료되었습니다.</strong>
+							<p>찾아가는교육 신청 후 2~3일 이내에 담당자가 유선으로 연락드립니다.<br />신청완료 후 교육일정을 변경,취소하고자 하시는 경우 신용교육원으로 직접 연락하시기 바랍니다.</p>
+						</div>
+					</div>
+
+					<div class="c_btn_center">
+						<button type="button" onclick="lectureResult(); return false;" class="btn_bluebg03">신청결과 확인</button>
+					</div>
+
+					<!--// end -->
+				</div>
+				<!--// 본문내용 -->
+				
+			<!--  -->
+			</div>
+			<!--// content 본문 -->
+			</form>
+		
+		<!-- // con_center end -->
+		</div>
+	
+	</div>
+	<!--// container -->
+
+	<!-- foot -->
+	<%@ include file="/WEB-INF/jsp/ccedu/inc/footer_inc.jsp"%>
+	<!--// foot end -->
+
+</div>
+
+</body>
+</html>

@@ -1,0 +1,245 @@
+<%
+/****************************************
+    subject : 신용상담사
+    summary : 신용상담사 : 원서접수 > 접수조회/수정
+    author  : SANGS
+    date    : 2018-06-15
+****************************************/
+%>
+<%@ page language="java" contentType="text/html; charset=utf-8" pageEncoding="utf-8"%>
+<%@ include file="/WEB-INF/jsp/ccedu/inc/taglib_inc.jsp"%>
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+	<title>접수조회/수정 > 원서접수 > 신용상담사 > 신용회복위원회 신용교육원</title>
+	<%@ include file="/WEB-INF/jsp/ccedu/inc/head_inc.jsp"%>
+	<script type="text/javascript">
+	
+		$(document).ready(function() {
+			
+			if('${examCheckMap}' == null || '${examCheckMap}' == '' ) {
+				fnModalMsg("접수한 내용이 없습니다.");
+			}
+		});
+	
+	
+		// 상세보기
+		function detailInfo(ccNo, type, ccAppNo) {
+			$("#pageMode").val("inquiry")
+			$("#ccAppNo").val(ccAppNo);
+			$("#ccNo").val(ccNo);
+			$("#mtAppType").val(type);
+			$("#frm").attr("action", "/ccedu/cc/applicationCrud.do");
+			$("#frm").submit();
+		}
+		
+		// 접수증 출력
+		function printReceipt(ccNo, type, ccAppNo,today,examdt) {
+			
+			
+			if(today<examdt){
+				alert(examdt);
+			}
+			
+			
+			$("#ccAppNo").val(ccAppNo);
+			$("#ccNo").val(ccNo);
+			$("#mtAppType").val(type);
+			
+			var w1 =1070;
+			var h1 = 900;
+			var url = "/ccedu/cc/printReceipt.do";
+			
+			window.open( url+"?"+$("#frm").serialize()
+				,"receipt","width="+w1+" height="+h1+", top=0, left=0, resizable=yes, status=no, menubar=no, toolbar=no, scrollbars=yes, location=no");
+		}
+		
+	</script>
+</head>
+
+<body>
+
+<!-- skip nav -->
+	<%@ include file="/WEB-INF/jsp/ccedu/inc/nav_inc.jsp"%>
+<!--// skip nav -->
+
+
+<div id="wrap">
+
+	<!-- header -->
+	<%@ include file="/WEB-INF/jsp/ccedu/inc/header_inc.jsp"%>
+	<!--// header -->
+
+	<!-- container -->
+	<div id="container">
+
+		<!-- location -->
+			<jsp:include page="/WEB-INF/jsp/ccedu/inc/location/loc_03_02.jsp">
+			  	<jsp:param name="menuNm" value="접수조회/수정"/> 
+			</jsp:include>
+		<!--// location -->
+
+		<div class="con_center">
+
+			<!-- lnb -->
+			<div id="lnb">
+				<jsp:include page="/WEB-INF/jsp/ccedu/inc/lnb/lnb_03.jsp">  
+				  	<jsp:param name="dep2" value="02"/>
+				  	<jsp:param name="dep3" value="02"/> 
+				</jsp:include>
+			</div>
+			<!--// lnb -->
+			
+			
+			<form id="frm" name="frm" method="post"  action="">
+				<input type="hidden" id="pageMode" name="pageMode" value=""/>
+				<input type="hidden" id="ccNo" name="ccNo" value=""/>
+				<input type="hidden" id="mtAppType" name="mtAppType" value=""/>
+				<input type="hidden" id="ccAppNo" name="ccAppNo" value=""/>
+			
+			<!-- content 본문 -->
+			<div id="content">
+
+				
+				<!-- 기존 START 2018-08-30  -->
+<!-- 				<h3 class="cont_titile">접수조회/수정</h3> -->
+				<!-- 기존 END 2018-08-30  -->
+				
+				<!-- 2018-08-28 김동인 작업 S --> 
+				<h3 class="cont_titile type03">접수조회/수정<span></span></h3>
+				<!-- 2018-08-28 김동인 작업 E -->
+				<!-- 본문내용 -->
+				<div class="cont_body">
+					<!-- start -->
+
+					<div class="c_section">
+						<div class="table_style_col2 mgt0">
+							<table>
+								<caption>번호, 구분, 시험명, 시험일을 확인 할 수 있고 상세보기버튼이 있는표</caption>
+								<colgroup>
+									<col />
+									<col />
+									<col />
+									<col />
+									<col />
+									<col />
+									<col />
+									<col />
+									<col />
+								</colgroup>
+								<thead>
+									<tr>
+										<th scope="col" class="pc_mobile2">No.</th>
+										<th scope="col">구분</th>
+										<th scope="col">시험명</th>
+										<th scope="col">시험일</th>
+										<th scope="col">응시지역</th>
+										<th scope="col">시험장소</th>
+										<th scope="col">접수증</th>
+										<th scope="col">비고</th>
+									</tr>
+								</thead>
+								<tbody>
+									<c:if test="${not empty examCheckMap}">
+										<c:forEach var="result" items="${examCheckMap}" varStatus="status" >
+											<tr>
+												<td class="align_center pc_mobile2">${result.RNUM}</td>
+												<td class="align_center">${result.MT_APP_NAME}</td>
+												<td>${result.ROUND_NM}</td>
+												<td class="align_center">${result.EXAM_DT}(${result.DAY})</td>
+												<td class="align_center">${result.PLACE_LOC}</td>
+												<td class="align_center">${result.PLACE_TITLE}</td>
+												<td class="align_center">												
+													<button type="button" class="btn_blueline" onclick="printReceipt('<c:out value="${result.CC_NO}"/>', '<c:out value="${result.MT_APP_TYPE}"/>', '<c:out value="${result.CC_APP_NO}"/>','<c:out value="${result.SYSDATE}"/>','<c:out value="${result.EXAM_DT2}"/>')">
+														<span class="pc_mobile">접수증출력</span><span class="mobile_pc">출력</span>
+													</button>
+												</td>
+												<td class="align_center">
+													<button class="btn_blueline" onclick="detailInfo('<c:out value="${result.CC_NO}"/>', '<c:out value="${result.MT_APP_TYPE}"/>', '<c:out value="${result.CC_APP_NO}"/>')">
+														<span class="pc_mobile">상세보기</span>	<span class="mobile_pc">상세</span>
+													</button>
+												</td>
+											</tr>
+										</c:forEach>
+									</c:if>
+									
+									<c:if test="${empty examCheckMap}">
+										<tr>
+											<td class="align_center pc_mobile2" colspan="8"> 해당 내역이 없습니다. </td>
+											<td class="align_center mobile_pc2" colspan="7"> 해당 내역이 없습니다. </td>
+										</tr>
+									</c:if>
+								</tbody>
+							</table>
+						</div>
+					</div>
+
+<!-- 					<div class="c_section"> -->
+<!-- 						<h4 class="c_tit">환불 및 기타사항</h4> -->
+<!-- 						<ul class="c_txtlist"> -->
+<!-- 							<li> -->
+<!-- 								<h5>시험응시료 결제마감 : 원서접수 다음날까지 결제. 단, 접수마감일에는 접수마감 당일 18시까지.</h5> -->
+<!-- 								<ul class="in_txtul"> -->
+<!-- 									<li>결제 시 오류가 날 수 있으니 반드시 결제 성공을 확인하시기 바랍니다.</li> -->
+<!-- 									<li>원서접수 다음날 결제마감 시한까지 응시료를 입금하지 않으면 원서 접수가 자동취소 됩니다.</li> -->
+<!-- 								</ul> -->
+<!-- 							</li> -->
+<!-- 							<li> -->
+<!-- 								<h5>응시료 납부</h5> -->
+<!-- 								<ul class="in_txtul"> -->
+<!-- 									<li>응시료 : ￦50,000(신규검정) / ￦10,000(완화검정, 1~7회 민간자격 취득자) </li> -->
+<!-- 									<li>자격증 발급비 : ￦8,000원(합격자 중 희망자에 한함, 우편료 포함)</li> -->
+<!-- 									<li> -->
+<!-- 										응시료 납부방법 : 원서접수 시 신용카드결제, 실시간계좌이체 및 가상계좌 이체 중 택일 -->
+<!-- 										<p>※ 응시료 감면(증빙서류제출 필수)</p> -->
+<!-- 										<ul class="in_txtul"> -->
+<!-- 											<li>면제대상 : 「국민기초생활 보장법」에 따른 수급자 또는 「한부모가족지원법」에 따른 보호대상자</li> -->
+<!-- 											<li>할인(50%) : 대학생, 고등학생</li> -->
+<!-- 											<li>할인대상(50%) : 대학생, 고등학생 할인</li> -->
+<!-- 										</ul> -->
+<!-- 									</li> -->
+<!-- 								</ul> -->
+<!-- 							</li> -->
+<!-- 							<li> -->
+<!-- 								<h5>원서접수 취소 및 환불 안내</h5> -->
+<!-- 								<ul class="in_txtul"> -->
+<!-- 									<li>원서접수 마감 후 취소 시에는 재 접수가 불가하오니 신중하게 진행하시기 바랍니다.  </li> -->
+<!-- 									<li>100% 반환 : 원서접수기간 내(접수마감 일까지)</li> -->
+<!-- 									<li> -->
+<!-- 										50% 반환 : 접수마감 다음날~시험시행일 5일 전까지 -->
+<!-- 										<p class="color_orange">※ 위 반환기간 이후에는 반환이 불가능합니다. </p> -->
+<!-- 									</li> -->
+<!-- 									<li>접수취소 시 신용카드 승인 취소 및 계좌이체, 무통장 입금의 환불은 접수 취소 후 30일 내에 환불처리가 됩니다.</li> -->
+<!-- 									<li>응시수수료를 과오납한 경우 : 과오납한 금액 반환</li> -->
+<!-- 									<li>위원회의 귀책사유로 응시하지 못한 경우 : 전액 반환</li> -->
+<!-- 									<li>불가항력의 천재지변이나 이에 준하는 사유로 응시하지 못한 경우 : 전액 반환</li> -->
+<!-- 								</ul> -->
+<!-- 							</li> -->
+<!-- 						</ul> -->
+<!-- 					</div> -->
+
+					<!--// end -->
+				</div>
+				<!--// 본문내용 -->
+				
+			<!--  -->
+			</div>
+			<!--// content 본문 -->
+			</form>
+			
+			
+		
+		<!-- con_center end -->
+		</div>
+	
+	</div>
+	<!--// container -->
+
+	<!-- foot -->
+	<%@ include file="/WEB-INF/jsp/ccedu/inc/footer_inc.jsp"%>
+	<!--// foot end -->
+
+</div>
+
+</body>
+</html>

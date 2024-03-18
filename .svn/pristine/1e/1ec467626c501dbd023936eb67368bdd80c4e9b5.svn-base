@@ -1,0 +1,97 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.webapp.ccedu.mapper.OnlineReviewMapper">
+    <select id="selectReviewList" resultType="emap" parameterType="dmap">    
+	   SELECT
+		    (SELECT
+		    	COURSETITLE
+		   	FROM 
+		   		LMS_ED_COURSE
+		   	WHERE
+		   		COURSENO = A.COURSENO
+		   	) AS COURSETITLE
+		   	,(SELECT
+		   		MBERNM
+		   	FROM
+		   		LMS_CT_UNITY_MBER
+		   	WHERE
+		   		UNITY_MBERNO = A.USERNO		   	
+		   	) AS WRITER
+		    , A.CONTENT
+		    , TO_CHAR(A.WDATE, 'YYYY-MM-DD') AS WDATE
+		    , A.SCORE
+		FROM 
+		    LMS_ED_REVIEW A
+		    , LMS_ED_COURSE_SEQ B
+		WHERE       		    
+		    A.USEYN = 'Y'             
+       		AND A.CSEQNO = B.CSEQNO
+       		AND B.USEYN = 'Y'            
+		    <if test="courseno != null and courseno != ''">
+        	AND A.COURSENO = #{courseno}
+       		</if>		
+		ORDER BY
+		    A.REVIEWNO DESC
+	</select> 
+    <select id="selectReviewMap" resultType="emap" parameterType="dmap">
+		SELECT
+		    CONTENT
+		    , TO_CHAR(WDATE, 'YYYY-MM-DD') AS WDATE
+		    , SCORE
+		FROM
+		    LMS_ED_REVIEW
+		WHERE
+		    CSEQNO = #{searchCseqno}
+		    AND COURSENO = #{courseno}
+		    AND USERNO = #{SES_USERNO}
+	</select>
+				
+    <insert id="insertReview" parameterType="dmap">
+    	INSERT INTO
+		    LMS_ED_REVIEW
+		    (
+		        REVIEWNO
+		        , COURSENO
+		        , CSEQNO
+		        , USERNO
+		        , CONTENT
+		        , WDATE
+		        , USEYN
+		        , SCORE
+		    )
+		VALUES
+		    (
+		        (SELECT NVL(MAX(REVIEWNO),0)+1 FROM LMS_ED_REVIEW)
+		        , #{courseno}
+		        , #{searchCseqno}
+		        , #{SES_USERNO}
+		        , #{rvContent}
+		        , SYSDATE
+		        , 'Y'
+		        , #{rvScore}
+		    )
+    </insert>
+    
+    <update id="updateReview" parameterType="dmap">
+	    UPDATE
+		    LMS_ED_REVIEW
+		SET
+		    CONTENT = #{rvContent}
+		    , SCORE = #{rvScore}
+		    , WDATE = SYSDATE
+		WHERE
+		    CSEQNO = #{searchCseqno}
+		    AND COURSENO = #{courseno}
+	    	AND USERNO = #{SES_USERNO}
+    </update>
+        
+    <delete id="deleteReview" parameterType="dmap">
+	    DELETE FROM
+		    LMS_ED_REVIEW
+		WHERE
+		    CSEQNO = #{searchCseqno}
+		    AND COURSENO = #{courseno}
+	    	AND USERNO = #{SES_USERNO}
+    </delete>    
+</mapper>

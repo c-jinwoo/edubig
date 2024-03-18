@@ -1,0 +1,11 @@
+_this.$quizInfo = [
+	["다음 중 Extrude(돌출)명령어의 설정 항목이 <span style='color:#FF0000;'>아닌</span> 것은?","Direction(방향)","Axis(축)","Taper Angle(기울기 각도)","Operation(결합 유형)",false],	
+	["다음 중 Revolve(회전)에 대한 설명으로 <span style='color:#FF0000;'>틀린</span> 것은?","Profile(프로파일)을 회전하여 3D Model(모델)을 생성하는 명령어 이다.","Axis(축)을 반드시 지정해야 하면, 지정한 축을 기준으로 회전한다.","Path(경로선)를 지정하여 회전 경로를 설정할 수 있다.","Profile(프로파일)을 일부만 회전하는 경우 방향을 설정할 수 있다.",false],
+	["다음 중 Loft(로프트)에 대한 설명으로 <span style='color:#FF0000;'>틀린</span> 것은?","Profile(프로파일)을 연결하여 3D Model(모델)을 생성한다.","Profile(프로파일)은 같은 평면에 위치해 있어야 한다.","Guide Type(가이드 유형)에는 Rails(레일)과 Centerline(중심 선)이 있다.","Profile(프로파일)의 접선 유형이 다양하다.",false]
+];
+
+_this.$quizAnsInfo = [
+	[2,"Axis(축)은 회전체를 생성하는 Revolve(회전)의 설정 항목이다."],
+	[3,"Path(경로)를 지정하는 설정은 Revolve(회전)이 아니라 Sweep(스윕)이다."],
+	[2,"Profile(프로파일)은 서로 다른 높이를 가지고 있어야 한다."]
+];

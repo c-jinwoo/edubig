@@ -1,0 +1,119 @@
+package com.webapp.ccedu.service;
+
+import java.util.List;
+
+import com.sangs.support.DataMap;
+import com.sangs.support.EduMap;
+import com.sangs.support.FrontException;
+
+
+/**
+ * Description : 사용자 > 신용상담사 > 자격시험(자격소개 / 시험안내 / 시험(일정)공고 )
+ * 
+ * Modification Information
+ * 수정일			수정자			수정내용
+ * -------		-----------------------------------
+ * 2020.09.29	CSLAB		최초작성
+ *
+ */
+
+public interface OnlineEducationService {
+	
+	
+    /**
+     * 온라인교육 > 과정목록
+     * 
+     * @param data
+     * @return
+     * @throws Exception
+     */
+    List<EduMap> selectOnlineDetailList(DataMap data) throws Exception;
+    	
+    /**
+     * 온라인교육 > 과정 상세
+     * @param request
+     * @param model
+     * @param rMap
+     * @return
+     * @throws FrontException
+     */
+    EduMap getEdCourseSeqInfo(DataMap rMap) throws Exception;
+
+    /**
+     * 온라인교육 > 과정타이틀
+     * @param rMap
+     * @return
+     * @throws Exception
+     */
+    String selectOnlineDetailTitle(String str) throws Exception;   
+    
+    Integer getPaymentPrice(String orderno) throws Exception;
+    
+    Object getCurriculum(DataMap rMap) throws Exception;
+
+    /**
+     * 온라인교육 > 과정 파일정보
+     *
+     * @param data
+     * @return
+     * @throws Exception
+     */
+    List<EduMap> getFileInfoByCourseNo(int data) throws Exception; 
+    
+    /**
+     * 온라인교육 > 과정 파일정보
+     *
+     * @param data
+     * @return
+     * @throws Exception
+     */
+    List<EduMap> getFileInfoByCourseNo2(DataMap data) throws Exception; 
+    
+    /**
+     * 온라인교육 > 과정 자막 파일정보
+     *
+     * @param data
+     * @return
+     * @throws Exception
+     */
+    List<EduMap> getTxtFileInfoByCourseNo(DataMap data) throws Exception;
+
+    /**
+     * 온라인교육 > 교육 상세 페이지 조회
+     * 
+     * @param data
+     * @return
+     * @throws Exception
+     */
+    EduMap getCourseAppUserInfo(DataMap data) throws Exception;
+    
+    /**
+     * 온라인교육 > 온라인교육 신청 
+     * 
+     * @param data
+     * @throws Exception
+     */
+    void insertCourApplyExec(DataMap data) throws Exception;
+
+    /**
+     * 온라인교육 > 보증시스템 교육이수 여부 확인 
+     * 
+     * @param data
+     * @throws Exception
+     */
+	EduMap getGuarPttnNoChk(DataMap rMap) throws Exception;
+    /**
+     * 온라인교육 > 결제 
+     * 
+     * @param data
+     * @throws Exception
+     */
+	void insertPayment(DataMap rMap) throws Exception;
+    /**
+     * 온라인교육 > 결제 
+     * 
+     * @param data
+     * @throws Exception
+     */
+	Integer selectPaymentLastOrder() throws Exception;
+}

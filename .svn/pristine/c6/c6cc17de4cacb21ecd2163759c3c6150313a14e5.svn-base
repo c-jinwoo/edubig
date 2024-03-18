@@ -1,0 +1,220 @@
+<%
+/****************************************
+    subject : 신용상담사
+    summary : 신용상담사 : 원서접수 > 원서접수
+    author  : SANGS
+    date    : 2018-06-15
+****************************************/
+%>
+<%@ page language="java" contentType="text/html; charset=utf-8" pageEncoding="utf-8"%>
+<%@ include file="/WEB-INF/jsp/ccedu/inc/taglib_inc.jsp"%>
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+	<title>원서접수 > 원서접수 > 신용상담사 > 신용회복위원회 신용교육원</title>
+	<%@ include file="/WEB-INF/jsp/ccedu/inc/head_inc.jsp"%>
+	
+	<script type="text/javascript">
+		
+		function applicationForm(newOldChk, ccNo, type) {
+				
+			$.ajax({
+				url  : "/ccedu/cc/userLoginCheck.do",
+				type : "POST",
+				dataType : "json",
+				success : function(data) {
+					if(data == 'SUCCESS') {
+						applyOldNewChkAjax(newOldChk, ccNo, type);
+					}else{
+		 				fnModalMsg("로그인이 필요한 페이지 입니다.",function(){
+		 					$('#frm').attr('action', '/ccedu/common/login.do').submit();
+		 				});
+					}
+				}
+			});
+		}
+			
+		function applyOldNewChkAjax(newOldChk, ccNo, type){
+			
+			if(ccNo == '' || ccNo == null ) {
+				fnModalMsg("해당 시험일정이 없습니다.");
+				return false;
+			} else {
+				
+				$.ajax({
+					
+					url  : "/ccedu/cc/applyOldNewChkAjax.do",
+					type : "POST",
+					dataType : "json",
+					data : 
+					{
+						newOldChk : newOldChk, 
+						ccNo : ccNo,
+						type : type
+					},
+					success : function(data) {
+							console.log(data);
+							
+						if(data.applyYn == 'Y'){
+						
+							fnModalMsg("이미 접수내역이 있습니다.");
+							return false;
+
+						} else if(data.applyYn =='N') {
+							
+							// 시험일정에 등록된 것이 있다.
+							if(data.dataYn == "Y") {
+							
+								fnConfirm(data.msg + "대상자입니다. <br> 신청하시겠습니까?",function(result){
+									
+									if(result) {
+										$("#ccNo").val(data.ccNo);
+										$("#mtAppType").val(data.mtAppType);
+										$("#pageMode").val('insert');
+					 					$('#frm').attr('action', '/ccedu/cc/applicationCrud.do').submit();
+									}
+				 				});
+								return false;
+							
+							// 시험일정에 등록된 것이 없다.
+							} else {
+								
+								if(data.msg == '합격정보가 존재합니다.') {
+									
+									fnModalMsg("합격정보가 존재합니다.");
+									return false;
+									
+								} else {
+									fnModalMsg("해당 시험일정이 없습니다.");
+									return false;
+								}
+								
+							}
+							
+						} else if(data.applyYn == 'PASS'){
+							
+							fnModalMsg("합격정보가 존재합니다.");
+							return false;
+						}
+							
+					}
+				});
+			}
+			
+		}
+			
+	</script>
+</head>
+
+<body>
+
+<!-- skip nav -->
+	<%@ include file="/WEB-INF/jsp/ccedu/inc/nav_inc.jsp"%>
+<!--// skip nav -->
+
+
+<div id="wrap">
+
+	<!-- header -->
+	<%@ include file="/WEB-INF/jsp/ccedu/inc/header_inc.jsp"%>
+	<!--// header -->
+
+	<!-- container -->
+	<div id="container">
+
+		<!-- location -->
+		<jsp:include page="/WEB-INF/jsp/ccedu/inc/location/loc_03_02.jsp">
+		  	<jsp:param name="menuNm" value="원서접수"/> 
+		</jsp:include> 
+		<!--// location -->
+
+		<div class="con_center">
+
+			<!-- lnb -->
+			<div id="lnb">
+				
+				<jsp:include page="/WEB-INF/jsp/ccedu/inc/lnb/lnb_03.jsp">  
+				  	<jsp:param name="dep2" value="02"/>
+				  	<jsp:param name="dep3" value="01"/> 
+				</jsp:include> 
+			</div>
+			<!--// lnb -->
+			
+			<form id="frm" name="frm" method="post">
+				<input type="hidden" name="ccNo" id="ccNo" value=""/>
+				<input type="hidden" name="mtAppType" id="mtAppType" value=""/>
+				<input type="hidden" name="pageMode" id="pageMode" value=""/>
+				<input type="hidden" id="unityMberNo" name="unityMberNo" value="<c:out value='${REQUEST_DATA.SES_USERNO}'/>"/>
+				<input type="hidden" id="mberNm" name="mberNm" value="<c:out value='${REQUEST_DATA.SES_USERNAME}'/>"/>
+				<input type="hidden" id="applyChk" name="applyChk" value="<c:out value='${userInfo.APPLYCHK}'/>">
+
+			<!-- content 본문 -->
+			<div id="content">
+			
+				<!-- 기존 START 2018-08-30  -->
+<!-- 				<h3 class="cont_titile">원서접수</h3> -->
+				<!-- 기존 END 2018-08-30  -->
+				
+				<!-- 2018-08-28 김동인 작업 S --> 
+				<h3 class="cont_titile type03">원서접수<span></span></h3>
+				<!-- 2018-08-28 김동인 작업 E -->
+				
+				<!-- 본문내용 -->
+				<div class="cont_body">
+					<!-- start -->
+
+					<ul class="link_door">
+						<li>
+							<a href="#" class="inbox" onclick="applicationForm('<c:out value="N"/>', '<c:out value='${rowNewData.CC_NO }'/>', '<c:out value='${rowNewData.MT_APP_TYPE}'/>'); return false;">
+								<div class="img01"></div>
+								<h4>신규검정</h4>
+								<p class="txt">(자격증 취득이 처음이신 분)</p>
+							</a>
+						</li>
+						<li>
+							<a href="#" class="inbox" onclick="applicationForm('<c:out value="O"/>', '<c:out value='${rowOldData.CC_NO }'/>', '<c:out value='${rowOldData.MT_APP_TYPE}'/>'); return false;">
+								<div class="img02"></div>
+								<h4>완화검정</h4>
+								<p class="txt">(국가공인이 되기 전에 자격증 취득하셨던 분)</p>
+							</a>
+						</li>
+					</ul>
+
+					<div class="c_section">
+						<h4 class="c_tit">원서접수 안내</h4>
+						<ul class="c_txtlist line_height">
+							<li>신규검정 신청 대상 : 신용상담사 자격증 취득 신청이 처음이신 분</li>
+							<li>
+								완화검정 신청 대상: 국가공인 이전(2010년~2016년, 1회~7회 민간자격) 취득자 중 국가공인자격으로 전환을 희망하는 분
+								<p class="color_orange">※ 국가공인자격으로의 전환을 위한 완화검정은 2021년까지 시행합니다.</p>
+							</li>
+							<li>신규검정과 완화검정을 혼동하여 잘못 신청하는 경우가 없도록 유의하시기  바랍니다.</li>
+							<li>원서접수는 인터넷으로만 접수 가능하며, 원서접수는 공인인증서 및 휴대폰 인증을 통해 신청하실 수 있습니다. </li>
+						</ul>
+					</div>
+
+					<!--// end -->
+				</div>
+				<!--// 본문내용 -->
+				
+			<!--  -->
+			</div>
+			<!--// content 본문 -->
+			</form>
+			
+			
+		
+		<!-- con_center end -->
+		</div>
+	
+	</div>
+	<!--// container -->
+
+	<!-- foot -->
+	<%@ include file="/WEB-INF/jsp/ccedu/inc/footer_inc.jsp"%>
+	<!--// foot end -->
+
+</div>
+
+</body>
+</html>

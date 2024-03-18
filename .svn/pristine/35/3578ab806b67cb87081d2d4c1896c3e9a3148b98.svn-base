@@ -1,0 +1,165 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes" ?>
+<event>
+<!-- 강조빨간색칠하기-->
+<!-- &lt;span style="color:#ff3300"&gt;&lt;u&gt;않은&lt;&#47;span&gt;&lt;&#47;u&gt; -->
+<!-- 내려쓰기 -->
+<!-- &lt;br&gt; -->
+  <quiz flag="5" >
+      <page num="1" answer="4" type="multiple">
+          <question>
+              <alternate>문제 일.데이터분석 과제에 대한 설명 중 적합하지 않은 
+것은 무엇인가? </alternate>
+			  <symbol>Q1.</symbol>
+              <text>데이터분석 과제에 대한 설명 중 적합하지 않은 
+것은 무엇인가? </text>
+          </question>
+
+          <feedback>
+              <alternate>정답은 사번입니다. 데이터 분석을 통해 기대상태를 낮추거나 현재 상태를 높이거나, 또는 기대상태와 현재 상태를 동시에 조절하는 방안에 관한 잠재적 원인 진단, 가설적 해결방안을 수립하게 된다. </alternate>
+              <answer>
+                  <symbol>정답</symbol>
+                  <text>4</text>
+              </answer>
+              <explain>
+                  <symbol>4</symbol>
+                  <text>데이터 분석을 통해 기대상태를 낮추거나 현재 상태를 높이거나, 또는 기대상태와 현재 상태를 동시에 조절하는 방안에 관한 잠재적 원인 진단, 가설적 해결방안을 수립하게 된다.</text>
+              </explain>
+          </feedback>
+
+          <example num="1">
+              <alternate>보기 일번 과제란 해결해야할 문제나 이슈를 
+의미한다. </alternate>
+              <symbol>Q1</symbol>
+              <text>과제란 해결해야할 문제나 이슈를 
+의미한다. </text>
+          </example>
+          <example num="2">
+              <alternate>보기 이번 분석 과제는 분석활동의 대상이 된다.</alternate>
+              <symbol>2</symbol>
+              <text>분석 과제는 분석활동의 대상이 된다.</text>
+          </example>
+          <example num="3">
+              <alternate>보기 삼번 문제는 기대상태와 현재상태의 
+차이라고 정의할 수 있다.</alternate>
+              <symbol>3</symbol>
+              <text>문제는 기대상태와 현재상태의 
+차이라고 정의할 수 있다.</text>
+          </example>
+          <example num="4">
+              <alternate>보기 사번 데이터분석은 기대상태를 높이는 
+방향에서 문제를 해결하는 방법이다. </alternate>
+              <symbol>4</symbol>
+              <text>데이터분석은 기대상태를 높이는 
+방향에서 문제를 해결하는 방법이다. </text>
+          </example>
+      </page>
+
+      <page num="2" answer="3" type="multiple">
+          <question>
+              <alternate>문제 이. 수요기반 분석 과제에 대한 설명 중 관련성이 
+낮은 것은 무엇인가?</alternate>
+			  <symbol>Q2.</symbol>
+              <text>수요기반 분석 과제에 대한 설명 중 관련성이 
+낮은 것은 무엇인가?</text>
+          </question>
+
+          <feedback>
+              <alternate>정답은 일 번입니다. 수요기반 분석 과제는 해결해야 할 문제를 먼저 
+정의하고 이에 적합한 데이터나 분석기법을 활용하는 것이다.</alternate>
+              <answer>
+                  <symbol>정답</symbol>
+                  <text>3</text>
+              </answer>
+              <explain>
+                  <symbol>3</symbol>
+                  <text>수요기반 분석 과제는 해결해야 할 문제를 먼저 
+정의하고 이에 적합한 데이터나 분석기법을 활용하는 것이다.</text>
+
+              </explain>
+          </feedback>
+
+          <example num="1">
+              <alternate>보기 일번 선행적으로 문제해결에 대한 시나리오를 
+먼저 정의한다. </alternate>
+              <symbol>1</symbol>
+              <text>선행적으로 문제해결에 대한 시나리오를 
+먼저 정의한다. </text>
+          </example>
+          <example num="2">
+		  <alternate>보기 이번 활용되는 데이터는 문제 해결이 
+가능하도록 해주는 실행동인으로서의 역할을 한다. </alternate>
+              <symbol>2</symbol>
+              <text>활용되는 데이터는 문제 해결이 
+가능하도록 해주는 실행동인으로서의 역할을 한다. </text>
+          </example>
+          <example num="3">
+              <alternate>보기 삼번 데이터 종류나 분석기법에 문제상황을 
+맞추도록 한다.</alternate>
+              <symbol>3</symbol>
+              <text>데이터 종류나 분석기법에 문제상황을 
+맞추도록 한다.</text>
+          </example>
+          <example num="4">
+              <alternate>보기 사번 비즈니스 상의 이슈나 문제들의 
+해결방안에 초점을 맞춘다.</alternate>
+              <symbol>4</symbol>
+              <text>비즈니스 상의 이슈나 문제들의 
+해결방안에 초점을 맞춘다.</text>
+          </example>
+      </page>
+
+      <page num="3" answer="3" type="multiple">
+          <question>
+              <alternate>문제 삼. 다음 중 데이터 주도 분석과제 도출과 관계가 깊은 것은?</alternate>
+			  <symbol>Q3.</symbol>
+              <text>다음 중 데이터 주도 분석과제 도출과 관계가 깊은 것은?</text>
+          </question>
+
+          <feedback>
+              <alternate>정답일 삼 번입니다.
+			    데이터 주도 분석과제 도출이란 다양한 데이터 원천의 
+				조합 및 통합적/시각화 분석을 통해 의미 있는 패턴을 
+				파악하고, 이를 비즈니스 상에 적용/활용했을 때 기존의 
+				업무수행방식에 대한 이해를 돕고, 새로운 시각에서 
+				비즈니스 이슈/문제에 대한 해결이 가능하도록 해주는 
+				일련의 접근방법을 말한다.
+</alternate>
+              <answer>
+                  <symbol>정답</symbol>
+                  <text>3</text>
+              </answer>
+              <explain>
+                  <symbol>3</symbol>
+                  <text>
+				데이터 주도 분석과제 도출이란 다양한 데이터 원천의 
+				조합 및 통합적/시각화 분석을 통해 의미 있는 패턴을 
+				파악하고, 이를 비즈니스 상에 적용/활용했을 때 기존의 
+				업무수행방식에 대한 이해를 돕고, 새로운 시각에서 
+				비즈니스 이슈/문제에 대한 해결이 가능하도록 해주는 
+				일련의 접근방법을 말한다.</text>
+              </explain>
+          </feedback>
+
+          <example num="1">
+              <alternate>보기 일번 문제 정의를 토대로 적정한 데이터 분석기법으로 과제 도출</alternate>
+              <symbol>1</symbol>
+              <text>문제 정의를 토대로 적정한 데이터 분석기법으로 과제 도출</text>
+          </example>
+          <example num="2">
+              <alternate>보기 이번 문제해결능력 제고를 위해 분석기법을 통해 과제 도출</alternate>
+              <symbol>2</symbol>
+              <text>문제해결능력 제고를 위해 분석기법을 통해 과제 도출</text>
+          </example>
+          <example num="3">
+              <alternate>보기 삼번 선행적인 정의 없이 분석기법을 활용하여 과제 도출</alternate>
+              <symbol>3</symbol>
+              <text>선행적인 정의 없이 분석기법을 활용하여 과제 도출</text>
+          </example>
+          <example num="4">
+              <alternate>보기 사번 빅데이터 프레임워크를 통해 과제 도출</alternate>
+              <symbol>4</symbol>
+              <text>빅데이터 프레임워크를 통해 과제 도출</text>
+          </example>
+      </page>
+  </quiz>
+</event>

@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title></title>
+	<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+	<meta http-equiv="X-UA-Compatible" content="IE=edge">
+	<meta name="viewport" content="width=device-width,user-scalable=no,initial-scale=1.0" />
+	<link rel="stylesheet" href="../common/css/skin.css">
+	<style type="text/css">
+		html, body {position:fixed;width:100%;height:100%;margin:0;padding:0;overflow:hidden;}
+		#contentFrame { margin:0px; padding:0px; width:100%; height:100%;}
+	</style>
+	<script language="javascript" src="../common/js/jquery-1.12.3.min.js"></script>
+	<script language="javascript" src="../common/js/util.js"></script>
+	<script type="text/javascript" defer="defer">
+		var userInit = false;
+		function initPage() {
+			var lastPage = $("#lastview"+(getURL(1) * 1), opener.document).val();
+			var startPage = (lastPage == null || lastPage == "") ? "./01.html" : "./"+itostr(lastPage)+".html";
+			window.frames["contentFrame"].location.href = startPage;
+		}
+		function setPage(page) {
+			_setPage(page, window.frames["contentFrame"].location.href);	// 현재페이지
+		}
+		function onExit(){
+			var param1 = $('#contentFrame').get(0).contentWindow.cuserno;
+			var param2 = $('#contentFrame').get(0).contentWindow.treeno;
+			var param3 = $('#contentFrame').get(0).contentWindow.frameseq;
+			var param4 = $('#contentFrame').get(0).contentWindow._this.$curPageNumber;
+			var param5 = $('#contentFrame').get(0).contentWindow._this.$totPageNumber
+				
+			opener.progExec(param1, param2, param3, param4, param5);
+		}
+	</script>
+</head>
+<body scroll="no" ondragstart="return false" onselectstart="return false" oncontextmenu="return false" onload="initPage();" onunload="onExit();">
+	<iframe id="contentFrame" name="contentFrame" allowfullscreen="true" mozallowfullscreen="true" webkitallowfullscreen="true" border="0" frameborder="0" scrolling="no"></iframe>
+</body>
+</html>

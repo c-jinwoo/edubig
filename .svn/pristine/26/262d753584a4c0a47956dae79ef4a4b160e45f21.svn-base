@@ -1,0 +1,236 @@
+<%
+/****************************************
+    subject : 신용상담사
+    summary : 신용상담사 : 합격자조회/자격증신청 > 자격증 신청 리스트
+    author  : SANGS
+    date    : 2018-06-15
+****************************************/
+%>
+<%@ page language="java" contentType="text/html; charset=utf-8" pageEncoding="utf-8"%>
+<%@ include file="/WEB-INF/jsp/ccrs/cmmn/inc/taglib_inc.jsp"%>
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+	<title>자격증발급조회 > 합격자조회/자격증신청 > 신용상담사 > 신용회복위원회 신용교육원</title>
+	<%@ include file="/WEB-INF/jsp/ccedu/inc/head_inc.jsp"%>
+	
+	<script type="text/javascript">
+	
+		$(document).ready(function() {
+			
+			if('${licenseList}' == null || '${licenseList}' == '') {
+				fnModalMsg("접수한 내용이 없습니다.");
+			}
+			
+		});
+	
+	
+		// 상세보기
+		function detailLicense(licnNo, ccNo, ccAppNo) {
+			
+			$("#pageMode").val('inquiry');
+			$("#ccNo").val(ccNo);
+			$("#licnNo").val(licnNo);
+			$("#ccAppNo").val(ccAppNo);
+			$("#frm").attr("action", "/ccedu/cc/licenceForm.do");
+			$("#frm").submit();
+			
+		}
+	
+		
+			
+	
+	</script>
+</head>
+
+
+<body>
+
+<!-- skip nav -->
+	<%@ include file="/WEB-INF/jsp/ccedu/inc/nav_inc.jsp"%>
+<!--// skip nav -->
+
+
+<div id="wrap">
+
+	<!-- header -->
+	<%@ include file="/WEB-INF/jsp/ccedu/inc/header_inc.jsp"%>
+	<!--// header -->
+
+	<!-- container -->
+	<div id="container">
+
+		<!-- location -->
+		<jsp:include page="/WEB-INF/jsp/ccedu/inc/location/loc_03_03.jsp"> 
+		  	<jsp:param name="menuNm" value="자격증발급조회"/> 
+		</jsp:include>
+		<!--// location -->
+
+		<div class="con_center">
+
+			<!-- lnb -->
+			<div id="lnb">
+				<jsp:include page="/WEB-INF/jsp/ccedu/inc/lnb/lnb_03.jsp"> 
+				  	<jsp:param name="dep2" value="03"/>
+				  	<jsp:param name="dep3" value="03"/> 
+				</jsp:include>
+			</div>
+			<!--// lnb -->
+			
+			
+			<form id="frm" name="frm" method="post">
+				<input type="hidden" name="mtAppType" id="mtAppType" value="${REQUEST_DATA.mtAppType}"/>
+				<input type="hidden" name="pageMode" id="pageMode" value=""/>
+				<input type="hidden" name="ccNo" id="ccNo" value=""/>
+				<input type="hidden" name="licnNo" id="licnNo" value=""/>
+				<input type="hidden" name="ccAppNo" id="ccAppNo" value=""/>
+			
+			
+			<!-- content 본문 -->
+			<div id="content">
+			
+				<!-- 기존 START 2018-08-30  -->
+<!-- 				<h3 class="cont_titile">자격증 발급조회/수정</h3> -->
+				<!-- 기존 END 2018-08-30  -->
+				
+				<!-- 2018-08-28 김동인 작업 S --> 
+				<h3 class="cont_titile type03">자격증 발급조회/수정<span></span></h3>
+				<!-- 2018-08-28 김동인 작업 E -->
+
+				<!-- 본문내용 -->
+				<div class="cont_body">
+					<!-- start -->
+
+					<div class="c_section">
+						<div class="table_style_col mgt0">
+							<table>
+								<caption>번호, 발급목적, 발급일, 취소일, 상태를 확인 할 수 있고 상세보기버튼이 있는표</caption>
+								<colgroup>
+									<col  />
+									<col  />
+									<col  />
+									<col  />
+									<col  />
+								</colgroup>
+								<thead>
+									<tr>
+										<th scope="col">No.</th>
+										<th scope="col">발급목적</th>
+										<th scope="col">발급일</th>
+										<th scope="col">취소일</th>
+										<th scope="col">상태</th>
+										<th scope="col">상세</th>
+									</tr>
+								</thead>
+								<tbody>
+									<c:if test="${not empty licenseList}">
+										<c:forEach var="result" items="${licenseList}" varStatus="status">
+											<tr>
+												<td class="align_center"><c:out value='${result.RNUM}'/></td>
+												<td><c:out value='${result.MT_APP_NAME}'/></td>
+												<td class="align_center"><c:out value='${fn:substring(result.LICN_DT, 0, 10)}'/></td>
+												<td class="align_center">
+													<c:if test="${result.MT_PAY_STAT eq 'YS0003' || result.MT_PAY_STAT eq 'YS0004'}">
+														<c:out value="${fn:substring(result.CNL_DT, 0, 11)}"/>
+													</c:if> 
+												</td>
+												<td class="align_center">
+													<c:if test="${result.MT_PAY_STAT eq 'YS0001'}">입금대기</c:if>
+													<c:if test="${result.MT_PAY_STAT eq 'YS0002' && result.ISSYN eq 'S' }">배송대기</c:if>
+													<c:if test="${result.MT_PAY_STAT eq 'YS0002' && result.ISSYN eq 'Y'}">배송완료</c:if>
+													<c:if test="${result.MT_PAY_STAT eq 'YS0003' || result.MT_PAY_STAT eq 'YS0004'}">사용자취소</c:if>
+												</td>
+												<td class="align_center">
+													<button class="btn_blueline" onclick="detailLicense('<c:out value='${result.LICN_NO }'/>', '<c:out value='${result.CC_NO }'/>', '<c:out value='${result.CC_APP_NO }'/>')">
+													<span>상세정보</span>
+													</button>
+												</td>
+											</tr>
+										</c:forEach>
+									</c:if>
+									
+									<c:if test="${empty licenseList}">
+										<tr>
+											<td class="align_center"colspan="6"> 해당 내역이 없습니다. </td>
+										</tr>
+									</c:if>								
+								</tbody>
+							</table>
+						</div>
+					</div>
+
+					<div class="c_section">
+						<h4 class="c_tit">자격증 (재)발급 신청 안내</h4>
+						<ul class="c_txtlist line_height">
+							<li>자격증 발급비용 8,000원(우편료 포함)</li>
+							<li>
+								자격증 발급비용 입금계좌
+								<ul class="in_txtul02">
+									<li>기업은행 001-112939-04-481 예금주[신용회복위원회］</li>
+								</ul>
+							</li>
+							<li>현금영수증 발급을 위한 핸드폰 번호 입력 : 010-xxxx-xxxx</li>
+							<li>자격증은 발급비용 입금되어야 자격증 발급이 가능하며, 반드시 신청인 본인이름으로 입금하시기 바랍니다.</li>
+							<li>자격증은 입금이 완료된 후 3~4주 후에 받아보실 수 있습니다.</li>
+							<li>자격증 발급 취소는 자격증발급 조회/수정 화면에서 취소하시기 바랍니다. </li>
+						</ul>
+					</div>
+
+					<div class="c_section">
+						<h4 class="c_tit">자격증 예시</h4>
+						<div class="c_img_box">
+							<img src="/cmmn/images/sub/img_c_counselor.jpg" alt="국가공인 신용상담사 자격증 예시이미지, 내용은 다음과 같습니다." />
+							<div class="alt_text">
+								<h2>국가공인 신용상담사 자격증 (Credit Counselor)</h2>
+								<p>금융위원회 공인 제 2016-1호</p>
+								<span>사진영역</span>
+								<dl>
+									<dt>자격번호</dt>
+									<dd>2017-10-000001</dd>
+								</dl>
+								<dl>
+									<dt>성명</dt>
+									<dd>홍길동</dd>
+								</dl>
+								<dl>
+									<dt>생년월일</dt>
+									<dd>1980년 11월 11일</dd>
+								</dl>
+								<dl>
+									<dt>취득일자</dt>
+									<dd>2017년 09월 29일</dd>
+								</dl>
+								<dl>
+									<dt>유효기간</dt>
+									<dd>2020년 09월 28일</dd>
+								</dl>
+								<p>위와 같이 자격을 취득하였음을 증명함 2017년 10월 20일</p>
+								<strong>신용회복위원회 위원장 (인)</strong>
+							</div>
+						</div>
+					</div>
+
+					<!--// end -->
+				</div>
+				<!--// 본문내용 -->
+				
+			<!--  -->
+			</div>
+			<!--// content 본문 -->
+			</form>
+			
+			
+		<!-- con_cneter end -->
+		</div>
+	
+	</div>
+	<!--// container -->
+
+	<!-- foot -->
+	<%@ include file="/WEB-INF/jsp/ccedu/inc/footer_inc.jsp"%>
+	<!--// foot end -->
+
+</div>
+
+</body>
+</html>

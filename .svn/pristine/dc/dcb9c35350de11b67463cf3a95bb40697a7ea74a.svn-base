@@ -1,0 +1,39 @@
+package com.webapp.ccedu.service.impl;
+
+import java.util.ArrayList;
+import java.util.List;
+
+import javax.annotation.Resource;
+
+import org.springframework.stereotype.Service;
+
+import com.sangs.support.DataMap;
+import com.sangs.support.EduMap;
+import com.sangs.support.FrontException;
+import com.sangs.util.ParamUtil;
+import com.webapp.ccedu.mapper.OnlineReviewMapper;
+import com.webapp.ccedu.service.OnlineReviewService;
+
+/**
+ * Description : 
+ *
+ * Modification Information
+ * 수정일			수정자			수정내용
+ * -------		-----------------------------------
+ * 2021.03.26	CSLAB		최초작성
+ *
+ */
+
+@Service("onlineReviewService")
+public class OnlineReviewServiceImpl implements OnlineReviewService {	
+	@Resource(name = "onlineReviewMapper")
+	private OnlineReviewMapper onlineReviewMapper;	 
+
+	public List<EduMap> selectReviewList(DataMap rMap) throws Exception{
+		return onlineReviewMapper.selectReviewList(rMap);
+	}
+	
+	public EduMap selectReviewMap(DataMap rMap) throws Exception{
+		return onlineReviewMapper.selectReviewMap(rMap);
+	}		
+}

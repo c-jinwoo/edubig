@@ -1,0 +1,11 @@
+_this.$quizInfo = [
+	["다음 중 3D 프린터 출력 방식 중에 가장 대중적인 방법으로 노즐을 높은 온도로 가열하여 재료를 뽑아내 한 층씩 쌓아 올리며 <span style='color:#FF0000;'>출력하는 방식</span>은?","FDM(Fused Deposition Modelling) 또는 FFF(Fused Filament Fabrication)","SLA(StereoLithography)","DLP(Digital Light Processing)","SLS(Selective Laser Sintering)",false],	
+	["다음 중 필라멘트로 사용하는 ABS 소재 특징으로 <span style='color:#FF0000;'>틀린</span> 것은?","친환경 소재로 피부에 접촉하는 제품 만들기에 적합하다.","변질 및 변형이 적고 열에 강하다.","PLA 보다 페인트칠, 접착제, 표면 광택 등 후가공이 용이하다.","PLA 보다 높은 온도에서 프린팅이 이루어진다.",false],
+	["다음 중 3D 프린팅에서 지켜야 하는 안전 수칙으로 <span style='color:#FF0000;'>옳은</span> 것은?","작업 순서, 취급 주의 사항을 지키지 않는다.","출력이 잘 되는지 확인하기 위해 내부에 손을 넣는다.","위험한 작업을 시작하기 전에 다른 사람에게 알린다.","출력 시 문제가 생기면 큰 고장을 막기 위해 직접 빠르게 수리한다.",false]
+];
+
+_this.$quizAnsInfo = [
+	[1,"필라멘트(ABS, PLA 등)를 주재료로 사용하며 압출 노즐을 높은 온도로 가열하여 압력에 의해 재료를 뽑아내 한층 씩 쌓아 출력하는 방식은 FDM(Fused Deposition Modeling) 또는 FFF(Fused Filament Fabrication)이다."],
+	[1,"ABS 소재는 화학 성분이 나올 수 있기 때문에 음식 및 피부에 접촉하는 부분에는 사용하지 않는다."],
+	[3,"1. 작업 순서, 취급 주의 사항 및 안전 거리 등에 관한 사항을 지킨다.</br>2. 출력 중에는 절대로 내부에 손을 넣지 않는다.</br>4. 감전의 위험이 있으므로 출력 시 문제가 생긴 경우 직접 수리하지 않는다."]
+];

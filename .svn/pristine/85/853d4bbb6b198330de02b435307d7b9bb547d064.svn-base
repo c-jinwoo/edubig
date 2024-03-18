@@ -1,0 +1,103 @@
+<%
+/****************************************
+    subject : 회원관리
+    summary : 회원관리 : 회원 확인
+    author  : SANGS
+    date    : 2018-06-15
+****************************************/
+%>
+<%@ page language="java" contentType="text/html; charset=utf-8" pageEncoding="utf-8"%>
+<%@ include file="/WEB-INF/jsp/ccedu/inc/taglib_inc.jsp"%>
+<%@ include file="/WEB-INF/jsp/ccedu/inc/head_inc.jsp"%>
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+<script type="text/javascript">
+
+$(function(){ 
+
+	var retcode = '${retcode}';
+	var joinYn = '${joinYn}';
+	if(retcode == 'B000'){
+		
+		fnConfirm("실명인증이 완료되었습니다.", function(result) {
+			
+			if(joinYn != '' && joinYn == 'Y'){
+				opener.document.frm.confirmGubun.value = 'IPIN';
+				var ssn2 = '${result[11]}';
+				var sex  = '${result[9]}';
+				opener.document.frm.ssnCd.value= ssn2.substring(0,1);
+				if(ssn2 != null && ssn2.length > 1){
+					if(sex == '1'){
+						$('#sex').val('M');
+						opener.document.frm.sex.value= 'M';
+					}else{
+						$('#sex').val('F');
+						opener.document.frm.sex.value= 'F';
+					}
+				}
+				opener.document.frm.brthdy.value = ssn2.substr(2,7);
+				opener.document.frm.userName.value = '${result[6]}';
+				opener.document.frm.di.value = '${result[0]}';
+				opener.document.frm.submit();
+				
+			}else{
+				
+				opener.document.frm.confirmGubun.value = 'IPIN';
+				opener.document.frm.di.value = '${result[0]}';
+				opener.document.getElementById('certYn').innerHTML ='인증';
+				
+			}
+			self.close();
+			return false;
+		});
+		return false;
+		
+		
+	}else{
+		
+		fnConfirm("실명인증을 실패하였습니다.", function(result) {
+			if(joinYn != '' && joinYn == 'Y'){
+				opener.document.frm.action = '/ccedu/user/memberJoinStep02.do';
+			}else{
+				opener.document.frm.action = '/ccedu/common/oldmemCert.do';
+			}
+			opener.document.frm.submit();
+			self.close();
+			return false;
+		});
+		return false;
+		
+	}
+	
+});
+
+
+
+	
+	/*
+	인증코드 참조 ::: 
+	opener.document.kcbOutForm.encPsnlInfo.value 		= '${encPsnlInfo}';
+	opener.document.kcbOutForm.dupinfo.value 			= '${result[0]}';
+	opener.document.kcbOutForm.coinfo1.value            = '${result[1]}';
+	opener.document.kcbOutForm.coinfo2.value            = '${result[2]}';
+	opener.document.kcbOutForm.ciupdate.value           = '${result[3]}';
+	opener.document.kcbOutForm.virtualno.value 			= '${result[4]}';
+	opener.document.kcbOutForm.cpcode.value             = '${result[5]}';
+	opener.document.kcbOutForm.realname.value 			= '${result[6]}';
+	opener.document.kcbOutForm.cprequestnumber.value 	= '${result[7]}';
+	opener.document.kcbOutForm.age.value 				= '${result[8]}';
+	opener.document.kcbOutForm.sex.value 				= '${result[9]}';
+	opener.document.kcbOutForm.nationalinfo.value 		= '${result[10]}';
+	opener.document.kcbOutForm.birthdate.value 			= '${result[11]}';
+	opener.document.kcbOutForm.authinfo.value           = '${result[12]}';
+	opener.document.kcbOutForm.submit(); */
+	
+	
+	
+	 
+	
+//-->
+</script>
+</head>
+</html>

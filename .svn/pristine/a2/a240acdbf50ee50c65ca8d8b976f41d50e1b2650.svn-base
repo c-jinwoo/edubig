@@ -1,0 +1,70 @@
+<%
+/****************************************
+    subject : 회원가입
+    summary : 회원가입 : 회원가입 완료
+****************************************/
+%>
+<%@ page language="java" contentType="text/html; charset=utf-8" pageEncoding="utf-8"%>
+<%@ include file="/WEB-INF/jsp/ccedu/inc/taglib_inc.jsp"%>
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+	<%@ include file="/WEB-INF/jsp/ccedu/inc/head_inc.jsp"%>
+</head>
+<body>
+<div id="wrap">
+	<!-- header -->
+	<%@ include file="/WEB-INF/jsp/ccedu/inc/header_inc.jsp"%>
+	<!--// header -->
+	<!-- container -->
+	<div id="container">
+		<div class="con_center">
+		
+			<div id="content">
+				<!-- 메뉴 title -->
+				<div class="cont_title_wrapper">
+					<div class="wrapper">
+						<h3 class="cont_title">회원가입</h3>
+					</div>			
+				</div>
+				<div class="wrapper">				
+					<!-- 본문내용 -->
+					<div class="cont_body">
+						<!-- start -->
+						<div class="c_section">
+							<div class="c_head_step">
+								<ol>
+									<li><span class="num_wrap"><span class="num">1. </span>약관동의</span></li>
+									<li><span class="num_wrap"><span class="num">2. </span>회원정보 등록</span></li>
+									<li class="on"><span class="num_wrap"><span class="num">3. </span>회원가입 완료</span></li>
+								</ol>
+							</div>
+						</div>										
+						<div class="c_msg_box column mgt_first">
+							<div class="img_cpt_talk">
+								<strong>회원가입이 완료되었습니다.</strong>
+								<p>에듀빅에 가입되셨습니다.<br />로그인을 통해 다양한 혜택을 누릴 수 있습니다.</p>
+							</div>
+						</div>	
+						<div class="c_btn_center">
+							<button onclick="location.href='/ccedu/common/login.do'" class="btn_bluebg03">로그인</button>
+							<button onclick="location.href='/ccedu/main/main.do'" class="btn_blueline03">홈으로</a>
+						</div>
+						<!--// end -->
+					</div>
+					<!--// 본문내용 -->
+				</div>
+			</div>
+			<!--// content 본문 -->		
+		</div>
+	</div>
+	<!--// container -->
+
+	<!-- foot -->
+	<%@ include file="/WEB-INF/jsp/ccedu/inc/footer_inc.jsp"%>
+	<!--// foot end -->
+
+</div>
+
+</body>
+</html>

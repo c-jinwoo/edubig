@@ -1,0 +1,334 @@
+<%
+/****************************************
+    subject : 온라인교육
+    summary : 온라인교육 > 교육소개
+    author  : SANGS
+    date    : 2018-06-15
+****************************************/
+%>
+<%@ page language="java" contentType="text/html; charset=utf-8" pageEncoding="utf-8"%>
+<%@ include file="/WEB-INF/jsp/ccedu/inc/taglib_inc.jsp"%>
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+	<title>금융계산기 > 지식마당 > 신용회복위원회 </title>
+	<%@ include file="/WEB-INF/jsp/ccedu/inc/head_inc.jsp"%>
+<script type="text/javascript">
+
+
+	$(document).ready(function(e){
+		$('.resultData').hide();
+	});
+
+	
+	function moveTab(){
+		$('#tab').val("1");
+		$('form[name=frm]').attr('action', '/ccedu/intellectual/financialCalculator.do').submit();
+	}
+
+	function goResult(p_action){
+
+		if(!fnValiCheck($('#p_money'),"금액 입력을 입력해주세요.")) return false;
+		if(!fnValiCheck($('#p_month'),"저축기간 월수 입력해주세요.")) return false;
+		if(!fnValiCheck($('#p_rate'),"적금 이자율 입력해주세요."))return false; 
+
+		//num.toFixed(7) //포맷터
+		// DecimalFormat format = new DecimalFormat("0.0000000");
+		
+		if(!isNumber($('#p_money').val().replace(/,/gi, ""))){
+			fnModalMsg("숫자만 입력 가능 합니다.",function(){
+				$('#p_money').val("");
+				$('#p_money').focus();
+			});
+			return false;
+		}
+
+		if(!isNumber($('#p_month').val().replace(/,/gi, ""))){
+			fnModalMsg("숫자만 입력 가능 합니다.",function(){
+				$('#p_month').val("");
+				$('#p_month').focus();
+			});
+			return false;
+		}
+
+		if(!isNumber($('#p_rate').val().replace(/,/gi, ""))){
+			fnModalMsg("숫자만 입력 가능 합니다.",function(){
+				$('#p_rate').val("");
+				$('#p_rate').focus();
+			});
+			return false;
+		}
+
+		var v_action = p_action;
+		
+
+		var v_money = $('#p_money').val().replace(/,/gi, "");
+
+		var v_month = $('#p_month').val();
+
+		var v_totalmoney	   = 0.0;
+		var v_tax_totalmoney   = 0.0;
+		var v_stax_totalmoney  = 0.0;
+		
+		var v_tax_1			   = 0.0;
+		var v_tax_2			   = 0;
+		
+		var v_rate			   = 0.0;
+		var v_totalrate 	   = 0.0;
+
+		v_rate = $('#p_rate').val();
+			
+		if( v_action == "go"){
+	//		v_totalrate	= 1+((1*12)+1/2) * v_rate /12;
+
+			v_totalrate	= 1+(((1*v_month)+1)/2) * (v_rate * 0.01)/12;
+			v_totalrate = v_totalrate.toFixed(7);
+			
+			v_totalmoney = (v_money/v_totalrate)/v_month; //비과세
+			v_tax_totalmoney 	= (Math.round(parseInt(v_money) + (v_money - parseInt(v_totalmoney*v_month))*0.154)/v_totalrate)/v_month; //일반과세
+			v_stax_totalmoney 	= ((Math.round(parseInt(v_money) + (parseInt(v_money) - parseInt(v_totalmoney*v_month))*0.095))/v_totalrate)/v_month; //세금우대
+
+			// console.log("비과세");
+			// console.log(Math.floor(v_totalmoney));
+			// console.log("=========================================");
+			// console.log("일반과세");
+			// console.log(Math.floor(v_tax_totalmoney));
+			// console.log("=========================================");
+			// console.log("세금우대");
+			// console.log(Math.floor(v_stax_totalmoney));
+			// console.log("=========================================");
+			console.log(v_month);
+			$('.v_month_result').html(v_month);
+			$('.v_totalmoney_result').html(change_price_result(Math.floor(v_totalmoney)));
+			$('.v_tax_totalmoney_result').html(change_price_result(Math.floor(v_tax_totalmoney)));
+			$('.v_stax_totalmoney_result').html(change_price_result(Math.floor(v_stax_totalmoney)));
+			$('.p_money_result').html($('#p_money').val());
+
+
+			$('.resultData').show();
+		}
+	}
+
+	function isNumber(s) {
+	  s += ''; // 문자열로 변환
+	  s = s.replace(/^\s*|\s*$/g, ''); // 좌우 공백 제거
+	  if (s == '' || isNaN(s)) return false;
+	  return true;
+	}
+
+	function checkNum(pthis){
+
+		if($(pthis).val() > 100){
+			$(pthis).blur();
+	    	fnModalMsg('연이율 100% 를 초과할 수 없습니다.',function(){
+	    		$(pthis).val("");
+	    		$(pthis).focus();	
+	    	});
+	       
+	       return false;
+		}
+
+	    var _pattern2 = /^-?(\d{1,3}([.]\d{0,2})?)?$/;
+	    if (!_pattern2.test($(pthis).val())) {       
+	        $(pthis).blur();
+	    	fnModalMsg('숫자와 소수점 둘째자리까지 입력할 수 있습니다.',function(){
+	    		$(pthis).val("");
+	    		$(pthis).focus();	
+	    	});
+	       
+	       return false;
+	    } 
+	}
+
+
+	//입력창에서 자동으로 숫자표기(,) 로 변환
+	function change_price(loc) {
+		var str3 =loc.value;  
+		 var result="";
+		 for(i=0 ; i<str3.length ; i++)
+		  if(str3.substring(i,i+1) == ","); 
+		  else
+		   result=result+str3.substring(i,i+1);
+		   $('#p_money').val(magic(result));
+	}
+
+	function magic(str) {  
+		  var result="";  
+		  var len=str.length;  
+		  for(i=len-1,j=0;i>=0;i--) {  
+		    result=str.substring(i,i+1)+result;  
+		    j++;  
+		    if(j==3 && i!=0){  
+		      result=","+result;  
+		      j=0;  
+		    }  
+		  }  
+		  return result;  
+	}
+
+
+	function change_price_result(priceData) {
+		var str3 =String(priceData);
+		 var result="";
+		 for(i=0 ; i<str3.length ; i++)
+		  if(str3.substring(i,i+1) == ","); 
+		  else
+		   result=result+str3.substring(i,i+1);
+		   
+		   return magic(result);
+	}
+
+</script>
+</head>
+
+<body>
+<!-- skip nav -->
+	<%@ include file="/WEB-INF/jsp/ccedu/inc/nav_inc.jsp"%>
+<!--// skip nav -->
+
+
+<div id="wrap">
+
+	<!-- header -->
+	<%@ include file="/WEB-INF/jsp/ccedu/inc/header_inc.jsp"%>
+	<!--// header -->
+
+	<!-- container -->
+	<div id="container">
+
+		<!-- location -->
+		<jsp:include page="/WEB-INF/jsp/ccedu/inc/location/loc_04_03.jsp"> 
+		  	<jsp:param name="menuNm" value="금융계산기"/> 
+		</jsp:include> 
+		<!--// location -->
+
+		<div class="con_center">
+
+			<!-- lnb -->
+			<div id="lnb">
+				<jsp:include page="/WEB-INF/jsp/ccedu/inc/lnb/lnb_04.jsp"> 
+				  	<jsp:param name="dep2" value="03"/>
+				</jsp:include>
+			</div>
+			<!--// lnb -->
+
+			<!-- content 본문 -->
+			<div id="content">
+				
+				<!-- 기존 START 2018-08-30  -->
+<!-- 				<h3 class="cont_titile">금융계산기</h3> -->
+				<!-- 기존 END 2018-08-30  -->
+				
+				<!-- 2018-08-28 김동인 작업 S --> 
+				<h3 class="cont_titile type04">금융계산기<span></span></h3>
+				<!-- 2018-08-28 김동인 작업 E -->
+
+				<!-- 본문내용 -->
+				<div class="cont_body">
+					<!-- start -->
+
+					<div class="c_section">
+
+						<form name="frm" id="frm" action="" method="post">
+							<input type="hidden" name="tab" id="tab" value="<c:out value="${REQUEST_DATA.tab}"/>"/>
+						</form>
+
+						<div class="c_tab_link">
+							<ul>
+								<li><a href="#none" class="on" title="현재페이지">예/적금</a></li>
+								<li><a href="#none" onclick="moveTab()">대출</a></li>
+							</ul>
+						</div>
+
+						<ul class="c_txtlist">
+							<li>목표자금을 만들기 위해서 매월 얼마씩 저축을 해야 하는지 알아보실 수 있습니다.</li>
+							<li>원하시는 목표금액과 기간을 입력하세요.</li>
+						</ul>
+
+						<div class="graybox_write">
+							<dl>
+								<dt>얼마를 모으고 싶으세요?</dt>
+								<dd><input type="text" style="text-align: right;" title="금액 입력" id="p_money" name="p_money" class="text" maxlength="16" onkeyup="change_price(this);" />원</dd>
+							</dl>
+							<dl>
+								<dt>저축기간은 어느 정도 생각하시나요?</dt>
+								<dd><input type="text" style="text-align: right;" title="저축기간 월수 입력" maxlength="2" id="p_month" name="p_month" class="text" />개월</dd>
+							</dl>
+							<dl>
+								<dt>적금 이자는 어느 정도 생각하시나요?</dt>
+								<dd><input type="text" style="text-align: right;" title="적금 이자율 입력" id="p_rate" name="p_rate"  class="text" onkeyup="checkNum(this);"/>% (연이율)</dd>
+							</dl>
+						</div>
+
+						<div class="c_btn_center">
+							<button type="button" onclick="goResult('go')" class="btn_bluebg03">결과 보기</button>
+						</div>
+						
+					</div>
+
+					<!-- 결과 -->
+					<div class="c_section resultData">
+						<h4 class="c_tit">결과 요약</h4>
+						<div class="c_msg_left mgt_s">
+							<div class="img_msg_talk">
+								<p>
+									고객님께서는<br />
+									<strong>일반과세</strong> 로 가입 시 <span class="color_orange">매월 <span class="v_tax_totalmoney_result"></span>원</span>을 저축하셔야 <span class="color_orange"><span class="v_month_result"></span>개월</span> 동안 <span class="color_orange"><span class="p_money_result"></span>원</span>을 마련하실 수 있습니다.<br />
+									만약 <strong>세금우대</strong>로 가입하실 경우 <span class="color_orange">매월 <span class="v_stax_totalmoney_result"></span>원</span>을, <strong>비과세</strong>로 가입하실 경우 <span class="color_orange">매월 <span class="v_totalmoney_result"></span>원</span>을 저축하시면 됩니다.
+								</p>
+							</div>
+						</div>
+					</div>
+
+					<div class="c_section resultData">
+						<h4 class="c_tit">기간별 비교</h4>
+						<div class="table_style_col">
+							<table>
+								<caption>기간, 비과세, 세금우대, 일반과세 를 확인할수있는 표 입니다.</caption>
+								<colgroup>
+									<col  />
+									<col  />
+									<col  />
+									<col  />
+								</colgroup>
+								<thead>
+									<tr>
+										<th scope="col">기간</th>
+										<th scope="col">비과세</th>
+										<th scope="col">세금우대</th>
+										<th scope="col">일반과세</th>
+									</tr>
+								</thead>
+								<tbody>
+									<tr>
+										<td class="align_center"><span class="v_month_result"></span> 개월</td>
+										<td class="align_right"><span class="v_totalmoney_result"></span> 원</td>
+										<td class="align_right"><span class="v_stax_totalmoney_result"></span> 원</td>
+										<td class="align_right"><span class="v_tax_totalmoney_result"></span> 원</td>
+									</tr>
+								</tbody>
+							</table>
+						</div>
+					</div>
+					<!--// 결과 -->
+
+					<!--// end -->
+				</div>
+				<!--// 본문내용 -->
+				
+			<!--  -->
+			</div>
+			<!--// content 본문 -->
+
+		</div>
+	</div>
+	<!--// container -->
+
+	<!-- foot -->
+	<%@ include file="/WEB-INF/jsp/ccedu/inc/footer_inc.jsp"%>
+	<!--// foot end -->
+
+</div>
+
+</body>
+</html>

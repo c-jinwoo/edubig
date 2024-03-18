@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes" ?>
+<list>
+  <index>
+    <topic>
+      <list title="main" page="1">소개하기</list>
+      <list title="sub" page="1">비정형(텍스트)마이닝</list>
+
+      <list title="main" page="2">살펴보기</list>
+      <list title="sub" page="2">통계의 개념 및 통계량</list>
+      <list title="sub" page="3">텍스트 마이닝</list>
+	  <list title="sub" page="4">웹 마이닝</list>
+	  <list title="sub" page="5">오피니언 마이닝</list>
+	  <list title="sub" page="6">소셜 데이터 마이닝</list>
+
+      <list title="main" page="7">정리하기</list>
+      <list title="sub" page="7">핵심평가</list>
+      <list title="sub" page="8">학습정리</list>
+    </topic>
+  </index>
+</list>

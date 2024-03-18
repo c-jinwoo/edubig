@@ -1,0 +1,63 @@
+<%
+/****************************************************
+	system	: 고객센터 > 이벤트
+	title	: 게시판 목록
+*****************************************************/
+%>
+<%@ page language="java" contentType="text/html; charset=utf-8" pageEncoding="utf-8"%>
+<%@ include file="/WEB-INF/jsp/ccedu/inc/taglib_inc.jsp"%>
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+	<%@ include file="/WEB-INF/jsp/ccedu/inc/head_inc.jsp"%>	
+	<script type="text/javascript">
+	function fnView(bbsNo){
+		$("#bbsNo").val(bbsNo);
+		$("#frm").submit();
+	}
+	</script>
+</head>
+<body>
+	<!-- header -->
+	<%@ include file="/WEB-INF/jsp/ccedu/inc/header_inc.jsp"%>
+	<!--// header -->
+	
+	<!-- container -->
+	<div id="container">
+		<div class="con_center">
+			<div class="cont_title_wrapper">
+				<div class="wrapper">
+					<h3 class="cont_title">이벤트</h3>
+				</div>
+			</div>
+			<div id="content">
+				<div class="wrapper">
+					<form name="frm" id="frm" action="/ccedu/bbs/event/view.do" method="post">
+						<input type="hidden" name="bbsNo" id="bbsNo" value=""/>
+						<input type="hidden" name="bcateno" id="bcateno" value="${REQUEST_DATA.bcateno}"/>	
+						<div class="event_list_box">
+							<ul class="event_list">
+								<c:forEach items="${listData}" var="result">									
+									<li>
+										<div class="inbox" style="cursor:pointer;" onClick="fnView(<c:out value="${result.BBSNO}"/>);">
+											<img src="/att_file/edbbs/<c:out value="${result.BBSNO}"/>/<c:out value="${result.SAVFILE}"/>" alt="<c:out value="${result.TITLE}"/>"/>
+											<div class="info">
+												<p class="event_title"><c:out value="${result.TITLE}"/></p>
+											</div>
+										</div>
+									</li>		
+								</c:forEach>
+							</ul>
+						</div>
+					</form>
+				</div>	
+			</div>	
+		</div>	
+	</div>
+	<!--// container -->
+	
+	<!-- foot -->
+	<%@ include file="/WEB-INF/jsp/ccedu/inc/footer_inc.jsp"%>
+	<!--// foot end -->
+</body>
+</html>

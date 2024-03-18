@@ -1,0 +1,223 @@
+<%
+/****************************************
+	subject	: 신용상담사 > 자격시험 > 자격소개
+	summary	: 
+	author	: sangs
+	date	: 2018-05-28
+****************************************/
+%>
+<%@ page language="java" contentType="text/html; charset=utf-8" pageEncoding="utf-8"%>
+<%@ include file="/WEB-INF/jsp/common/inc/taglib_inc.jsp"%>
+<%@ include file="/WEB-INF/jsp/academy/cmmn/inc/top_inc.jsp"%>
+<%@ include file="/WEB-INF/jsp/academy/cmmn/inc/header_inc.jsp"%>
+	
+<script type="text/javascript">
+	$(document).ready(function(){
+		var cate = "<c:out value='${REQUEST_DATA.cate}'/>";
+		if(cate != ''){
+			$('#'+cate+'Btn').click();
+		}
+		
+		$(".btn-more").on("click" , function(){
+			var check = $("#checkCount").val();
+			var bbsNo = $(this).attr("bbsNo");
+			var bcateNo = $(this).attr("bcateNo"); 
+			var viewCount = $(this).attr("viewCount");
+			
+			if(check == 'Y'){
+				$.ajax({
+					url : "/academy/helpdesk/faqCountUpdate.do",
+					data : {check : check , bbsNo : bbsNo , bcateNo : bcateNo},
+		            dataType : "json",
+		            type : 'post',
+		            success : function(data){
+		            	$("#viewCount"+viewCount).html(data);
+		            },
+		            error : function(e) {
+		                alert("error :" + e.responseText);
+		            }
+				});
+				
+				$("#checkCount").val("N");
+				$(this).attr("title","자주묻는질문 상세보기 닫기"); 
+			}else if(check == 'N'){
+				$("#checkCount").val("Y");
+				$(this).attr("title","자주묻는질문 상세보기 열기"); 
+			}
+		});
+		
+		
+	});
+	
+</script>
+<div class="container" id="Subcontent">
+	<article class="subArea">
+        <div class="subCntWrap">
+		<%@ include file="/WEB-INF/jsp/academy/cmmn/inc/lnb_ccedu.jsp" %>
+			<div class="path">
+      			<ul>
+          			<li><span class="home text-hide">신용상담사</span></li>
+             		<li>원서접수</li>
+              		<li class="active">원서접수</li>
+          		</ul>
+      </div>
+      
+	  <div class="subConts" id="sub-content">
+		<section class="bgTop_cate04"><!--   카테고리별 이미지 추가  -->
+			<div class="contTop">
+				<h2 class="h2_tit">원서접수</h2>
+         	</div>           	
+        </section>
+        
+        ${codeList }
+        
+        
+        <br><br>
+        ${listData }
+   
+			<!-- Sub Contents -->
+			<div class="sub-contents-section">
+
+                <!-- 탭 메뉴 -->
+                <div class="tabmenu-list six-columns">
+                	<button type="button" class="btn-tabmenu on"><span>전체</span></button>
+                	<c:forEach var="result" items="${codeList}" varStatus="status">
+                		
+               			<button type="button" 
+               			<c:choose>
+               				<c:when test="${result.MT_SUB_CODE eq 'FQ0001'}">class="btn-tabmenu no-brd-l"</c:when>
+               				<c:when test="${result.MT_SUB_CODE eq 'FQ0002'}">class="btn-tabmenu no-brd-l"</c:when>
+               				<c:when test="${result.MT_SUB_CODE eq 'FQ0003'}">class="btn-tabmenu no-brd-t"</c:when>
+<%--                				<c:when test="${result.MT_SUB_CODE eq 'SF0004'}">class="btn-tabmenu no-brd-l no-brd-t"</c:when> --%>
+<%--                				<c:when test="${result.MT_SUB_CODE eq 'SF0005'}">class="btn-tabmenu no-brd-l no-brd-t"</c:when> --%>
+               			</c:choose> 
+               			class="btn-tabmenu no-brd-l" id="${result.MT_SUB_CODE}Btn"><span>${result.MT_SUB_NAME}</span></button>
+                	</c:forEach>
+                	
+                    <!-- <button type="button" class="btn-tabmenu no-brd-l"><span>회원정보 관련</span></button>
+                    <button type="button" class="btn-tabmenu no-brd-l"><span>수강신청 관련</span></button>
+                    <button type="button" class="btn-tabmenu no-brd-t"><span>학습 관련</span></button>
+                    <button type="button" class="btn-tabmenu no-brd-l no-brd-t"><span>결제 관련</span></button>
+                    <button type="button" class="btn-tabmenu no-brd-l no-brd-t"><span>기타</span></button> -->
+                </div>
+				<!-- //탭 메뉴 -->
+
+						
+						<form id="" name="" action="" method="post">
+							<input type="hidden" id="checkCount" name="checkCount" value="Y">
+						</form>
+						
+                        <!-- 탭 메뉴 컨텐츠 -->
+                        <div class="tabmenu-contents">
+
+                             <!-- 전체 -->
+                             <div class="faq-all-box">
+                                 <ul class="faq-list-box">
+                                 	<c:forEach items="${listData}" var="result" varStatus="status">	
+                                     <li>
+                                         <button type="button" class="btn-faq-parent">Q. <c:out value="${result.TITLE}"/></button>
+                                         <div class="faq-child-contents">
+                                             <span class="faq-a-mark">A.</span><p class="faq-a-txt"><c:out value="${result.CONTENT}" escapeXml="false" /></p>
+                                         </div>
+                                     </li>
+                                     </c:forEach>
+                                 </ul>
+                             </div>
+                             <!-- //전체 -->
+
+                             <!-- 회원정보관련 -->
+                             <div class="faq-member-box">
+                             	<ul class="faq-list-box">
+                                 	<c:forEach items="${listData}" var="result" varStatus="status">	
+                                 		<c:if test="${result.MT_CATE_CODE eq 'FQ0001'}">
+		                                     <li>
+		                                         <button type="button" class="btn-faq-parent">Q. <c:out value="${result.TITLE}"/></button>
+		                                         <div class="faq-child-contents">
+		                                             <span class="faq-a-mark">A.</span><p class="faq-a-txt"><c:out value="${result.CONTENT}" escapeXml="false"/></p>
+		                                         </div>
+		                                     </li>
+                                 		</c:if>
+                                     </c:forEach>
+                                 </ul>
+                             </div>
+                             <!-- //회원정보관련 -->
+
+                             <!-- 수강신청관련 -->
+                             <div class="faq-signup-box">
+                             	<ul class="faq-list-box">
+                                 	<c:forEach items="${listData}" var="result" varStatus="status">	
+                                 		<c:if test="${result.MT_CATE_CODE eq 'FQ0002'}">
+		                                     <li>
+		                                         <button type="button" class="btn-faq-parent">Q. <c:out value="${result.TITLE}"/></button>
+		                                         <div class="faq-child-contents">
+		                                             <span class="faq-a-mark">A.</span><p class="faq-a-txt"><c:out value="${result.CONTENT}" escapeXml="false"/></p>
+		                                         </div>
+		                                     </li>
+                                 		</c:if>
+                                     </c:forEach>
+                                 </ul>
+                             </div>
+                             <!-- 수강신청관련 -->
+
+                             <!-- 학습관련 -->
+                             <div class="faq-education-box">
+                             <ul class="faq-list-box">
+                                 	<c:forEach items="${listData}" var="result" varStatus="status">	
+                                 		<c:if test="${result.MT_CATE_CODE eq 'FQ0003'}">
+		                                     <li>
+		                                         <button type="button" class="btn-faq-parent">Q. <c:out value="${result.TITLE}"/></button>
+		                                         <div class="faq-child-contents">
+		                                             <span class="faq-a-mark">A.</span><p class="faq-a-txt"><c:out value="${result.CONTENT}" escapeXml="false"/></p>
+		                                         </div>
+		                                     </li>
+                                 		</c:if>
+                                     </c:forEach>
+                                 </ul>
+                             </div>
+                             <!-- //학습관련 -->
+
+<!--                              결제관련 -->
+<!--                              <div class="faq-payment-box"> -->
+<!--                              	<ul class="faq-list-box"> -->
+<%--                                  	<c:forEach items="${listData}" var="result" varStatus="status">	 --%>
+<%--                                  		<c:if test="${result.MT_CATE_CODE eq 'SF0004'}"> --%>
+<!-- 		                                     <li> -->
+<%-- 		                                         <button type="button" class="btn-faq-parent">Q. <c:out value="${result.TITLE}"/></button> --%>
+<!-- 		                                         <div class="faq-child-contents"> -->
+<%-- 		                                             <span class="faq-a-mark">A.</span><p class="faq-a-txt"><c:out value="${result.CONTENT}"/></p> --%>
+<!-- 		                                         </div> -->
+<!-- 		                                     </li> -->
+<%--                                  		</c:if> --%>
+<%--                                      </c:forEach> --%>
+<!--                                  </ul> -->
+<!--                              </div> -->
+<!--                              //결제관련 -->
+
+<!--                              기타 -->
+<!--                              <div class="faq-etc-box"> -->
+<!--                              	<ul class="faq-list-box"> -->
+<%--                                  	<c:forEach items="${listData}" var="result" varStatus="status">	 --%>
+<%--                                  		<c:if test="${result.MT_CATE_CODE eq 'SF0005'}"> --%>
+<!-- 		                                     <li> -->
+<%-- 		                                         <button type="button" class="btn-faq-parent">Q. <c:out value="${result.TITLE}"/></button> --%>
+<!-- 		                                         <div class="faq-child-contents"> -->
+<%-- 		                                             <span class="faq-a-mark">A.</span><p class="faq-a-txt"><c:out value="${result.CONTENT}"/></p> --%>
+<!-- 		                                         </div> -->
+<!-- 		                                     </li> -->
+<%--                                  		</c:if> --%>
+<%--                                      </c:forEach> --%>
+<!--                                  </ul> -->
+<!--                              </div> -->
+<!--                              //기타 -->
+<!--                          </div> -->
+                         <!-- //탭 메뉴 컨텐츠 -->
+
+			</div>
+			<!-- //Sub Contents -->
+
+		</div>
+	</div>
+</div>
+<!-- footer -->
+<%@ include file="/WEB-INF/jsp/academy/cmmn/inc/footer_inc.jsp"%>
+

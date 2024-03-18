@@ -1,0 +1,11 @@
+_this.$quizInfo = [
+	["다음 중 Mesh Data(데이터)에 대한 설명으로 <span style='color:#FF0000;'>틀린</span> 것은?","Insert Mesh(파일 불러오기) 기능을 이용해 Stl, Ovj 파일 유형을 작업 공간으로 불러오기 할 수 있다.","Solid Body(솔리드 바디) 유형으로 변경하기 위해서는 Do Not Capture Design History를 누른다.","Mesh Data(데이터)는 속이 채워져 있으며 표면이 삼각 면, 혹은 사각 면으로 구성되어 있다.","Mesh to Brep(마우스 우클릭)을 이용해 Body의 유형을 변경할 수 있다.",false],	
+	["다음 중 SVG Data(데이터)에 대한 설명으로 <span style='color:#FF0000;'>틀린</span> 것은?","Insert SVG 기능으로 파일을 불러오기 할 수 있다.","Fusion 360 에서는 Sketch(스케치)로 사용할 수 있는 Graphics Data(그래픽 데이터)이다.","Sketch Curve(스케치 커브)로 사용할 수 있는 CAD Data(데이터)의 일종이다.","Control Point Frame(형상 제어 점) 옵션을 이용해 정점의 위치를 수정할 수 있다.",false],
+	["다음 중 DXF Data 대한 설명으로 <span style='color:#FF0000;'>틀린</span> 것은?","Insert DXF(DXF 파일 불러오기) 기능을 이용해 파일을 불러오기 할 수 있다.","Mesh to Brep(마우스 우클릭)을 이용해 Body의 유형을 변경할 수 있다.","Sketch Curve(스케치 커브) 및 Sketch Profile(스케치 프로파일)로 활용할 수 있다.","One Sketch Per Layer(구성요소 분리) 옵션을 이용해 구성 요소를 분리할 수 있다.",false]
+];
+
+_this.$quizAnsInfo = [
+	[3,"Mesh Data(데이터)는 표면이 삼각 면, 혹은 사각 면으로 구성되어 있으며 내부가 비워져 있다."],
+	[3,"Sketch Curve(스케치 커브)로 사용할 수 있는 CAD Data는 DXF 이다."],
+	[2,"Mesh to Brep(마우스 우클릭)은 Mesh Body를 Solid Body로 생성해주는 팝업 메뉴이다."]
+];

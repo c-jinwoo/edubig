@@ -1,0 +1,28 @@
+<%
+/****************************************
+    subject : 상단 메뉴
+    summary : 상단 메뉴 : 지식마당(04)>신용지식UP(01)
+    author  : SANGS
+    date    : 2018-06-12
+****************************************/
+%>
+<%@ page language="java" contentType="text/html; charset=utf-8" pageEncoding="utf-8"%>
+		<div id="location_wrap">
+			<div class="con_center">
+				 <div class="location">
+				 	<h2 class="alt_text">현재위치</h2>
+					<a href="/ccedu/main/main.do" class="btn_home"><img src="/cmmn/images/location_home.png" alt="홈" /></a>
+					<ul class="location_nav">
+						<li><span>지식마당</span></li>
+						<li><span>신용지식UP</span></li>
+						<li class="location_toggle">
+							<a href="#sub_other" onclick="return false;"><span><%=request.getParameter("menuNm") %></span></a>
+							<ul id="sub_other">
+								<li><a href="/ccedu/intellectual/creditTermDctnr.do"><span>신용용어 사전</span></a></li>
+								<li><a href="/ccedu/intellectual/boardList.do?bcateno=9"><span>지식자료실</span></a></li>
+							</ul>
+						</li>
+					</ul>
+				 </div>
+			 </div>
+		</div>

@@ -1,0 +1,11 @@
+_this.$quizInfo = [
+	["㉯ 참조 파일을 이용하여 3D 모델 작성하는 방법 중 <span style='color:#FF0000;'>틀린</span> 것은?","Mesh Body는 Solid Body로 변환 후 편집해야 한다.","Insert dxf Data를 이용해 stl 파일을 불러오기 한다.","조작자를 이용해 위치를 조정할 수 있다.","팝업(Pop-up) 메뉴에서 Move/Copy(이동/복사) 기능을 사용할 수 있다.",false],	
+	["다음 중 ㉰ 3D 모델로 변환하는 방법으로 <span style='color:#FF0000;'>틀린</span> 것은?","[Insert]-[Insert Mesh] 클릭하여 불러오기 한다.","Assemble(조립)을 하기 위해 우선 Body를 Component(구성요소)로 변경한다.","기준 객체는 Ground(객체 고정)을 이용해 고정시킨다.","Frame.stl 파일을 참조하여 모델을 작성한다.",false],
+	["다음 중 조립(Assemble)하기에 대한 설명으로 <span style='color:#FF0000;'>틀린</span> 것은?","수험번호.f3d와 수험번호.stl로 저장한다.","Motion(이동) 메뉴에서 Slider(슬라이더)를 설정한다.","Motion(이동) 메뉴에서는 Revolute(회전)을 설정할 수 없다.","[File]-[Export] 클릭하여 파일을 내보낸다.",false]
+];
+
+_this.$quizAnsInfo = [
+	[2,"Insert Mesh를 이용해 stl 파일을 불러오기 한다."],
+	[4,"Wave.stl 파일을 이용해 3D 모델을 작성한다."],
+	[3,"Motion(이동) 메뉴에서는 Revolute(회전)을 설정할 수 있다."]
+];

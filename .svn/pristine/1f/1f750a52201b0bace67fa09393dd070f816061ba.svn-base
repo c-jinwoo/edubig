@@ -1,0 +1,252 @@
+<%
+/****************************************
+	subject	: 신용상담사 > 자격시험 > 자격소개
+	summary	: 
+	author	: sangs
+	date	: 2018-05-28
+****************************************/
+%>
+<%@ page language="java" contentType="text/html; charset=utf-8" pageEncoding="utf-8"%>
+<%@ include file="/WEB-INF/jsp/common/inc/taglib_inc.jsp"%>
+<%@ include file="/WEB-INF/jsp/academy/cmmn/inc/top_inc.jsp"%>
+<%@ include file="/WEB-INF/jsp/academy/cmmn/inc/header_inc.jsp"%>
+	
+<script type="text/javascript">
+	$(document).ready(function(){
+		$('.link-txt a').each(function(){
+		    var replaced = $(this).text().replace(/&lt;/g, '<').replace(/&gt;/g, '>');
+		    $(this).text(replaced);
+		});
+		
+	});
+	
+	
+	function fnView(bbsNo, bcateno, secuyn) {
+		
+		if("Y" == secuyn) {
+			$('#bbsNoChk').val(bbsNo);
+			$('#myModal').modal('show');
+		} else if("N" == secuyn) {
+			$("#bbsNo").val(bbsNo);
+			$("#bcateno").val(bcateno);
+			$("#frm").attr("action", "/ccedu/cceduInfo/bbsDetail.do");
+			$("#frm").submit();
+		}
+	}
+	
+	function regitBbs(bcateno) {
+		$("#pageMode").val('insert');
+		$("#bcateno").val(bcateno);
+		$("#frm").attr("action", "/academy/helpdesk/regitBbsForm.do");
+		$("#frm").submit();
+	}
+	
+	function pwdCheck() {
+		
+		var bbsNoChk = $('#bbsNoChk').val();
+		var pwdChk = $("#pwdChk").val();
+		
+		$.ajax({
+			url : "/ccedu/cceduInfo/bbsPwdChkAjax.do",
+			data : 
+				{
+					pwdChk : $("#pwdChk").val(),
+					bbsNo : bbsNoChk
+				},
+			dataType : "json",
+			type : 'post',
+			success : function(data) {
+				if(data != null) {
+					
+					fnView(data.BBSNO, data.BCATENO, 'N');
+					$("#myModal").find('.close').click();
+
+				}
+			},
+			error : function(e) {
+				fnModalMsg("error :" + e.responseText);
+			}
+		})	// ajax
+			
+	}
+	
+</script>
+<div class="container" id="Subcontent">
+    <article class="subArea">
+        <div class="subCntWrap">
+		<%@ include file="/WEB-INF/jsp/academy/cmmn/inc/lnb_ccedu.jsp" %>
+		<div class="path">
+        	<ul>
+            	<li><span class="home text-hide">신용상담사</span></li>
+                <li>고객센터</li>
+                <c:if test="${REQUEST_DATA.bcateno eq 11}">
+                	<li class="active">공지사항</li>
+                </c:if>
+            </ul>
+        </div>
+        <form id="frm" name-="frm" method="post">
+        <input type="hidden" id="bbsNoChk" name="bbsNoChk" value=""/>
+        <input type="hidden" id="bbsNo" name="bbsNo" value=""/>
+        <input type="hidden" id="bcateno" name="bcateno" value=""/>
+        <input type="hidden" id="pageMode" name="pageMode" value=""/>
+ 		<div class="subConts" id="sub-content">
+			<section class="bgTop_cate04"><!--   카테고리별 이미지 추가  -->
+            		<div class="contTop">
+            		<c:if test="${REQUEST_DATA.bcateno eq 11}">
+                		<h2 class="h2_tit">공지사항</h2>
+               		</c:if>
+            			
+            		</div>           	
+	            </section>
+	            
+	           	<c:if test="${REQUEST_DATA.bcateno eq 12}">
+	           		${codeList }
+	           	</c:if>
+	            
+	            <section class="tableBox">
+					<div class="tblTop row">
+						<div class="col-sm-6"></div>
+						<div class="col-sm-6 col-xs-12">
+							<fieldset>
+									<legend class="sr-only">검색</legend>
+									<div class="titSearchWrap">
+										<select id="search" name="search">
+											<option value="">선택</option>
+											<option value="title">제목</option>
+										</select>
+										 <input type="text" name="searchText" title="검색어 입력" id="searchText" class="form-control" onkeypress="if(event.keyCode==13){searchWord();return false}" value="${REQUEST_DATA.searchWord}">
+										<button class="btn btn-sm btn-mint" onclick="searchWord(); return false" title="검색">검색</button>
+									</div>
+							</fieldset>
+						</div>
+					</div>
+					
+					<c:if test="${REQUEST_DATA.bcateno eq 12}">
+	           		${codeList }
+	           		<!-- 탭 메뉴 -->
+                <div class="tabmenu-list six-columns">
+                	<button type="button" class="btn-tabmenu on"><span>전체</span></button>
+                	<c:forEach var="result" items="${codeList}" varStatus="status">
+                		
+               			<button type="button" 
+               			<c:choose>
+               				<c:when test="${result.MT_SUB_CODE eq 'FQ0001'}">class="btn-tabmenu no-brd-l"</c:when>
+               				<c:when test="${result.MT_SUB_CODE eq 'FQ0002'}">class="btn-tabmenu no-brd-l"</c:when>
+               				<c:when test="${result.MT_SUB_CODE eq 'FQ0003'}">class="btn-tabmenu no-brd-t"</c:when>
+               				<c:when test="${result.MT_SUB_CODE eq 'FQ0004'}">class="btn-tabmenu no-brd-l no-brd-t"</c:when>
+               				<c:when test="${result.MT_SUB_CODE eq 'FQ0005'}">class="btn-tabmenu no-brd-l no-brd-t"</c:when>
+               			</c:choose> 
+               			class="btn-tabmenu no-brd-l" id="${result.MT_SUB_CODE }Btn"><span>${result.MT_SUB_NAME}</span></button>
+                	</c:forEach>
+                </div>
+				<!-- //탭 메뉴 -->
+	           		</c:if>
+					
+
+					<div class="tblWrap">
+						<table class="boardList">
+							<colgroup>
+								<col style="width: 15%">
+								<col style="width: *">
+							</colgroup>
+							<tbody>
+								<c:choose>
+									<c:when test="${not empty listData}">
+										<c:forEach items="${listData}" var="result" varStatus="status">
+											<tr>
+												<td class="text-center">
+<%-- 												<c:if test="${result.BCATENO eq 11}"> --%>
+<%-- 													<img  src="${result.THUMBNAIL }/${result.SAVFILE}" height="100px" width="100px"><br> --%>
+<%-- 												</c:if> --%>
+												<c:if test="${result.BCATENO eq 11 || result.BCATENO eq 14}">
+													<c:if test="${result.TOPYN eq 'Y'}">
+														<strong class="fnt16 po_C2">[공지]</strong>
+													</c:if>
+													<c:if test="${result.TOPYN eq 'N'}">
+														<strong class="fnt16 po_C7">${resultCount-(REQUEST_DATA.cPage-1)*10-status.count+1}</strong>
+													</c:if>
+												
+												</c:if>
+												<c:if test="${result.BCATENO eq 13}">
+													<strong class="fnt16 po_C7">${resultCount-(REQUEST_DATA.cPage-1)*10-status.count+1}</strong>
+												</c:if>
+												</td>
+												
+												<td>
+													<dl class="dl_notice">
+														<dt>
+															<a href="#none" class="noti_tit ellipsis" onclick="fnView('<c:out value="${result.BBSNO}"/>','<c:out value="${REQUEST_DATA.bcateno}"/>','<c:out value="${result.SECUYN}"/>'); return false;" title="<c:out value="${result.TITLE}"/> 상세보기"> <c:out value="${result.TITLE}" /> <c:if test="${result.DATE_DIFF < 7}"><span class="new"></span></c:if></a>
+														</dt>
+														<dd>
+															<ul class="mrg_t5 noaddfile">
+																<li class="li_bar"><strong class="mrg_r10">등록일</strong><span><c:out value="${result.WDATE}" /></span></li>
+																<li class="li_bar"><strong class="mrg_r10">조회수</strong><span><c:out value="${result.RCNT}" /></span></li>
+																<c:if test="${result.bcateno ne 13}">
+																	<c:if test="${result.FILECNT > 0}">
+																		<li class="li_bar"><img src="/academy/images/sub/down.png" alt=""></li>
+																	</c:if>
+																	<c:if test="${result.CMT > 0 }">
+																		<li class="li_bar">답변완료</li>
+																	</c:if>
+																</c:if>
+															</ul>
+														</dd>
+													</dl>
+												</td>
+											</tr>
+										</c:forEach>
+									</c:when>
+									<c:otherwise>
+										<tr>
+											<td class="text-center">
+												<c:if test="${REQUEST_DATA.searchWord eq ''}">
+													<strong class="fnt16 po_C7">등록된 게시글이 없습니다.</strong>
+												</c:if> 
+												<c:if test="${REQUEST_DATA.searchWord ne ''}">
+													<strong class="fnt16 po_C7">검색 결과가 없습니다.</strong>
+												</c:if>
+											</td>
+										</tr>
+									</c:otherwise>
+								</c:choose>
+							</tbody>
+						</table>
+						
+						
+						<c:if test="${REQUEST_DATA.bcateno eq 13 }">
+							<a href="#" onclick="regitBbs('<c:out value='${REQUEST_DATA.bcateno}'/>'); return false;">등록</a>
+						</c:if>
+						
+						<c:if test="${not empty listData}">
+							<paging:page cpage="${REQUEST_DATA.cPage}" total="${resultCount}" pageSize="${REQUEST_DATA.rowCount}" link="javascript:move_page" />
+						</c:if>
+	
+					</div><!-- .tblWrap -->
+				</section>
+			</div>
+			</form>
+			<!-- //sub-contents -->
+		</div>
+</div>	 
+	 
+<!-- footer -->
+<%@ include file="/WEB-INF/jsp/academy/cmmn/inc/footer_inc.jsp"%>
+<div class="modal fade" id="myModal">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+        <h4 class="modal-title">Modal title</h4>
+      </div>
+      <div class="modal-body">
+        <p>글 작성시 입력한 비밀번호를 입력해주세요.</p>
+        <input type="password" id="pwdChk" name="pwdChk" value="" placeholder="password">
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-default" data-dismiss="modal">취소</button>
+        <button type="button" class="btn btn-primary" onclick="pwdCheck(); return false;">확인</button>
+      </div>
+    </div><!-- /.modal-content -->
+  </div><!-- /.modal-dialog -->
+</div><!-- /.modal -->
+

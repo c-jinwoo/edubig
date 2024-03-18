@@ -1,0 +1,2114 @@
+package com.webapp.academy.ctrl;
+
+import java.io.PrintWriter;
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.regex.Pattern;
+
+import javax.annotation.Resource;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+
+import org.apache.commons.lang3.StringUtils;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+import org.codehaus.jackson.map.ObjectMapper;
+import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
+import org.springframework.ui.ModelMap;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+
+import com.google.common.base.Predicate;
+import com.google.common.collect.Iterables;
+import com.google.common.collect.Lists;
+import com.google.gson.Gson;
+import com.sangs.session.UserSessionManager;
+import com.sangs.session.UserSessionVO;
+import com.sangs.support.DataMap;
+import com.sangs.support.EduMap;
+import com.sangs.support.FrontException;
+import com.sangs.support.SangsProperties;
+import com.sangs.util.DateUtil;
+import com.sangs.util.DownloadServlet;
+import com.sangs.util.SangsUtil;
+import com.sangs.util.StringUtil;
+import com.webapp.academy.service.BoardService;
+import com.webapp.academy.service.TutorService;
+
+/**
+ * Description : 강사 관련 컨트롤러
+ * 
+ * Modification Information
+ * 수정일			수정자			수정내용
+ * -------		-----------------------------------
+ * 2020.09.29	CSLAB		최초작성
+ *
+ */
+
+@Controller
+public class TutorController {
+
+	private Logger log = LogManager.getLogger(this.getClass());
+	
+    @Resource(name = "tutorService")
+    private TutorService  tutorService;
+
+    @Resource(name = "boardService")
+    private BoardService boardService; 
+    
+    // TODO: 강사 커뮤니티 목록
+    @RequestMapping(value = "/academy/tutor/tutorCmmntyList.do")
+    public String tutorCmmntyList(HttpServletRequest request, HttpServletResponse res, DataMap rMap) throws FrontException {
+        try {
+            if ("N".equals(rMap.getString("SES_ISLOGIN")) || rMap.getInt("SES_USERNO") < 1) {// 로그인 안했다면
+                request.setAttribute("msg", "로그인이 필요한 페이지 입니다.");
+                request.setAttribute("url", "/academy/common/login.do");
+                return "forward:/common/msgForward.do";
+            }
+            int tutorGrade = tutorService.getTutorGradeCnt(rMap); // 현재 강사로 위촉된 사람만 접근
+            if(tutorGrade == 0) {
+            	request.setAttribute("msg", "접근권한이 없습니다.");
+                request.setAttribute("url", "/academy/main/main.do");
+                return "forward:/common/msgForward.do";
+            }
+            
+            String sdate = rMap.getString("sdate");
+            String edate = rMap.getString("edate");
+            if(("").equals(sdate)){
+                sdate = DateUtil.getMonthAgoDate(-7);
+            }
+            if(("").equals(edate)){
+                edate = DateUtil.getNowDate();
+            }
+            rMap.setString("sdate", sdate);
+            rMap.setString("edate", edate);
+            
+            
+            //커뮤니티 탭
+            List<EduMap> map = tutorService.getCmmntyList(rMap);
+
+            if(map.size() > 0){
+	            if(rMap.getString("bbsNo").equals(null) || !rMap.containsKey("bbsNo")){
+	            	EduMap subMap = (EduMap)map.get(0);
+	            	rMap.setString("bbsNo", Integer.toString(subMap.getInt("BBSNO")));
+	            	rMap.setString(("bbsAnswerAt"), subMap.getString("BBS_ANSWER_AT"));
+	            	rMap.setString(("bbsNoticeAt"), subMap.getString("BBS_NOTICE_AT"));
+	            }
+            }
+            
+            request.setAttribute("LIST_DATA", map);
+            request.setAttribute("totalCnt", tutorService.getCmmntySubListCount(rMap));
+            request.setAttribute("SUBTOPLIST_DATA", tutorService.getCmmntySubTopList(rMap));
+            request.setAttribute("SUBLIST_DATA", tutorService.getCmmntySubList(rMap));
+            
+            request.setAttribute("menu_nm", "mypage");
+            request.setAttribute("lnb_menu", "tutorCmmnty");
+            request.setAttribute("REQUEST_DATA", rMap);
+        } catch (Exception e) { log.debug(e.getMessage());
+             
+            throw new FrontException(e);
+        }
+
+        return "academy/tutor/tutor_cmmnty_list";
+    }
+    
+    /**
+     * 강사커뮤니티 상세
+     * @date	: 2016. 9. 20.
+     * @author	: 구동림, rnehdfla12@sangs.co.kr
+     * 
+     * @param request
+     * @param model
+     * @param rMap
+     * @return
+     * @throws FrontException
+     */
+    // TODO: 강사 커뮤니티 상세
+	@RequestMapping(value = "/academy/tutor/tutorCmmntyView.do")
+	public String tutorCmmntyView(HttpServletRequest request, HttpServletResponse res, DataMap rMap, ModelMap model) throws Exception {
+		
+		if ("N".equals(rMap.getString("SES_ISLOGIN")) || rMap.getInt("SES_USERNO") < 1) {// 로그인 안했다면
+             request.setAttribute("msg", "로그인이 필요한 페이지 입니다.");
+             request.setAttribute("url", "/academy/common/login.do");
+             return "forward:/common/msgForward.do";
+        }
+		int tutorGrade = tutorService.getTutorGradeCnt(rMap); // 현재 강사로 위촉된 사람만 접근
+        if(tutorGrade == 0) {
+        	request.setAttribute("msg", "접근권한이 없습니다.");
+            request.setAttribute("url", "/academy/main/main.do");
+            return "forward:/common/msgForward.do";
+        }
+        
+		//커뮤니티 탭
+        request.setAttribute("LIST_DATA", tutorService.getCmmntyList(rMap));
+        
+        //상세보기 정보
+        request.setAttribute("VIEW", tutorService.getCmmntyDetailSubInfo(rMap));
+        
+		//조회수 증가
+        tutorService.updateCmmntyRcnt(rMap);
+		
+        //하위글 여부확인후 삭제버튼 비활성화를위한 조회
+        request.setAttribute("delCheck", tutorService.selectReplyInfo(rMap));
+        
+        //파일조회
+		request.setAttribute("fileList", tutorService.getFileList(rMap));
+		
+		request.setAttribute("menu_nm", "mypage");
+        request.setAttribute("lnb_menu", "tutorCmmnty");
+		model.addAttribute("REQUEST_DATA", rMap);
+		
+		return "academy/tutor/tutor_cmmnty_view";
+	}
+	
+	/**
+     * 강사커뮤니티 등록 폼
+     * @date	: 2016. 9. 20.
+     * @author	: 구동림, rnehdfla12@sangs.co.kr
+     * @param request
+     * @param model
+     * @param rMap
+     * @return
+     * @throws FrontException
+     */
+	// TODO: 강사 커뮤니티  등록 폼
+	@RequestMapping(value = "/academy/tutor/tutorCmmntyForm.do")
+	public String tutorCmmntyForm(HttpServletRequest request, HttpServletResponse res, DataMap rMap, ModelMap model) throws Exception {
+		
+		if ("N".equals(rMap.getString("SES_ISLOGIN")) || rMap.getInt("SES_USERNO") < 1) {// 로그인 안했다면
+            request.setAttribute("msg", "로그인이 필요한 페이지 입니다.");
+            request.setAttribute("url", "/academy/common/login.do");
+            return "forward:/common/msgForward.do";
+		}
+		int tutorGrade = tutorService.getTutorGradeCnt(rMap); // 현재 강사로 위촉된 사람만 접근
+		if(tutorGrade == 0) {
+			request.setAttribute("msg", "접근권한이 없습니다.");
+			request.setAttribute("url", "/academy/main/main.do");
+			return "forward:/common/msgForward.do";
+		}
+       
+		//커뮤니티 탭
+        request.setAttribute("LIST_DATA", tutorService.getCmmntyList(rMap));
+        String qu = rMap.getString("qu");
+        EduMap map = null;
+        if(qu.equals("reply") || qu.equals("update")){
+        	map =  tutorService.getCmmntyDetailSubInfo(rMap);
+        	if(qu.equals("update")){
+        		List<EduMap> fileList = tutorService.getFileList(rMap);
+        		if(fileList.size() > 0){
+        			rMap.setString("fileSCount",Integer.toString(fileList.size()));
+        		}
+        		request.setAttribute("fileList", fileList);
+        	}else{
+        		request.setAttribute("fileList", "0");
+        	}
+
+        }else{
+        	//첨부파일 시작
+            rMap.setString("fileSCount","0");
+        }
+        
+        request.setAttribute("UPDATE_DATA", map);
+        
+        request.setAttribute("menu_nm", "mypage");
+        request.setAttribute("lnb_menu", "tutorCmmnty");
+		model.addAttribute("REQUEST_DATA", rMap);
+		
+		return "academy/tutor/tutor_cmmnty_form";
+	}
+	
+	/**
+     * 강사 커뮤니티  등록
+     * 수정일  : 2016. 9. 19.
+     * 수정자  : 구동림
+     *
+     * @param request
+     * @param res
+     * @param rMap
+     * @return
+     * @throws Exception
+     */
+	// TODO: 강사 커뮤니티  등록
+	@RequestMapping(value="/academy/tutor/tutorcmmntySubInsert.do" , method = RequestMethod.POST)
+	public String cmmntySubInsert(HttpServletRequest request, HttpServletResponse res, DataMap rMap) throws Exception {
+
+		if ("N".equals(rMap.getString("SES_ISLOGIN")) || rMap.getInt("SES_USERNO") < 1) {// 로그인 안했다면
+            request.setAttribute("msg", "로그인이 필요한 페이지 입니다.");
+            request.setAttribute("url", "/academy/common/login.do");
+            return "forward:/common/msgForward.do";
+		}
+		int tutorGrade = tutorService.getTutorGradeCnt(rMap); // 현재 강사로 위촉된 사람만 접근
+		if(tutorGrade == 0) {
+			request.setAttribute("msg", "접근권한이 없습니다.");
+			request.setAttribute("url", "/academy/main/main.do");
+			return "forward:/common/msgForward.do";
+		}
+		
+        String qu = rMap.getString("qu");
+        String msg = "" ;
+		try{
+            //삭제 부분
+            if(qu.equals("delete")){
+            	tutorService.deleteCmmntySubInfo(rMap);
+            	qu = "" ;
+            	msg = "삭제하였습니다." ;
+            }
+            else if(qu.equals("insert") || qu.equals("update") || qu.equals("reply")){
+            	
+            	if(qu.equals("insert") || qu.equals("reply")){
+            		
+            		if(qu.equals("insert")){
+            			
+            			tutorService.insertCmmntySubInfo(rMap);
+            			
+            			rMap.setString("nttNo" , tutorService.getNewNttNo());
+            			
+            			tutorService.insertCmmntySubFileInfo(request,rMap);
+            			
+            			//사용자 jFile업데이트
+            			/*tutorService.updateCmmntySubFileInfo(rMap);*/
+                		qu = "" ;
+                    	msg = "등록하였습니다." ; 
+            		}else if(qu.equals("reply")){
+            			tutorService.insertCmmntySubReplyInfo(rMap);
+            			rMap.setString("nttNo" , tutorService.getNewNttNo());
+            			tutorService.insertCmmntySubFileInfo(request,rMap);
+                		qu = "" ;
+                    	msg = "등록하였습니다." ; 
+            		}
+            	}
+            	else if(qu.equals("update")){ 
+            		tutorService.updateCmmnthSubInfo(rMap);
+            		tutorService.updateCmmnthSubReplyInfo(rMap);
+            		tutorService.insertCmmntySubFileInfo(request,rMap);
+            		qu = "" ;
+                	msg = "수정하였습니다." ; 
+            	}
+            	
+            }
+            request.setAttribute("msg", msg);
+            request.setAttribute("qu", qu);
+            request.setAttribute("returnUrl", "/academy/tutor/tutorCmmntyList.do");
+            request.setAttribute("REQUEST_DATA", rMap);
+		}
+		catch(Exception e){ log.debug(e.getMessage());
+	        request.setAttribute("msg", "등록에 실패 하였습니다.");
+		}
+		return "academy/tutor/tutor_cmmnty_exec";
+	}
+	
+	/**
+     * 강사정보관리 상세
+     *
+     * @date	: 2016. 9. 20.
+     * @author	: 구동림, rnehdfla12@sangs.co.kr
+     *
+     * @param request
+     * @param res
+     * @param rMap
+     * @throws Exception
+     */
+	@RequestMapping(value = "/academy/tutor/lectureDetail.do")
+	public String tutor_detail(HttpServletRequest request, HttpServletResponse res, DataMap rMap, ModelMap model) throws Exception {
+		if ("N".equals(rMap.getString("SES_ISLOGIN")) || rMap.getInt("SES_USERNO") < 1) {// 로그인 안했다면
+            request.setAttribute("msg", "로그인이 필요한 페이지 입니다.");
+            request.setAttribute("url", "/academy/common/login.do");
+            return "forward:/common/msgForward.do";
+		}
+		int tutorGrade = tutorService.getTutorGradeCnt(rMap); // 현재 강사로 위촉된 사람만 접근
+		if(tutorGrade == 0) {
+			request.setAttribute("msg", "접근권한이 없습니다.");
+			request.setAttribute("url", "/academy/main/main.do");
+			return "forward:/common/msgForward.do";
+		}
+		
+		if(!rMap.containsKey("entrstYear")){
+			Calendar c = Calendar.getInstance(); //객체 생성 및 현재 일시분초...셋팅
+			String entrstYear = new String();
+			entrstYear = String.valueOf(c.get(Calendar.YEAR));
+			rMap.setString("entrstYear", entrstYear);
+		}
+		
+		rMap.set("tabNo", 0);
+		
+        rMap.setString("mtCode", SangsProperties.getProperty("Globals.mtCode_MT_TUTOR_CODE"));
+        model.addAttribute("tutorOptions", tutorService.getMtSubCodeList(rMap));
+        model.addAttribute("tutor", tutorService.getTutorDetail2(rMap));
+        /*구분정보리스트*/
+        rMap.setString("mtCode", SangsProperties.getProperty("Globals.mtCode_MT_TUTOR_SE_CODE"));
+        model.addAttribute("mtTutorSeList", tutorService.getMtSubCodeList(rMap));
+        /*지원분야리스트*/
+        rMap.setString("mtCode", SangsProperties.getProperty("Globals.mtCode_MT_FIELD_CODE"));
+        model.addAttribute("mtFieldList", tutorService.getMtSubCodeList(rMap));
+        /*지역리스트*/
+        rMap.setString("mtCode", SangsProperties.getProperty("Globals.mtCode_MT_AREA_CODE"));
+        model.addAttribute("mtAreaList", tutorService.getMtSubCodeList(rMap));
+        /*최종학력리스트*/
+        rMap.setString("mtCode", SangsProperties.getProperty("Globals.mtCode_MT_ACDMCR_CODE"));
+        model.addAttribute("mtAcdmcrList", tutorService.getMtSubCodeList(rMap));
+        
+        // 정보관리 첨부파일
+        request.setAttribute("fileList", tutorService.getSpecialLectureFile2(rMap));
+        
+        // 전직장 정보 getLectureJobInfo
+        request.setAttribute("jobList", tutorService.getLectureJobInfo(rMap));
+        //  model.addAttribute("tutor", tutorService.getTutorDetail2(rMap));
+        
+        
+        request.setAttribute("menu_nm", "mypage");
+        request.setAttribute("lnb_menu", "tutorMng");
+        rMap.setString("title", SangsProperties.getProperty("Globals.tutorInfo"));
+		model.addAttribute("REQUEST_DATA", rMap);
+		
+		return "academy/tutor/lecture_detail";
+	}
+	
+	
+	/**
+     * 강사이력서 다운로드
+     *
+     * @date	: 2016. 9. 20.
+     * @author	: 구동림, rnehdfla12@sangs.co.kr
+     *
+     * @param request
+     * @param res
+     * @param rMap
+     * @throws Exception
+     */
+	@RequestMapping(value = "/academy/tutor/lectureResumeDown.do")
+	public String lectureResumeDown(HttpServletRequest request, HttpServletResponse res, DataMap rMap, ModelMap model) throws Exception {
+	
+		if ("N".equals(rMap.getString("SES_ISLOGIN")) || rMap.getInt("SES_USERNO") < 1) {// 로그인 안했다면
+            request.setAttribute("msg", "로그인이 필요한 페이지 입니다.");
+            request.setAttribute("url", "/academy/common/login.do");
+            return "forward:/common/msgForward.do";
+		}
+		int tutorGrade = tutorService.getTutorGradeCnt(rMap); // 현재 강사로 위촉된 사람만 접근
+		if(tutorGrade == 0) {
+			request.setAttribute("msg", "접근권한이 없습니다.");
+			request.setAttribute("url", "/academy/main/main.do");
+			return "forward:/common/msgForward.do";
+		}
+		
+		// 최종학력, 학교, 전공, 현직작(입사년월, 퇴사년월, 회사, 부서/직위)
+		request.setAttribute("tutor", tutorService.getTutorDetail2(rMap));
+		// 전직장 정보 getLectureJobInfo
+        request.setAttribute("jobList", tutorService.getLectureJobInfo(rMap));
+		// 타기관 강의이력
+        request.setAttribute("hisList", tutorService.getTutorHisList(rMap)); //경력관리
+        //특강 강의이력 목록
+        request.setAttribute("resultList", tutorService.getSpecialLectureList(rMap));
+        
+		request.setAttribute("menu_nm", "mypage");
+        request.setAttribute("lnb_menu", "tutorMng");
+        
+		model.addAttribute("REQUEST_DATA", rMap);
+		
+		return "academy/tutor/resume";
+	}
+	
+	 /**
+     * 강사정보관리 파일다운로드
+     * @param url
+     * @param msg
+     * @param model
+     * @return
+     * @throws Exception
+     */
+    @RequestMapping(value = "/academy/tutor/noticeFiledown.do")
+    public String noticeFiledown(HttpServletRequest req, HttpServletResponse res, DataMap rMap) throws FrontException {
+
+        DownloadServlet filedown = new DownloadServlet();
+        boolean result;
+
+        try {
+            //rMap.setString("filename", "/cmmn/6BAE7B3F1CBB415FBE6A15D65DB18BE7.xls");
+            rMap.setString("filename", SangsUtil.replaceAll(rMap.getString("filename"), "/cmmn/", ""));
+            //상위경로 진입 방지
+ 
+            
+			result = filedown.downLoadFile(req, res, tutorService.getFileInfo(rMap));
+			
+            if (result) {
+                return null;
+            } else {
+                return "/common/cmmn_error";
+            }
+
+        } catch (Exception e) { log.debug(e.getMessage());
+            return "common/cmmn_error";
+        }
+    }
+    
+    /**
+     * 강사 결과보고 파일다운로드
+     * @param url
+     * @param msg
+     * @param model
+     * @return
+     * @throws Exception
+     */
+    @RequestMapping(value = "/academy/tutor/lecturePersonalFiledown.do")
+    public String lecturePersonalFiledown(HttpServletRequest req, HttpServletResponse res, DataMap rMap) throws FrontException {
+
+        DownloadServlet filedown = new DownloadServlet();
+        boolean result;
+
+        try {
+            //rMap.setString("filename", "/cmmn/6BAE7B3F1CBB415FBE6A15D65DB18BE7.xls");
+            rMap.setString("filename", SangsUtil.replaceAll(rMap.getString("filename"), "/cmmn/", ""));
+            //상위경로 진입 방지
+ 
+			result = filedown.downLoadFile(req, res, tutorService.lecturePersonalFiledown(rMap));
+			
+            if (result) {
+                return null;
+            } else {
+                return "/common/cmmn_error";
+            }
+
+        } catch (Exception e) { log.debug(e.getMessage());
+            return "common/cmmn_error";
+        }
+    }
+    
+    
+	
+    /**
+     * 강사 정보관리 파일 삭제
+     * 
+     * 수정일	: 2016. 10. 04.						
+     * 수정자	: 구동림, rnehdfla12@sangs.co.kr	
+   
+     * @param request
+     * @param res
+     * @param rMap
+     * @return
+     * @throws Exception
+     */
+    // TODO: 강사 정보관리 파일 삭제
+    @RequestMapping(value = "/academy/tutor/deleteLecture.do")
+    public String deleteLecture(HttpServletRequest request, HttpServletResponse res, DataMap rMap) throws Exception {
+
+        try {
+        	String msg = "";
+        	String returnUrl = "";
+        	tutorService.deleteLecture(rMap);
+        	
+        		msg = "삭제 되었습니다.";
+        		returnUrl = "/academy/tutor/lectureDetail.do?qu=insert";
+        	
+    		request.setAttribute("msg", msg);
+    		request.setAttribute("returnUrl", returnUrl);
+    		request.setAttribute("REQUEST_DATA", rMap);
+    		
+        } catch (Exception e) { log.debug(e.getMessage());
+             
+            throw new Exception(e);
+        }
+
+		return "academy/tutor/lecture_exec";
+    }
+    
+    
+	
+	
+	private List<EduMap>  findReportTypeList(List<EduMap> list, final String key) {
+		return Lists.newArrayList(Iterables.filter(list, new Predicate<EduMap>() {
+			@Override
+			public boolean apply(EduMap emap) {
+				return emap.getString("MT_REPORT_TYPE_CODE").trim().equals(key);
+			}
+		}));
+	}
+	
+	/**
+    *
+    * 수정일  : 2016. 9. 21.
+    * 수정자  : 구동림
+    *
+    * @param request
+    * @param res
+    * @param rMap
+    * @return
+    * @throws Exception
+    */
+	@RequestMapping(value="/academy/tutor/tutorUpdate.do" , method = RequestMethod.POST)
+	public String tutorUpdate(HttpServletRequest request, HttpServletResponse res, DataMap rMap) throws Exception {
+		if ("N".equals(rMap.getString("SES_ISLOGIN")) || rMap.getInt("SES_USERNO") < 1) {// 로그인 안했다면
+            request.setAttribute("msg", "로그인이 필요한 페이지 입니다.");
+            request.setAttribute("url", "/academy/common/login.do");
+            return "forward:/common/msgForward.do";
+		}
+		int tutorGrade = tutorService.getTutorGradeCnt(rMap); // 현재 강사로 위촉된 사람만 접근
+		if(tutorGrade == 0 && rMap.getInt("SES_GRADENO") != 100) {
+			request.setAttribute("msg", "접근권한이 없습니다.");
+			request.setAttribute("url", "/academy/main/main.do");
+			return "forward:/common/msgForward.do";
+		}
+		
+		try{
+	
+			tutorService.updateTutorInfo(request,rMap);
+            
+			request.setAttribute("msg",  "수정에 성공 하였습니다.");
+            request.setAttribute("returnUrl", "/academy/tutor/lectureDetail.do");
+            request.setAttribute("REQUEST_DATA", rMap);
+		}
+		catch(Exception e){ log.debug(e.getMessage());
+			e.printStackTrace();
+	        request.setAttribute("msg", "수정에 실패 하였습니다.");
+		}
+		return "academy/tutor/tutor_cmmnty_exec";
+	}
+	
+	
+	/**
+    * 강사정보관리 > 경력관리
+    * 수정일  : 2016. 9. 19.
+    * 수정자  : 구동림
+    *
+    * @param request
+    * @param res
+    * @param rMap
+    * @return
+    * @throws Exception
+    */
+	@RequestMapping(value="/academy/tutor/lectureHisList.do" , method = RequestMethod.POST)
+	public String tutorHisList(HttpServletRequest request, HttpServletResponse res, DataMap rMap) throws Exception {
+		
+		if ("N".equals(rMap.getString("SES_ISLOGIN")) || rMap.getInt("SES_USERNO") < 1) {// 로그인 안했다면
+            request.setAttribute("msg", "로그인이 필요한 페이지 입니다.");
+            request.setAttribute("url", "/academy/common/login.do");
+            return "forward:/common/msgForward.do";
+		}
+		int tutorGrade = tutorService.getTutorGradeCnt(rMap); // 현재 강사로 위촉된 사람만 접근
+		if(tutorGrade == 0) {
+			request.setAttribute("msg", "접근권한이 없습니다.");
+			request.setAttribute("url", "/academy/main/main.do");
+			return "forward:/common/msgForward.do";
+		}
+		
+		try{
+			
+//			request.setAttribute("tutor", tutorService.getTutorDetail(rMap));
+			request.setAttribute("tutor", tutorService.getTutorDetail2(rMap));
+			request.setAttribute("hisList", tutorService.getTutorHisList(rMap)); //경력관리
+			request.setAttribute("entList", tutorService.getTutorEntRstList(rMap));//위촉이력
+			request.setAttribute("entYearList", tutorService.getTutorEntRstYearList(rMap));//위촉이력 년도
+			
+			request.setAttribute("menu_nm", "mypage");
+		    request.setAttribute("lnb_menu", "tutorMng");
+		    rMap.setString("title", SangsProperties.getProperty("Globals.tutorInfo"));
+			request.setAttribute("REQUEST_DATA", rMap);
+		}
+		catch(Exception e){ log.debug(e.getMessage());
+		}
+		return "academy/tutor/lecture_hist_list";
+	}
+	
+
+	/**
+	 * 이력관리 저장
+	 * @param res
+	 * @param rMap
+	 * @throws Exception
+	 */
+	@RequestMapping(value = "/academy/tutor/saveReportAjax.do")
+	public void saveReportAjax(HttpServletResponse res, DataMap rMap) throws Exception {
+		res.setContentType("text/html; charset=utf-8");
+		PrintWriter out = res.getWriter();
+		Gson gson = new Gson();
+		String json = null;
+		
+		try {
+			if ("S".equals(rMap.getString("type"))) {
+				if (!StringUtils.isEmpty(rMap.getString("hisno"))) {
+					//tutorService.updateTutorHis(rMap);
+				} else {
+					//tutorService.insertTutorHis(rMap);
+				}
+			} else {
+				//tutorService.deleteTutorHis(rMap);
+			}
+
+			json = gson.toJson("SUCCESS");
+
+		} catch (Exception e) { log.debug(e.getMessage());
+			 
+			json = gson.toJson("FAIL");
+		}
+
+		out.print(json);
+		out.flush();
+		out.close();
+	}
+	
+	/**
+	 * 이력관리 삭제
+	 * @param res
+	 * @param rMap
+	 * @throws Exception
+	 */
+	@RequestMapping(value = "/academy/tutor/deleteMberAjax.do")
+	public void deleteMberAjax(HttpServletResponse res, DataMap rMap) throws Exception {
+		res.setContentType("text/html; charset=utf-8");
+		PrintWriter out = res.getWriter();
+		Gson gson = new Gson();
+		String json = null;
+		
+		try {
+			
+			tutorService.deleteTutorHis(rMap);
+			
+			json = gson.toJson("SUCCESS");
+
+		} catch (Exception e) { log.debug(e.getMessage());
+			 
+			json = gson.toJson("FAIL");
+		}
+
+		out.print(json);
+		out.flush();
+		out.close();
+	}
+	
+	/**
+	 * 커뮤니티 파일 삭제
+	 * @param res
+	 * @param rMap
+	 * @throws Exception
+	 */
+	@RequestMapping(value = "/academy/tutor/deleteCmmntyFileAjax.do")
+	public void deleteCmmntyFileAjax(HttpServletResponse res, DataMap rMap) throws Exception {
+		res.setContentType("text/html; charset=utf-8");
+		PrintWriter out = res.getWriter();
+		Gson gson = new Gson();
+		String json = null;
+		
+		try {
+			tutorService.deleteCmmntyFile(rMap);
+			
+			json = gson.toJson("SUCCESS");
+
+		} catch (Exception e) { log.debug(e.getMessage());
+			 
+			json = gson.toJson("FAIL");
+		}
+
+		out.print(json);
+		out.flush();
+		out.close();
+	}
+	
+	/**
+     * 정규교육 강의이력
+     * 
+     * 수정일	: 2016. 8. 30.						
+     * 수정자	: 이진영, sweetjy09@sangs.co.kr	
+   
+     * @param request
+     * @param res
+     * @param rMap
+     * @return
+     * @throws Exception
+     */
+    // TODO: 위원회 강의이력
+    @RequestMapping(value = "/academy/tutor/lectureCommitteeList.do")
+    public String lectureList(HttpServletRequest request, HttpServletResponse res, DataMap rMap) throws Exception {
+
+    	if ("N".equals(rMap.getString("SES_ISLOGIN")) || rMap.getInt("SES_USERNO") < 1) {// 로그인 안했다면
+            request.setAttribute("msg", "로그인이 필요한 페이지 입니다.");
+            request.setAttribute("url", "/academy/common/login.do");
+            return "forward:/common/msgForward.do";
+		}
+		int tutorGrade = tutorService.getTutorGradeCnt(rMap); // 현재 강사로 위촉된 사람만 접근
+		if(tutorGrade == 0) {
+			request.setAttribute("msg", "접근권한이 없습니다.");
+			request.setAttribute("url", "/academy/main/main.do");
+			return "forward:/common/msgForward.do";
+		}
+		
+        try {
+        	
+        	//개인 강의이력 확인코드 셋팅 
+        	if(rMap.getInt("tabNo") == 2){
+        		rMap.setString("tutorHisYn" , "N");
+        	}else if(rMap.getInt("tabNo") == 3){
+        		rMap.setString("tutorHisYn" , "Y");
+        	}
+        	
+        	// 공통코드 분류코드
+            String mtCode = "";
+           
+           
+            //정규교육관리 목록
+            request.setAttribute("resultList", tutorService.getLectureList(rMap));
+            request.setAttribute("totalCount", tutorService.getLectureListCount(rMap));
+
+            request.setAttribute("tutor", tutorService.getTutorDetail2(rMap));
+            
+            request.setAttribute("menu_nm", "mypage");
+            request.setAttribute("lnb_menu", "tutorMng");
+            rMap.setString("title", SangsProperties.getProperty("Globals.tutorInfo"));
+    		request.setAttribute("REQUEST_DATA", rMap);
+        } catch (Exception e) { log.debug(e.getMessage());
+             
+            throw new Exception(e);
+        }
+
+		return "academy/tutor/lecture_committee_list";
+    }
+    
+    /**
+     * 위원회 강의이력 / 개인 강의이력 상세
+     * 
+     * 수정일	: 2016. 8. 31.						
+     * 수정자	: 이진영, sweetjy09@sangs.co.kr	
+   
+     * @param request
+     * @param res
+     * @param rMap
+     * @return
+     * @throws Exception
+     */
+    // TODO: 위원회 강의이력 / 개인 강의이력 상세
+    @RequestMapping(value = "/academy/tutor/lecturePersonalView.do")
+    public String lectureCommitteeView(HttpServletRequest request, HttpServletResponse res, DataMap rMap) throws Exception {
+    	if ("N".equals(rMap.getString("SES_ISLOGIN")) || rMap.getInt("SES_USERNO") < 1) {// 로그인 안했다면
+            request.setAttribute("msg", "로그인이 필요한 페이지 입니다.");
+            request.setAttribute("url", "/academy/common/login.do");
+            return "forward:/common/msgForward.do";
+		}
+		int tutorGrade = tutorService.getTutorGradeCnt(rMap); // 현재 강사로 위촉된 사람만 접근
+		if(tutorGrade == 0) {
+			request.setAttribute("msg", "접근권한이 없습니다.");
+			request.setAttribute("url", "/academy/main/main.do");
+			return "forward:/common/msgForward.do";
+		}
+    	try {
+    		// 공통코드 분류코드
+    		String mtCode = "";
+    		            
+    		/*// 신청구분 (특강 구분코드)
+            mtCode= SangsProperties.getProperty("Globals.mtCode_MT_SC_CODE");
+            rMap.setString("mtCode", mtCode);
+            rMap.setString("abcCd", SangsProperties.getProperty("Globals.mtCode_MT_SC_CODE_LECTURE"));
+            request.setAttribute("categoryData2", tutorService.getMtSubCodeList(rMap));*/
+    		
+    		// 영역구분1
+            mtCode = SangsProperties.getProperty("Globals.mtCode_MT_SP_AREA_CODE");
+            rMap.setString("mtCode", mtCode);
+            request.setAttribute("codeList", tutorService.getMtSubCodeList(rMap));
+
+            /*// 교육시설
+            mtCode = SangsProperties.getProperty("Globals.mtCode_MT_FCLTS_CODE");
+            rMap.setString("mtCode", mtCode);
+            rMap.setString("abcCd", "");
+            rMap.setString("ref1" , SangsProperties.getProperty("Globals.mtCode_MT_SC_CODE_LECTURE"));
+            request.setAttribute("edufacilitiesList", tutorService.getMtSubCodeList(rMap));
+            
+        	// 강사분류
+            mtCode = SangsProperties.getProperty("Globals.mtCode_MT_TUTOR_CODE");
+            rMap.setString("mtCode", mtCode);
+            rMap.setString("ref", "POP");
+            request.setAttribute("categoryData4", tutorService.getMtSubCodeList(rMap));
+    		
+    		if(rMap.getString("tutorHisYn").equals("N")){
+    			// 특강 신청일시
+                request.setAttribute("timeList", tutorService.getSpecialLectureTime(rMap));
+    		}else if(rMap.getString("tutorHisYn").equals("Y")){
+    			request.setAttribute("timeInfo", tutorService.getSpecialLectureTimeInfo(rMap));
+    		}*/
+            
+            // 강사 첨부파일
+            request.setAttribute("fileList", tutorService.getSpecialLectureFile(rMap));
+            
+            // 특강정보
+            /*String[] phone = map.getString("APPLY_PHONE").split("-");
+            for(int i = 1; i < phone.length; i++){
+            	rMap.setString("phone"+i, phone[i]);
+            }
+            EduMap map = tutorService.getLectureInfo(rMap);
+            request.setAttribute("map", map);*/
+            
+            request.setAttribute("infoResult", tutorService.getLectureInfo(rMap));
+            
+            //request.setAttribute("tutor", tutorService.getTutorDetail(rMap));
+            /*request.setAttribute("tutor", tutorService.getTutorDetail2(rMap));
+            request.setAttribute("entList", tutorService.getTutorEntRstList(rMap));//위촉이력
+*/            
+            request.setAttribute("menu_nm", "mypage");
+            request.setAttribute("lnb_menu", "tutorMng");
+            rMap.setString("title", SangsProperties.getProperty("Globals.tutorInfo"));
+            request.setAttribute("REQUEST_DATA", rMap);
+	    } catch (Exception e) { log.debug(e.getMessage());
+	         
+	        throw new Exception(e);
+	    }
+	
+		return "academy/tutor/lecture_personal_view";
+	}
+    
+    /**
+     * 공통 콤보파일 ajax
+     * @param url
+     * @param msg
+     * @param model
+     * @return
+     * @throws Exception
+     */
+    // TODO: 공통 콤보파일 ajax
+    @RequestMapping(value = "/academy/tutor/ajaxCategory.do")
+	public String ajaxCategory(HttpServletRequest request, HttpServletResponse res, DataMap rMap) throws Exception {
+		try{
+			List<EduMap> resultList = tutorService.getMtSubCodeList(rMap);
+			request.setAttribute("resultList", resultList);
+		}
+		catch (Exception e) { log.debug(e.getMessage());
+		}
+		request.setAttribute("REQUEST_DATA", rMap);
+		return "academy/tutor/ajaxComboCategory";
+	}
+    
+    /**
+     * 특강관리 강사 검색
+     * 
+     * 수정일	: 2016. 9. 22.						
+     * 수정자	: 구동림, rnehdfla12@sangs.co.kr	
+     * @param request
+     * @param res
+     * @param rMap
+     * @return
+     * @throws Exception
+     */
+    // TODO: 특강관리 강사 검색
+    @RequestMapping(value = "/academy/tutor/lectureTutorSearch.do")
+    public String lectureTutorSearch(HttpServletRequest request, HttpServletResponse res, DataMap rMap) throws Exception {
+    	if ("N".equals(rMap.getString("SES_ISLOGIN")) || rMap.getInt("SES_USERNO") < 1) {// 로그인 안했다면
+            request.setAttribute("msg", "로그인이 필요한 페이지 입니다.");
+            request.setAttribute("url", "/academy/common/login.do");
+            return "forward:/common/msgForward.do";
+		}
+    	
+    	try{
+    		// 공통코드 분류코드
+            String mtCode = "";
+            
+        	// 강사분류
+            mtCode = SangsProperties.getProperty("Globals.mtCode_MT_TUTOR_CODE");
+            rMap.setString("mtCode", mtCode);
+            rMap.setString("ref", "POP");
+            request.setAttribute("categoryData4", tutorService.getMtSubCodeList(rMap));
+            
+            request.setAttribute("resultList", tutorService.getLecTutorList(rMap));
+    		request.setAttribute("REQUEST_DATA", rMap);
+    		
+    		
+    	}catch (Exception e) { log.debug(e.getMessage());
+		}
+		
+		request.setAttribute("REQUEST_DATA", rMap);
+		return "academy/tutor/lecture_tutor_pop";
+	}
+    
+    /**
+     * 강사 이력사항
+     *
+     * 수정일	: 2016. 9. 22.						
+     * 수정자	: 구동림, rnehdfla12@sangs.co.kr	
+     *
+     * @param request
+     * @param res
+     * @param rMap
+     * @throws Exception
+     */
+    // TODO: 강사 이력사항
+    @RequestMapping(value = "/academy/tutor/lectureTutorHis.do")
+    public void lectureTutorHis(HttpServletRequest request, HttpServletResponse res, DataMap rMap) throws Exception {
+    	// 이력사항 리스트	
+    	rMap.setInt("entrstYear",  DateUtil.getYear());
+    	List<EduMap> tutorHisList =  tutorService.getTutorHisList(rMap);
+		List<Map<String, Object>> resultList = new ArrayList<Map<String, Object>>();
+
+		ObjectMapper mapper = new ObjectMapper();
+		String json = "";
+		
+		for(int i=0;i<tutorHisList.size();i++){
+			
+			EduMap hisListMap = (EduMap)tutorHisList.get(i);
+			
+			Map<String, Object> hisMap = new HashMap<String, Object>();
+			hisMap.put("hisno"			, hisListMap.getInt("HISNO"));
+			hisMap.put("activeWork"		, hisListMap.getString("ACTIVE_WORK"));
+			hisMap.put("grpNm"			, hisListMap.getString("GRP_NM"));
+			hisMap.put("etc"			, hisListMap.getString("ETC"));
+			hisMap.put("userno"			, hisListMap.getInt("USERNO"));
+			hisMap.put("entrstYear"		, hisListMap.getString("ENTRST_YEAR"));
+			hisMap.put("workYear"		, hisListMap.getString("WORK_YEAR"));
+			resultList.add(hisMap);
+		}		
+		
+		json = mapper.writeValueAsString(resultList);
+
+		res.setContentType("text/json;charset=utf-8");
+		PrintWriter printWriter = res.getWriter();
+		printWriter.print(json);
+		printWriter.flush();
+		printWriter.close();
+    }
+    
+    
+    /**
+     * 강사공간 특강교육 결과보고
+     * 
+     * 수정일	: 2016. 9. 22.						
+     * 수정자	: 구동림, rnehdfla12@sangs.co.kr	
+   
+     * @param request
+     * @param res
+     * @param rMap
+     * @return
+     * @throws Exception
+     */
+    // TODO: 강사공간 특강교육 결과보고
+    @RequestMapping(value = "/academy/tutor/lectureExec.do")
+    public String lectureExec(HttpServletRequest request, HttpServletResponse res, DataMap rMap) throws Exception {
+
+        try {
+        	String msg = "";
+        	String returnUrl = "" ;
+        	
+        	tutorService.insertLecture(request, rMap);
+    		request.setAttribute("REQUEST_DATA", rMap);
+    		
+    		if(rMap.getString("qu").equals("update")){
+    			msg = "수정되었습니다.";
+    		}else if(rMap.getString("qu").equals("insert")){
+    			msg = "등록되었습니다.";
+    		}
+    		if(rMap.getString("mod").equals("persnal")){
+    			returnUrl = "/academy/tutor/lecturePersonalList.do";
+    		}else if(rMap.getString("mod").equals("committe")){
+    			returnUrl = "/academy/tutor/lectureCommitteeList.do";
+    		}
+    		request.setAttribute("msg", msg);	
+    		request.setAttribute("returnUrl", returnUrl);
+    		
+    		request.setAttribute("REQUEST_DATA", rMap);
+    		
+        } catch (Exception e) { log.debug(e.getMessage());
+             
+            throw new Exception(e);
+        }
+
+        return "academy/tutor/lecture_exec";
+    }
+    
+    /**
+     * 특강관리 강의이력 리스트
+     * 
+     * 수정일	: 2016. 9. 23.						
+     * 수정자	: 구동림, rnehdfla12@sangs.co.kr	
+   
+     * @param request
+     * @param res
+     * @param rMap
+     * @return
+     * @throws Exception
+     */
+    // TODO: 개인강의이력
+    @RequestMapping(value = "/academy/tutor/lecturePersonalList.do")
+    public String lecturePersonalList(HttpServletRequest request, HttpServletResponse res, DataMap rMap) throws Exception {
+    	if ("N".equals(rMap.getString("SES_ISLOGIN")) || rMap.getInt("SES_USERNO") < 1) {// 로그인 안했다면
+            request.setAttribute("msg", "로그인이 필요한 페이지 입니다.");
+            request.setAttribute("url", "/academy/common/login.do");
+            return "forward:/common/msgForward.do";
+		}
+		int tutorGrade = tutorService.getTutorGradeCnt(rMap); // 현재 강사로 위촉된 사람만 접근
+		if(tutorGrade == 0) {
+			request.setAttribute("msg", "접근권한이 없습니다.");
+			request.setAttribute("url", "/academy/main/main.do");
+			return "forward:/common/msgForward.do";
+		}
+		
+    	try {
+    		// 공통코드 분류코드
+            String mtCode = "";
+            
+            //개인 강의이력 확인코드 셋팅 
+            rMap.setString("tutorHisYn" , "Y");
+           
+            //특강 강의이력 목록
+            request.setAttribute("resultList", tutorService.getSpecialLectureList(rMap));
+            request.setAttribute("totalCount", tutorService.getSpecialLectureListCount(rMap));
+
+            //request.setAttribute("tutor", tutorService.getTutorDetail(rMap));
+            request.setAttribute("tutor", tutorService.getTutorDetail2(rMap));
+            request.setAttribute("menu_nm", "mypage");
+            request.setAttribute("lnb_menu", "tutorMng");
+    		request.setAttribute("REQUEST_DATA", rMap);
+        	
+        } catch (Exception e) { log.debug(e.getMessage());
+             
+            throw new Exception(e);
+        }
+
+		return "academy/tutor/lecture_personal_list";
+    }
+    
+    /**
+     * 개인 강의이력 등록
+     * 
+     * 수정일	: 2016. 9. 23.						
+     * 수정자	: 구동림, rnehdfla12@sangs.co.kr	
+   
+     * @param request
+     * @param rMap
+     * @return
+     * @throws Exception
+     */
+    // TODO: 개인강의이력 등록
+    @RequestMapping(value = "/academy/tutor/lecturePersonalForm.do")
+    public String lecturePersonalForm(HttpServletRequest request, HttpServletResponse res, DataMap rMap) throws Exception {
+    	
+    	try {
+    		
+    		String sdate = rMap.getString("sdate");
+            String edate = rMap.getString("edate");
+            if(("").equals(sdate)){
+                sdate = DateUtil.getMonthAgoDate(-7);
+            }
+            if(("").equals(edate)){
+                edate = DateUtil.getNowDate();
+            }
+            rMap.setString("sdate", sdate);
+            rMap.setString("edate", edate);
+            
+    		// 공통코드 분류코드
+            String mtCode = "";
+            
+            //개인 강의이력 확인코드 셋팅 
+            rMap.setString("tutorHisYn" , "Y");
+            
+            // 교육시설
+            mtCode = SangsProperties.getProperty("Globals.mtCode_MT_FCLTS_CODE");
+            rMap.setString("mtCode", mtCode);
+            request.setAttribute("edufacilitiesList", tutorService.getMtSubCodeList(rMap));
+            
+            // 특강정보
+            request.setAttribute("map", tutorService.getLectureInfo(rMap));
+            
+            //특강관리 목록
+            request.setAttribute("resultList", tutorService.getLectureList(rMap));
+            request.setAttribute("totalCount", tutorService.getLectureListCount(rMap));
+
+            // 강사 첨부파일
+            request.setAttribute("fileList", tutorService.getSpecialLectureFile(rMap));
+            
+            //request.setAttribute("tutor", tutorService.getTutorDetail(rMap));
+            request.setAttribute("tutor", tutorService.getTutorDetail2(rMap));
+            request.setAttribute("entList", tutorService.getTutorEntRstList(rMap));//위촉이력
+            
+            request.setAttribute("menu_nm", "mypage");
+            request.setAttribute("lnb_menu", "tutorMng");
+    		request.setAttribute("REQUEST_DATA", rMap);
+        	
+        } catch (Exception e) { log.debug(e.getMessage());
+             
+            throw new Exception(e);
+        }
+
+		return "academy/tutor/lecture_personal_form";
+    }
+    
+    /**
+     * 개인강의이력 등록 실행
+     * 
+     * 수정일	: 2016. 9. 23.						
+     * 수정자	: 구동림, rnehdfla12@sangs.co.kr	
+   
+     * @param request
+     * @param res
+     * @param rMap
+     * @return
+     * @throws Exception
+     */
+    // TODO: 개인강의이력 등록 실행
+    @RequestMapping(value = "/academy/tutor/lecturePersonalInfoExec.do")
+    public String lecturePersonalInfoExec(HttpServletRequest request, HttpServletResponse res, DataMap rMap) throws Exception {
+
+        try {
+        	//큐브리드의 EDU_DATE 타입이 VARCHAR여서 입력시의 날짜를 셋팅.
+        	java.util.Date d = new java.util.Date();
+        	SimpleDateFormat date = new SimpleDateFormat("yyyy-MM-dd");
+        	rMap.setString("eduDate", date.format(d));
+        	
+        	tutorService.insertLecture(request, rMap);
+    		request.setAttribute("REQUEST_DATA", rMap);
+    		request.setAttribute("msg", "등록되었습니다.");
+    		request.setAttribute("returnUrl", "/academy/tutor/lecturePersonalList.do");
+    		
+        } catch (Exception e) { log.debug(e.getMessage());
+             
+            throw new Exception(e);
+        }
+
+		return "academy/tutor/lecture_exec";
+    }
+    
+    /**
+     * 평가이력 리스트
+     * 
+     * 수정일	: 2016. 9. 24.						
+     * 수정자	: 구동림, rnehdfla12@sangs.co.kr	
+   
+     * @param request
+     * @param res
+     * @param rMap
+     * @return
+     * @throws Exception
+     */
+    // TODO: 평가이력
+    @RequestMapping(value = "/academy/tutor/evaluationList.do")
+    public String evaluationList(HttpServletRequest request, HttpServletResponse res, DataMap rMap) throws Exception {
+    	if ("N".equals(rMap.getString("SES_ISLOGIN")) || rMap.getInt("SES_USERNO") < 1) {// 로그인 안했다면
+            request.setAttribute("msg", "로그인이 필요한 페이지 입니다.");
+            request.setAttribute("url", "/academy/common/login.do");
+            return "forward:/common/msgForward.do";
+		}
+		int tutorGrade = tutorService.getTutorGradeCnt(rMap); // 현재 강사로 위촉된 사람만 접근
+		if(tutorGrade == 0) {
+			request.setAttribute("msg", "접근권한이 없습니다.");
+			request.setAttribute("url", "/academy/main/main.do");
+			return "forward:/common/msgForward.do";
+		}
+		
+    	try {
+    		//평가 강의이력 목록
+    		 String mtReportTypeCode = SangsProperties.getProperty("Globals.mtCode_MT_REPORT_TYPE_CODE");
+    		 rMap.setString("mtReportTypeCode", mtReportTypeCode);
+    		  
+    		//request.setAttribute("tutor", tutorService.getTutorDetail(rMap));
+    		request.setAttribute("tutor", tutorService.getTutorDetail2(rMap));
+    		
+    		List<EduMap> tmp = tutorService.getTutorDetail2(rMap);
+    		if(rMap.getString("entrstYear").equals("")||rMap.getString("entrstYear").equals(null)){
+    			rMap.setInt("entrstYear", tmp.get(0).getInt("ENTRST_YEAR"));
+    		}
+	   		 //평가 강의이력 강의교안
+	   		 request.setAttribute("resultFirst", tutorService.getEvaluationFirst(rMap));
+	   		 
+	   		 //평가 강의이력 강의계획
+	   		 request.setAttribute("resultSecond", tutorService.getEvaluationSecond(rMap));
+	   		 
+	   		 //평가 강의이력 설문
+	   		 request.setAttribute("resultThird", tutorService.getEvaluationThird(rMap));
+	   		 
+	   		//평가 강의이력 에세이
+	   		 request.setAttribute("resultFourth", tutorService.getEvaluationFourth(rMap));
+   		 
+    		request.setAttribute("entList", tutorService.getTutorEntRstList(rMap));//위촉이력
+    		request.setAttribute("entYearList", tutorService.getTutorEntRstYearList(rMap));//위촉이력 년도
+    		request.setAttribute("menu_nm", "mypage");
+            request.setAttribute("lnb_menu", "tutorMng");
+     		request.setAttribute("REQUEST_DATA", rMap);
+     		
+         } catch (Exception e) { log.debug(e.getMessage());
+              
+             throw new Exception(e);
+         }
+
+ 		return "academy/tutor/evaluation_list";
+     }
+    
+    /**
+     * 보고서제출 리스트
+     * 
+     * 수정일	: 2016. 9. 24.						
+     * 수정자	: 구동림, rnehdfla12@sangs.co.kr	
+   
+     * @param request
+     * @param res
+     * @param rMap
+     * @return
+     * @throws Exception
+     */
+    // TODO: 보고서제출 리스트
+    @RequestMapping(value = "/academy/tutor/reportList.do")
+    public String reportList(HttpServletRequest request, HttpServletResponse res, DataMap rMap) throws Exception {
+    	if ("N".equals(rMap.getString("SES_ISLOGIN")) || rMap.getInt("SES_USERNO") < 1) {// 로그인 안했다면
+            request.setAttribute("msg", "로그인이 필요한 페이지 입니다.");
+            request.setAttribute("url", "/academy/common/login.do");
+            return "forward:/common/msgForward.do";
+		}
+		int tutorGrade = tutorService.getTutorGradeCnt(rMap); // 현재 강사로 위촉된 사람만 접근
+		if(tutorGrade == 0) {
+			request.setAttribute("msg", "접근권한이 없습니다.");
+			request.setAttribute("url", "/academy/main/main.do");
+			return "forward:/common/msgForward.do";
+		}
+		
+    	try {
+    		//평가 강의이력 목록
+    		 String mtReportTypeCode = SangsProperties.getProperty("Globals.mtCode_MT_REPORT_TYPE_CODE");
+    		 rMap.setString("mtReportTypeCode", mtReportTypeCode);
+    		  
+    		//request.setAttribute("tutor", tutorService.getTutorDetail(rMap));
+    		request.setAttribute("tutor", tutorService.getTutorDetail2(rMap));
+    		request.setAttribute("entList", tutorService.getTutorEntRstList(rMap));//위촉이력
+    		request.setAttribute("entYearList", tutorService.getTutorEntRstYearList(rMap));//위촉이력 년도
+    		 
+    		List<EduMap> tmp = tutorService.getTutorDetail2(rMap);
+    		if(rMap.getString("entrstYear").equals("")||rMap.getString("entrstYear").equals(null)){
+    			rMap.setInt("entrstYear", tmp.get(0).getInt("ENTRST_YEAR"));
+    		}
+	   		request.setAttribute("resultList", tutorService.getEvaluationList(rMap));
+   		 
+    		request.setAttribute("menu_nm", "mypage");
+            request.setAttribute("lnb_menu", "tutorMng");
+     		request.setAttribute("REQUEST_DATA", rMap);
+     		
+         } catch (Exception e) { log.debug(e.getMessage());
+              
+             throw new Exception(e);
+         }
+
+ 		return "academy/tutor/report_list";
+     }
+    
+
+    /**
+     * 평가관리 파일등록폼
+     * 
+     * 수정일	: 2016. 9. 26.						
+     * 수정자	: 구동림, rnehdfla12@sangs.co.kr	
+   
+     * @param request
+     * @param res
+     * @param rMap
+     * @return
+     * @throws Exception
+     */
+    // TODO: 특강관리 등록폼
+    @RequestMapping(value = "/academy/tutor/evaluationForm.do")
+    public String evaluationForm(HttpServletRequest request, HttpServletResponse res, DataMap rMap) throws Exception {
+    	if ("N".equals(rMap.getString("SES_ISLOGIN")) || rMap.getInt("SES_USERNO") < 1) {// 로그인 안했다면
+            request.setAttribute("msg", "로그인이 필요한 페이지 입니다.");
+            request.setAttribute("url", "/academy/common/login.do");
+            return "forward:/common/msgForward.do";
+		}
+		int tutorGrade = tutorService.getTutorGradeCnt(rMap); // 현재 강사로 위촉된 사람만 접근
+		if(tutorGrade == 0) {
+			request.setAttribute("msg", "접근권한이 없습니다.");
+			request.setAttribute("url", "/academy/main/main.do");
+			return "forward:/common/msgForward.do";
+		}
+		
+        try {
+        	String qu = rMap.getString("qu");
+        	List<EduMap> map = tutorService.getReportData(rMap);
+
+    		request.setAttribute("menu_nm", "mypage");
+            request.setAttribute("lnb_menu", "tutorMng");
+        	request.setAttribute("REQUEST_DATA", rMap);
+    		
+        } catch (Exception e) { log.debug(e.getMessage());
+             
+            throw new Exception(e);
+        }
+
+		return "academy/tutor/evaluation_form";
+    }
+    
+    /**
+     * 평가관리 파일등록
+     * 
+     * 수정일	: 2016. 9. 23.						
+     * 수정자	: 구동림, rnehdfla12@sangs.co.kr	
+   
+     * @param request
+     * @param res
+     * @param rMap
+     * @return
+     * @throws Exception
+     */
+    // TODO: 특강관리 등록
+    @RequestMapping(value = "/academy/tutor/evaluationExec.do")
+    public String evaluationExec(HttpServletRequest request, HttpServletResponse res, DataMap rMap) throws Exception {
+
+        try {
+        	String msg = "";
+        	
+        	if(rMap.getString("qu").equals("insert")){
+        		msg = "등록되었습니다.";
+        	}else if(rMap.getString("qu").equals("update")){
+        		msg = "수정되었습니다.";
+        	}else if(rMap.getString("qu").equals("delete")){
+        		msg = "삭제되었습니다.";
+        	}
+        	
+        	tutorService.insertLecture(request, rMap);
+    		request.setAttribute("REQUEST_DATA", rMap);
+    		request.setAttribute("msg", msg);
+    		request.setAttribute("returnUrl", "/academy/tutor/evaluationList.do");
+    		
+        } catch (Exception e) { log.debug(e.getMessage());
+             
+            throw new Exception(e);
+        }
+
+		return "academy/tutor/lecture_exec";
+    }
+    
+    /**
+     * 보고서 제출
+     * 
+     * 수정일	: 2016. 9. 26.						
+     * 수정자	: 구동림, rnehdfla12@sangs.co.kr	
+   
+     * @param request
+     * @param res
+     * @param rMap
+     * @return
+     * @throws Exception
+     */
+    // TODO: 특강관리 등록
+    @RequestMapping(value = "/academy/tutor/reportForm.do")
+    public String reportInfoForm(HttpServletRequest request, HttpServletResponse res, DataMap rMap) throws Exception {
+    	if ("N".equals(rMap.getString("SES_ISLOGIN")) || rMap.getInt("SES_USERNO") < 1) {// 로그인 안했다면
+            request.setAttribute("msg", "로그인이 필요한 페이지 입니다.");
+            request.setAttribute("url", "/academy/common/login.do");
+            return "forward:/common/msgForward.do";
+		}
+		int tutorGrade = tutorService.getTutorGradeCnt(rMap); // 현재 강사로 위촉된 사람만 접근
+		if(tutorGrade == 0) {
+			request.setAttribute("msg", "접근권한이 없습니다.");
+			request.setAttribute("url", "/academy/main/main.do");
+			return "forward:/common/msgForward.do";
+		}
+		
+        try {
+        	if(rMap.getString("mtTutorFileCode").equals("")){
+        		rMap.putString("mtTutorFileCode", "TF0004");
+        	}
+        	
+    		request.setAttribute("entYearList", tutorService.getTutorEntRstYearList(rMap));//위촉이력 년도
+        	
+    		List<EduMap> map = tutorService.getReportData(rMap);
+    		request.setAttribute("lnb_menu", "tutorMng");
+    		request.setAttribute("reportFile", map);
+    		request.setAttribute("tutor", tutorService.getTutorDetail(rMap));
+    		request.setAttribute("entList", tutorService.getTutorEntRstList(rMap));//위촉이력
+    		request.setAttribute("REQUEST_DATA", rMap);
+    		
+        } catch (Exception e) { log.debug(e.getMessage());
+             
+            throw new Exception(e);
+        }
+
+		return "academy/tutor/report_form";
+    }
+    
+    
+    /**
+     * 보고서 제출 / 평가이력관리 등록 / 수정
+     * 
+     * 수정일	: 2016. 9. 26.						
+     * 수정자	: 구동림, rnehdfla12@sangs.co.kr	
+   
+     * @param request
+     * @param res
+     * @param rMap
+     * @return
+     * @throws Exception
+     */
+    // TODO: 특강관리 등록
+    @RequestMapping(value = "/academy/tutor/reportInsertExec.do")
+    public String reportInsertExec(HttpServletRequest request, HttpServletResponse res, DataMap rMap) throws Exception {
+
+        try {
+        	String msg = "";
+        	String returnUrl = "";
+        	
+        	tutorService.reportInfoExec(request, rMap);
+        	
+        	if(rMap.getString("qu").equals("insert")){
+        		msg = "등록 되었습니다.";
+        	}else if(rMap.getString("qu").equals("update")){
+        		msg = "수정 되었습니다.";
+        	}else if(rMap.getString("qu").equals("delete")){
+        		msg = "삭제 되었습니다.";
+        	}
+        	if(rMap.getString("mod").equals("eval")){
+        		returnUrl = "/academy/tutor/evaluationList.do";
+        	}else if(rMap.getString("mod").equals("report")){
+        		returnUrl = "/academy/tutor/reportList.do";
+        	}
+        	
+    		request.setAttribute("msg", msg);
+    		request.setAttribute("returnUrl", returnUrl);
+    		request.setAttribute("REQUEST_DATA", rMap);
+    		
+        } catch (Exception e) { log.debug(e.getMessage());
+             
+            throw new Exception(e);
+        }
+
+		return "academy/tutor/lecture_exec";
+    }
+    
+    /**
+     * 보고서 제출 / 평가이력관리 파일삭제
+     * 
+     * 수정일	: 2016. 9. 26.						
+     * 수정자	: 구동림, rnehdfla12@sangs.co.kr	
+   
+     * @param request
+     * @param res
+     * @param rMap
+     * @return
+     * @throws Exception
+     */
+    // TODO: 특강관리 등록
+    @RequestMapping(value = "/academy/tutor/deleteEvaluationInfo.do")
+    public String deleteEvaluationInfo(HttpServletRequest request, HttpServletResponse res, DataMap rMap) throws Exception {
+
+        try {
+        	String msg = "";
+        	String returnUrl = "";
+        	
+        	tutorService.deleteEvaluationInfo(rMap);
+        	
+    		msg = "삭제 되었습니다.";
+    		returnUrl = "/academy/tutor/evaluationList.do";
+        	
+    		request.setAttribute("msg", msg);
+    		request.setAttribute("returnUrl", returnUrl);
+    		request.setAttribute("REQUEST_DATA", rMap);
+    		
+        } catch (Exception e) { log.debug(e.getMessage());
+             
+            throw new Exception(e);
+        }
+
+		return "academy/tutor/lecture_exec";
+    }
+    
+    /**
+     * 위원회 파일 삭제
+     * 
+     * 수정일	: 2016. 10. 04.						
+     * 수정자	: 구동림, rnehdfla12@sangs.co.kr	
+   
+     * @param request
+     * @param res
+     * @param rMap
+     * @return
+     * @throws Exception
+     */
+    // TODO: 특강관리 등록
+    @RequestMapping(value = "/academy/tutor/deleteLectureCommitteeInfo.do")
+    public String deleteLectureCommitteeInfo(HttpServletRequest request, HttpServletResponse res, DataMap rMap) throws Exception {
+
+        try {
+        	String msg = "";
+        	String returnUrl = "";
+        	tutorService.deleteLectureCommitteeInfo(rMap);
+        	
+        		msg = "삭제 되었습니다.";
+        		returnUrl = "/academy/tutor/lecturePersonalView.do";
+        	
+    		request.setAttribute("msg", msg);
+    		request.setAttribute("returnUrl", returnUrl);
+    		request.setAttribute("REQUEST_DATA", rMap);
+    		
+        } catch (Exception e) { log.debug(e.getMessage());
+             
+            throw new Exception(e);
+        }
+
+		return "academy/tutor/lecture_exec";
+    }
+    
+    /**
+     * 위원회 파일 삭제
+     * 
+     * 수정일	: 2016. 10. 04.						
+     * 수정자	: 구동림, rnehdfla12@sangs.co.kr	
+   
+     * @param request
+     * @param res
+     * @param rMap
+     * @return
+     * @throws Exception
+     */
+    // TODO: 소통게시판 파일 삭제
+    @RequestMapping(value = " /academy/tutor/deleteTutorBoardFile.do")
+    public void deleteTutorBoardFile(HttpServletRequest request, HttpServletResponse res, DataMap rMap) throws Exception {
+		res.setContentType("text/html; charset=utf-8");
+		PrintWriter out = res.getWriter();
+		Gson gson = new Gson();
+		String json = null;
+		
+		try {
+			tutorService.deleteTutorBoardFile(rMap);
+			json = gson.toJson("SUCCESS");
+
+		} catch (Exception e) {
+			json = gson.toJson("FAIL");
+		}
+
+		out.print(json);
+		out.flush();
+		out.close();
+	}
+    
+    /**
+     * 경력관리 등록/수정
+     * 
+     * 수정일	: 2016. 10. 07.						
+     * 수정자	: 구동림, rnehdfla12@sangs.co.kr	
+   
+     * @param request
+     * @param res
+     * @param rMap
+     * @return
+     * @throws Exception
+     */
+    // TODO: 특강관리 등록
+    @RequestMapping(value = "/academy/tutor/lectureHisInsert.do")
+    public String lectureHisInsert(HttpServletRequest request, HttpServletResponse res, DataMap rMap) throws Exception {
+        try {
+        	String msg = "";
+        	String returnUrl = "";
+        	tutorService.updateTutorHis(request , rMap);
+    		
+        	msg = "등록 되었습니다.";
+    		returnUrl = "/academy/tutor/lectureHisList.do";
+    		request.setAttribute("msg", msg);
+    		request.setAttribute("returnUrl", returnUrl);
+    		request.setAttribute("REQUEST_DATA", rMap);
+    		
+        } catch (Exception e) { log.debug(e.getMessage());
+             
+            throw new Exception(e);
+        }
+
+		return "academy/tutor/lecture_exec";
+    }
+    
+
+    
+
+    
+    
+
+    
+    
+    
+    /**
+     * 강사공간 > (공지사항, 자료실, 소통마당) 상세
+     * @param request
+     * @param model
+     * @param rMap
+     * @return
+     * @throws FrontException
+     */
+    @RequestMapping(value = "/academy/tutor/tutorBoardView/{bcateno}/{bbsNo}.do")
+    public String lectureNoticeView(HttpServletRequest request, HttpServletResponse res, DataMap rMap
+    								,@PathVariable("bcateno") String bcateno, @PathVariable("bbsNo") int bbsNo) throws FrontException {
+    	
+    	try{
+    		if ("N".equals(rMap.getString("SES_ISLOGIN")) || rMap.getInt("SES_USERNO") < 1) {// 로그인 안했다면
+                request.setAttribute("msg", "로그인이 필요한 페이지 입니다.");
+                request.setAttribute("url", "/academy/common/login.do");
+                return "forward:/common/msgForward.do";
+    		}
+    		int tutorGrade = tutorService.getTutorGradeCnt(rMap); // 현재 강사로 위촉된 사람만 접근
+    		if(tutorGrade == 0 && rMap.getInt("SES_GRADENO") != 100) {
+    			request.setAttribute("msg", "접근권한이 없습니다.");
+    			request.setAttribute("url", "/academy/main/main.do");
+    			return "forward:/common/msgForward.do";
+    		}
+    		
+    		rMap.putString("bcateno", bcateno);
+    		rMap.putInt("bbsNo",  bbsNo);
+    		
+    		boolean flag = Pattern.matches("^[0-9]*$", bcateno);
+    		
+    		if(flag == true) {
+	    		tutorService.updateTutorBoardViewCnt(rMap);
+		    	EduMap boardMap = tutorService.selectTutorBoardView(rMap);
+		    	
+	    	
+		    	request.setAttribute("rowData", boardMap);
+				request.setAttribute("listData", tutorService.getTutorBoardFileList(rMap.getInt("bbsNo")));
+				
+				// 강사 소통게시판일경우 댓글
+				if(rMap.getInt("bcateno") == 1030){
+					request.setAttribute("replyList", tutorService.getTutorBoardReplyList(rMap));
+				}
+				
+				if(boardMap != null) {
+					int bbsnoPrev = boardMap.getInt("BBSNO_PREV");
+					int bbsnoNext = boardMap.getInt("BBSNO_NEXT");
+					
+					// 이전글
+					rMap.setInt("bbsNo", bbsnoPrev);
+					request.setAttribute("prevData", tutorService.selectTutorBoardView(rMap));
+					
+					// 다음글
+					rMap.setInt("bbsNo", bbsnoNext);
+					request.setAttribute("nextData", tutorService.selectTutorBoardView(rMap));
+				
+					request.setAttribute("menu_nm", "mypage");
+					request.setAttribute("lnb_menu", "tutorBoard"+rMap.getString("bcateno"));
+					request.setAttribute("categoryData", boardService.getBoardCategoryList(rMap));
+					if(rMap.getInt("bcateno") == 1034){
+						rMap.setString("title", SangsProperties.getProperty("Globals.tutorNotice"));
+					} else if(rMap.getInt("bcateno") == 1030){
+						rMap.setString("title", SangsProperties.getProperty("Globals.tutorComunity"));
+					} else if(rMap.getInt("bcateno") == 1035){
+						rMap.setString("title", SangsProperties.getProperty("Globals.tutorData"));
+					}
+					
+					request.setAttribute("REQUEST_DATA", rMap);
+		    	
+				// 해당 게시물이 존재하지 않을 경우,
+				} else {
+		    		request.setAttribute("msg", "해당 게시물이 존재하지 않습니다.");
+		    		request.setAttribute("type", "MAIN"); 
+	    			return "forward:/common/msgForward.do";
+		    	}
+		    	
+    		} else {
+    			request.setAttribute("msg", "해당 게시판이 존재하지 않습니다.");
+    			request.setAttribute("type", "MAIN"); 
+    			return "forward:/common/msgForward.do";
+    		}
+    		
+    	} catch (Exception e) { log.debug(e.getMessage());
+             
+            throw new FrontException(e);
+        }
+    	
+    	return "academy/tutor/tutor_board_view";
+    }
+    
+    
+    /**
+     * 강사공간 > (공지사항, 자료실, 소통마당) 상세
+     * @param request
+     * @param model
+     * @param rMap
+     * @return
+     * @throws FrontException
+     */
+    
+    @RequestMapping(value = "/academy/tutor/tutorBoardForm.do")
+    public String tutorBoardForm(HttpServletRequest request, HttpServletResponse res, DataMap rMap) throws FrontException {
+    	 
+    	try{
+    		if ("N".equals(rMap.getString("SES_ISLOGIN")) || rMap.getInt("SES_USERNO") < 1) {// 로그인 안했다면
+                request.setAttribute("msg", "로그인이 필요한 페이지 입니다.");
+                request.setAttribute("url", "/academy/common/login.do");
+                return "forward:/common/msgForward.do";
+    		}
+    		int tutorGrade = tutorService.getTutorGradeCnt(rMap); // 현재 강사로 위촉된 사람만 접근
+    		if(tutorGrade == 0) {
+    			request.setAttribute("msg", "접근권한이 없습니다.");
+    			request.setAttribute("url", "/academy/main/main.do");
+    			return "forward:/common/msgForward.do";
+    		}
+    		
+    		// tutorService.updateTutorBoardViewCnt(rMap);
+    		if(!rMap.get("qu").equals("insert")){
+    			
+    			EduMap boardMap = tutorService.selectTutorBoardView(rMap);
+    			
+    			request.setAttribute("rowData", boardMap);
+    			request.setAttribute("listData", tutorService.getTutorBoardFileList(rMap.getInt("bbsNo")));
+    			
+    		}
+			 
+			request.setAttribute("menu_nm", "mypage");
+            request.setAttribute("lnb_menu", "tutorBoard"+rMap.getString("bcateno"));
+            request.setAttribute("categoryData", boardService.getBoardCategoryList(rMap));
+            if(rMap.getInt("bcateno") == 1034){
+            	rMap.setString("title", SangsProperties.getProperty("Globals.tutorNotice")+" "+"글쓰기");
+            } else if(rMap.getInt("bcateno") == 1030){
+            	rMap.setString("title", SangsProperties.getProperty("Globals.tutorComunity")+" "+"글쓰기");
+            } else if(rMap.getInt("bcateno") == 1035){
+            	rMap.setString("title", SangsProperties.getProperty("Globals.tutorData"));
+            }
+            request.setAttribute("REQUEST_DATA", rMap);
+			
+    	} catch (Exception e) { log.debug(e.getMessage());
+             
+            throw new FrontException(e);
+        }
+    	
+    	return "academy/tutor/tutor_board_form";
+    }
+    
+    /**
+     * 게시글 등록/수정/삭제 실행
+     * 
+     * @date	: 2016. 4. 15.					
+     * @author	: 이진영, sweetjy09@sangs.co.kr 
+     *
+     * @param request
+     * @param res
+     * @param rMap
+     * @return
+     * @throws Exception
+     */
+    // TODO: 게시글 등록/수정/삭제 실행
+    @RequestMapping(value = "/academy/tutor/boardExec.do", method = RequestMethod.POST)
+    public String boardExec(HttpServletRequest request, HttpServletResponse res, DataMap rMap) throws Exception {
+
+        try {
+        	UserSessionVO userVo = UserSessionManager.getUserSessionVO(request);
+        	
+        	// 특수문자 치환 (insert)
+        	rMap.setString("title", StringUtil.setContent(rMap.getString("title")));
+        	rMap.setString("writer", userVo.getUserName()); 
+        	rMap.setInt("userNo", userVo.getUserNo());
+        	rMap.setString("topYn", "N"); 
+        	
+    	   	String qu = rMap.getString("qu");
+    	   		//삭제부분
+    		   	if(qu.equals("delete")){
+    		   		//게시글 삭제
+    		   		boardService.tutorDeleteBoardInfo(rMap);
+    		   		tutorService.tutorBoardFileDelete(rMap);
+//    		   		adminTutorService.deleteEdDataFile(rMap);
+    		   		
+    		   	} else if (qu.equals("insert") || qu.equals("update")){
+    		   		
+    			   	if(qu.equals("insert")){
+    			    	
+    			   		int bbsNo = boardService.getMaxBoardNo(rMap);
+    			   		
+    				   	rMap.setInt("bbsNo", bbsNo);
+    				   	rMap.setString("writer", userVo.getUserName());
+    				   	
+    				   	boardService.insertBoardInfo(request, rMap);
+    				   	
+    				  //수정부분 
+    			   	} else if(qu.equals("update")) {
+    			   		boardService.updateBoardInfo(request, rMap);
+    			   	}
+    		}
+    		request.setAttribute("REQUEST_DATA", rMap);
+        } catch (Exception e) {
+            
+            throw new Exception(e);
+        }
+
+       return "redirect:/academy/tutor/tutorBoardList.do?bcateno=1030";
+    }
+
+    /**
+     * 강사공간 - 강사자료실
+     * @param request
+     * @param res
+     * @param rMap
+     * @return
+     * @throws Exception
+     */
+    @RequestMapping(value = "/academy/tutor/lectureData.do")
+    public String lectureData(HttpServletRequest request, HttpServletResponse res, DataMap rMap) throws Exception {
+        try {
+        	if ("N".equals(rMap.getString("SES_ISLOGIN")) || rMap.getInt("SES_USERNO") < 1) {// 로그인 안했다면
+                request.setAttribute("msg", "로그인이 필요한 페이지 입니다.");
+                request.setAttribute("url", "/academy/common/login.do");
+                return "forward:/common/msgForward.do";
+    		}
+    		int tutorGrade = tutorService.getTutorGradeCnt(rMap); // 현재 강사로 위촉된 사람만 접근
+    		if(tutorGrade == 0) {
+    			request.setAttribute("msg", "접근권한이 없습니다.");
+    			request.setAttribute("url", "/academy/main/main.do");
+    			return "forward:/common/msgForward.do";
+    		}
+    		
+        	rMap.putString("bcateno", SangsProperties.getProperty("Globals.bbsBcateTutorData"));
+//        	
+//        	request.setAttribute("listData", tutorService.selectTutorBoardList(rMap));
+//        	request.setAttribute("resultCount", tutorService.selectLectureBoardListCnt(rMap));
+        	
+        	request.setAttribute("menu_nm", "mypage");
+            request.setAttribute("lnb_menu", "tutorData");
+    		request.setAttribute("REQUEST_DATA", rMap);
+    		
+        } catch (Exception e) { log.debug(e.getMessage());
+             
+            throw new Exception(e);
+        }
+		return "academy/tutor/lecture_data";
+    }
+      
+    /**
+     * 강사공간 > 강사공지사항 게시판 상세
+     * @param request
+     * @param model
+     * @param rMap
+     * @return
+     * @throws FrontException
+     */
+    @RequestMapping(value = "/academy/tutor/lectureDataView.do")
+    public String lectureDataView(HttpServletRequest request, HttpServletResponse res, DataMap rMap) throws FrontException {
+    	
+    	try{
+    		if ("N".equals(rMap.getString("SES_ISLOGIN")) || rMap.getInt("SES_USERNO") < 1) {// 로그인 안했다면
+                request.setAttribute("msg", "로그인이 필요한 페이지 입니다.");
+                request.setAttribute("url", "/academy/common/login.do");
+                return "forward:/common/msgForward.do";
+    		}
+    		int tutorGrade = tutorService.getTutorGradeCnt(rMap); // 현재 강사로 위촉된 사람만 접근
+    		if(tutorGrade == 0) {
+    			request.setAttribute("msg", "접근권한이 없습니다.");
+    			request.setAttribute("url", "/academy/main/main.do");
+    			return "forward:/common/msgForward.do";
+    		}
+    		
+    		rMap.putString("bcateno", SangsProperties.getProperty("Globals.bbsBcateTutorData"));
+    		
+    		tutorService.updateTutorBoardViewCnt(rMap);
+	    	EduMap boardMap = tutorService.selectTutorBoardView(rMap);
+	    	
+	    	request.setAttribute("rowData", boardMap);
+			request.setAttribute("listData", tutorService.getTutorBoardFileList(rMap.getInt("bbsNo")));
+			if(boardMap != null){
+				int bbsnoPrev = boardMap.getInt("BBSNO_PREV");
+				int bbsnoNext = boardMap.getInt("BBSNO_NEXT");
+				
+				// 이전글
+				rMap.setInt("bbsNo", bbsnoPrev);
+				request.setAttribute("prevData", tutorService.selectTutorBoardView(rMap));
+				
+				// 다음글
+				rMap.setInt("bbsNo", bbsnoNext);
+				request.setAttribute("nextData", tutorService.selectTutorBoardView(rMap));
+			}
+			
+			request.setAttribute("menu_nm", "mypage");
+            request.setAttribute("lnb_menu", "tutorData");
+			request.setAttribute("REQUEST_DATA", rMap);
+			
+    	} catch (Exception e) { log.debug(e.getMessage());
+             
+            throw new FrontException(e);
+        }
+    	
+    	return "academy/tutor/lecture_data_view";
+    }
+    
+    /**
+     * 진행 중인 특강 목록
+     *
+     * @date	: 2016. 9. 20.
+     * @author	: 박강희
+     *
+     * @param request
+     * @param res
+     * @param rMap
+     * @throws Exception
+     */
+	@RequestMapping(value = "/academy/tutor/specialLectureAll.do")
+	public String tutor_specialLectureAll(HttpServletRequest request, HttpServletResponse res, DataMap rMap, ModelMap model) throws Exception {
+		
+		if ("N".equals(rMap.getString("SES_ISLOGIN")) || rMap.getInt("SES_USERNO") < 1) {// 로그인 안했다면
+            request.setAttribute("msg", "로그인이 필요한 페이지 입니다.");
+            request.setAttribute("url", "/academy/common/login.do");
+            return "forward:/common/msgForward.do";
+		}
+		int tutorGrade = tutorService.getTutorGradeCnt(rMap); // 현재 강사로 위촉된 사람만 접근
+		if(tutorGrade == 0) {
+			request.setAttribute("msg", "접근권한이 없습니다.");
+			request.setAttribute("url", "/academy/main/main.do");
+			return "forward:/common/msgForward.do";
+		}
+        
+		rMap.put("mtCode", SangsProperties.getProperty("Globals.mtCode_MT_LCTRE_CODE"));
+		rMap.setString("lecStatusCode", SangsProperties.getProperty("Globals.mtCode_MT_STATUS_ALLOTMENT"));
+        request.setAttribute("menu_nm", "mypage");
+        request.setAttribute("lnb_menu", "tutorSpecialAll");
+        
+        model.addAttribute("specialLectureAll", tutorService.getSpecialLectureAll(rMap));
+        
+		model.addAttribute("REQUEST_DATA", rMap);
+		
+		return "academy/tutor/special_lecture_all";
+	}
+	
+	/**
+     * 진행 중인 특강 목록
+     *
+     * @date	: 2016. 9. 20.
+     * @author	: 박강희
+     *
+     * @param request
+     * @param res
+     * @param rMap
+     * @throws Exception
+     */
+	@RequestMapping(value = "/academy/tutor/specialLectureAllView.do")
+	public String tutor_specialLectureAllView(HttpServletRequest request, HttpServletResponse res, DataMap rMap, ModelMap model) throws Exception {
+        
+		if ("N".equals(rMap.getString("SES_ISLOGIN")) || rMap.getInt("SES_USERNO") < 1) {// 로그인 안했다면
+            request.setAttribute("msg", "로그인이 필요한 페이지 입니다.");
+            request.setAttribute("url", "/academy/common/login.do");
+            return "forward:/common/msgForward.do";
+		}
+		int tutorGrade = tutorService.getTutorGradeCnt(rMap); // 현재 강사로 위촉된 사람만 접근
+		if(tutorGrade == 0) {
+			request.setAttribute("msg", "접근권한이 없습니다.");
+			request.setAttribute("url", "/academy/main/main.do");
+			return "forward:/common/msgForward.do";
+		}
+		
+		rMap.put("mtCode", SangsProperties.getProperty("Globals.mtCode_MT_LCTRE_CODE"));
+        request.setAttribute("menu_nm", "mypage");
+        request.setAttribute("lnb_menu", "tutorSpecialAll");
+        
+        model.addAttribute("resultList",tutorService.getSpecialLectureAllView(rMap));
+        
+		model.addAttribute("REQUEST_DATA", rMap);
+		
+		return "academy/tutor/special_lecture_all_view";
+	}
+	
+	/**
+     * 특강신청정보 리스트
+     *
+     * @date	: 2016. 9. 20.
+     * @author	: 박강희
+     *
+     * @param request
+     * @param res
+     * @param rMap
+     * @throws Exception
+     */
+	@RequestMapping(value = "/academy/tutor/specialLectureInfo.do")
+	public String tutor_specialLectureinfo(HttpServletRequest request, HttpServletResponse res, DataMap rMap, ModelMap model) throws Exception {
+		if ("N".equals(rMap.getString("SES_ISLOGIN")) || rMap.getInt("SES_USERNO") < 1) {// 로그인 안했다면
+            request.setAttribute("msg", "로그인이 필요한 페이지 입니다.");
+            request.setAttribute("url", "/academy/common/login.do");
+            return "forward:/common/msgForward.do";
+		}
+		int tutorGrade = tutorService.getTutorGradeCnt(rMap); // 현재 강사로 위촉된 사람만 접근
+		if(tutorGrade == 0) {
+			request.setAttribute("msg", "접근권한이 없습니다.");
+			request.setAttribute("url", "/academy/main/main.do");
+			return "forward:/common/msgForward.do";
+		}
+        
+        request.setAttribute("menu_nm", "mypage");
+        request.setAttribute("lnb_menu", "tutorSpecialInfo");
+        
+        model.addAttribute("resultList",tutorService.getSpecialLectureInfo(rMap));
+        
+		model.addAttribute("REQUEST_DATA", rMap);
+		
+		return "academy/tutor/special_lecture_info";
+	}
+	
+	/**
+     * 특강신청정보 리스트
+     *
+     * @date	: 2016. 9. 20.
+     * @author	: 박강희
+     *
+     * @param request
+     * @param res
+     * @param rMap
+     * @throws Exception
+     */
+	@RequestMapping(value = "/academy/tutor/specialLectureInfoView.do")
+	public String tutor_specialLectureInfoView(HttpServletRequest request, HttpServletResponse res, DataMap rMap, ModelMap model) throws Exception {
+		if ("N".equals(rMap.getString("SES_ISLOGIN")) || rMap.getInt("SES_USERNO") < 1) {// 로그인 안했다면
+            request.setAttribute("msg", "로그인이 필요한 페이지 입니다.");
+            request.setAttribute("url", "/academy/common/login.do");
+            return "forward:/common/msgForward.do";
+		}
+		int tutorGrade = tutorService.getTutorGradeCnt(rMap); // 현재 강사로 위촉된 사람만 접근
+		if(tutorGrade == 0 ) {
+			request.setAttribute("msg", "접근권한이 없습니다.");
+			request.setAttribute("url", "/academy/main/main.do");
+			return "forward:/common/msgForward.do";
+		}
+        
+        request.setAttribute("menu_nm", "mypage");
+        request.setAttribute("lnb_menu", "tutorSpecialInfo");
+        
+        model.addAttribute("resultList",tutorService.getSpecialLectureInfoView(rMap));
+        
+		model.addAttribute("REQUEST_DATA", rMap);
+		
+		return "academy/tutor/special_lecture_info_view";
+	}
+	
+	/**
+     * 특강신청정보  배정취소
+     *
+     * @date	: 2016. 9. 20.
+     * @author	: 박강희
+     *
+     * @param request
+     * @param res
+     * @param rMap
+     * @throws Exception
+     */
+	@RequestMapping(value = "/academy/tutor/cancel_exec.do")
+	public String tutor_specialLectureCacelExec(HttpServletRequest request, HttpServletResponse res, DataMap rMap, ModelMap model) throws Exception {
+        
+		Map<String, Object> paramMap = new HashMap<String, Object>();
+
+        paramMap.put("slno", rMap.getInt("slno"));    
+        paramMap.put("lecStatusCode", SangsProperties.getProperty("Globals.mtCode_MT_STATUS_ALLOTMENT"));
+        paramMap.put("SES_USERNO", rMap.getInt("SES_USERNO"));
+        paramMap.put("SES_USERNAME", rMap.getString("SES_USERNAME"));
+        
+        try {
+        	
+            tutorService.specialLectureCancelExec(paramMap);
+            rMap.setString("title", "신청취소");
+            rMap.setString("msg", "신청 취소하였습니다.");
+             
+        } catch (Exception ex) {
+            rMap.setString("msg", "정상적으로 처리되지 않았습니다. 관리자에게 문의해주세요.");
+        }
+        
+        request.setAttribute("REQUEST_DATA", rMap);
+        return "forward:/academy/tutor/specialLectureInfo.do";
+	}
+	
+    @RequestMapping(value = "/academy/tutor/tutorBoardReplySubmit.do")
+    public String ajaxMovePageList(HttpServletRequest request,DataMap rMap, Model model) throws Exception {
+    	if ("N".equals(rMap.getString("SES_ISLOGIN")) || rMap.getInt("SES_USERNO") < 1) {// 로그인 안했다면
+            model.addAttribute("result", "FAIL");
+            return "jsonView";
+		}
+    	
+    	if(rMap.get("pmode").equals("SUB")){ //등록
+			tutorService.tutorBoardReplySubmit(rMap);
+		} else if(rMap.get("pmode").equals("DEL")){//삭제
+			tutorService.tutorBoardReplyDelete(rMap);
+		} else if(rMap.get("pmode").equals("MOD")){//수정
+			tutorService.tutorBoardReplyModify(rMap);
+		} else if(rMap.get("pmode").equals("RESUB")){//답글등록
+			tutorService.tutorBoardCmtReplySubmit(rMap);
+		}
+    	
+    	model.addAttribute("result",tutorService.getTutorBoardReplyAjaxList(rMap));
+		return "jsonView";
+    }
+}

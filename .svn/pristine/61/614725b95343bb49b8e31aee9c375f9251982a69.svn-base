@@ -1,0 +1,55 @@
+<%
+/****************************************
+    subject : 리뷰
+    summary : 리뷰
+****************************************/
+%>
+<%@ page language="java" contentType="text/html; charset=utf-8" pageEncoding="utf-8"%>
+<%@ include file="/WEB-INF/jsp/inc/taglib_inc.jsp"%>
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+	<title>에듀빅 :: 수강후기</title>
+	<%@ include file="/WEB-INF/jsp/inc/head_inc.jsp"%>
+</style>
+<script type="text/javascript">	
+</script>
+</head>
+<body>	
+	<!-- header -->
+	<%@ include file="/WEB-INF/jsp/inc/header_inc.jsp"%>
+	<!--// header -->
+	
+	<form name="frm" id="frm" method="post" action="/review/main.do">
+		<input type="hidden" id="cateno" name="cateno" value=""/>
+	</form>	
+	<!-- container -->
+	<div id="container">
+		<div class="con_center">	
+			<div class="cont_title_wrapper">
+				<div class="wrapper">
+					<h3 class="cont_title">수강후기</h3>
+				</div>			
+			</div>			
+			<div id="content">
+				<div class="wrapper">		
+					<div class="cont_body">
+						<c:forEach items="${list_data}" var="result">
+							<c:out value="${result.CATENM}"/>
+							<c:out value="${result.WRITER}"/>
+							<c:out value="${result.CONTENT}"/>
+							<c:out value="${result.WDATE}"/>
+							<c:out value="${result.SCORE}"/>						
+						</c:forEach>
+					</div>
+				</div>
+			</div>
+		</div>	
+	</div>
+	<!--// container -->
+	
+	<!-- foot -->
+	<%@ include file="/WEB-INF/jsp/inc/footer_inc.jsp"%>
+	<!--// foot end -->
+</body>
+</html>

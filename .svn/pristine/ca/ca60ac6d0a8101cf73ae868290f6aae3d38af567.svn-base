@@ -1,0 +1,157 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes" ?>
+<event>
+<!-- 강조빨간색칠하기-->
+<!-- &lt;span style="color:#ff3300"&gt;&lt;u&gt;않은&lt;&#47;span&gt;&lt;&#47;u&gt; -->
+<!-- 내려쓰기 -->
+<!-- &lt;br&gt; -->
+  <quiz flag="5" >
+      <page num="1" answer="3" type="multiple">
+          <question>
+              <alternate>문제 일.다음 중 데이터 시각화의 개념으로 올바른 것을 
+고르시오</alternate>
+			  <symbol>Q1.</symbol>
+              <text>다음 중 데이터 시각화의 개념으로 올바른 것을 
+고르시오</text>
+          </question>
+
+          <feedback>
+              <alternate>정답은 삼번입니다. ①은 텍스트마이닝, ②는 웹마이닝, ④는 비정형데이터에 대한 설명이다. </alternate>
+              <answer>
+                  <symbol>정답</symbol>
+                  <text>3</text>
+              </answer>
+              <explain>
+                  <symbol>3</symbol>
+                  <text>①은 텍스트마이닝, ②는 웹마이닝, ④는 비정형데이터에 대한 설명이다.</text>
+              </explain>
+          </feedback>
+
+          <example num="1">
+              <alternate>보기 일번 대규모 문서에서 정보를 추출하거나, 
+연계성을 파악 분류, 군집화 하는 것</alternate>
+              <symbol>Q1</symbol>
+              <text>대규모 문서에서 정보를 추출하거나, 
+연계성을 파악 분류, 군집화 하는 것</text>
+          </example>
+          <example num="2">
+              <alternate>보기 이번 웹서비스를 이용하면서 웹에서 패턴을 
+발견 하는 것</alternate>
+              <symbol>2</symbol>
+              <text>웹서비스를 이용하면서 웹에서 패턴을 
+발견 하는 것</text>
+          </example>
+          <example num="3">
+              <alternate>보기 삼번 방대한 양의 데이터를 탐색하거나 
+이해할 때 가장 좋은 방법</alternate>
+              <symbol>3</symbol>
+              <text>방대한 양의 데이터를 탐색하거나 
+이해할 때 가장 좋은 방법</text>
+          </example>
+          <example num="4">
+              <alternate>보기 사번 미리 정의된 데이터 모델을 가지고 
+있지 않은 데이터</alternate>
+              <symbol>4</symbol>
+              <text>미리 정의된 데이터 모델을 가지고 
+있지 않은 데이터</text>
+          </example>
+      </page>
+
+      <page num="2" answer="4" type="multiple">
+          <question>
+              <alternate>문제 이. 데이터 시각화의 단계가 올바른 것을 고르시오</alternate>
+			  <symbol>Q2.</symbol>
+              <text>데이터 시각화의 단계가 올바른 것을 고르시오</text>
+          </question>
+
+          <feedback>
+              <alternate>정답은 사 번입니다. 데이터 시각화의 단계는 획득→구조화→추출→마이닝
+→시각화→재정의→상호작용의 순서로 이루어진다.</alternate>
+              <answer>
+                  <symbol>정답</symbol>
+                  <text>4</text>
+              </answer>
+              <explain>
+                  <symbol>4</symbol>
+                  <text>데이터 시각화의 단계는 획득→구조화→추출→마이닝
+→시각화→재정의→상호작용의 순서로 이루어진다.</text>
+
+              </explain>
+          </feedback>
+
+          <example num="1">
+              <alternate>보기 일번 획득→추출→구조화→마이닝
+→시각화→재정의→상호작용</alternate>
+              <symbol>1</symbol>
+              <text>획득→추출→구조화→마이닝
+→시각화→재정의→상호작용</text>
+          </example>
+          <example num="2">
+		  <alternate>보기 이번 획득→구조화→마이닝→추출
+→시각화→재정의→상호작용</alternate>
+              <symbol>2</symbol>
+              <text>획득→구조화→마이닝→추출
+→시각화→재정의→상호작용</text>
+          </example>
+          <example num="3">
+              <alternate>보기 삼번 획득→구조화→추출→마이닝
+→시각화→상호작용→재정의</alternate>
+              <symbol>3</symbol>
+              <text>획득→구조화→추출→마이닝
+→시각화→상호작용→재정의</text>
+          </example>
+          <example num="4">
+              <alternate>보기 사번 획득→구조화→추출→마이닝
+→시각화→재정의→상호작용</alternate>
+              <symbol>4</symbol>
+              <text>획득→구조화→추출→마이닝
+→시각화→재정의→상호작용</text>
+          </example>
+      </page>
+
+      <page num="3" answer="3" type="multiple">
+          <question>
+              <alternate>문제 삼. 데이터 시각화 방법 중 자신의 목적에 맞는 
+프로그래밍 언어를 이용하여 새로운 데이터 조작 방법을 적용하는 방법은?</alternate>
+			  <symbol>Q3.</symbol>
+              <text>데이터 시각화 방법 중 자신의 목적에 맞는 
+프로그래밍 언어를 이용하여 새로운 데이터 조작 방법을 적용하는 방법은?</text>
+          </question>
+
+          <feedback>
+              <alternate>정답일 삼 번입니다. 시각화 기법 중 프로그래밍 기술은 다양한 형태의 
+데이터에 대한 유연한 적응 능력을 향상 시키며, 데이터의 사용자 조작이 자유롭다. </alternate>
+              <answer>
+                  <symbol>정답</symbol>
+                  <text>3</text>
+              </answer>
+              <explain>
+                  <symbol>3</symbol>
+                  <text>시각화 기법 중 프로그래밍 기술은 다양한 형태의 
+데이터에 대한 유연한 적응 능력을 향상 시키며, 데이터의 사용자 조작이 자유롭다. </text>
+
+              </explain>
+          </feedback>
+
+          <example num="1">
+              <alternate>보기 일번 차트와 통계 방법</alternate>
+              <symbol>1</symbol>
+              <text>차트와 통계 방법</text>
+          </example>
+          <example num="2">
+              <alternate>보기 이번 통계 툴 방법</alternate>
+              <symbol>2</symbol>
+              <text>통계 툴 방법</text>
+          </example>
+          <example num="3">
+              <alternate>보기 삼번 프로그래밍 방법 </alternate>
+              <symbol>Q3</symbol>
+              <text>프로그래밍 방법 </text>
+          </example>
+          <example num="4">
+              <alternate>보기 사번 지도 방법</alternate>
+              <symbol>4</symbol>
+              <text>지도 방법</text>
+          </example>
+      </page>
+  </quiz>
+</event>

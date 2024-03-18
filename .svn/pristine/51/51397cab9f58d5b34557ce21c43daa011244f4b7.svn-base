@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<title></title>
+		<meta charset = "UTF-8">
+		<meta http-equiv="X-UA-Compatible" content="IE=Edge">
+		<meta name="apple-mobile-web-app-capable" content="yes" />
+		<meta name="apple-mobile-web-app-status-bar-style" content="black" />
+
+		<link rel="stylesheet" href="../common/css/skin.css">
+		<script language="javascript" src="./coticontent.v.1.0.0.js"></script>
+
+		<style type="text/css">
+			html, body { height: 100%; margin:0px; padding:0px; overflow:hidden; background: white; }
+			#contentFrame { margin:-0px; padding:-0px; width:100%; height:100%; }
+		</style>
+
+		<script type="text/javascript" defer="defer">
+			/**
+			 * 시작
+			 */
+			function initPage() {
+			    var index = "18";
+				var location;
+				var startPage = "./01.html";
+				var _totalPages = _this.$totalPageNumber;
+				if(bolPorted) {
+					_setTotalPage(_totalPages); // 전체페이지수
+					location = _getLocation(); // 마지막 학습 위치
+
+					if (location != "" && location != undefined) {
+						if (!confirm("이전에 학습하신 곳으로 이동 하시겠습니까?")) {
+							location = startPage;
+						}
+					} else {
+						location = startPage;
+					}
+					window.frames["contentFrame"].location.href = location;
+				}else{
+					location = startPage;
+					window.frames["contentFrame"].location.href = startPage;
+				}
+			}
+
+			/**
+			 * 현재 페이지
+			 */
+			function setPage(page) {
+				_setPage(page, window.frames["contentFrame"].location.href); // 현재페이지
+			}
+			function onExit(){
+				var param1 = $('#contentFrame').get(0).contentWindow.cuserno;
+				var param2 = $('#contentFrame').get(0).contentWindow.treeno;
+				var param3 = $('#contentFrame').get(0).contentWindow.frameseq;
+				var param4 = $('#contentFrame').get(0).contentWindow._this.$curPageNumber;
+				var param5 = $('#contentFrame').get(0).contentWindow._this.$totalPageNumber;
+					
+				opener.progExec(param1, param2, param3, param4, param5);
+			}
+		</script>
+
+	</head>
+	<body scroll="no" ondragstart="return false" onselectstart="return false" oncontextmenu="return false" onload="initPage();" onunload="onExit();">
+		<iframe  id="contentFrame" name="contentFrame" allowfullscreen="true" mozallowfullscreen="true" webkitallowfullscreen="true" border="0" frameborder="0" scrolling="no" style="max-width: 1280px; max-height: 760px;"></iframe>
+		<script src="../common/js/jquery-1.12.3.min.js"></script>
+		<script language="javascript" src="../common/js/application.js"></script>
+		<script language="javascript" src="../common/js/config.js"></script>
+  </body>
+</html>

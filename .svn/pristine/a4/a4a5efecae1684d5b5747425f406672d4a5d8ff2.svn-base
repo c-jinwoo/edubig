@@ -1,0 +1,139 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes" ?>
+<event>
+<!-- 강조빨간색칠하기-->
+<!-- &lt;span style="color:#ff3300"&gt;&lt;u&gt;않은&lt;&#47;span&gt;&lt;&#47;u&gt; -->
+<!-- 내려쓰기 -->
+<!-- &lt;br&gt; -->
+  <quiz flag="10" >
+      <page num="1" answer="1" type="multiple">
+          <question>
+              <alternate>문제 일.모집단의 일부인 표본의 특성을 이용하여 모집단의 
+특성을 추정하거나 가설을 검정하는 방법을 다룬 통계분야는?</alternate>
+			  <symbol>Q1.</symbol>
+              <text>모집단의 일부인 표본의 특성을 이용하여 모집단의 
+특성을 추정하거나 가설을 검정하는 방법을 다룬 통계분야는?</text>
+          </question>
+
+          <feedback>
+              <alternate>정답은 삼번입니다. 모집단의 일부인 표본의 특성을 이용하여 모집단의 
+특성을 추정하거나 가설을 검정하는 방법을 다룬 
+통계분야는 추측통계학이다. </alternate>
+              <answer>
+                  <symbol>정답</symbol>
+                  <text>1</text>
+              </answer>
+              <explain>
+                  <symbol>1</symbol>
+                  <text>모집단의 일부인 표본의 특성을 이용하여 모집단의 
+특성을 추정하거나 가설을 검정하는 방법을 다룬 
+통계분야는 추측통계학이다.</text>
+              </explain>
+          </feedback>
+
+          <example num="1">
+              <alternate>보기 일번 추측통계학</alternate>
+              <symbol>Q1</symbol>
+              <text>추측통계학</text>
+          </example>
+          <example num="2">
+              <alternate>보기 이번 수정통계학</alternate>
+              <symbol>2</symbol>
+              <text>수정통계학</text>
+          </example>
+          <example num="3">
+              <alternate>보기 삼번 자료통계학</alternate>
+              <symbol>3</symbol>
+              <text>자료통계학</text>
+          </example>
+          <example num="4">
+              <alternate>보기 사번  분석통계학</alternate>
+              <symbol>4</symbol>
+              <text> 분석통계학</text>
+          </example>
+      </page>
+
+      <page num="2" answer="1" type="multiple">
+          <question>
+              <alternate>문제 이. 다음 중 기술통계에 해당하는 것은?</alternate>
+			  <symbol>Q2.</symbol>
+              <text>다음 중 기술통계에 해당하는 것은?</text>
+          </question>
+
+          <feedback>
+              <alternate>정답은 일 번입니다. 추정, 가설검정, 회귀분석, 상관분석 등은 추론통계에 해당한다.</alternate>
+              <answer>
+                  <symbol>정답</symbol>
+                  <text>1</text>
+              </answer>
+              <explain>
+                  <symbol>1</symbol>
+                  <text>추정, 가설검정, 회귀분석, 상관분석 등은 추론통계에 해당한다.</text>
+
+              </explain>
+          </feedback>
+
+          <example num="1">
+              <alternate>보기 일번 그래프</alternate>
+              <symbol>1</symbol>
+              <text>그래프</text>
+          </example>
+          <example num="2">
+		  <alternate>보기 이번 실제 추정</alternate>
+              <symbol>2</symbol>
+              <text>추정</text>
+          </example>
+          <example num="3">
+              <alternate>보기 삼번 가설검정</alternate>
+              <symbol>3</symbol>
+              <text>가설검정</text>
+          </example>
+          <example num="4">
+              <alternate>보기 사번 회귀분석</alternate>
+              <symbol>4</symbol>
+              <text>회귀분석</text>
+          </example>
+      </page>
+
+      <page num="3" answer="3" type="multiple">
+          <question>
+              <alternate>문제 삼. 다음 중 등간척도에 해당하는 자료는?</alternate>
+			  <symbol>Q3.</symbol>
+              <text>다음 중 등간척도에 해당하는 자료는?</text>
+          </question>
+
+          <feedback>
+              <alternate>정답일 일 번입니다. 등간척도 자료는 상대적 크기를 나타내는 것으로 절대영점이 없다.</alternate>
+              <answer>
+                  <symbol>정답</symbol>
+                  <text>3</text>
+              </answer>
+              <explain>
+                  <symbol>3</symbol>
+                  <text> 등간척도 자료는 상대적 크기를 나타내는 것으로 절대영점이 없다.</text>
+
+              </explain>
+          </feedback>
+
+          <example num="1">
+              <alternate>보기 일번 몸무게</alternate>
+              <symbol>1</symbol>
+              <text>몸무게</text>
+          </example>
+          <example num="2">
+              <alternate>보기 이번 불량률</alternate>
+              <symbol>2</symbol>
+              <text>불량률</text>
+          </example>
+          <example num="3">
+              <alternate>보기 삼번 온도</alternate>
+              <symbol>Q3</symbol>
+              <text>온도</text>
+          </example>
+          <example num="4">
+              <alternate>보기 사번 성적</alternate>
+              <symbol>4</symbol>
+              <text>성적</text>
+          </example>
+      </page>
+  </quiz>
+</event>

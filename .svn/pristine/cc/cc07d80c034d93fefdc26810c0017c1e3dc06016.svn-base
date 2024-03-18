@@ -1,0 +1,211 @@
+<%
+/****************************************
+    subject : 온라인교육
+    summary : 온라인교육 > 교육소개
+    author  : SANGS
+    date    : 2018-07-06
+****************************************/
+%>
+<%@ page language="java" contentType="text/html; charset=utf-8" pageEncoding="utf-8"%>
+<%@ include file="/WEB-INF/jsp/ccedu/inc/taglib_inc.jsp"%>
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+	<title>신용건강검진 > 지식마당 > 신용회복위원회 </title>
+	<%@ include file="/WEB-INF/jsp/ccedu/inc/head_inc.jsp"%>
+
+	<style> .mgr_20 { margin-top : 20px;}	</style>
+
+<script type="text/javascript">
+
+	$(documnet).get(function() {
+			
+		
+			
+	});	
+
+	function fnSubmit() {
+
+		$('form[name=frm]').attr('action', '/ccedu/intellectual/creditHealthCheckupInfo.do').submit();
+	}
+
+</script>
+</head>
+
+<body>
+<!-- skip nav -->
+	<%@ include file="/WEB-INF/jsp/ccedu/inc/nav_inc.jsp"%>
+<!--// skip nav -->
+
+<div id="wrap">
+
+	<!-- header -->
+	<%@ include file="/WEB-INF/jsp/ccedu/inc/header_inc.jsp"%>
+	<!--// header -->
+
+	<!-- container -->
+	<div id="container">
+
+		<!-- location -->
+		<jsp:include page="/WEB-INF/jsp/ccedu/inc/location/loc_04_03.jsp"> 
+		  	<jsp:param name="menuNm" value="신용건강검진"/> 
+		</jsp:include> 
+		<!--// location -->
+
+		<div class="con_center">
+
+			<!-- lnb -->
+			<div id="lnb">
+				<jsp:include page="/WEB-INF/jsp/ccedu/inc/lnb/lnb_04.jsp"> 
+				  	<jsp:param name="dep2" value="04"/>
+				</jsp:include>
+			</div>
+			<!--// lnb -->
+
+			<!-- content 본문 -->
+			<div id="content">
+
+				<form name="frm" id="frm" action="" method="post">
+				</form>
+				
+				
+				<!-- 기존 START 2018-08-30  -->
+<!-- 				<h3 class="cont_titile">신용건강검진</h3> -->
+				<!-- 기존 END 2018-08-30  -->
+				
+				<!-- 2018-08-28 김동인 작업 S --> 
+				<h3 class="cont_titile type04">신용건강검진<span></span></h3>
+				<!-- 2018-08-28 김동인 작업 E -->
+
+				<!-- 본문내용 -->
+				<div class="cont_body">
+					<!-- start -->
+
+					<div class="c_msg_left mgt0">
+						<div class="img_msg_talk">
+							<p><strong>${REQUEST_DATA.SES_USERID}</strong>님의 신용수준은 ${REQUEST_DATA.sum}점입니다. <br>신용을 단단하게 키우기 위한 처방전은 아래와 같습니다.</p>
+						</div>
+					</div>
+
+					<div class="c_section">
+						<c:choose>
+  							<c:when test="${ 25 >= REQUEST_DATA.sum  }">
+  							 <!-- 0 ~ 25 점	 -->
+  							 	<h4 class="c_tit">처방전</h4>
+								<ul class="c_txtlist">
+									<li>이미 스스로는 빚을 감당할 능력을 상실한 상황으로 여러분들의 빚(부채)에 여러 차례의 대수술이 필요한 경우입니다.</li>
+									<li>수술을 해 본 사람들은 알겠지만 아프다고 무조건 수술하는 것은 아닙니다.</li>
+									<li>이 수술이 과연 나에게 필요한 수술인지, 수술을 받기 위한 요건이 되는지 여러 가지 검사를 해보게 됩니다.</li>
+									<li>여러분들은 과연 수술을 받을 요건이 되는지 어떠한 수술이 적합한지 먼저 알아보도록 합시다.
+										<br />과도한 빚 독촉에 시달리고 있다면 <a href="https://www.ccrs.or.kr/main.do" target=_blank title="신용회복위원회 사이트 이동"><strong class="color_orange">신용회복위원회에서 상담</strong></a>을 받아보도록 합니다.
+										<br/>※ 대표전화 1600-5500
+									</li>
+								</ul>
+  							</c:when>
+  							<c:when test="${ REQUEST_DATA.sum >= 26 and 50 >= REQUEST_DATA.sum }">
+  							<!-- 26 ~ 50 점 -->
+	  							<h4 class="c_tit">처방전</h4>
+								<ul class="c_txtlist">
+									<li>과도한 빚으로 인해 연체를 하고 있는 상황입니다. 지금 당장 부채문제에 응급치료하지 않으면 채무불이행에 따르는 법적조치가 취해지며 스스로 해결할 수 없을 정도로 문제가 커질 수 있습니다.</li>
+									<li>해결 가능한 빚부터 정리해나가야 할 것입니다. 부채목록표를 작성하고 구체적인 상환계획을 세우십시오. 여러분들이 이겨내야 하는 적은 바로 여러분의 빚입니다. 지피지기면 백전백승이라는 말도 있듯이 빚을 이겨내기 위해서 먼저 빚이 어떤지 알아보는 것부터 시작하도록 합니다.</li>
+									<li>현금화 할 수 있는 자산(예금, 적금, 현재 살고 있는 집을 포함하여)을 활용하여 부채상환을 우선 하도록 하십시오.</li>
+									<li>무슨 일이 있더라도 카드깡을 해서는 안됩니다. 카드깡을 하게되면 금융질서문란자로 등재되어 어떠한 신용회복제도도 이용할 수 없을 뿐만 아니라 경제활동에 많은 제약을 받게 됩니다.</li>
+									<li>절대 고금리의 사채를 빌리지 마십시오. 만약 사채를 빌렸다면 금리가 높은 사채부터 갚도록 하십시오. 게다가 부채 중 사채비율이 너무 크면 신용회복위원회에서도 도와드릴 수 없습니다.</li>
+									<li>대출이나 카드 발급을 거절당했다면 그 이유가 무엇인지 반드시 확인해보고 문제를 해결해야 할 것입니다.</li>
+									<li>빚을 갚고 싶으나 지금 당장 소득이 없다면<a href="http://job.ccrs.or.kr" target=_blank title="신용회복위원회 취업지원센터 새탭으로 연결"><strong class="color_orange">신용회복위원회 취업지원센터</strong></a>로 문의하십시오.</li>
+									<li>스스로 부채문제를 하기가 힘들다면 더 이상 빚을 늘리지 말고<a href="https://www.ccrs.or.kr/main.do" target=_blank title="신용회복위원회 사이트 이동"><strong class="color_orange">신용회복위원회에서 상담</strong></a>을 받아보도록 합니다.</li>
+								</ul>
+
+  							</c:when>
+  							<c:when test="${ REQUEST_DATA.sum >= 51 and 70 >= REQUEST_DATA.sum }">
+  							<!-- 51 ~ 70 점 -->
+  								<h4 class="c_tit">처방전</h4>
+  								<ul class="c_txtlist">
+									<li>빚을 상환하는데 어려움을 느끼며 때때로 연체를 하고 있는 상황입니다. 장기적인 계획을 가지고 빚을 치료해나가야 할 것입니다.</li>
+									<li>연체문제를 해결하기 위해서는 우선 해당 금융기관의 담당자에게 도움을 청하도록 합니다. 부채상환일정을 미리 밝히고 빚을 갚겠다는 의지를 보여준다면 추가적인 법적 조치(담보물이나 자산, 급여 등의 가압류)를 사전에 방지할 수 있습니다.</li>
+									<li>부채목록표를 작성하고 구체적인 상환계획을 세우십시오. 여러분들이 이겨내야 하는 적은 바로 여러분의 빚입니다. 지피지기면 백전백승이라는 말도 있듯이 빚을 이겨내기 위해서 먼저 빚이 어떤지 알아보는 것부터 시작하도록 합니다.</li>
+									<li>기존 대출상품을 담보대출과 보증대출과 같이 이자비용이 적은 것으로 전환하십시오.<br>아무리 빚 갚는 것이 힘들더라도 빚을 내어 빚을 갚는 돌려막기를 해서는 안될것입니다.</li>
+									<li>이제 더 이상 추가적인 빚을 만들어서는 안 될 것입니다. 뿐만 아니라 현재 지출수준을 낮추는 것이 중요합니다. 지출 목록을 작성해보고 지출을 줄일 수 있는 항목은 어떤 것들이 있는지 체크해보도록 합니다.</li>
+									<li>결제일 변경과 리볼빙 서비스 등을 이용하여 부채상환 시기를 최대한 늦추어서 부채를 상환할 수 있도록 노력해야 합니다.</li>
+									<li>신용문제가 일시적으로 나타난 현상인지, 혹은 장기적으로 계속될 상환인지를 판단해서, 장기적으로 계속될 상황이면 집을 팔거나 혹은 집을 줄이는 등 계획을 세워야 할 것입니다.</li>
+									<li><a href="https://www.ccrs.or.kr/main.do" target=_blank title="신용회복위원회 사이트 이동"><strong class="color_orange">신용회복위원회에서 상담</strong></a>을 받아보는 것도 좋은 방법입니다.</li>
+								</ul>
+  							</c:when>
+  							<c:when test="${ REQUEST_DATA.sum >= 71 and 90 >= REQUEST_DATA.sum }">
+  							<!-- 71 ~ 90 점 -->
+  								<h4 class="c_tit">처방전</h4>
+  								<ul class="c_txtlist">
+  									<li>비교적 신용상태가 양호한 편입니다. 현재는 자신의 신용상태가 전혀 문제가 없어 보여도 관리를 소홀히 하면 자신도 모르는 사이에 신용문제가 발생할 수 있습니다.</li>
+  									<li>신용관리교육을 통한 예방주사 맞고 규칙적인 신용사용 준비운동으로 신용문제를 방지해야 할 것입니다.</li>
+  									<li>다음은 신용관리의 기본원칙입니다. 다음 사항을 고려하여 항상 신용관리를 하시기 바랍니다.</li>
+  									
+  									<li class="mgr_20"><strong>주거래 은행을 만드십시오.</strong></li>
+  									<li>이는 고객의 신용을 평가할 때 해당은행과의 거래 실적이 중요하게 반영되기 때문입니다. 그러므로 카드 대금 결제, 공과금 이체, 통신대금 납부, 월급 이체 등 금융거래를 한 은행에 집중해 관리하는 것이 신용 평가에서 좋은 점수를 받을 수 있습니다.</li>
+
+  									<li class="mgr_20"><strong>자동이체를 이용합니다.</strong></li>
+  									<li>자동 이체를 하면 부주의에 의해 발생하는 연체를 방지할 수 있기 때문입니다. 또한 통장 잔액을 자주 확인해서 마이너스 혹은 연체가 되지 않도록 관리해야 합니다.</li>
+  									<li>적은 금액이라도, 단 하루라도 연체를 가볍게 생각하지 마십시오.</li>
+  									<li>특히 신용카드의 경우 아주 작은 연체기록 조차도 금융기관들이 서로 공유하기 때문에 개인신용관리상 불리한 기록을 남길 수 습니다.</li>
+
+  									<li class="mgr_20"><strong>부채의 상한선을 설정해 놓습니다.</strong></li>
+  									<li>신용카드를 사용하거나 돈을 빌려할 경우, 본인이 감당할 수 있는 부채의 상한선을 미리 정해 놓으면 과다한 부채로 인해 곤란을 겪는 일을 예방할 수 있습니다.</li>
+  									
+  									<li class="mgr_20"><strong>꼭 필요한 카드만을 사용합니다.</strong></li>
+  									<li>신용카드는 1～2개만을 가지고 있되 본인에게 혜택이 많이 주어지는 카드를 선택하여 집중적으로 사용하는 것이 좋습니다. 이는 신용카드 관리가 간편할 뿐 아니라 자신의 신용을 쌓는데도 도움이 됩니다.</li>
+  									
+  									<li class="mgr_20"><strong>카드의 현금서비스는 절대 하지 마십시오.</strong></li>
+  									<li>카드의 현금서비스는 대출의 편리성이 있는 만큼 대출의 필요성이 덜한 상황에서도 쉽게 이용하게 되는 경향이 있습니다. 이러한 장점만큼 높은 이자율과 빠른 상환을 감수해야 합니다.</li>
+  									
+  									<li class="mgr_20"><strong>금융거래시 관련자료를 잘 보관합니다.</strong></li>
+  									<li>물품구입, 연체금 상환 등을 한 후에는 영수증을 반드시 보관해 두어야 합니다. 그리고 자신의 금융거래를 알려주는 SMS서비스를 이용하면 자신이 모르는 사이에 발생할 수 있는 금융사고에 대비할 수 있습니다.</li>
+  									
+  									<li class="mgr_20"><strong>할부금 납부는 신용카드를 활용합니다.</strong></li>
+  									<li>지로용지에 비해 신용카드의 활용은 결제일을 잊어버리거나 지로용지를 관리해야하는 위험에서 벗어날 수 있습니다.</li>
+  									
+  									<li class="mgr_20"><strong>보증은 절대 서지 마십시오.</strong></li>
+  									<li>보증은 곧 자신의 채무로 간주된다는 것을 인식하고 보증을 설 때는 신중하게 결정하십시오. 이미 보증을 섰다면 보증기간을 체크해 두었다가 기간 만료시 본인 허락없이 연장되지 않도록 관리해야 합니다.</li>
+  									
+  									<li class="mgr_20"><strong>변경된 주소는 반드시 카드회사, 금융기관에 통보하십시오.</strong></li>
+  									<li>주소지가 변경되면 신용카드사, 은행, 이동통신 등 대금 결제중인 해당 회사에 변경된 주소를 통보합니다. 나중에 주소 변경으로 연락이 되지 않아 불이익을 받을 수 있기 때문입니다.</li>
+  								</ul>
+  							</c:when>
+  							<c:when test="${ REQUEST_DATA.sum >= 91  }">
+  							<!-- 91 ~ 100 점 -->
+  								<h4 class="c_tit">처방전</h4>
+								<ul class="c_txtlist">
+									<li> 연체할 가능성이 있다면 연체하기 전 미리 빚을 진 기관(채권자)과 상담하는 것이 좋습니다. 본인의 빚을 관리하는 담당자와 돈을 갚을 계획에 대해 상의할 때, 앞으로 수입에 따라 얼마를 언제까지 갚겠다는 부채상환일정을 미리 밝히고 빚을 갚겠다는 의지를 보여주는 것이 중요합니다. </li>
+  									<li> 내가 과연 매달 얼마나 빚을 갚고 있는지 매달의 부채상환리스트 작성합니다.</li>
+  									<li> 문제가 더 커지기 전에 적어도 3개월치 생활비 정도는 비상금으로 저축을 해둬야 합니다. </li>
+  									<li> 신용카드 사용요금을 점차 줄여나가야 할 것입니다. 신용카드를 2개 이상 가지고 있다면 꼭 필요한 1개만 쓰고 나머지 카드들은 해지하도록 합니다. 신용카드비교표 또한 체크카드를 쓰는 것도 좋은 방법이 될 수 있습니다. </li>
+  									<li> 무심코 쓰는 신용카드 현금서비스 수수료가 얼마인지 알고 사용을 합니다.</li>
+  									<li> 주변인들에게 현재 자신이 처한 상황을 솔직하게 털어놓고 도움을 청해야 합니다. 주변에 알리지 않으면 미리 해결될 수 있는 문제도 곪아서 더 큰 문제로 커질 수도 있습니다. </li>
+  									<li> 가계부를 작성하는 등 불필요하게 지출하고 있는 부분을 찾아 줄입니다.</li>
+								</ul>
+  							</c:when>
+
+ 						</c:choose>
+					</div>
+					<div class="c_btn_center">
+						<button type="button" onclick="fnSubmit(); return false;" class="btn_bluebg03">처음으로</button>
+					</div>
+
+					<!--// end -->
+				</div>
+				<!--// 본문내용 -->
+				
+			<!--  -->
+			</div>
+			<!--// content 본문 -->
+
+		</div>
+	</div>
+	<!--// container -->
+
+	<!-- foot -->
+	<%@ include file="/WEB-INF/jsp/ccedu/inc/footer_inc.jsp"%>
+	<!--// foot end -->
+
+</div>
+
+</body>
+</html>

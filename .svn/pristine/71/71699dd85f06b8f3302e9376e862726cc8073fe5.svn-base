@@ -1,0 +1,11 @@
+_this.$quizInfo = [
+	["다음 중 참조파일을 이용한 모델링 방법에 대해 <span style='color:#FF0000;'>잘못</span> 설명한 것은?","Insert Mesh를 이용해 stl 파일을 불러오기 한다.","Mesh body는 Mesh to BRep(마우스 우클릭) 팝업 메뉴를 이용해 Solid Body로 변환할 수 있다.","Dxf 파일은 Sketch Profile(스케치 프로파일)로 사용한다.","Mesh Body는 Solid Body로 변환하지 않아도 편집할 수 있다.",false],
+	["다음 중 ㉰모델 조립을 작성하는 방법에 대한 설명으로 <span style='color:#FF0000;'>틀린</span> 것은?","기준 객체는 Ground(객체 고정)을 이용해 고정시킨다.","조립 조건에서 Joint Type(작동 유형)은 Slider(슬라이더)이다.","Assemble(조립)을 하기 위해 우선 Body를 Component(구성요소)로 변경한다.","Joint(조인트) 위치는 임의로 지정하되, joint Type(작동 유형)은 조건에 맞춰 적용한다.",false],
+	["3D 모델 조립(Assemble)하기에 대한 설명으로 <span style='color:#FF0000;'>틀린</span> 것은?","조립 위치가 반대로 적용된 경우 Flip 항목을 눌러 방향을 반전시킬 수 있다.","작성한 모델은 수험번호.f3d로 저장한다.","기준 객체는 ㉰ 모델이 기준이 된다.","작성한 모델은 수험번호.stl로 저장한다.",false],
+];
+
+_this.$quizAnsInfo = [
+	[4,"Mesh Body는 Solid Body로 변환 후 편집해야 한다."],
+	[4,"Joint(조인트) 위치 및 Joint Type(작동 유형)은 조건을 맞춰 적용해야 한다."],
+	[3,"기준 객체는 ㉮ 모델이 기준이다."]
+];

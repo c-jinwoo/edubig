@@ -1,0 +1,531 @@
+.content > .quiz {
+  position: absolute;
+  color: #000000;
+  background: url(../img/quiz/background.png) no-repeat;
+  font-family: NanumBarunGothic;
+  background-size: 100% 100%;
+  width: 100%;
+  height: 100%;
+  z-index: 99;
+  display: none;
+  top:0;left:0;
+}
+.content > .quiz > .leftSymbol {
+  background: url(../img/quiz/leftSymbol.png) no-repeat;
+  background-size: 100% 100%;
+  width: 36%;
+  height: 7%;
+  position: absolute;
+  left : -24%;
+  top : 2%;
+}
+
+.content > .quiz > .wrongAnswer {
+  background: url(../img/quiz/wrongAnswer.png) no-repeat;
+  background-size: 100% 100%;
+  width: 100%;
+  height: 100%;
+  z-index: 300;
+  display: none;
+  position: absolute;
+}
+
+.content > .quiz > .noneCheck {
+  background: url(../img/quiz/noneCheck.png) no-repeat;
+  background-size: 100% 100%;
+  width: 100%;
+  height: 100%;
+  z-index: 300;
+  display: none;
+  position: absolute;
+}
+
+.content > .quiz > .page {
+  width: 100%;
+}
+
+.content > .quiz > .page > .question {
+  top: 12%;
+  left: 6%;
+  position: absolute;
+  width: 85%;
+  color: #333333;
+}
+
+.content > .quiz > .page > .question > .text {
+	font-weight: bold;
+	font-family: NanumBarunGothic;
+    position: relative;
+    bottom: 44px;
+    left: 10%;
+    font-size: 24px;
+    letter-spacing: -1px;
+	max-width:90%;
+}
+.content > .quiz > .page > .question > .symbol {
+    font-family: NanumBarunGothic;
+    position: relative;
+    bottom: -22px;
+    font-size: 65px;
+    font-weight: 900;
+    letter-spacing: -4px;
+    color: #000;
+}
+
+.content > .quiz > .page > .question > .symbol > .oSymbol {
+  position: absolute;
+  background: url(../img/quiz/oSymbol.png) no-repeat;
+  bottom: -12px;
+  left: -5px;
+  width: 95px;
+  height: 100px;
+  display: none;
+/*   z-index:-99999; */
+/* /*   font-size: 150px; */ 
+/*   color: rgb(205, 61, 78); */
+/*   font-family: arial; */
+}
+.content > .quiz > .page > .question > .symbol > .xSymbol {
+  position: absolute;
+  background: url(../img/quiz/xSymbol.png) no-repeat;
+  bottom: -12px;
+  left: -5px;
+  width: 95px;
+  height: 100px;
+  display: none;
+/*   z-index:-99999; */
+/*   font-size: 150px; */
+/*   color: rgb(205, 61, 78); */
+/*   font-family: arial; */
+}
+
+
+.content > .quiz > .page > .example {
+  top: 30%;
+  left: 15%;
+  position: absolute;
+  width: 70%;
+  cursor: Pointer;  
+}
+
+
+.content > .quiz > .page > .example > .multiple {
+  list-style-type: none;
+  font-size: 20px;
+  width: 90%;
+  font-weight: 300;
+  margin-bottom: 20px;
+  letter-spacing: -1px;
+}
+.content > .quiz > .page > .example > .multiple:hover {
+  /*color:#015896;*/
+  color:#F85A5A;
+}
+
+.content > .quiz > .page > .example > .multiple > div {
+  position: absolute;
+  border: 0px;
+  width: 35px;
+  height: 35px;
+  margin-bottom: 100px;
+}
+.content > .quiz > .page > .example > .multiple > .text {
+  font-family: NanumSquare;
+  left: 40px;
+  top: 5px;
+  height: 35px;
+  position: relative;
+  line-height: 130%;
+  font-weight :700;
+  letter-spacing: -1px;
+}
+
+.content > .quiz > .page > .example > .multiple > .btn1{
+  background: url(../img/quiz/btn1.png) no-repeat;
+  background-size: 100% 100%;
+}
+.content > .quiz > .page > .example > .multiple > .btn2{
+  background: url(../img/quiz/btn2.png) no-repeat;
+  background-size: 100% 100%;
+}
+.content > .quiz > .page > .example > .multiple > .btn3{
+  background: url(../img/quiz/btn3.png) no-repeat;
+  background-size: 100% 100%;
+}
+.content > .quiz > .page > .example > .multiple > .btn4{
+  background: url(../img/quiz/btn4.png) no-repeat;
+  background-size: 100% 100%;
+}
+
+
+.content > .quiz > .page > .example > .multiple > .btn1:hover{
+  background: url(../img/quiz/correctBtn1.png) no-repeat;
+  background-size: 100% 100%;
+}
+.content > .quiz > .page > .example > .multiple > .btn2:hover{
+  background: url(../img/quiz/correctBtn2.png) no-repeat;
+  background-size: 100% 100%;
+}
+.content > .quiz > .page > .example > .multiple > .btn3:hover{
+  background: url(../img/quiz/correctBtn3.png) no-repeat;
+  background-size: 100% 100%;
+}
+.content > .quiz > .page > .example > .multiple > .btn4:hover{
+  background: url(../img/quiz/correctBtn4.png) no-repeat;
+  background-size: 100% 100%;
+}
+
+
+
+
+
+.content > .quiz > .page > .example > .multiple > .btn1_hover{
+  background: url(../img/quiz/correctBtn1.png) no-repeat;
+  background-size: 100% 100%;
+}
+.content > .quiz > .page > .example > .multiple > .btn2_hover{
+  background: url(../img/quiz/correctBtn2.png) no-repeat;
+  background-size: 100% 100%;
+}
+.content > .quiz > .page > .example > .multiple > .btn3_hover{
+  background: url(../img/quiz/correctBtn3.png) no-repeat;
+  background-size: 100% 100%;
+}
+.content > .quiz > .page > .example > .multiple > .btn4_hover{
+  background: url(../img/quiz/correctBtn4.png) no-repeat;
+  background-size: 100% 100%;
+}
+
+
+
+
+.content > .quiz > .page > .example > .multiple > .btn1.toggle{
+  background: url(../img/quiz/checkBtn1.png) no-repeat;
+  background-size: 100% 100%;
+}
+.content > .quiz > .page > .example > .multiple > .btn2.toggle{
+  background: url(../img/quiz/checkBtn2.png) no-repeat;
+  background-size: 100% 100%;
+}
+.content > .quiz > .page > .example > .multiple > .btn3.toggle{
+  background: url(../img/quiz/checkBtn3.png) no-repeat;
+  background-size: 100% 100%;
+}
+.content > .quiz > .page > .example > .multiple > .btn4.toggle{
+  background: url(../img/quiz/checkBtn4.png) no-repeat;
+  background-size: 100% 100%;
+}
+.content > .quiz > .page > .example > .multiple > .btn1.correct{
+  background: url(../img/quiz/correctBtn1.png) no-repeat;
+  background-size: 100% 100%;
+}
+.content > .quiz > .page > .example > .multiple > .btn2.correct{
+  background: url(../img/quiz/correctBtn2.png) no-repeat;
+  background-size: 100% 100%;
+}
+.content > .quiz > .page > .example > .multiple > .btn3.correct{
+  background: url(../img/quiz/correctBtn3.png) no-repeat;
+  background-size: 100% 100%;
+}
+.content > .quiz > .page > .example > .multiple > .btn4.correct{
+  background: url(../img/quiz/correctBtn4.png) no-repeat;
+  background-size: 100% 100%;
+}
+
+.content > .quiz > .page > .confirm {
+/*   top: 69%; */
+/*   right: 3%; */
+   top: 478px;
+   right: 98px;
+  position: absolute;
+  width: 120px;
+  height: 35px;
+  border: 0px;
+  background: url(../img/quiz/confirm.png) no-repeat;
+  background-size: 100% 100%;
+  cursor: pointer;
+}
+.content > .quiz > .page >.confirm:hover {
+  background: url(../img/quiz/confirm_over.png) no-repeat;
+  background-size: 100% 100%;
+}
+
+.content > .quiz > .page >.feedback {
+  background: url(../img/quiz/feedback.png) no-repeat;
+  background-size: 100% 100%;
+/*   width: 86%; */
+/*   height: 17%; */
+/*   top: 73%; */
+/*   left:3%; 
+  width: 737px;
+  height: 85px;*/
+  width:875px;
+  height:78px;
+  top: 65%;
+  left: 140px;
+  position: absolute;
+}
+
+.content > .quiz > .page > .feedback > .answer > .symbol {
+  font-size: 25px;
+  left: 7%;
+  top: 33%;
+  position: absolute;
+}
+
+.content > .quiz > .page > .feedback > .answer > .text {
+    font-size: 24px;
+    color: #333333;
+    left: 11.5%;
+    top: 25%;
+    position: absolute;
+    font-family: NanumGothic;
+}
+
+.content > .quiz > .page > .feedback > .explain {
+  font-size: 22px;
+  left: 100px;
+  top: 68%;
+  width: 93%;
+  position: absolute;
+  letter-spacing: -1px;
+
+}
+.content > .quiz > .page > .feedback > .nextBtn {
+  background: url(../img/quiz/nextBtn.png) no-repeat;
+  background-size: 100% 100%;
+  width: 120px;
+  height: 35px;
+  top: -19%;
+  right: -19%;
+  position: absolute;
+  border: 0px;
+  cursor: pointer;
+}
+.content > .quiz > .page > .feedback > .nextBtn:hover {
+  background: url(../img/quiz/nextBtn_over.png) no-repeat;
+  background-size: 100% 100%;
+}
+.content > .quiz > .page > .feedback > .resultBtn {
+  background: url(../img/quiz/resultBtn.png) no-repeat;
+  background-size: 100% 100%;
+  width: 120px;
+  height: 35px;
+  top: -19%;
+  right: -19%;
+  position: absolute;
+  border: 0px;
+  cursor: pointer;
+}
+.content > .quiz > .page > .feedback > .resultBtn:hover {
+  background: url(../img/quiz/resultBtn_over.png) no-repeat;
+  background-size: 100% 100%;
+}
+
+
+
+.content > .quiz > .board {
+	background: url(../img/quiz/background_quiz.png) no-repeat 100% 100% / 100% 100%;
+	position: absolute;
+	width: 100%;
+    height: 100%;
+    z-index: 99;
+  	
+  	
+/*     width: 100%; */
+}
+.content > .quiz > .board > .top {
+    color: #333333;
+}
+.content > .quiz > .board > .top > .symbol{
+	position: absolute;
+	left: 10%;
+	top: 15%;
+	font-size: 40px;
+
+}
+
+.content > .quiz > .board > .top > .explain{
+  position: absolute;
+  left: 30%;
+  top: 16%;
+  font-size: 30px;
+}
+.content > .quiz > .board > .top > .explain_1{
+    position: absolute;
+    left: 45%;
+    top: 15%;
+    font-family: NanumSquare;
+    font-weight: 900;
+    letter-spacing: -3px;
+    font-size: 34px; 
+}
+
+.content > .quiz > .board > .top > .explain_2{
+    position: absolute;
+	left: 34%;
+    top: 25%;
+    font-family: NanumSquare;
+    font-weight: 900;
+    letter-spacing: -4px;
+    font-size: 55px;
+}
+
+.content > .quiz > .board > .middle{
+    position: absolute;
+    top: 48.5%;
+    left: 30%;
+    width: 50%;
+    height: 50%;
+
+}
+.content > .quiz > .board > .middle > .line{
+  border: dashed;
+  border-color: #aaaaaa;
+  border-width: 1px 3px 3px 1px;
+  height: 50%;
+  float: left;
+  top: 10%;
+  position: relative;
+}
+
+.content > .quiz > .board > .middle > .result{
+  position: relative;
+  float: left;
+  width: 20%;
+  height: 30%;
+  margin: 22px;
+}
+.content > .quiz > .board > .middle > .result > .symbol {
+  font-size: 50px;
+  text-align: center;
+  font-family: sans-serif;
+  color: #666666;
+  bottom: 15%;
+  position: relative;
+}
+.content > .quiz > .board > .middle > .result > .checkSymbol {
+  width : 100%;
+  height: 100%;
+}
+.content > .quiz > .board > .middle > .result > .oSymbol {
+  background: url(../img/quiz/oSymbol.png) no-repeat;
+  background-size: 100% 100%;
+}
+.content > .quiz > .board > .middle > .result > .xSymbol {
+  background: url(../img/quiz/xSymbol.png) no-repeat;
+  background-size: 100% 100%;
+}
+
+.content > .quiz > .board > .retryBtn  {
+  background: url(../img/quiz/retry.png) no-repeat;
+  background-size: 100% 100%;
+  width: 120px;
+  height: 35px;
+  border: 0px;
+  top: 80%;
+  left: 50%;
+  margin-left: -60px;
+  position: absolute;
+  cursor: pointer;
+}
+
+.content > .quiz > .board > .retryBtn:hover  {
+  background: url(../img/quiz/retry_over.png) no-repeat;
+  background-size: 100% 100%;
+}
+
+/*
+@media screen and (min-width:1600px) {
+  .content > .quiz > .page > .question > .oSymbol {
+    bottom: 0px;
+    left: 0px;
+    font-size: 200px;
+  }
+  .content > .quiz > .page > .question > .xSymbol {
+    bottom: 0px;
+    left: 0px;
+    font-size: 200px;
+  }
+
+
+  .content > .quiz > .page > .question > .text {
+    font-weight: bold;
+    position: relative;
+    bottom: 60px;
+    left: 7.5%;
+    font-size: 40px;
+  }
+  .content > .quiz > .page > .question > .symbol {
+    position: relative;
+    bottom: 5px;
+    font-size: 70px;
+  }
+  .content > .quiz > .page > .example > .multiple {
+    font-size: 28px;
+    font-weight: 400;
+    margin-bottom: 30px;
+  }
+  .content > .quiz > .page > .example > .multiple > div {
+    width: 50px;
+    height: 50px;
+    margin-bottom: 100px;
+  }
+  .content > .quiz > .page > .example > .multiple > .text {
+    left: 80px;
+    top: 10px;
+    height: 36px;
+  }
+  .content > .quiz > .page > .feedback > .answer > .symbol {
+    font-size: 40px;
+    left: 7%;
+    top: 33%;
+    position: absolute;
+  }
+
+  .content > .quiz > .page > .feedback > .answer > .text {
+font-size: 20px;
+    color: #000000;
+    left: 170px;
+     left: 13%; 
+    top: 27%;
+  }
+
+  .content > .quiz > .page > .feedback > .explain {
+    font-size: 30px;
+    left : 23%;
+    top: 20%;
+    width: 75%;
+  }
+
+}
+*/
+
+
+
+.start_btn{
+/* 	display:none; */
+	position: absolute;
+	top:490px;
+	background: url(../img/quiz/start.png) no-repeat;
+	background-size: cover;
+	text-indent: -1000em;
+	cursor: pointer;
+	border:0px;
+	/*
+	left:460px;
+	width: 92px;
+	height: 29px;*/
+	left:53%;
+	margin-left:-97.5px;
+	width:130px;
+	height:50px;
+	z-index:200;
+}
+
+.start_btn:hover{
+	background: url(../img/quiz/start_over.png) no-repeat;
+	background-size: cover;
+	width:130px;
+	height:50px;
+}

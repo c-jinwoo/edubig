@@ -1,0 +1,410 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.webapp.academy.mapper.LectureMapper">
+
+
+	<!-- 사업자 번호 검색 -->
+	<select id="getOfficeInfo" parameterType="dmap" resultType="emap">
+	/*getOfficeInfo*/
+	
+		SELECT
+			  COMP_NO
+    		, COMP_BIZNO
+    		, COMP_NM
+    		, COMP_CEO_NM
+    		, COMP_POSTNO
+    		, COMP_ADDR1
+    		, COMP_ADDR2
+    		, USE_YN
+    		, REGIST_DT
+    	FROM LMS_ED_LECTURE_COMP
+    	WHERE COMP_BIZNO = #{compBizno}
+
+	</select>
+	
+	<!-- SL_NO 최대값 구하기 -->
+	<select id="getMaxSlNo" resultType="int">
+	/* getMaxSlNo */
+	
+		SELECT NVL(MAX(SL_NO), 0) + 1 FROM LMS_ED_LECTURE
+		
+	</select>
+	
+	
+	<!-- 방문교육 등록  -->
+	<insert id="insertLecture" parameterType="dmap">
+	/* insertLecture */
+	
+		INSERT INTO LMS_ED_LECTURE
+			(
+				  SL_NO
+				, SL_APP_NM
+				, SL_APP_TEL1
+				<if test="slAppTel2 != null and slAppTel2 != '' ">
+					, SL_APP_TEL2
+				</if> 
+				, SL_APP_EMAIL
+				, HOPE_ODR
+				, SL_LOC_CD
+				<if test="slLocEtc != null and slLocEtc != '' ">
+					, SL_LOC_ETC
+				</if>
+				, SL_TARGET_CD
+				, SL_PCNT
+				<if test="slEtcCont != null and slEtcCont != '' ">
+					, SL_ETC_CONT
+				</if>
+				, SL_VPATH_CD
+				<if test="slVpathEtc != null and slVpathEtc !='' ">
+					, SL_VPATH_ETC
+				</if>
+				, USE_YN
+				, REGIST_DT
+				, SL_STAT_CD
+				, MT_COMP_DEPT1
+				<if test="mtCompDept2 != null and mtCompDept2 != '' ">
+					, MT_COMP_DEPT2
+				</if>
+				, COMP_NM
+				, COMP_POSTNO
+				, COMP_ADDR1
+				, COMP_ADDR2
+			)
+			VALUES
+			(
+				  #{slNo}
+				, #{slAppNm}
+				, #{slAppTel1}
+				<if test="slAppTel2 != null and slAppTel2 != '' ">
+					, #{slAppTel2}
+				</if>
+				, #{slAppEmail}
+				, '1'
+				, #{slLocCd}
+				<if test="slLocEtc != null and slLocEtc != '' ">
+					, #{slLocEtc}
+				</if>
+				, #{slTargetCd}
+				, #{slPcnt}
+				<if test="slEtcCont != null and slEtcCont != '' ">
+					, #{slEtcCont}
+				</if>
+				, #{slVpathCd}
+				<if test="slVpathEtc != null and slVpathEtc != '' ">
+					, #{slVpathEtc}
+				</if>
+				, 'Y'
+				, SYSDATE
+				, 'LE0001'
+				, #{mtCompDept1}
+				<if test="mtCompDept2 != null and mtCompDept2 != '' ">
+					, #{mtCompDept2}
+				</if>
+				, #{compNm}
+				, #{compPostNo}
+				, #{compAddr1}
+				, #{compAddr2}
+			)
+	
+	</insert>
+	
+	
+	<!-- 방문교육_희망일 HOPE_NO MAX 값 -->
+	<select id="getMaxHopeNo" resultType="int">
+	/* getMaxHopeNo */
+	
+		SELECT NVL(MAX(HOPE_NO), 0) +1 FROM LMS_ED_LECTURE_HOPE
+	
+	</select>  
+	
+	
+	<!-- 방문교육_희망일 등록 -->
+	<insert id="insertLectureHope" parameterType="dmap">
+	/* insertLectureHope */
+		
+		INSERT INTO LMS_ED_LECTURE_HOPE
+			(
+				  SL_NO
+				, HOPE_NO
+				, HOPE_ODR
+				, HOPE_DAY
+				, HOPE_ST_HOUR
+				, HOPE_ST_MIN
+				, HOPE_ED_HOUR
+				, HOPE_ED_MIN
+				, USE_YN
+				, REGIST_DT
+			)
+			VALUES
+			(
+				  #{slNo}
+				, #{hopeNo}
+				, #{hopeOdr}
+				, TO_CHAR(TO_DATE(SUBSTR(#{eduSdate}, 1, 8), 'YYYYMMDD'), 'YYYY-MM-DD')
+				, SUBSTR(#{eduSdate}, 9, 2)
+				, SUBSTR(#{eduSdate}, 11,2)
+				, SUBSTR(#{eduEdate}, 9, 2)
+				, SUBSTR(#{eduEdate}, 11,2)
+				, 'Y'
+				, SYSDATE
+			)
+		
+	</insert>
+	
+	
+	<!-- 방문교육_기자재 EQU_NO MAX 값 -->
+	<select id="getMaxEquNo" resultType="int">
+	/* getMaxEquNo */
+	
+		SELECT NVL(MAX(EQU_NO), 0) + 1 FROM LMS_ED_LECTURE_EQU
+	
+	</select> 
+	
+	
+	<!-- 방문교육 기자재 등록 -->
+	<insert id="insertLectureEqu" parameterType="dmap">
+	/* insertLectureEqu */
+		
+		INSERT INTO LMS_ED_LECTURE_EQU
+			(
+				  SL_NO
+				, EQU_NO
+				, EQU_CD
+				, USE_YN
+				, REGIST_DT
+				<if test="etc != null and etc != '' ">
+					<if test="equCd == 'VE0006' ">
+						, ETC
+					</if>
+				</if>
+			)
+			VALUES
+			(
+				  #{slNo}
+				, #{equNo}
+				, #{equCd}
+				, 'Y'
+				, SYSDATE
+				<if test="etc != null and etc != '' ">
+					<if test="equCd == 'VE0006' ">
+						, #{etc}
+					</if>
+				</if>
+			)
+	
+	</insert>
+	
+	
+	<!--  성명 & 이메일조회 방문교육 정보 리스트 -->
+	<select id="lectureList" parameterType="dmap" resultType="emap">
+	/* lectureList */
+	
+		SELECT AA.*
+		FROM (
+				SELECT
+				      SL_NO
+				    , ROW_NUMBER() OVER(ORDER BY SL_NO ASC) RNUM 
+				    , SL_APP_NM
+				    , SL_APP_TEL1
+				    , SL_APP_TEL2
+				    , SL_APP_EMAIL
+				    , HOPE_ODR
+				    , SL_LOC_CD
+				    , SL_LOC_ETC
+				    , FN_GET_CMMN_CODE_NM('VL', SL_LOC_CD)AS SL_LOC_NAME
+				    , SL_TARGET_CD
+				    , FN_GET_CMMN_CODE_NM('VT', SL_TARGET_CD)AS SL_TARGET_NAME
+				    , SL_PCNT
+				    , SL_VPATH_CD
+				    , FN_GET_CMMN_CODE_NM('VV', SL_VPATH_CD)AS SL_VPATH_NAME
+				    , SL_VPATH_ETC
+				    , USE_YN
+				    , REGIST_DT
+				    , SL_STAT_CD
+				    , FN_GET_CMMN_CODE_NM('LE', SL_STAT_CD)AS SL_STAT_NAME
+				    , SL_ETC_CONT
+				    , COMP_NM
+				    , COMP_POSTNO
+				    , COMP_ADDR1
+				    , COMP_ADDR2
+				    , CASE SL_STAT_CD WHEN 'LE0004'
+		              THEN (SELECT TO_CHAR(TO_DATE(HOPE_DAY, 'YYYY-MM-DD'),'YYYY.MM.DD') FROM LMS_ED_LECTURE_HOPE C WHERE C.HOPE_ODR = A.HOPE_ODR AND A.SL_NO = C.SL_NO)
+		              ELSE ('-') END FINALIZEDAY
+				FROM LMS_ED_LECTURE A
+				WHERE SL_APP_NM = #{slAppNm}
+				AND SL_APP_EMAIL = #{slAppEmail}
+			) AA
+			WHERE 1=1
+			ORDER BY SL_NO DESC
+			
+	</select> 
+	
+	
+	<!-- 해당 방문 교육 정보  -->
+	<select id="getlectureInfo" parameterType="dmap" resultType="emap">
+	/* getlectureInfo */
+	
+		SELECT
+              SL_NO
+            , COMP_NO
+            , SL_APP_NM
+            , SL_APP_TEL1
+            , SL_APP_TEL2
+            , SL_APP_EMAIL
+            , HOPE_ODR
+            , SL_LOC_CD
+            , SL_LOC_ETC
+            , FN_GET_CMMN_CODE_NM('VL', SL_LOC_CD)AS SL_LOC_NAME
+            , SL_TARGET_CD
+            , FN_GET_CMMN_CODE_NM('VT', SL_TARGET_CD)AS SL_TARGET_NAME
+            , SL_PCNT
+            , SL_ETC_CONT
+            , SL_VPATH_CD
+            , FN_GET_CMMN_CODE_NM('VV', SL_VPATH_CD)AS SL_VPATH_NAME
+            , SL_VPATH_ETC
+            , USE_YN
+            , REGIST_DT
+            , SL_STAT_CD
+            , FN_GET_CMMN_CODE_NM('LE', SL_STAT_CD)AS SL_STAT_NAME
+            , SL_ETC_CONT
+            , COMP_NM
+            , COMP_POSTNO
+            , COMP_ADDR1
+            , COMP_ADDR2
+        FROM LMS_ED_LECTURE
+        WHERE SL_NO = #{slNo}
+	
+	</select>	
+	
+	
+	<!--  해당 방문교육_기자재 리스트  -->
+	<select id="lectureEquList" parameterType="dmap" resultType="emap">
+	/* lectureEquList */
+	
+<!-- 		SELECT 
+              A.MT_SUB_CODE
+            , A.MT_SUB_NAME
+            , CASE WHEN (SELECT COUNT(*) FROM LMS_ED_LECTURE_EQU WHERE SL_NO = #{slNo}
+              AND EQU_CD = A.MT_SUB_CODE 
+              AND USE_YN = 'Y' 
+              GROUP BY SL_NO) > 0 THEN 'Y'ELSE 'N' END USE
+         FROM LMS_CD_MT_SUB A WHERE MT_CODE = 'VE'
+         AND A.USEYN = 'Y' -->
+         
+     	
+<!--      	  SELECT A.*
+          FROM ( SELECT 
+          			   A.MT_SUB_CODE
+                     , A.MT_SUB_NAME
+                     , A.ETC
+                     , CASE WHEN (SELECT COUNT(*) FROM LMS_ED_LECTURE_EQU WHERE SL_NO = #{slNo}
+                       AND EQU_CD = A.MT_SUB_CODE 
+                       AND USE_YN = 'Y' 
+                       GROUP BY SL_NO) > 0 THEN 'Y'ELSE 'N' END USE
+                 FROM LMS_CD_MT_SUB A 
+                 WHERE MT_CODE = 'VE'
+                 AND A.USEYN = 'Y'
+                ) A
+          WHERE USE = 'Y' -->
+          
+	    SELECT 
+		      A.MT_SUB_CODE
+		    , A.MT_SUB_NAME
+		    , B.EQU_NO
+		    , B.EQU_CD
+		    , B.USE_YN  
+		    , B.ETC
+		FROM LMS_CD_MT_SUB A
+		INNER JOIN LMS_ED_LECTURE_EQU B
+		ON A.MT_SUB_CODE = B.EQU_CD
+		WHERE SL_NO = #{slNo}
+		
+	</select>
+	
+	
+	<!--  해당 방문교육_희망일 리스트 -->
+	<select id="lectureHopeList" parameterType="dmap" resultType="emap">
+	/* lectureHopeList */
+	
+		SELECT 
+            SL_NO
+          , HOPE_ODR
+          , HOPE_DAY
+          , TO_CHAR(TO_DATE(HOPE_ST_HOUR, 'HH24'), 'HH24')AS HOPE_ST_HOUR
+          , TO_CHAR(TO_DATE(HOPE_ST_MIN, 'MI'), 'MI')AS HOPE_ST_MIN
+          , TO_CHAR(TO_DATE(HOPE_ED_HOUR, 'HH24'), 'HH24')AS HOPE_ED_HOUR
+          , TO_CHAR(TO_DATE(HOPE_ED_MIN, 'MI'), 'MI')AS HOPE_ED_MIN
+        FROM LMS_ED_LECTURE_HOPE 
+        WHERE SL_NO = #{slNo}
+        AND USE_YN = 'Y'
+        ORDER BY SL_NO ASC  
+	
+	</select>
+	
+
+	<!--  사용자 > 방문교육 신청 > 기업등록 > 기업 일련번호 max값 -->
+	<select id="getMaxCompNo" parameterType="dmap" resultType="int">
+	/* getMaxCompNo */
+		
+		SELECT NVL(MAX(COMP_NO), 0) + 1 FROM LMS_ED_LECTURE_COMP
+			
+	</select>	
+	
+	
+	<!--  사용자 > 방문교육 신청 > 기업등록  -->
+	<insert id="officeInsert" parameterType="dmap">
+	/* officeInsert */
+	
+		INSERT INTO LMS_ED_LECTURE_COMP
+			(
+				  COMP_NO
+				, COMP_BIZNO 
+				, COMP_NM 
+				, COMP_CEO_NM 
+				, COMP_POSTNO 
+				, COMP_ADDR1
+				<if test="compAddr2 != null and compAddr2 != ''">
+					, COMP_ADDR2 
+				</if>
+				, USE_YN
+				, REGIST_DT
+			)
+			VALUES
+			(
+				  #{compNo}
+				, #{compBizno}
+				, #{compNm}
+				, #{compCeoNm}
+				, #{compPostNo}
+				, #{compAddr1}
+				<if test="compAddr2 != null and compAddr2 != ''">
+					, #{compAddr2}
+				</if>
+				, 'Y'
+				, SYSDATE
+			)
+			
+	</insert>
+	
+	
+	<!--  사용자 > 방문교육 신청취소  -->
+	<update id="deleteLecture" parameterType="dmap">
+	/* deleteLecture */
+	
+		UPDATE LMS_ED_LECTURE
+		SET 
+			  USE_YN = 'N'
+			, SL_STAT_CD = 'LE0007'
+		WHERE SL_NO = #{slNo}
+	
+	
+	</update>
+	
+	
+	<!-- 오늘 날짜 VS 방문교육 날짜 비교 -->
+
+	
+	
+	
+</mapper>

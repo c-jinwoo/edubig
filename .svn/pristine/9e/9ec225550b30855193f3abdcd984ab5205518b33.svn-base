@@ -1,0 +1,152 @@
+<%
+/****************************************
+    subject : 온라인교육
+    summary : 온라인교육 > 교육소개
+    author  : SANGS
+    date    : 2018-06-15
+****************************************/
+%>
+<%@ page language="java" contentType="text/html; charset=utf-8" pageEncoding="utf-8"%>
+<%@ include file="/WEB-INF/jsp/ccedu/inc/taglib_inc.jsp"%>
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+	<title>설문조사 > 커뮤니티 > 지식마당 > 신용회복위원회 신용교육원</title>
+	<%@ include file="/WEB-INF/jsp/ccedu/inc/head_inc.jsp"%>
+<script type="text/javascript">
+	
+	function move_page(cPage){
+		$('#cPage').val(cPage);
+		$('form[name=frm]').attr('action', '').submit();
+	} 
+
+	function fnForm(pollcseqno){
+		$('#pollCseQno').val(pollcseqno);
+		$('form[name=frm]').attr('action', '/ccedu/intellectual/sitePollForm.do').submit();
+	}
+</script>
+</head>
+
+<body>
+<!-- skip nav -->
+	<%@ include file="/WEB-INF/jsp/ccedu/inc/nav_inc.jsp"%>
+<!--// skip nav -->
+
+
+<div id="wrap">
+
+	<!-- header -->
+	<%@ include file="/WEB-INF/jsp/ccedu/inc/header_inc.jsp"%>
+	<!--// header -->
+
+	<!-- container -->
+	<div id="container">
+
+		<!-- location -->
+		<jsp:include page="/WEB-INF/jsp/ccedu/inc/location/loc_04_02.jsp"> 
+		  	<jsp:param name="menuNm" value="설문조사"/> 
+		</jsp:include> 
+		<!--// location -->
+
+		<div class="con_center">
+
+			<!-- lnb -->
+			<div id="lnb">
+				<jsp:include page="/WEB-INF/jsp/ccedu/inc/lnb/lnb_04.jsp"> 
+				  	<jsp:param name="dep2" value="02"/>
+				  	<jsp:param name="dep3" value="02"/> 
+				</jsp:include>
+			</div>
+			<!--// lnb -->
+
+
+			<!-- content 본문 -->
+			<div id="content">
+				
+				<!-- 기존 START 2018-08-30  -->
+<!-- 				<h3 class="cont_titile">설문조사</h3> -->
+				<!-- 기존 END 2018-08-30  -->
+				
+				<!-- 2018-08-28 김동인 작업 S --> 
+				<h3 class="cont_titile type04">설문조사<span></span></h3>
+				<!-- 2018-08-28 김동인 작업 E -->
+
+				<!-- 본문내용 -->
+				<div class="cont_body">
+					<!-- start -->
+					<form name="frm" id="frm" action="" method="post">
+						<input type="hidden" name="cPage" id="cPage" value="<c:out value="${REQUEST_DATA.cPage}"/>"/>
+						<input type="hidden" name="pollCseQno" id="pollCseQno" value=""/>
+						
+						<div class="c_section">
+							<div class="table_style_col mgt0">
+								<table>
+									<caption>번호, 설문명, 참여기간을 확인 할 수 있고 참여하기버튼이 있는표</caption>
+									<colgroup>
+										<col  />
+										<col  />
+										<col  />
+										<col  />
+									</colgroup>
+									<thead>
+										<tr>
+											<th scope="col">No.</th>
+											<th scope="col">설문명</th>
+											<th scope="col">참여기간</th>
+											<th scope="col"><span class="alt_text">참여하기 버튼영역</span></th>
+										</tr>
+									</thead>
+									<tbody>
+										<c:if test="${not empty sitePollList}">
+											<c:forEach items="${sitePollList}" var="result" varStatus="status">
+												<tr>
+													<td class="align_center"><c:out value="${resultCount-(REQUEST_DATA.cPage-1)*10-status.count+1}"/></td>
+													<td><c:out value="${result.TITLE}"/></td>
+													<td class="align_center" ><c:out value="${result.SDATE}"/> ~ <c:out value="${result.EDATE}"/></td>
+													<td class="align_center">
+														<c:if test="${result.DATE_CHK_YN eq 'Y' }">
+															<button type="button" onclick="fnForm('<c:out value="${result.POLLCSEQNO}"/>')" class="btn_blueline"><span>참여하기</span></button>
+														</c:if>
+														<c:if test="${result.DATE_CHK_YN ne 'Y' }">
+															<button type="button" class="btn_blueline_disabled" ><span>참여하기</span></button>
+														</c:if>
+													</td>
+
+												</tr>
+											</c:forEach>
+										</c:if>
+
+										<c:if test="${empty sitePollList}"><tr><td colspan="4" class="align_center">게시글이 없습니다.</td></tr></c:if>
+
+									</tbody>
+								</table>
+							</div>
+						</div>
+						<c:if test="${not empty sitePollList}">
+							<div class="paging">
+								<paging:page cpage="${REQUEST_DATA.cPage}" total="${resultCount}" pageSize="${REQUEST_DATA.rowCount}" link="javascript:move_page" />
+							</div>
+						</c:if>
+					</form>
+					<!--// end -->
+				</div>
+				<!--// 본문내용 -->
+				
+			<!--  -->
+			</div>
+			<!--// content 본문 -->
+
+
+
+		</div>
+	</div>
+	<!--// container -->
+
+	<!-- foot -->
+	<%@ include file="/WEB-INF/jsp/ccedu/inc/footer_inc.jsp"%>
+	<!--// foot end -->
+
+</div>
+
+</body>
+</html>

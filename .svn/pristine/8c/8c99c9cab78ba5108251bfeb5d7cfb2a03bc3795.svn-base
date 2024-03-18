@@ -1,0 +1,73 @@
+package com.sangs.interceptor;
+
+import java.net.URLDecoder;
+
+import javax.annotation.Resource;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+
+import org.springframework.web.servlet.ModelAndView;
+import org.springframework.web.servlet.ModelAndViewDefiningException;
+import org.springframework.web.servlet.handler.HandlerInterceptorAdapter;
+
+import com.sangs.session.UserSessionManager;
+import com.sangs.session.UserSessionVO;
+import com.sangs.support.DataMap;
+import com.sangs.support.EduMap;
+import com.webapp.common.service.CommonUserService;
+import com.webapp.common.service.impl.CommonUserServiceImpl;
+
+/**
+ * Description : 로그인인증 인터셉터
+ */
+public class InterceptorForAuth extends HandlerInterceptorAdapter{
+    @Resource(name = "commonUserService")
+    private CommonUserService commonUserService;
+    
+    @Override
+    public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) throws Exception{    	
+    	UserSessionVO userSessionVO = UserSessionManager.getUserSessionVO(request);   	
+    	
+    	if(!userSessionVO.getIsLogin().equals("Y") || userSessionVO.getUserNo() == 0){    		
+    		String returnUrl = request.getRequestURI();
+    		
+            if(request.getQueryString() != null || "".equals(request.getQueryString())){
+                returnUrl += "?" + request.getQueryString();
+            }
+            
+            // 리턴주소 설정
+            request.setAttribute("url", "/common/login.do?returnUrl="+URLDecoder.decode(returnUrl, "UTF-8"));
+            request.setAttribute("returnUrl", URLDecoder.decode(returnUrl, "UTF-8"));
+            request.setAttribute("msg", "로그인후 이용할 수 있습니다.");
+            ModelAndView modelAndView = new ModelAndView("forward:/common/msgForward.do");           
+        }    	
+    	else{   	    
+			DataMap rMap = new DataMap();
+			   
+			rMap.set("userNo", userSessionVO.getUserNo());
+			EduMap userInfo = commonUserService.getUserLmsInfo(rMap);
+			
+			if(userInfo.get("SESSION_ID") == userSessionVO.getSessionId()){            		
+				String returnUrl = request.getRequestURI();
+
+				if(request.getQueryString() != null || "".equals(request.getQueryString())){
+					returnUrl += "?" + request.getQueryString();
+				}            		
+				request.setAttribute("url", "/user/login.do?returnUrl="+URLDecoder.decode(returnUrl, "UTF-8"));
+				request.setAttribute("returnUrl", URLDecoder.decode(returnUrl, "UTF-8"));
+				request.setAttribute("msg", "비정상적인 접근이 감지되어 로그아웃 되었습니다.");
+				ModelAndView modelAndView = new ModelAndView("forward:/common/msgForward.do");            		
+        		
+				UserSessionManager.deleteUserSessionVO(request);				
+			}
+    	}
+        return true;
+    }
+
+    /**
+     * view로 포워드되기전 처리 
+     */
+    @Override
+    public void postHandle(HttpServletRequest req, HttpServletResponse response, Object handler, ModelAndView modelAndView) throws Exception{    	
+    }
+}

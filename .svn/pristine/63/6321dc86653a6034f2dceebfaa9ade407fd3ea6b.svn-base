@@ -1,0 +1,211 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.webapp.academy.mapper.EduInfoMapper">
+
+    <resultMap id="clobMap" type="emap">
+        <result property="INFO_PROFILE" column="INFO_PROFILE" jdbcType="CLOB" javaType="java.lang.String"/>
+    </resultMap>
+
+    <!--
+          수정일			수정자			 수정내용
+    ==============================================================
+    2016-10-18			구동림			생성 / 질의 패턴 수정
+    -->
+   <select id="getDataList" resultType="emap" parameterType="dmap">
+		SELECT BBSNO
+			,  USERNO
+			, TITLE
+			, WRITER
+			, RCNT
+			, TO_CHAR(WDATE , 'YYYY-MM-DD HH24:MI:SS')AS WDATE
+			, CONTENT
+			, GRPNO
+			, BCATENO
+		FROM LMS_ED_BBS
+		WHERE BCATENO IN (#{category1},#{category2})
+		AND OPEN_AT = 'Y'
+		<if test="searchWord != null and searchWord != '' ">
+			AND TITLE LIKE '%' || #{searchWord} || '%'
+		</if>
+		ORDER BY WDATE DESC
+   </select>
+    
+    <select id="getViewData" resultType="emap" parameterType="dmap">
+    	SELECT A.*
+    	FROM(
+    		SELECT A.BBSNO
+				,  A.USERNO
+				, A.TITLE
+				, A.WRITER
+				, A.RCNT
+				, A.WDATE
+				, DBMS_LOB.SUBSTR(A.CONTENT, DBMS_LOB.GETLENGTH(A.CONTENT), 1)AS CONTENT 
+				, A.GRPNO
+				, A.BCATENO
+				, LEAD(A.BBSNO,1) OVER( ORDER BY GRPNO DESC, REFSTEP ASC) AS BBSNO_PREV
+				, LAG(A.BBSNO,1) OVER(ORDER BY GRPNO DESC, REFSTEP ASC) AS BBSNO_NEXT
+			FROM LMS_ED_BBS A 
+			WHERE OPEN_AT = 'Y'
+			AND BCATENO IN (#{category1},#{category2})
+			ORDER BY WDATE DESC
+    		)A
+    	WHERE A.BBSNO = #{bbsNo}
+   </select>
+   
+   <select id="getViewDataFile" resultType="emap" parameterType="dmap">
+   		SELECT FILE_ID 
+   			, ORGFILE 
+   			, BBSNO 
+   			, FILE_SEQ
+		FROM LMS_ED_BBS_FILE
+		WHERE BBSNO = #{bbsNo}
+   </select>
+   
+   <select id="getFileInfo" resultType="emap" parameterType="dmap">
+		SELECT SAVPATH
+			, ORGFILE
+			, SAVFILE
+		FROM LMS_ED_BBS_FILE
+		WHERE BBSNO =  #{bbsNo}
+		AND FILE_ID = #{fileId}
+		AND FILE_SEQ = #{fileSeq}
+   </select>
+   
+   <select id="getWorldFileInfo" resultType="emap" parameterType="dmap">
+		SELECT SAVPATH
+			, ORGFILE
+			, SAVFILE
+		FROM LMS_ED_DATA_FILE
+		WHERE BBSNO =  #{bbsNo}
+   </select>
+   
+   <select id="getListData" resultType="emap" parameterType="dmap">
+		SELECT BBSNO
+			, WRITER
+			, TO_CHAR(WDATE , 'YYYY-MM-DD')AS WDATE
+			, TITLE
+			, GRPNO
+			, BCATENO
+			, (SELECT SAVPATH FROM LMS_ED_DATA_FILE B WHERE A.BBSNO = B.BBSNO AND B.FGUBUN = 'IMG' )AS JPGSAVPATH
+			, (SELECT SAVFILE FROM LMS_ED_DATA_FILE B WHERE A.BBSNO = B.BBSNO AND B.FGUBUN = 'IMG' )AS JPGSAVFILE
+			, (SELECT ORGFILE FROM LMS_ED_DATA_FILE B WHERE A.BBSNO = B.BBSNO AND B.FGUBUN = 'IMG' )AS JPGORGFILE
+			, (SELECT SAVPATH FROM LMS_ED_DATA_FILE B WHERE A.BBSNO = B.BBSNO AND B.FGUBUN = 'VIDEO' )AS MPSAVPATH
+			, (SELECT SAVFILE FROM LMS_ED_DATA_FILE B WHERE A.BBSNO = B.BBSNO AND B.FGUBUN = 'VIDEO' )AS MPSAVFILE
+			, (SELECT ORGFILE FROM LMS_ED_DATA_FILE B WHERE A.BBSNO = B.BBSNO AND B.FGUBUN = 'VIDEO' )AS MPORGFILE
+		FROM LMS_ED_BBS A
+		WHERE BCATENO = #{bcateNo}
+		AND OPEN_AT = 'Y'
+   </select>
+   
+   <select id="getTransListData" resultType="emap" parameterType="dmap">
+		<!-- SELECT A.BBSNO
+			, A.WRITER
+			, TO_CHAR(A.WDATE , 'YYYY-MM-DD')AS WDATE
+			, A.WDATE
+			, A.TITLE
+			, A.GRPNO
+			, A.BCATENO
+			, FILE_ID
+			, FTYPE
+			, ORGFILE
+			, SAVFILE
+			, SAVPATH
+			, DELETE_YN
+			, REG_DATE
+		FROM 
+			(
+				SELECT BBSNO
+					, WRITER
+					, TO_CHAR(WDATE , 'YYYY-MM-DD')AS WDATE
+					, TITLE
+					, GRPNO
+					, BCATENO
+				FROM LMS_ED_BBS
+				WHERE BCATENO = #{bcateNo}
+			)A , LMS_ED_DATA_FILE B
+		WHERE A.BBSNO = B.BBSNO -->
+		SELECT BBSNO
+			, WRITER
+			, TO_CHAR(WDATE , 'YYYY-MM-DD')AS WDATE
+			, TITLE
+			, GRPNO
+			, BCATENO
+			, FILE_AT
+			, LINK_URL
+		FROM LMS_ED_BBS
+		WHERE BCATENO = #{bcateNo}
+   </select>
+   
+   <select id="getEduContentsList" resultType="emap" parameterType="dmap">
+   			SELECT A.*
+				, (SELECT SAVPATH FROM LMS_ED_DATA_FILE B WHERE A.BBSNO = B.BBSNO AND B.FGUBUN = 'IMG')AS JPGSAVPATH
+				, (SELECT ORGFILE FROM LMS_ED_DATA_FILE B WHERE A.BBSNO = B.BBSNO AND B.FGUBUN = 'IMG')AS JPGORGFILE
+				, (SELECT SAVFILE FROM LMS_ED_DATA_FILE B WHERE A.BBSNO = B.BBSNO AND B.FGUBUN = 'IMG')AS JPGSAVFILE
+				, (SELECT SAVPATH FROM LMS_ED_DATA_FILE B WHERE A.BBSNO = B.BBSNO AND B.FGUBUN = 'VIDEO')AS MPSAVPATH
+				, (SELECT ORGFILE FROM LMS_ED_DATA_FILE B WHERE A.BBSNO = B.BBSNO AND B.FGUBUN = 'VIDEO')AS MPORGFILE
+				, (SELECT SAVFILE FROM LMS_ED_DATA_FILE B WHERE A.BBSNO = B.BBSNO AND B.FGUBUN = 'VIDEO')AS MPSAVFILE
+			FROM 
+			(
+				SELECT BBSNO
+					, WRITER
+					, TO_CHAR(WDATE , 'YYYY-MM-DD')AS WDATE
+					, TITLE
+					, GRPNO
+					, BCATENO
+					, DBMS_LOB.SUBSTR(CONTENT, DBMS_LOB.GETLENGTH(CONTENT), 1)AS CONTENT
+				FROM LMS_ED_BBS
+				WHERE BCATENO = #{bcateNo}
+				AND OPEN_AT = 'Y'
+			)A
+			ORDER BY WDATE DESC
+   </select>
+   
+   <update id="updateFileCount" parameterType="dmap">
+   		UPDATE LMS_ED_DATA_FILE SET
+   			DCNT = DCNT + 1
+   		WHERE FILE_ID = #{fileId}	
+   </update>
+   
+   <!-- 인권영화신청 리스트 -->
+   <select id="getMoveReqsList" resultType="emap" parameterType="dmap">
+		SELECT A.*
+		, B.SAVPATH	
+		, B.ORGFILE
+		, B.SAVFILE
+		FROM(
+			 SELECT BBSNO
+					, WRITER
+					, TO_CHAR(WDATE , 'YYYY-MM-DD')AS WDATE
+					, TITLE
+					, GRPNO
+					, BCATENO
+					, DBMS_LOB.SUBSTR(CONTENT, DBMS_LOB.GETLENGTH(CONTENT), 1)AS CONTENT
+				FROM LMS_ED_BBS
+				WHERE BCATENO =  #{bcateNo}
+				AND OPEN_AT = 'Y'
+			)A , LMS_ED_DATA_FILE B
+		WHERE A.BBSNO = B.BBSNO
+		AND B.DELETE_YN = 'N'
+		<choose>
+			<when test="bbsno != null and bbsno != ''">AND A.BBSNO = 2079</when>
+			<otherwise>AND A.BBSNO != 2079</otherwise>
+		</choose>
+		ORDER BY WDATE ASC
+   </select>
+   
+   <update id="updateMovieFileCount" parameterType="dmap">
+   		UPDATE LMS_ED_DATA_FILE SET
+   			DCNT = DCNT + 1
+   		WHERE ORGFILE = #{fileId}
+   		AND BBSNO = #{bbsNo}	
+   </update>
+   
+   <select id="getFileInfoByEduInfo" resultType="emap" parameterType="dmap">
+   		SELECT SAVFILE 
+   			, SAVPATH 
+   			, ORGFILE 
+		FROM LMS_ED_DATA_FILE
+		WHERE FILE_ID = #{fileId}
+   </select>
+</mapper>

@@ -1,0 +1,29 @@
+<%
+/****************************************
+    subject : 좌측 메뉴
+    summary : 좌측 메뉴 : 찾아가는 교육(02)
+    author  : SANGS
+    date    : 2018-06-12
+****************************************/
+%>
+<%@ page language="java" contentType="text/html; charset=utf-8" pageEncoding="utf-8"%>
+<%
+	String dep2 = (String)request.getParameter("dep2"); 
+	String dep3 = (String)request.getParameter("dep3");
+%>
+<%@ include file="/WEB-INF/jsp/ccedu/inc/taglib_inc.jsp"%>
+<h2>교육과정</h2>
+	<ul class="lnb_menu">
+		<c:forEach items="${courseList}" var="result" varStatus="stat">
+			<c:choose>
+				<c:when test="${param.mtSubCode eq result.P_KEY || param.mtScCode eq result.P_KEY}">
+					<li class="on">				
+				</c:when>
+				<c:otherwise>
+					<li>				
+				</c:otherwise>		
+			</c:choose>
+				<a href="/ccedu/online/onlineDetailList.do?mtSubCode=${result.P_KEY}"/><span>${result.P_VALUE}</span></a>
+			</li>
+		</c:forEach>
+	</ul>

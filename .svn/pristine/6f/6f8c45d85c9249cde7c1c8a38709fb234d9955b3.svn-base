@@ -1,0 +1,55 @@
+<%
+/****************************************
+    subject : 회원관리
+    summary : 회원관리 : 회원 확인
+    author  : SANGS
+    date    : 2018-06-15
+****************************************/
+%>
+<%@ page language="java" contentType="text/html; charset=utf-8" pageEncoding="utf-8"%>
+<%@ include file="/WEB-INF/jsp/ccedu/inc/taglib_inc.jsp"%>
+<%@ include file="/WEB-INF/jsp/ccedu/inc/head_inc.jsp"%>
+<html>
+<head>
+<script type="text/javascript">
+	
+	$(function(){
+		
+		var retcode = '${retcode}';
+		
+		if(retcode == 'B000'){
+			document.form1.action = "${commonSvlUrl}";
+			document.form1.method = "post";
+			document.form1.submit();
+		}else{
+			
+			fnConfirm("일시적인 오류가 발생하였습니다.", function(result) {
+				
+				opener.document.frm.action = '/ccedu/user/memberJoinStep02.do';
+				opener.document.frm.submit();
+				self.close();
+				return false;
+			});
+			return false;
+			
+		}
+		
+		
+	});
+	
+</script>
+</head>
+	
+<body>
+	
+	<form name="form1">
+	<!-- 인증 요청 정보 -->
+	<!--// 필수 항목 -->
+	<input type="hidden" name="tc" value="kcb.oknm.online.safehscert.popup.cmd.P901_CertChoiceCmd"/>				<!-- 변경불가-->
+	<input type="hidden" name="rqst_data"		value="${e_rqstData}"/>		<!-- 요청데이터 -->
+	<input type="hidden" name="target_id"		value="${targetId }"/>			<!-- 타겟ID --> 
+	<!-- 필수 항목 //-->	
+	</form>
+	
+</body>
+</html>

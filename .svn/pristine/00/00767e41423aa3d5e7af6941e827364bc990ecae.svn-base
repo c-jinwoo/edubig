@@ -1,0 +1,137 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes" ?>
+<event>
+<!-- 강조빨간색칠하기-->
+<!-- &lt;span style="color:#ff3300"&gt;&lt;u&gt;않은&lt;&#47;span&gt;&lt;&#47;u&gt; -->
+<!-- 내려쓰기 -->
+<!-- &lt;br&gt; -->
+  <quiz flag="6" >
+      <page num="1" answer="1" type="multiple">
+          <question>
+              <alternate>문제 일.빅데이터 수집에 있어 고려해야 할 문제점 및 기술 요건이라고 하기 어려운 것은 무엇인가?</alternate>
+			  <symbol>Q1.</symbol>
+              <text>빅데이터 수집에 있어 고려해야 할 문제점 및 기술 요건이라고 하기 어려운 것은 무엇인가?</text>
+          </question>
+
+          <feedback>
+              <alternate>정답은 이번입니다. 수집 대상 데이터의 대용량화에 따른 대용량 데이터의 수집 기술이 고려해야 문제이다. </alternate>
+              <answer>
+                  <symbol>정답</symbol>
+                  <text>1</text>
+              </answer>
+              <explain>
+                  <symbol>1</symbol>
+                  <text>수집 대상 데이터의 대용량화에 따른 대용량 데이터의 수집 기술이 고려해야 문제이다.</text>
+              </explain>
+          </feedback>
+
+          <example num="1">
+              <alternate>보기 일번 수집 대상 데이터의 경량화에 따른 소량 데이터의 수집 기술</alternate>
+              <symbol>Q1</symbol>
+              <text>수집 대상 데이터의 경량화에 따른 소량 데이터의 수집 기술</text>
+          </example>
+          <example num="2">
+              <alternate>보기 이번 데이터 적재 시간이 전체의 상당 부분을 차지하는 것에 대한 실시간 수집 및 적재 시간의 단축</alternate>
+              <symbol>2</symbol>
+              <text>데이터 적재 시간이 전체의 상당 부분을 차지하는 것에 대한 실시간 수집 및 적재 시간의 단축</text>
+          </example>
+          <example num="3">
+              <alternate>보기 삼번 지속적으로 증가하는 데이터에 따른 수평적 확장의 용이성</alternate>
+              <symbol>3</symbol>
+              <text>지속적으로 증가하는 데이터에 따른 수평적 확장의 용이성</text>
+          </example>
+          <example num="4">
+              <alternate>보기 사번 다양한 웹 문서의 수집과 수집된 문서로부터 필요한 데이터를 추출하는 기법</alternate>
+              <symbol>4</symbol>
+              <text>다양한 웹 문서의 수집과 수집된 문서로부터 필요한 데이터를 추출하는 기법</text>
+          </example>
+      </page>
+
+      <page num="2" answer="2" type="multiple">
+          <question>
+              <alternate>문제 이. 빅데이터의 자동수집방법 중 주로 웹로봇을 이용하여 조직 외부에 존재하는 소셜 데이터 등과 같은 인터넷에 공개되어 있는 자료를 수집하는 방법은 무엇인가? </alternate>
+			  <symbol>Q2.</symbol>
+              <text>빅데이터의 자동수집방법 중 주로 웹로봇을 이용하여 조직 외부에 존재하는 소셜 데이터 등과 같은 인터넷에 공개되어 있는 자료를 수집하는 방법은 무엇인가? </text>
+          </question>
+
+          <feedback>
+              <alternate>정답은 일 번입니다. 주로 웹로봇을 이용하여 조직 외부에 존재하는 소셜 데이터 등과 같은 인터넷에 공개되어 있는 자료를 수집하는 방법은 크롤링이다.</alternate>
+              <answer>
+                  <symbol>정답</symbol>
+                  <text>2</text>
+              </answer>
+              <explain>
+                  <symbol>2</symbol>
+                  <text>주로 웹로봇을 이용하여 조직 외부에 존재하는 소셜 데이터 등과 같은 인터넷에 공개되어 있는 자료를 수집하는 방법은 크롤링이다.</text>
+
+              </explain>
+          </feedback>
+
+          <example num="1">
+              <alternate>보기 일번 로그 수집기</alternate>
+              <symbol>1</symbol>
+              <text>로그 수집기</text>
+          </example>
+          <example num="2">
+		  <alternate>보기 이번 크롤링(crawling)</alternate>
+              <symbol>2</symbol>
+              <text>크롤링(crawling)</text>
+          </example>
+          <example num="3">
+              <alternate>보기 삼번 센싱(sensing)</alternate>
+              <symbol>3</symbol>
+              <text>센싱(sensing)</text>
+          </example>
+          <example num="4">
+              <alternate>보기 사번 RSS 리더</alternate>
+              <symbol>4</symbol>
+              <text>RSS 리더</text>
+          </example>
+      </page>
+
+      <page num="3" answer="4" type="multiple">
+          <question>
+              <alternate>문제 삼. 다음 중 방문한 사이트의 모든 페이지 복사본을 
+생성하는데 사용되며, 이렇게 생성된 페이지의 보다 빠른 검색을 위하여 인덱싱을 수행하는 기법은 무엇인가?</alternate>
+			  <symbol>Q3.</symbol>
+              <text>다음 중 방문한 사이트의 모든 페이지 복사본을 
+생성하는데 사용되며, 이렇게 생성된 페이지의 보다 빠른 검색을 위하여 인덱싱을 수행하는 기법은 무엇인가?</text>
+          </question>
+
+          <feedback>
+              <alternate>정답일 사 번입니다. 웹 페이지에 게시된 정보를 수집하는 기법으로 
+웹 로봇과 웹 크롤러가 있으며, 위에 대한 내용은 웹 크롤러가 수행한다. </alternate>
+              <answer>
+                  <symbol>정답</symbol>
+                  <text>4</text>
+              </answer>
+              <explain>
+                  <symbol>4</symbol>
+                  <text>웹 페이지에 게시된 정보를 수집하는 기법으로 
+웹 로봇과 웹 크롤러가 있으며, 위에 대한 내용은 웹 크롤러가 수행한다. </text>
+
+              </explain>
+          </feedback>
+
+          <example num="1">
+              <alternate>보기 일번 오픈 API</alternate>
+              <symbol>1</symbol>
+              <text>오픈 API</text>
+          </example>
+          <example num="2">
+              <alternate>보기 이번 센싱(sensing)</alternate>
+              <symbol>2</symbol>
+              <text>센싱(sensing)</text>
+          </example>
+          <example num="3">
+              <alternate>보기 삼번 로그 수집기</alternate>
+              <symbol>Q3</symbol>
+              <text>로그 수집기</text>
+          </example>
+          <example num="4">
+              <alternate>보기 사번 웹 크롤러(web crawler)</alternate>
+              <symbol>4</symbol>
+              <text>웹 크롤러(web crawler)</text>
+          </example>
+      </page>
+  </quiz>
+</event>

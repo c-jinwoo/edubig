@@ -1,0 +1,284 @@
+<%
+	/****************************************
+	 subject : 회원가입
+	 summary : 회원가입 : 정보인증
+	 ****************************************/
+%>
+<%@ page language="java" contentType="text/html; charset=utf-8"	pageEncoding="utf-8"%>
+<%@ include file="/WEB-INF/jsp/ccedu/inc/taglib_inc.jsp"%>
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<%@ include file="/WEB-INF/jsp/ccedu/inc/head_inc.jsp"%>
+<script type="text/javascript">
+	var searching = false;
+	$(document).ready(function() {
+		fnEmailDomainSet();// 이메일 도메인 세팅
+		onlyNumAlpha('userEmail1');
+	});
+	function cancle() {
+		fnConfirm("정말로 회원가입을 취소하시겠습니까?", function(result) {
+			if (result) {
+				$('#frm').attr('action', '/ccedu/main/main.do').submit();
+			} else {
+				return false;
+			}
+		})
+	};
+	function fnGoSubmit(){	
+		$("#sex").val($("input[name^='sex']:checked").val());
+		
+		if(!fnValiCheck($('#userName'),'이름을 입력 해 주세요.')) return false;	
+		if(!fnValiCheck($('#brthYear'),'연도를 선택해 주세요.')) return false;
+		if(!fnValiCheck($('#brthMonth'),'월을 선택해 주세요.')) return false;
+		if(!fnValiCheck($('#brthDay'),'일을 선택해 주세요.')) return false;
+		if(!fnValiCheck($('#sex'), '성별을 입력 해 주세요.'))	return false;	
+		if(!fnValiCheck($('#emailDupCheck'), '이메일 인증을 해 주세요.')) return false;
+		
+		$("#brthdy").val($("#brthYear").val()+$("#brthMonth").val()+$("#brthDay").val());		
+		
+		frm.submit();
+	}
+	//이메일 인증
+	function checkEmail(){
+		if(!searching){
+			var val1 = true, val2 = true;
+			if($("#userEmail1").val() == ""){
+				val1 = false;			
+			}
+			if($("#userEmail2").val() == ""){
+				val2 = false;			
+			}
+			var result = val1 || val2;			
+			if(!val1 || !val2){
+				fnModalMsg('이메일을 입력해 주세요.');	
+				return false;
+			}			
+			
+			searching = true;											
+			$.ajax({
+			    url : "/ccedu/user/ajaxMailConfirm.do",
+			    data : {
+					email : $("#userEmail1").val() +"@"+ $("#userEmail2").val()
+			  	},
+			    dataType : "json",
+			    type : 'post',
+			    success : function(data){	
+			    	if(data.result == "SUCCESS"){ 
+			    		fnModalMsg("인증코드가 발송되었습니다.");
+			    	}
+			    	else if(data.result == "FAIL"){
+			    		fnModalMsg("이미 등록된 이메일입니다.");			    		
+			    	}
+					searching = false;
+			    },
+			    error : function(e) {
+		    		fnModalMsg("일시적인 오류가 발생했습니다.");
+			    }
+		    });	
+		}
+	}
+	// 인증코드 확인
+	function checkCode(){	
+		$.ajax({
+		    url : "/ccedu/user/ajaxAuthCodeCheck.do",
+		    data : {
+		    	authNumber : $("#authNumber").val()
+		  	},
+		    dataType : "json",
+		    type : 'post',
+		    success : function(data){	
+		    	if(data.result == "SUCCESS"){ 
+		    		fnModalMsg("인증에 성공했습니다.",function(){		   
+		    			$(".emailAuthTr, .checkEmailBtn").hide();
+		    			$(".emailTr th").attr("rowspan","1");
+		    				    			
+		    			$('#emailDupCheck').val("Y");	
+		    			
+		    			var email = $('#userEmail1').val();
+		    			if($('#userEmail3').val() == ''){
+		    				email += '@' + $('#userEmail2').val();
+		    			} 
+		    			else{
+		    				email += '@' + $('#userEmail3').val();
+		    			}
+		    			$('#email').val(email);	
+		    		});
+		    	}
+		    	else if(data.result == "FAIL"){
+		    		fnModalMsg("인증에 실패했습니다.");			    		
+		    	}
+		    },
+		    error : function(e) {
+	    		fnModalMsg("일시적인 오류가 발생했습니다.");
+		    }
+	    });	
+	}
+	//이메일 도메인 설정
+	function fnEmailDomainSet(){
+		var selectedDomain = $('#userEmail3').val();
+		$('#userEmail2').val('');
+
+		if(selectedDomain == ''){
+			$('#userEmail2').removeAttr('readonly');
+		}
+		else{
+			$('#userEmail2').val(selectedDomain);
+			$('#userEmail2').attr('readonly', 'readonly');
+		}
+	}
+</script>
+</head>
+<body>
+	<%@ include file="/WEB-INF/jsp/common/pop_post.jsp"%>
+	<div id="wrap">
+		<form name="frm" id="frm" action="/ccedu/user/memberJoinStep03.do" method="post">
+			<fieldset>
+				<input type="hidden" name="email" id="email" value="" />
+				<input type="hidden" name="brthdy" id="brthdy" value="" />
+				<input type="hidden" name="di" id="di" value="<c:out value="${REQUEST_DATA.di }"/>" />
+				<input type="hidden" name="confirmGubun" id="confirmGubun" value="<c:out value="${REQUEST_DATA.confirmGubun}"/>" /> 
+				<input type="hidden" name="mberType" id="mberType" value="<c:out value="${REQUEST_DATA.mberType }"/>" /> 
+				<input type="hidden" name="idDupCheck" id="idDupCheck" value="" /> 
+				<input type="hidden" name="emailDupCheck" id="emailDupCheck" value="" /> 
+				<input type="hidden" name="isMobile" value="" /> 
+				<input type="hidden" name="ssnCd" id="ssnCd" value="<c:out value="${REQUEST_DATA.ssnCd }"/>" />
+
+				<!-- header -->
+				<%@ include file="/WEB-INF/jsp/ccedu/inc/header_inc.jsp"%>
+				<!--// header -->
+				<!-- container -->
+				<div id="container">
+					<div class="con_center">
+						<!-- content 본문 -->
+						<div id="content">
+							<!-- 메뉴 title -->
+							<div class="cont_title_wrapper">
+								<div class="wrapper">
+									<h3 class="cont_title">회원가입</h3>
+								</div>			
+							</div>			
+							<div class="wrapper">
+								<!-- 본문내용 -->
+								<div class="cont_body">
+									<!-- start -->
+	
+									<div class="c_section">
+										<div class="c_head_step">
+											<ol>
+												<li><span class="num_wrap"><span class="num">1. </span>약관동의</span></li>
+												<li class="on"><span class="num_wrap"><span class="num">2. </span>회원정보 인증</span></li>
+												<li><span class="num_wrap"><span class="num">3. </span>회원정보 등록</span></li>
+												<li><span class="num_wrap"><span class="num">4. </span>회원가입 완료</span></li>
+											</ol>
+										</div>
+									</div>
+	
+									<div class="c_section">
+										<ul class="c_txtlist mgt_first">
+											<li>회원가입을 위해 성명, 휴대폰번호, 이메일주소 등의 정보를 정확히 입력해주시기 바랍니다.</li>
+											<li>입력하신 개인정보는 회원님의 동의없이 제3자에게 제공되지 않으며, 관련 내용은 개인정보처리방침에서 확인 가능합니다.</li>
+										</ul>
+										<div class="table_style_row table_style_row1">
+											<table>
+												<caption>개인정보를 설정할수있는 표 입니다.</caption>
+												<colgroup>
+													<col class="col2_1" />
+													<col />
+												</colgroup>
+												<tr>
+													<th scope="row"><span class="required">필수사항 : </span>이름</th>
+													<td>
+														<div class="form_field">
+															<input type="text" title="이름 입력" id="userName" name="userName" maxlength="60" class="input_pw_wid" />
+														</div>
+													</td>
+												</tr>
+												<tr>
+													<th scope="row"><span class="required">필수사항 : </span>생년월일</th>
+													<td>
+														<div class="form_field">
+															<select title="생년월일 년 선택" id="brthYear" name="brthYear" class="wid_date">
+				                                           		<option value="">선택</option>
+				                                           		<c:forEach var="i" begin="0" end="120" step="1">
+				                                           			<option value="<c:out value="${REQUEST_DATA.nowYear + 12 - i}"/>"> <c:out value="${REQUEST_DATA.nowYear + 12 - i}"/>년 </option>
+				                                           		</c:forEach>
+															</select>
+															<select title="생년월일 월 선택" id="brthMonth" name="brthMonth" class="wid_date">
+				                                          		<option value="">선택</option>
+				                                           		<c:forEach var="i" begin="1" end="12" step="1">
+				                                           			<option value="<fmt:formatNumber value="${i}" pattern="00"/>"> <c:out value="${i}"/>월 </option>
+				                                           		</c:forEach>
+															</select>
+															<select title="생년월일 일 선택" id="brthDay" name="brthDay" class="wid_date">
+				                                        		<option value="">선택</option>
+				                                        		<c:forEach var="i" begin="1" end="31" step="1">
+				                                        			<option value="<fmt:formatNumber value="${i}" pattern="00"/>"> <c:out value="${i}"/>일 </option>
+				                                        		</c:forEach>
+															</select>															
+														</div>	
+													</td>
+												</tr>
+												<tr>
+													<th scope="row"><span class="required">필수사항 : </span>성별</th>
+													<td>													
+														<div class="form_field">
+															<div class="ff_radio">
+																<input type="radio" name="sex" id="jSexM" value="M"/><label for="jSexM">남자</label>
+															</div>
+															<div class="ff_radio">
+																<input type="radio" name="sex" id="jSexF" value="F"/><label for="jSexF">여자</label>
+															</div>
+														</div>
+														<input type="hidden" name="sex" id="sex" value="" />
+													</td>
+												</tr>
+												<tr class="emailTr">
+													<th rowspan="2" scope="row"><span class="required">필수사항 : </span>이메일</th>
+													<td>
+														<div class="form_field">
+															<input type="text" title="이메일 아이디 입력" id="userEmail1" name="userEmail1" maxlength="30" class="input_email_id" />
+															<span class="widbox widbox_email">@</span>
+															<input type="text" title="도메인 입력" id="userEmail2" name="userEmail2" maxlength="50" class="input_email_domain" />
+																<select title="직접입력 할 수 있는 도메인 선택" class="select_email_domain" id="userEmail3" name="userEmail3" onchange="fnEmailDomainSet(); return false;">
+																<c:forEach var="emap2" items="${mailDomainCodeList}" varStatus="status2">
+																	<option value="${emap2.MT_SUB_NAME}"><c:out value="${emap2.MT_SUB_NAME}"/></option>
+																</c:forEach>
+																<option value="">직접입력</option>
+															</select>
+															<button class="btn_graybg02 btn_postal_code checkEmailBtn" onclick="checkEmail();return false;">인증하기</button>
+														</div>
+													</td>
+												</tr>	
+												<tr class="emailAuthTr">
+													<td>
+														<div class="form_field">
+															<input type="text" title="이메일 인증코드" id="authNumber" name="authNumber" maxlength="6" class="authNumber" />
+															<button class="btn_graybg02 btn_postal_code checkEmailBtn" onclick="checkCode();return false;">확인</button>
+														</div>
+													</td>
+												</tr>											
+											</table>	
+										</div>
+									</div>	
+									<div class="c_btn_center">
+										<button onclick="cancle(); return false;" class="btn_graybg03">취소</button>
+										<button onclick="fnGoSubmit();return false;" class="btn_bluebg03">완료</button>
+									</div>
+									<!--// end -->
+								</div>
+								<!--// 본문내용 -->
+							</div>
+						</div>
+						<!--// content 본문 -->
+					</div>
+				</div>
+				<!--// container -->
+				<!-- foot -->
+				<%@ include file="/WEB-INF/jsp/ccedu/inc/footer_inc.jsp"%>
+				<!--// foot end -->
+			</fieldset>
+		</form>
+	</div>
+</body>
+</html>

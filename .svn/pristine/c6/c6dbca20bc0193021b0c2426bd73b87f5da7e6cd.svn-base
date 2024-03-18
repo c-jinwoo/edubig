@@ -1,0 +1,11 @@
+_this.$quizInfo = [
+	["다음 중 Mirror(대칭)에 대한 설명으로 <span style='color:#FF0000;'>틀린</span> 것은?","3D Model(모델)을 대칭 복사하는 명령어 이다.","Plane(대칭 면)을 지정할 때 3D Model(모델)의 구성 면을 선택할 수 있다.","Pattern Type(배열 유형)에는 Faces, Bodies, Features 등이 있다.","Plane(대칭 면) 작성을 위해 주로 사용되는 Construct(참조 형상)은 Tangent Plane(접선 평면)이다.",false],	
+	["다음 중 Surface Workspace(서피스 작업환경)에 대한 설명으로 <span style='color:#FF0000;'>틀린</span> 것은?","표면을 기반으로 한 모델링 작업 영역이다.","Sketch Profile(스케치 프로파일) 및 Sketch Curve(스케치 커브)를 이용해 3d Model(모델)을 생성할 수 있다.","Thicken(두께) 명령어를 통해 두께를 적용할 수 있다.","Surface Workspace(서피스 작업환경)에서 작성한 객체는 Solid Workspace(솔리드 작업환경)에서 사용할 수 없다.",false],
+	["다음 중 Thicken(두께)에 대한 설명으로 <span style='color:#FF0000;'>틀린</span> 것은?","표면에 두께를 적용하여 3D Model(모델)을 생성한다.","Thicken(두께) 기능은 Surface Workspace(서피스 작업환경)에서만 사용할 수 있다.","Direction(방향) 옵션은 두께의 방향을 설정할 수 있다.","Selection(선택) 옵션은 접선으로 연결되어 있는 면에 대해 연결 선택여부를 설정한다.",false]
+];
+
+_this.$quizAnsInfo = [
+	[4,"대칭 면(Plane) 작성을 위해 주로 사용되는 Construct(참조 형상)은 Midplane(중간 평면)이다."],
+	[4,"Surface Workspace(서피스 작업환경)에서 작성한 객체는 Solid Workspace(솔리드 작업환경)에서 사용할 수 있다."],
+	[2,"Thicken(두께) 기능은 Surface Workspace(서피스 작업환경)과 Solid Workspace(솔리드 작업환경) 두 영역 모두에서 사용할 수 있다."]
+];

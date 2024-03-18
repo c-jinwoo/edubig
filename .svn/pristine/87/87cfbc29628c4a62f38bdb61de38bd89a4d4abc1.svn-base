@@ -1,0 +1,198 @@
+<%
+/****************************************
+    subject : 온라인교육
+    summary : 온라인교육 > 교육소개
+    author  : SANGS
+    date    : 2018-06-15
+****************************************/
+%>
+<%@ page language="java" contentType="text/html; charset=utf-8" pageEncoding="utf-8"%>
+<%@ include file="/WEB-INF/jsp/ccedu/inc/taglib_inc.jsp"%>
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+	<title>설문조사 > 커뮤니티 > 지식마당 > 신용회복위원회 신용교육원</title>
+	<%@ include file="/WEB-INF/jsp/ccedu/inc/head_inc.jsp"%>
+	<script type="text/javascript">
+		
+		$(document).ready(function(){
+			
+			history.pushState(null, null, location.href);
+		    window.onpopstate = function () {
+		        history.go(1);
+			};
+			
+		});
+	 
+		// 설문 저장
+		function fnSave(){
+	   		var radioArr = new Array();
+	   		
+	   		$(":radio").each(function(i, val) {
+	   			if ($(this).is(':checked')) {
+	   				radioArr.push($(this).val());
+	   			}
+	   		});
+
+	   		
+	   		var radioCnt = 0;
+	   	 	<c:forEach items="${edPollQuizList}" var="result" varStatus="stat">
+				<c:if test="${result.MT_CPOLL_CODE == 'JBBA00'}">
+					radioCnt++;
+				</c:if>
+			</c:forEach>
+			
+	   		if(radioCnt == radioArr.length){
+	   			$('form[name=ansFrm]').attr('target', '_self').attr('action', '/ccedu/intellectual/sitePollExec.do').submit();
+	   		}else {
+	   			fnModalMsg('누락된 항목이 있습니다. <br/>모든 항목에 정답을 입력해주세요');
+	   		}
+	   		
+	   	}
+	
+	</script>
+
+</head>
+
+<body>
+<!-- skip nav -->
+	<%@ include file="/WEB-INF/jsp/ccedu/inc/nav_inc.jsp"%>
+<!--// skip nav -->
+
+
+<div id="wrap">
+
+	<!-- header -->
+	<%@ include file="/WEB-INF/jsp/ccedu/inc/header_inc.jsp"%>
+	<!--// header -->
+
+	<!-- container -->
+	<div id="container">
+
+		<!-- location -->
+		<jsp:include page="/WEB-INF/jsp/ccedu/inc/location/loc_04_02.jsp"> 
+		  	<jsp:param name="menuNm" value="설문조사"/> 
+		</jsp:include> 
+		<!--// location -->
+
+		<div class="con_center">
+
+			<!-- lnb -->
+			<div id="lnb">
+				<jsp:include page="/WEB-INF/jsp/ccedu/inc/lnb/lnb_04.jsp"> 
+				  	<jsp:param name="dep2" value="02"/>
+				  	<jsp:param name="dep3" value="02"/> 
+				</jsp:include>
+			</div>
+			<!--// lnb -->
+
+
+			<!-- content 본문 -->
+			<div id="content">
+				
+				<!-- 기존 START 2018-08-30  -->
+<!-- 				<h3 class="cont_titile">설문조사</h3> -->
+				<!-- 기존 END 2018-08-30  -->
+				
+				<!-- 2018-08-28 김동인 작업 S --> 
+				<h3 class="cont_titile type04">설문조사<span></span></h3>
+				<!-- 2018-08-28 김동인 작업 E -->
+		
+
+				<!-- 본문내용 -->
+				<div class="cont_body">
+					<!-- start -->
+					
+					<div class="c_section">
+						<h4 class="c_tit">설문조사 참여방법 안내</h4>
+						<div class="txt_introbox">
+							<h5>5점척도</h5>
+							<p>설문 문항을 읽고 본인이 생각하는 항목을 골라주세요.<br>(매우 아니다 =1, 아니다 =2. 보통이다 =3, 그렇다 =4, 매우 그렇다 =5)</p>
+							<h5>서술형</h5>
+							<p>설문 문항을 읽고 본인이 생각하는 의견을  자유롭게 적어주세요.</p>
+						</div>
+					</div>
+					
+					<div class="c_section">
+						<h4 class="c_tit">설문 안내</h4>
+						<div class="txt_introbox"><c:out value="${sitePollChk.SUMMARY}" escapeXml="false"/></div>
+					</div>
+					
+					<div class="c_section">
+						<h4 class="c_tit"><c:out value='${edPollInfo.TITLE}'/></h4>
+						<form name="ansFrm" id="ansFrm" method="post" >
+			
+							<input type="hidden" name="userNo" id="userNo" value="<c:out value="${REQUEST_DATA.SES_USERNO}"/>">
+							<input type="hidden" name="answer" id="answer" value="">
+							<input type="hidden" name="pollCseQno" id="pollCseQno" value="<c:out value="${REQUEST_DATA.pollCseQno}"/>"/>
+							<input type="hidden" name="mtAppType" id="mtAppType" value="<c:out value="${REQUEST_DATA.mtAppType}"/>"/>
+							<input type="hidden" name="ccNo" id="ccNo" value="<c:out value="${REQUEST_DATA.ccNo}"/>"/>
+							<input type="hidden" name="ccAppNo" id="ccAppNo" value="<c:out value="${REQUEST_DATA.ccAppNo}"/>"/>
+							<c:forEach items="${moduleList}" var="moduleList">
+								<c:set  var="count" value="1" />	
+								<div class="survey_box first">
+									<h5 class="title"><span>[ 설문 ${stat.count} ]</span> ${moduleList.CPOLL_TITLE}</h5>
+									<ul class="survey_list">
+									<c:forEach items="${edPollQuizList}" var="result" varStatus="stat">
+										<input type="hidden" name="exNo" qType="${moduleList.MT_CPOLL_CODE}" id="exNo${result.count}" value="<c:out value='${result.QNO }'/>"/>
+								 	 	<input type="hidden" name="itemSeq" id="itemSeq" value="<c:out value='${result.ITEMNO}'/>">
+										
+										<c:if test="${moduleList.CPOLL_TITLE == result.CPOLL_TITLE}">
+											<input type="hidden" id="qno" name="qno${stat.index}" value="${result.QNO}"/>
+											<input type="hidden" name="ordr" id="ordr" value="<c:out value='${result.ORDR }'/>"/>
+											<c:if test="${result.MT_CPOLL_CODE == 'JBBA00'}">
+												<li>
+													<p>${count}. ${result.SUBJECT}</p>
+													<div class="sel_points">
+														<h6 class="alt_text">점수선택</h6>
+														<c:forEach items="${edPollQitemList}" var="pollQitemList" varStatus ="stat2">
+															<c:if test="${pollQitemList.QNO == result.QNO}">
+																<input type="radio" id="result01<c:out value="${stat2.index}"/>" itemSeq="itemSeq<c:out value="${stat.index}"/>" value="<c:out value="${pollQitemList.ITEM_SUBJECT}"/>" name="itemSeq<c:out value="${stat.index}"/>" />
+																<label for="result01<c:out value="${stat2.index}"/>">${pollQitemList.ITEM_ORDR}</label>
+															</c:if>
+														</c:forEach>
+													</div>
+												</li>
+											</c:if>
+									
+											<c:if test="${result.MT_CPOLL_CODE == 'JBAA00' }">
+												<li class="in_textarea">
+													<p>${count}. ${result.SUBJECT}</p>
+													<input type="hidden" name="exNo" qType="${result.MT_CPOLL_CODE}" id="exNo${result.count}" value="<c:out value='${result.QNO }'/>"/>
+													<textarea name="itemSeq<c:out value="${stat.index}"/>" itemSeq="itemSeq<c:out value="${stat.index}"/>" id="answer<c:out value="${stat.count}"/>" cols="50" rows="10" placeholder="내용을 입력해주세요." title="이번 교육의 좋은점을 입력해주세요."></textarea>
+												
+												</li>
+											</c:if>
+											<c:set  var="count" value="${count+1}" />
+										</c:if>
+									</c:forEach>
+									</ul>
+								</div>
+							</c:forEach>
+							
+							<div class="c_btn_center">
+								<button onclick="fnSave(); return false;" class="btn_bluebg03">설문조사 참여하기</button>
+							</div>
+						</form>
+					</div>
+					<!--// end -->
+				</div>
+				<!--// 본문내용 -->
+				
+			</div>
+			<!--// content 본문 -->
+
+
+
+		</div>
+	</div>
+	<!--// container -->
+
+	<!-- foot -->
+	<%@ include file="/WEB-INF/jsp/ccedu/inc/footer_inc.jsp"%>
+	<!--// foot end -->
+
+</div>
+
+</body>
+</html>

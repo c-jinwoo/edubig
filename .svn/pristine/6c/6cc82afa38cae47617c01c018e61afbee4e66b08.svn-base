@@ -1,0 +1,990 @@
+package com.webapp.ccedu.ctrl;
+
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.io.PrintWriter;
+import java.net.HttpURLConnection;
+import java.net.URL;
+import java.net.URLDecoder;
+import java.net.URLEncoder;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.List;
+import java.util.Map;
+
+import javax.annotation.Resource;
+import javax.servlet.ServletOutputStream;
+import javax.servlet.http.Cookie;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
+
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+import org.springframework.stereotype.Controller;
+import org.springframework.ui.ModelMap;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseBody;
+
+import com.google.gson.Gson;
+import com.sangs.session.SessionManager;
+import com.sangs.session.UserSessionManager;
+import com.sangs.support.ControllerParamManager;
+import com.sangs.support.DataMap;
+import com.sangs.support.EduMap;
+import com.sangs.support.FrontException;
+import com.sangs.support.SangsProperties;
+import com.sangs.util.Aes_128;
+import com.sangs.util.DownloadServlet;
+import com.sangs.util.NxKeyUtil;
+import com.sangs.util.ParamUtil;
+import com.sangs.util.SangsCryptUtil;
+import com.sangs.util.SangsUtil;
+import com.webapp.academy.mapper.BoardMapper;
+import com.webapp.academy.mapper.MyClassMapper;
+import com.webapp.academy.service.CommonService;
+import com.webapp.academy.service.MyClassService;
+import com.webapp.academy.service.TutorService;
+import com.webapp.academy.service.UserService;
+import com.webapp.classdesk.service.ClassdeskBoardService;
+import com.webapp.common.service.CommonUserService;
+
+/**
+ * Description : 사용자 공통 관련 컨트롤러
+ *
+ * Modification Information
+ * 수정일          		수정자         		수정내용
+ * -------      -----------------------------------
+ * 2020.09.29	CSLAB		최초작성
+ *
+ */
+
+@Controller
+public class CommonController {
+
+    @Resource(name = "commonService")
+    private CommonService     commonService;
+
+    @Resource(name = "commonUserService")
+    private CommonUserService commonUserService;
+
+    @Resource(name = "myClassService")
+    private MyClassService myClassService;
+    
+    @Resource(name = "classdeskBoardService")
+    private ClassdeskBoardService classdeskBoardService;
+    
+    @Resource(name = "userService")
+    private UserService userService;
+
+    @Resource(name = "boardMapper")
+    private BoardMapper       boardMapper;
+    
+    @Resource(name = "tutorService")
+    private TutorService  tutorService;
+    
+    @Resource(name = "myClassMapper")
+    private MyClassMapper       myClassMapper;
+        
+    private Logger log = LogManager.getLogger(CommonController.class);
+
+    /**
+     * 로그인 폼
+     * @param
+     * @return
+     * @throws Exception
+     */
+    // TODO : 로그인 폼
+    @RequestMapping(value = "/ccedu/common/login.do")
+    private String login(HttpServletRequest req, HttpServletResponse res, DataMap rMap) throws FrontException {
+
+        if (!("").equals(rMap.getString("SES_USERID"))) {// 로그인 했다면
+            req.setAttribute("msg", "이미 로그인 상태 입니다.");
+            req.setAttribute("url", "/ccedu/main/main.do");
+            return "forward:/common/msgForward.do";
+        }
+
+        try {
+            req.setAttribute("returnUrl", ParamUtil.getStrParam(rMap.getString("returnUrl"),"/ccedu/main/main.do") );
+            
+            req.setAttribute("menu_nm", "mypage");
+            req.setAttribute("lnb_menu", "login");
+            rMap.setString("title", SangsProperties.getProperty("Globals.login"));
+            
+            req.setAttribute("REQUEST_DATA", rMap);
+
+        }catch (Exception e) { log.debug(e.getMessage());
+	       throw new FrontException(e);
+	    }
+        return "ccedu/login/member_login";
+    }
+
+    /**
+     * 로그인 실행
+     * @param
+     * @return
+     * @throws Exception
+     */
+    // TODO : 로그인 실행
+    @RequestMapping(value = "/ccedu/common/loginExec.do")
+    private String loginExec(HttpServletRequest req, HttpServletResponse res, DataMap rMap) throws FrontException {
+
+    	HttpSession session = req.getSession();
+        try {
+            String isMobile = rMap.getString("isMobile");
+            String password = "";
+            
+            password = rMap.getString("pwd");
+                       
+            rMap.setString("pwd",  password);
+            String userId = rMap.getString("userId");
+            String mberNm = "";
+            
+            int loginFailCnt = 0; // 로그인 실패 카운트
+            EduMap map = commonUserService.getLoginUserInfo(rMap);
+            if(map!=null){
+                rMap.setString("regUserId", userId);
+                rMap.setInt("comNo", map.getInt("COMNO"));
+                loginFailCnt = map.getInt("LOGIN_FAIL_CNT");
+                mberNm = map.getString("USERNAME");
+            }
+            
+            if(map != null 	//회원 데이터가 있으며
+            		&& (map.getString("PWD") == null || "".equals(map.getString("PWD")))	//패스워드가 없는 사용자
+        		){
+            	/***************본인인증 후 패스워드 재설정**************/
+            	
+            	rMap.putString("$userId", userId);
+            	rMap.putString("$mberNm", mberNm);
+            	rMap.putString("$brthdyCd", map.getString("BRTHDY_CD"));
+            	
+            	DataMap removeDataMap = new DataMap();
+        	    removeDataMap = SangsUtil.dataMapRemoveScriptTag(rMap);
+        	    
+            	req.setAttribute("paramInputs", ControllerParamManager.getParamHtmlFormConvert(removeDataMap));
+            	req.setAttribute("msg", "본인인증 후 사이트 이용이 가능합니다.<br>※ 2018.8.20 홈페이지 개편에 따라 <br>기존 회원분께서도 재인증 부탁드립니다.");
+                req.setAttribute("url", "/ccedu/common/oldmemCert.do");
+                return "forward:/common/msgForward.do";
+            	 
+            }else if(map != null && "N".equals(map.getString("REG_AT"))){
+            	req.setAttribute("msg", "주니어 회원의 경우 관리자 승인 후 로그인이 가능합니다.");
+	            req.setAttribute("url", "/ccedu/main/main.do" );
+            }else if(map != null && "Y".equals(map.getString("CHANGE_PWD"))){
+            	req.setAttribute("msg", "비밀번호를 변경한지 3개월이 지났습니다.<br>비밀변호 변경 후 로그인 가능합니다.");
+	            req.setAttribute("url", "/ccedu/user/memberFindIdPw.do?findgb=pw" );
+            }else if ( map != null && SangsCryptUtil.isMatch(password, map.getString("PWD")) 
+                    && ("Y".equals(map.getString("REG_AT"))) 
+                    && loginFailCnt < 5 ){
+            	
+            	
+            	int jsssionChk = 0;
+                Cookie[] cookies = req.getCookies();
+    			for (int i = 0; i < cookies.length; i++) {
+    				cookies[i].getName(); 
+    				cookies[i].getValue();
+    				
+    				if(cookies[i].getName().equals("JSESSIONID")){
+    					jsssionChk=i;
+    				}
+    			
+    			}
+    			String JSESSIONID = cookies[jsssionChk].getValue();
+    			rMap.putString("jessionId", JSESSIONID);
+    			commonUserService.updateJsessionId(rMap);
+    			
+    			
+                //세션에 저장.
+                UserSessionManager.getUserSessionInsert(req, commonUserService, map.getInt("USERNO"));
+                // 로그인정보등록(중복로그인처리관련)
+                SessionManager sessionManager = SessionManager.getInstance();
+                sessionManager.setLoginSessionFront(req, userId);
+                req.setAttribute("USERNAME", map.getString("USERNAME"));
+                
+                /** [공통] 로그인이력 등록 **/
+                commonUserService.insertMbrLoginLog(
+                        req,
+                        SangsProperties.getProperty("Globals.MBR_TRANS_SYS_GB_ACADEMY"),
+                        SangsProperties.getProperty("Globals.MBR_LOGIN_GB_SUCESS"),
+                        "로그인실행"
+                );
+                
+                //로그인 성공 시 로그인 실패횟수는 0으로 초기화
+                commonUserService.updateLoginSuccessInfo(rMap);
+                
+                req.setAttribute("url", ParamUtil.getStrParam(rMap.getString("returnUrl"),"/ccedu/main/main.do") );
+            
+            }
+            else{
+    	
+		        rMap.setString("msg", "아이디 또는 비밀번호를 다시 확인하세요.");
+				
+		        /** [공통] 로그인이력 등록 **/
+		        commonUserService.insertMbrLoginLog(
+		                req,
+		                SangsProperties.getProperty("Globals.MBR_TRANS_SYS_GB_ACADEMY"),
+		                SangsProperties.getProperty("Globals.MBR_LOGIN_GB_FAIL"),
+		                "로그인실패"
+		        );
+		        
+		        // 비밀번호 입력오류로 로그인 제한 및 회원승인상태 대기로 변경
+		        commonUserService.updateLoginFailCntInfo(rMap);
+		        loginFailCnt = loginFailCnt + 1; // 실패카운트 증가
+		        
+		        // 로그인 실패횟수 업데이트 후 다시 재조회
+		        if(loginFailCnt > 4) {
+		            req.setAttribute("msg", "비밀번호 5회 입력 오류로 로그인이 제한됩니다. 비밀번호 찾기를 통해 비밀번호를 재설정해주세요.");
+		            req.setAttribute("url", "/ccedu/user/memberFindIdPw.do" );
+		        }
+		        else {
+		            req.setAttribute("msg", rMap.getString("msg"));
+		            req.setAttribute("url", "/ccedu/common/login.do" );
+		        }
+		    }
+        } catch (Exception e) { log.debug(e.getMessage());
+             
+            throw new FrontException(e);
+        }
+        req.setAttribute("paramInputs", ControllerParamManager.getParamHtmlFormConvert(rMap));
+        req.setAttribute("REQUEST_DATA", rMap);
+
+        return "forward:/common/msgForward.do";
+    }
+
+    /**
+     * 로그아웃
+     * @param
+     * @return
+     * @throws Exception
+     */
+    // TODO : 로그아웃
+    @RequestMapping(value = "/ccedu/common/logout.do")
+    private String logout(HttpServletRequest req, HttpServletResponse res, DataMap rMap) throws FrontException {
+
+        try {
+        	commonUserService.deleteJsessionId(rMap);
+            /** [공통] 로그인이력 등록 **/
+            commonUserService.insertMbrLoginLog(
+                    req,
+                    SangsProperties.getProperty("Globals.MBR_TRANS_SYS_GB_ACADEMY"),
+                    SangsProperties.getProperty("Globals.MBR_LOGIN_GB_LOGOUT"),
+                    "로그아웃"
+            );
+        } catch (Exception e){ throw new FrontException(e);}
+
+        /** 세션 정보를 삭제한다. */
+        UserSessionManager.deleteUserSessionVO(req);
+
+        return "redirect:/";
+    }
+
+
+    /**
+     * 우편번호 찾기
+     * @param params
+     * @param req
+     * @param res
+     * @param model
+     * @return
+     * @throws Exception
+     */
+    @RequestMapping(value = "/academy/common/common/post.do")
+    private String post(HttpServletRequest request, DataMap rMap) throws FrontException {
+        try {
+            //request.setAttribute("listData", commonService.getPostcodeList(rMap));
+
+        	rMap.setString("title", SangsProperties.getProperty("Globals.post"));
+            request.setAttribute("REQUEST_DATA", rMap);
+
+        } catch (Exception e) { log.debug(e.getMessage());
+             
+            throw new FrontException(e);
+        }
+
+        return "academy/cmmn/jsp/post_pop";
+    }
+
+    /**
+     * 우편번호 찾기 회원가입시
+     * @param params
+     * @param req
+     * @param res
+     * @param model
+     * @return
+     * @throws Exception
+     */
+    @RequestMapping(value = "/academy/common/common/postJoin.do")
+    private String postJoin(HttpServletRequest request, DataMap rMap) throws FrontException {
+        try {
+            //request.setAttribute("listData", commonService.getPostcodeList(rMap));
+
+            request.setAttribute("REQUEST_DATA", rMap);
+
+        } catch (Exception e) { log.debug(e.getMessage());
+             
+            throw new FrontException(e);
+        }
+
+        return "academy/cmmn/jsp/post_pop_join";
+    }
+
+    /**
+     * 우편번호 찾기 실행
+     * @param params
+     * @param req
+     * @param res
+     * @param model
+     * @return
+     * @throws Exception
+     */
+    @RequestMapping(value = "/common/getPostAjax.do")
+    public void getPost(@RequestParam Map<String, String> params, HttpServletRequest req, HttpServletResponse res, ModelMap model) throws Exception {
+
+        String sendUrl = null;
+        StringBuffer query = new StringBuffer();
+        String searchSe = SangsUtil.nchk(params.get("searchSe"));
+
+        if ("oldpost".equals(searchSe)) {
+            sendUrl = SangsProperties.getProperty("Globals.lotNumberAdressUrl");
+            searchSe = "dong";
+        } else {
+            sendUrl = SangsProperties.getProperty("Globals.newAdressUrl");
+        }
+
+        query.append("searchSe=");
+        query.append(searchSe);
+        query.append("&");
+        String temp = URLEncoder.encode(SangsUtil.nchk(params.get("srchText")), "EUC-KR");
+
+        temp = URLDecoder.decode(temp, "ISO-8859-1");
+        String srchwrd = URLEncoder.encode(temp, "UTF-8");
+
+        query.append("srchwrd=");
+        query.append(srchwrd);
+        query.append("&");
+        query.append("serviceKey=");
+        query.append(URLEncoder.encode(SangsProperties.getProperty("Globals.serviceKey"), "UTF-8"));
+
+        URL url = new URL(sendUrl + "?" + query);
+        HttpURLConnection conn = (HttpURLConnection)url.openConnection();
+
+        if (conn.getResponseCode() != 200) {
+            throw new IOException(conn.getResponseMessage());
+        }
+
+        // Buffer the result into a string
+        BufferedReader rd = new BufferedReader(new InputStreamReader(conn.getInputStream(), "UTF-8"));
+        StringBuilder sb = new StringBuilder();
+        String line;
+        while ((line = rd.readLine()) != null) {
+            sb.append(line);
+        }
+        rd.close();
+
+        conn.disconnect();
+
+
+        res.setContentType("text/html; charset=utf-8");
+        PrintWriter out = res.getWriter();
+
+        out.print(sb.toString());
+        out.flush();
+        out.close();
+    }
+
+
+    /**
+     * 새 우편번호 검색 (5자리)
+     * @param  currentPage : 현재 페이지. 기본값은 1
+     * @param  countPerPage : 페이지당 출력 목록 수. 기본값은 10
+     * @param  confmKey : 부여 받은 승인키 (승인 중인 경우 테스트키)
+     * @param  keyword : 입력 검색어
+     * @return
+     * @throws Exception
+     */
+    @RequestMapping(value="/common/getNewPostAjax.do")
+    public void getNewPostAjax(@RequestParam Map<String, String> params, HttpServletRequest req, HttpServletResponse res, ModelMap model) throws Exception {
+
+    	
+    	try{
+    	String currentPage = req.getParameter("currentPage");
+        String countPerPage = req.getParameter("countPerPage");
+        String newZipcodeUrl = SangsProperties.getProperty("Globals.newZipcodeUrl");
+        String confmKey = SangsProperties.getProperty("Globals.confmKey"); // 인증키
+         String srchText = URLEncoder.encode(req.getParameter("srchText"), "UTF-8"); // 검색
+         
+
+        String apiUrl = newZipcodeUrl
+                + "?currentPage="+currentPage
+                + "&countPerPage="+countPerPage
+                + "&keyword="+srchText
+                + "&confmKey="+confmKey;
+
+        URL url = new URL(apiUrl);
+        BufferedReader br = new BufferedReader(new InputStreamReader(url.openStream(),"UTF-8"));
+        StringBuffer sb = new StringBuffer();
+        String tempStr = null;
+        while(true){
+            tempStr = br.readLine();
+            if(tempStr == null) break;
+            sb.append(tempStr);
+        }
+
+        br.close();
+        res.setCharacterEncoding("UTF-8");
+        res.setContentType("text/xml");
+        res.getWriter().write(sb.toString());
+        
+    	}catch(Exception e){
+    		e.printStackTrace();
+    		throw new Exception(e);
+    	}
+    }
+
+
+
+    /**
+     * 새 우편번호 검색 회원가입 폼에서 접근 (5자리)
+     * @param  currentPage : 현재 페이지. 기본값은 1
+     * @param  countPerPage : 페이지당 출력 목록 수. 기본값은 10
+     * @param  confmKey : 부여 받은 승인키 (승인 중인 경우 테스트키)
+     * @param  keyword : 입력 검색어
+     * @return
+     * @throws Exception
+     */
+    @RequestMapping(value="/common/getNewPostAjaxJoin.do")
+    public void getNewPostAjaxJoin(@RequestParam Map<String, String> params, HttpServletRequest req, HttpServletResponse res, ModelMap model, DataMap rMap) throws Exception {
+
+        String currentPage = req.getParameter("currentPage");
+        String countPerPage = req.getParameter("countPerPage");
+        String newZipcodeUrl = SangsProperties.getProperty("Globals.newZipcodeUrl");
+        String confmKey = URLEncoder.encode(SangsProperties.getProperty("Globals.confmKey"), "UTF-8"); // 인증키
+//         String srchText = URLEncoder.encode(req.getParameter("srchText"), "UTF-8"); // 검색
+        String srchText = URLEncoder.encode(req.getParameter("srchText"), "UTF-8");
+
+        String apiUrl = newZipcodeUrl
+                + "?currentPage="+currentPage
+                + "&countPerPage="+countPerPage
+                + "&keyword="+srchText
+                + "&confmKey="+confmKey;
+
+        URL url = new URL(apiUrl);
+        BufferedReader br = new BufferedReader(new InputStreamReader(url.openStream(),"UTF-8"));
+        StringBuffer sb = new StringBuffer();
+        String tempStr = null;
+        while(true){
+            tempStr = br.readLine();
+            if(tempStr == null) break;
+            sb.append(tempStr);
+        }
+
+        br.close();
+        res.setCharacterEncoding("UTF-8");
+        res.setContentType("text/xml");
+        res.getWriter().write(sb.toString());
+    }
+
+
+
+    /**
+     * 메시지를 alert 뿌리고 url에 해당하는 페이지로 이동한다.
+     * @param url
+     * @param msg
+     * @param model
+     * @return
+     * @throws Exception
+     */
+    @RequestMapping(value = "/common/msgForward.do")
+    public String msgForward(HttpServletRequest req, DataMap rMap) throws FrontException {
+
+    	req.setAttribute("paramInputs", (String)req.getAttribute("paramInputs"));
+        req.setAttribute("msg", (String)req.getAttribute("msg"));
+        req.setAttribute("url", (String)req.getAttribute("url"));
+        return "/common/msg_forward";
+    }
+
+    /**
+     * 나의강의실 파일다운로드
+     * @param url
+     * @param msg
+     * @param model
+     * @return
+     * @throws Exception
+     */
+    @RequestMapping(value = "/academy/classdeskFiledown.do")
+    public String reportFiledown(HttpServletRequest req, HttpServletResponse res, DataMap rMap) throws FrontException {
+
+        DownloadServlet filedown = new DownloadServlet();
+        boolean result;
+
+        try {
+        	
+        	EduMap data = classdeskBoardService.getBbsFileInfo(rMap);
+        	
+            EduMap map = new EduMap() ;
+            map.put("SAVFILE", data.getString("SAVFILE"));
+            map.put("SAVPATH", data.getString("SAVPATH"));
+            map.put("ORGFILE", data.getString("ORGFILE"));
+            result = filedown.downLoadFile(req, res, map);
+            
+            if (result) {
+                return null;
+                
+            } else {
+                return "/common/cmmn_error";
+            }
+
+        } catch (Exception e) { log.debug(e.getMessage());
+            return "common/cmmn_error";
+        }
+    }
+  
+    /**
+     * 회원정보수정 > 본인확인
+     * @param
+     * @return
+     * @throws Exception
+     */
+    // TODO : 회원정보수정 > 본인확인
+    @RequestMapping(value = "/ccedu/common/modiCheck.do")
+    private String modiCheck(HttpServletRequest req, HttpServletResponse res, DataMap rMap) throws FrontException {
+
+        if (("").equals(rMap.getString("SES_USERID"))) {
+            rMap.putString("$returnUrl", "/ccedu/common/modiCheck.do");
+            
+            DataMap removeDataMap = new DataMap();
+    	    removeDataMap = SangsUtil.dataMapRemoveScriptTag(rMap);
+            req.setAttribute("paramInputs", ControllerParamManager.getParamHtmlFormConvert(removeDataMap));
+            
+            req.setAttribute("msg", "로그인 후 이용가능합니다.");
+            req.setAttribute("url", "/ccedu/common/login.do");
+            return "forward:/common/msgForward.do";
+        }
+
+        try {
+            rMap.setString("userId", rMap.getString("SES_USERID"));
+            req.setAttribute("REQUEST_DATA", rMap);
+
+        }catch (Exception e) { log.debug(e.getMessage());
+	       throw new FrontException(e);
+	    }
+        return "ccedu/member/modi_check";
+    }
+    
+    
+    /**
+     * 회원정보수정 > 회원정보 등록
+     * @param request
+     * @param model
+     * @param rMap
+     * @return
+     * @throws FrontException
+     */
+    // TODO: 회원가입 > 등록
+    @RequestMapping(value = "/ccedu/common/modiForm.do")
+    public String modiForm(HttpServletRequest req, HttpServletResponse res, DataMap rMap) throws FrontException {
+
+        if (("").equals(rMap.getString("SES_USERID"))) {
+        	req.setAttribute("msg", "로그인 후 이용가능합니다.");
+        	req.setAttribute("url", "/ccedu/common/login.do");
+            return "forward:/common/msgForward.do";
+        }
+        
+        HttpSession session = req.getSession();
+        
+        try {
+        	
+        	String isMobile = rMap.getString("isMobile");
+            String password = rMap.getString("pwd");
+            
+        	rMap.setString("userId",  rMap.getString("SES_USERID"));
+        	rMap.setString("pwd",  password);
+        	
+        	EduMap map = commonUserService.getLoginUserInfo(rMap);
+        	
+        	
+        	System.out.println(password+"@@@@"+rMap);
+        	System.out.println(map+"@@@@@");
+        	
+        	if ( map != null && SangsCryptUtil.isMatch(password, map.getString("PWD")) 
+                    && ("Y".equals(map.getString("REG_AT"))) 
+                ){
+        		
+        		req.setAttribute("uMap", map);
+            	
+                //	이메일 도메인 목록
+                rMap.setString("mtCode","MA");
+                req.setAttribute("mailDomainCodeList", commonService.selectMtCodeSub(rMap));
+                
+                //	직업 목록
+                rMap.setString("mtCode","JO");
+                req.setAttribute("jobKndCodeList", commonService.selectMtCodeSub(rMap));
+                
+                //	가입경로 목록
+                rMap.setString("mtCode","PA");
+                req.setAttribute("userPathCodeList", commonService.selectMtCodeSub(rMap));
+                
+                req.setAttribute("REQUEST_DATA", rMap);
+        	}else{
+            	req.setAttribute("msg", "회원정보가 일치하지 않습니다.");
+            	req.setAttribute("url", "/ccedu/common/modiCheck.do");
+                return "forward:/common/msgForward.do";
+        	}
+        
+        } 
+        catch (Exception e) { log.debug(e.getMessage());
+            throw new FrontException(e);
+        }
+        
+        return "ccedu/member/modi_form";
+    }
+    
+    /**
+     * 회원정보수정 > 회원정보 수정
+     * @param request
+     * @param model
+     * @param rMap
+     * @return
+     * @throws FrontException
+     */
+    // TODO: 회원정보수정 > 회원정보 수정
+    @RequestMapping(value = "/ccedu/common/modiExec.do")
+    public String modiExec(HttpServletRequest req, HttpServletResponse res, DataMap rMap) throws FrontException {
+
+
+    	if (("").equals(rMap.getString("SES_USERID"))) {
+        	req.setAttribute("msg", "로그인 후 이용가능합니다.");
+        	req.setAttribute("url", "/ccedu/common/login.do");
+            return "forward:/common/msgForward.do";
+        }
+        
+        
+        try {
+        	
+        	HttpSession session = req.getSession();
+            
+            String isMobile = rMap.getString("isMobile");
+            String password = rMap.getString("userPassword");
+            
+            
+            rMap.setString("userId",  rMap.getString("SES_USERID"));
+            rMap.setString("pwd", password);
+        	
+        	EduMap map = commonUserService.getLoginUserInfo(rMap);
+        	
+        	//비밀번호 변경여부 체크
+        	if ( map != null && !SangsCryptUtil.isMatch(password, map.getString("PWD")) 
+                    && ("Y".equals(map.getString("REG_AT"))) 
+            ){
+        		commonUserService.updatePwdUpdDt(rMap);
+        	}
+        	
+        	//수정
+        	commonUserService.updateMemberInfo(rMap);
+        	
+            req.setAttribute("REQUEST_DATA", rMap);
+            
+            req.setAttribute("msg", "회원정보가 수정되었습니다.");
+            req.setAttribute("url", "/ccedu/main/main.do");
+        
+        } 
+        catch (Exception e) { log.debug(e.getMessage());
+            throw new FrontException(e);
+        }
+        
+        return "forward:/common/msgForward.do";
+        
+    }
+    
+    /**
+     * 회원정보수정 > 회원탈퇴
+     * @param
+     * @return
+     * @throws Exception
+     */
+    // TODO : 회원정보수정 > 본인확인
+    @RequestMapping(value = "/ccedu/common/secsnForm.do")
+    private String secsnForm(HttpServletRequest req, HttpServletResponse res, DataMap rMap) throws FrontException {
+
+        if (("").equals(rMap.getString("SES_USERID"))) {
+            req.setAttribute("msg", "로그인 후 이용가능합니다.");
+            req.setAttribute("url", "/ccedu/common/login.do");
+            return "forward:/common/msgForward.do";
+        }
+
+        try {
+            rMap.setString("userId", rMap.getString("SES_USERID"));
+            
+            //	탈퇴 사유 목록
+            rMap.setString("mtCode","PC");
+            req.setAttribute("secsnCodeList", commonService.selectMtCodeSub(rMap));
+            
+            req.setAttribute("REQUEST_DATA", rMap);
+
+        }catch (Exception e) { log.debug(e.getMessage());
+	       throw new FrontException(e);
+	    }
+        return "ccedu/member/secsn_form";
+    }
+    
+    /**
+     * 회원정보수정 > 회원탈퇴 실행
+     * @param
+     * @return
+     * @throws Exception
+     */
+    // TODO : 회원정보수정 > 회원탈퇴 실행
+    @RequestMapping(value = "/ccedu/common/secsnExec.do")
+    private String secsnExec(HttpServletRequest req, HttpServletResponse res, DataMap rMap) throws FrontException {
+
+        if (("").equals(rMap.getString("SES_USERID"))) {
+            req.setAttribute("msg", "로그인 후 이용가능합니다.");
+            req.setAttribute("url", "/ccedu/common/login.do");
+            return "forward:/common/msgForward.do";
+        }
+        
+        if (!(rMap.getString("userId")).equals(rMap.getString("SES_USERID"))) {
+            req.setAttribute("msg", "회원정보가 일치하지 않습니다.");
+            req.setAttribute("url", "/ccedu/main/main.do");
+            return "forward:/common/msgForward.do";
+        }
+        
+        HttpSession session = req.getSession();
+        boolean succ = false;
+        try {
+        	
+        	String isMobile = rMap.getString("isMobile");
+        	String password = "";
+
+        	if("true".equals(isMobile)){
+        	  try{
+        	  }catch(Exception e){
+        	    log.error("CommonController.loginExec - " + e);
+        	    req.setAttribute("msg", "일시적인 오류가 발생했습니다.<br>오류가 지속될 시 문의 바랍니다.");
+        	    req.setAttribute("url", "/ccedu/common/login.do");
+        	    return "forward:/common/msgForward.do";
+        	  }
+        	}else{
+        	  DataMap nxMap = NxKeyUtil.getDecryptNxKey(rMap.getString("hid_key_data"), rMap.getString("E2E_userPassword"), session);
+        	  
+        	  if(nxMap == null || nxMap.getInt("errCd") != 0){
+        	    log.error("CommonController.loginExec - nxMap is NULL");
+        	    req.setAttribute("msg", "일시적인 오류가 발생했습니다.<br>오류가 지속될 시 문의 바랍니다.");
+        	    req.setAttribute("url", "/ccedu/common/login.do");
+        	    return "forward:/common/msgForward.do";
+        	  }
+        	  
+        	  if( nxMap.getInt("errCd") != 0){
+        	    log.error(nxMap.getString("errMsg"));
+        	    req.setAttribute("msg", "일시적인 오류가 발생했습니다.<br>오류가 지속될 시 문의 바랍니다.");
+        	    req.setAttribute("url", "/ccedu/common/login.do");
+        	    return "forward:/common/msgForward.do";
+        	  }
+        	  
+        	  password = nxMap.getString("resultVal");
+        	}
+        	
+
+        	rMap.setString("pwd",  password);
+        	
+        	EduMap map = commonUserService.getLoginUserInfo(rMap);
+        	
+        	if ( map != null && SangsCryptUtil.isMatch(password, map.getString("PWD"))){
+        		//삭제
+        		commonUserService.updateMemberSecsn(rMap);
+        		succ = true;
+        		
+        	}
+        	
+        	
+        	if(succ){
+        		req.setAttribute("msg", "탈퇴가 완료 되었습니다");
+            	commonUserService.deleteJsessionId(rMap);
+                UserSessionManager.deleteUserSessionVO(req);
+        	}
+        	else  req.setAttribute("msg", "탈퇴에 실패했습니다.");
+        	
+        	
+        	req.setAttribute("url", "/ccedu/main/main.do");
+            req.setAttribute("REQUEST_DATA", rMap);
+
+        }catch (Exception e) { log.debug(e.getMessage());
+	       throw new FrontException(e);
+	    }
+        return "forward:/common/msgForward.do";
+    }
+    
+    /**
+     * 전체메뉴 > 이용안내 > 사이트맵
+     * @param
+     * @return
+     * @throws Exception
+     */
+    // TODO : 전체메뉴
+    @RequestMapping(value="/ccedu/common/commonMenu.do")
+    public String commonMenu(HttpServletRequest req, HttpServletResponse res, DataMap rMap) throws FrontException {
+        req.setAttribute("REQUEST_DATA", rMap);
+    	return "ccedu/main/common_menu";
+    	
+    }
+    
+    
+    /**
+     * 전체메뉴 > 이용안내 > 이용약관
+     * @param
+     * @return
+     * @throws Exception
+     */
+    // TODO : 전체메뉴
+    @RequestMapping(value="/ccedu/common/termsConditions.do")
+    public String termsConditions(HttpServletRequest req, HttpServletResponse res, DataMap rMap) throws FrontException {
+        req.setAttribute("REQUEST_DATA", rMap);
+    	return "ccedu/main/terms_conditions";
+    	
+    }
+    
+    
+    /**
+     * 전체메뉴 > 이용안내 > 개인정보보호정책
+     * @param
+     * @return
+     * @throws Exception
+     */
+    // TODO : 전체메뉴
+    @RequestMapping(value="/ccedu/common/privacy.do")
+    public String privacy(HttpServletRequest req, HttpServletResponse res, DataMap rMap) throws FrontException {
+        req.setAttribute("REQUEST_DATA", rMap);
+    	return "ccedu/main/privacy";
+    	
+    }
+    
+    /**
+     * 전체메뉴 > 이용안내 > 저작권보호
+     * @param
+     * @return
+     * @throws Exception
+     */
+    // TODO : 전체메뉴
+    @RequestMapping(value="/ccedu/common/copyright.do")
+    public String copyright(HttpServletRequest req, HttpServletResponse res, DataMap rMap) throws FrontException {
+        req.setAttribute("REQUEST_DATA", rMap);
+    	return "ccedu/main/copyright";
+    	
+    }
+    
+    
+    /**
+     * FOOTER > 이메일 무단 수집 거부
+     * @param
+     * @return
+     * @throws Exception
+     */
+    // TODO : 전체메뉴
+    @RequestMapping(value="/ccedu/common/rejectEmail.do")
+    public String rejectEmail(HttpServletRequest req, HttpServletResponse res, DataMap rMap) throws FrontException {
+        req.setAttribute("REQUEST_DATA", rMap);
+    	return "ccedu/main/reject_email";
+    }
+    
+    
+    /**
+     * FOOTER > 찾아오시는 길
+     * @param
+     * @return
+     * @throws Exception
+     */
+    // TODO : 전체메뉴
+    @RequestMapping(value="/ccedu/common/navigation.do")
+    public String navigation(HttpServletRequest req, HttpServletResponse res, DataMap rMap) throws FrontException {
+        req.setAttribute("REQUEST_DATA", rMap);
+    	return "ccedu/main/navigation";
+    }
+    
+    @RequestMapping(value="/ccedu/common/cancel.do")
+    public String cancel(HttpServletRequest req, HttpServletResponse res, DataMap rMap) throws FrontException {
+        req.setAttribute("REQUEST_DATA", rMap);
+    	return "ccedu/main/cancel";
+    }
+    
+    
+    /**
+     * 공인인증서 > 로그 > ajax 
+     * @param
+     * @return
+     * @throws IOException 
+     * @throws Exception
+     */
+    // TODO :  공인인증서 > 로그 > ajax 
+    @RequestMapping(value = "/ccedu/common/realNameAuthLogAjax.do")
+    public void realNameAuthLogAjax(HttpServletRequest request, HttpServletResponse response, DataMap rMap) throws FrontException, IOException{
+    	
+    	 response.setContentType("text/html; charset=utf-8");
+		 PrintWriter out = response.getWriter();
+	     Gson gson = new Gson();
+	     String json = null;
+	     
+	     try {       
+	    	 ArrayList result = new ArrayList();
+	    	 commonService.insertRealNameAuth((ArrayList) result, rMap);
+	    	
+	    } catch (Exception ex) {
+	    	json = gson.toJson("FAIL");
+	    }
+	     
+	    out.print(json);
+	    out.flush();
+	    out.close();
+    	
+    }
+     
+    /*
+     * 1. MD5 해쉬암호화 (수정하지 마세요.)
+     *  1) MD5 해쉬암호화는 거래 위변조를 막기위한 방법
+     *  
+     *  2) 해쉬 암호화 적용 (LGD_MID + LGD_OID + LGD_AMOUNT + LGD_TIMESTAMP + LGD_MERTKEY ) 
+     *  LGD_MID    	  : 상점아이디
+     *  LGD_OID    	  : 주문번호
+     *  LGD_AMOUNT    : 금액
+     *  LGD_TIMESTAMP : 타임스탬프
+     *  LGD_MERTKEY   : 상점 MertKey
+     * 
+     */
+    private String hashDataCreate(String LGD_AMOUNT, String LGD_TIMESTAMP, String LGD_OID ) throws NoSuchAlgorithmException{
+    	String LGD_HASHDATA = "";
+    	String CST_PLATFORM = SangsProperties.getProperty("Global.CST_PLATFORM");
+    	String CST_MID =  SangsProperties.getProperty("Global.CST_MID");
+    	String LGD_MID = ("test".equals(CST_PLATFORM.trim())?"t":"") + CST_MID;
+    	String LGD_MERTKEY = SangsProperties.getProperty("Global.LGD_MERTKEY");
+
+    	StringBuffer sb = new StringBuffer();
+        sb.append(LGD_MID);
+        sb.append(LGD_OID);
+        sb.append(LGD_AMOUNT);
+        sb.append(LGD_TIMESTAMP);
+        sb.append(LGD_MERTKEY);
+
+        byte[] bNoti = sb.toString().getBytes();
+        MessageDigest md = MessageDigest.getInstance("MD5");
+        byte[] digest = md.digest(bNoti);
+
+        StringBuffer strBuf = new StringBuffer();
+        for (int i=0 ; i < digest.length ; i++) {
+            int c = digest[i] & 0xff;
+            if (c <= 15){
+                strBuf.append("0");
+            }
+            strBuf.append(Integer.toHexString(c));
+        }
+        
+        LGD_HASHDATA = strBuf.toString();
+        
+    	return LGD_HASHDATA;
+    };
+    
+}

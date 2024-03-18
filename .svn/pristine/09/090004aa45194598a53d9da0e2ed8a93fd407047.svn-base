@@ -1,0 +1,58 @@
+ 
+package com.sangs.util;
+ 
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.InputStreamReader;
+import java.util.ArrayList;
+
+//import egovframework.rte.fdl.string.EgovStringUtil;
+import egovframework.com.cmm.EgovStringUtil;
+
+public class SangsFileUtil extends EgovStringUtil{
+    
+	/**
+	 * 파일을 삭제함
+	 * @param file_nm /파일이름
+	 * @param filePath //파일 실제경로
+	 * @throws Exception
+	 */
+	public static void deleteFile(String fileName, String filePath) throws Exception  {
+		
+		File f = new File(filePath +  File.separator + fileName); // 파일 객체생성
+		if( f.exists()) f.delete(); // 파일이 존재하면 파일을 삭제한다.
+		
+		//thumnail쪽도 삭제
+		File thumb = new File(filePath + "thumb/" + fileName); // 파일 객체생성
+		if( thumb.exists()) thumb.delete(); // 파일이 존재하면 파일을 삭제한다.
+		
+	}
+	
+	public static ArrayList<String> readFile(String filePath) throws Exception{
+		
+		ArrayList<String> temp = new ArrayList<String>();
+		
+		 	try {
+			 
+		       // 바이트 단위로 파일읽기
+		        // 대상 파일
+		 		 BufferedReader in = new BufferedReader(
+		 		           new InputStreamReader(new FileInputStream(filePath), "utf-8"));
+		 		 
+		 		 String str;
+		       
+		        while ((str= in.readLine())!= null){
+		        	str =str.replaceAll(",", ".#");
+		        	temp.add(str);
+		        }
+		         //출력
+
+		        in.close(); //스트림 닫기
+		 		} catch (Exception e) {
+		 			e.getStackTrace();
+		 		}
+		 	return temp;
+		
+	}
+}

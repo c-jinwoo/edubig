@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes" ?>
+<list>
+  <index>
+    <topic>
+      <list title="main" page="1">소개하기</list>
+      <list title="sub" page="1">마이닝과 머신러닝 기반 데이터 분석</list>
+
+      <list title="main" page="2">살펴보기</list>
+      <list title="sub" page="2">데이터마이닝의 이해</list>
+      <list title="sub" page="3">연관관계분석</list>
+	    <list title="sub" page="4">의사결정나무</list>
+	    <list title="sub" page="5">인공신경망</list>
+	    <list title="sub" page="6">사례기반추론</list>
+	    <list title="sub" page="7">군집분석</list>
+	    <list title="sub" page="8">머신러닝</list>
+
+      <list title="main" page="9">정리하기</list>
+      <list title="sub" page="9">핵심평가</list>
+      <list title="sub" page="10">학습정리</list>
+    </topic>
+  </index>
+</list>

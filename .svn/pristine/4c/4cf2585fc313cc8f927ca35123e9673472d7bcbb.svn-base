@@ -1,0 +1,11 @@
+_this.$quizInfo = [
+	["다음 중 Rectangle Pattern(사각 배열)에 대한 설명으로 <span style='color:#FF0000;'>틀린</span> 것은?","사각 배열 복사 명령어 이다.","사각 배열 복사를 위해서는 반드시 회전 Axis(축)을 지정해야 한다.","배열 복사의 방향은 3D Model(모델)의 모서리나 Axis(축)을 지정할 수 있다.","Distance Type(거리 유형) 옵션은 거리 값 적용 유형을 설정한다.",false],	
+	["다음 중 Circular Pattern(원형 배열)에 대한 설명으로 <span style='color:#FF0000;'>틀린</span> 것은?","기준 Axis(축)을 지정하여 회전 배열 복사한다.","배열 복사의 수량 설정에는 원본을 포함하지 않는다.","Suppress(억제) 옵션은 객체의 화면 표시 유무를 설정한다.","배열 유형에는 Full(360도 회전), Angle(회전 각도 입력), Symmetric(대칭 배열)이 있다.",false],
+	["다음 중 Pattern on Path(경로 배열)에 대한 설명으로 <span style='color:#FF0000;'>틀린</span> 것은?","객체를 지정한 Path(경로)를 따라 배열복사 한다.","경로는 3D Model(모델)의 모서리나 Sketch Curve(스케치 커브)를 지정할 수 있다.","적용 범위는 Path(경로)의 전체 길이에 대한 비율로 적용할 수 있다.","직선으로 구성된 Path(경로)만 적용할 수 있다.",false]
+];
+
+_this.$quizAnsInfo = [
+	[2,"회전 Axis(축)을 반드시 지정해야 하는 유형은 Circular Pattern(원형 배열)이다."],
+	[2,"모든 Pattern(배열) 객체의 수량 설정에는 원본 객체를 포함한다."],
+	[4,"Pattern on Path(경로 배열)의 Path(경로)는 직선 뿐만 아니라 곡선 유형도 지정할 수 있다."]
+];

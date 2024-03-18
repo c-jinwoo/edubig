@@ -1,0 +1,161 @@
+<%
+/****************************************
+	subject	: 신용상담사 > 자격시험 > 자격소개
+	summary	: 
+	author	: sangs
+	date	: 2018-05-28
+****************************************/
+%>
+<%@ page language="java" contentType="text/html; charset=utf-8" pageEncoding="utf-8"%>
+<%@ include file="/WEB-INF/jsp/common/inc/taglib_inc.jsp"%>
+<%@ include file="/WEB-INF/jsp/academy/cmmn/inc/top_inc.jsp"%>
+<%@ include file="/WEB-INF/jsp/academy/cmmn/inc/header_inc.jsp"%>
+	
+<script type="text/javascript">
+
+
+		var aryData1 = new Array;
+		var aryData2 = new Array;
+		var aryData3 = new Array;
+		var aryData4 = new Array;
+		var aryData5 = new Array;
+		var aryData6 = new Array;
+		
+		<c:forEach var="result" items="${refreTraiList}" varStatus="status">
+			aryData1.push('${result.FILE_PATH}');   // 경로
+			aryData2.push('${result.MEDIA_FILE}');  // mp4 파일명 
+			aryData3.push('${result.CUSERNO}');    // 수강코드
+			aryData4.push('${result.TREENO}');     // 목차코드
+			aryData5.push('${result.STUDYTIME}'); // 학습시간
+			aryData6.push('${result.SDAY}'); // 페이지
+		</c:forEach>
+
+
+	$(document).ready(function(){
+		$('.link-txt a').each(function(){
+		    var replaced = $(this).text().replace(/&lt;/g, '<').replace(/&gt;/g, '>');
+		    $(this).text(replaced);
+		});
+		
+	});
+	
+	function learning(idx) {
+		
+		$('#filePath').val(aryData1[idx]);
+		$('#mediaFile').val(aryData2[idx]);
+		$('#cuserno').val(aryData3[idx]);
+		$('#treeno').val(aryData4[idx]);
+		$('#studytime').val(aryData5[idx]);
+
+		$('#sday').val(aryData6[idx]);
+		
+		//TEST DATE
+		$('#studytime').val(500);
+
+		window.open("http://localhost:8080/edu_data/contents/1001.html","mediaPop","width=1000,height=650");
+	}
+
+	function progExec(cuserno, treeno, sday, studytime, totalEduTime){
+
+		console.log();
+		console.log("cuserno : " + cuserno);
+		console.log("treeno : " + treeno);
+		console.log("sday : " + sday);
+		console.log("studytime : " + studytime);
+		console.log("totalEduTime : " + totalEduTime);
+
+        $.ajax({
+            url : "/academy/myclass/ajaxProgressCheck.do",
+            data : { cuserno : cuserno
+	               , treeno : treeno
+	               , studytime : studytime 
+	               , totalEduTime : totalEduTime
+	               , sday : sday
+	               , cceduDiv : 'Y'
+            	   },
+            dataType : "json",
+            type : 'post',
+            success : function(res) { 		            	
+            	location.reload();
+            },
+            error : function(e) {
+                alert("error :" + e.responseText);
+            }
+        }); 
+    }
+	
+</script>
+<form id="frm" name="frm" method="post">
+	<input type="hidden" name="filePath" id="filePath" value=""/>
+	<input type="hidden" name="mediaFile" id="mediaFile" value=""/>
+	<input type="hidden" name="cuserno" id="cuserno" value=""/>
+	<input type="hidden" name="treeno" id="treeno" value=""/>
+	<input type="hidden" name="studytime" id="studytime" value=""/>
+	<input type="hidden" name="sday" id="sday" value="1"/>
+
+<div class="container" id="Subcontent">
+    <article class="subArea">
+        <div class="subCntWrap">
+		<%@ include file="/WEB-INF/jsp/academy/cmmn/inc/lnb_ccedu.jsp" %>
+		<div class="path">
+        	<ul>
+            	<li><span class="home text-hide">신용상담사</span></li>
+                <li>자격시험</li>
+                <li class="active">수험표출력</li>
+            </ul>
+        </div>
+		<div class="subConts" id="sub-content">
+			<section class="bgTop_cate04"><!--   카테고리별 이미지 추가  -->
+            		<div class="contTop">
+            			<h2 class="h2_tit">보수교육</h2>
+            		</div>           	
+	            </section>
+	            
+<!-- 	            ${refreTraiInfo }
+	            <br><br><br><br>
+	            ${refreTraiList } -->
+	            
+	            <table class="tbl-board list"  border="1">
+	        			<caption>신용상담사 신규</caption>
+	        				<colgroup>
+								<col align=middle width="10%">
+								<col align=middle width="30%">
+							  	<col align=middle width="30%">
+							  	<col align=middle width="20%">
+							  	<col align=middle width="20%">
+							</colgroup>
+                          	<thead>
+                            	<tr>
+                                  	<th scope="col">NO</th>
+                                  	<th scope="col">과정명</th>
+                                  	<th scope="col">학습시간</th>
+									<th scope="col">학습완료일</th>
+									<th scope="col"></th>
+                           	 	</tr>
+                          	</thead>
+                          	<tbody>
+                          	<c:if test="${not empty refreTraiList}">
+                          		<c:forEach var="result" items="${refreTraiList}" varStatus="status">
+                             		<tr>
+	                             		<!--  시험명 -->
+	                                  	<td>${result.RNUM}</td>
+	                             		<!--  시험명 -->
+	                                  	<td>${result.SUBJECT}</td>
+	                                	<!-- 접수기간 -->
+	                                  	<td class="subject">
+											${result.RUNTIME}분
+                                  		</td> 
+                                  		<!-- 선택 -->
+                                  		<td>${result.COMP_DATE}</td>
+                                  		<td> 
+                                  			<c:if test="${result.COMP_DATE eq null}"><a href="#" onclick="learning('${status.index}'); return false;">학습하기</a></c:if>
+                                  		</td>
+                              		</tr>
+                               	</c:forEach> 
+							</c:if>
+                          </tbody>
+                      </table>
+</div>	 
+</form>
+<!-- footer -->
+<%@ include file="/WEB-INF/jsp/academy/cmmn/inc/footer_inc.jsp"%>

@@ -1,0 +1,400 @@
+@import url(./font.css);
+body {
+  width: 100%;
+  height: 100%;
+  background: url(../img/loading.gif) no-repeat;
+  background-size: 100% 100%;
+  overflow:hidden;
+  margin:0px;
+  padding:0px;
+}
+.content {
+  position: absolute;
+  left: 0px;
+  top: 0px;
+  width: 1280px;
+  height: 760px;
+}
+.content > .video1 {
+  position: absolute;
+  width: 100%;
+  height: auto;
+  /*height:720px;*/
+  z-index: 100;
+}
+.content > .controlBar {
+  position: absolute;
+  bottom : 0px;
+  z-index: 200;
+  outline: 1px solid #30353b;
+  border-top: 1px solid #7B7B7D;
+  /*background: #001219;*/
+  background: linear-gradient(to right, #1B2530, #484849);
+  padding-top: 0px;
+  width: 1280px;
+  right:0px;
+  transition-duration: 0.4s;
+ }
+.content > .controlBar > .btm_line{
+	position:absolute;
+	width:1280px;
+	height:5px;
+	top:35px;
+	background:linear-gradient(to right, rgba(0,0,0,0), rgba(0,0,0,0.3), rgba(0,0,0,0));
+}/*
+.content > .controlBar .button> button:hover,
+.content > .controlBar .button> button:focus{
+    background-position: -26px 0px;
+}
+.content > .controlBar > .button> button.toggle{
+    background-position: -0px -26px;
+}
+.content > .controlBar > .button > button.toggle:hover,
+.content > .controlBar > .button > button.toggle:focus{
+    background-position: -26px -26px;
+}
+.content > .controlBar .button.movePrev> button:hover,
+.content > .controlBar .button.movePrev> button:focus,
+.content > .controlBar .button.moveNext> button:hover,
+.content > .controlBar .button.moveNext> button:focus{
+    background-position: -30px 0px;
+}
+.content > .controlBar > .button.movePrev> button.toggle,
+.content > .controlBar > .button.moveNext> button.toggle{
+    background-position: -0px -30px;
+}
+.content > .controlBar > .button.movePrev> button.toggle:hover,
+.content > .controlBar > .button.movePrev> button.toggle:focus,
+.content > .controlBar > .button.moveNext > button.toggle:hover,
+.content > .controlBar > .button.moveNext > button.toggle:focus{
+    background-position: -30px -30px;
+}*/
+
+.content > .controlBar .button> button:hover{
+    background-position: -26px 0px;
+}
+.content > .controlBar > .button> button.toggle{
+    background-position: -0px -26px;
+}
+.content > .controlBar > .button > button.toggle:hover{
+    background-position: -26px -26px;
+}
+.content > .controlBar .button.movePrev> button:hover,
+.content > .controlBar .button.moveNext> button:hover{
+    background-position: -30px 0px;
+}
+.content > .controlBar > .button.movePrev> button.toggle,
+.content > .controlBar > .button.moveNext> button.toggle{
+    background-position: -0px -30px;
+}
+.content > .controlBar > .button.movePrev> button.toggle:hover,
+.content > .controlBar > .button.moveNext > button.toggle:hover{
+    background-position: -30px -30px;
+}
+.content > .controlBar > .line{
+	float:left;
+	height:20px; 
+	width:0px;
+	border-right:0px;
+	border-left: 1px solid #8c8c8c;
+	margin-left: 60px;
+}
+.content > .controlBar > .button{
+  position: absolute;
+  top:6px;
+  width: 26px;
+  height: 26px;
+  border: 0px;
+  font-family: KoPub DotumLight;
+  color: #ffffff;
+  cursor: pointer;
+}
+.content > .controlBar > .button > button{
+  border: 0px;
+  width: 100%;
+  height: 100%;
+  cursor: pointer;
+}
+.content > .controlBar > .trackBtn,
+.content > .controlBar > .line{
+	visibility:hidden;
+}
+.content > .controlBar > .logo {
+	left:50px;
+	width:125px;
+	height:25px;
+	/*background: url(../img/logo.png) no-repeat 100% 100% /100% 100%;*/
+	top:7px;
+	cursor:initial;
+}
+.content > .controlBar > .info {
+	left:80px;
+}
+.content > .controlBar > .down {
+	left:140px;
+}
+.content > .controlBar > .play {
+	right:450px;
+}
+.content > .controlBar > .pause {
+	right:450px;
+}
+.content > .controlBar > .replay {
+	right:420px;
+}
+.content > .controlBar > .trackBtn {
+	right:325px;
+}
+.content > .controlBar > .sound {
+	right:340px;
+}
+.content > .controlBar > .fullScreen {
+	right:380px;
+}
+.content > .controlBar > .movePrev {
+	right:145px;
+	width:30px;
+}
+.content > .controlBar > .moveNext {
+	right:20px;
+	width:30px;
+}
+.content > .controlBar > .info > button {
+  background: url(../img/icon_info.png) no-repeat;
+}
+.content > .controlBar > .down > button {
+  background: url(../img/icon_down.png) no-repeat;
+}
+.content > .controlBar > .play > button {
+  background: url(../img/icon_play.png) no-repeat;
+}
+.content > .controlBar > .pause > button {
+  background: url(../img/icon_pause.png) no-repeat;
+}
+.content > .controlBar > .replay > button {
+  background: url(../img/icon_replay.png) no-repeat;
+}
+.content > .controlBar > .trackBtn > button {
+  background: url(../img/icon_text.png) no-repeat;
+}
+.content > .controlBar > .sound > button {
+  background: url(../img/icon_vol.png) no-repeat;
+}
+.content > .controlBar > .fullScreen > button {
+  background: url(../img/icon_scale.png) no-repeat;
+}
+.content > .controlBar > .movePrev > button {
+  background: url(../img/icon_pre.png) no-repeat;
+}
+.content > .controlBar > .moveNext > button {
+  background: url(../img/icon_next.png) no-repeat;
+}
+.content > .controlBar > .digClock {
+	top:14px;
+	color:#ffffff;
+	font-family:KoPub DotumLight;
+	font-size:12px;
+}
+.content > .controlBar > .curTime {
+	right:550px;
+}
+.content > .controlBar > .slash {
+	right:510px;
+}
+.content > .controlBar > .totalTime {
+	right:493px;
+}
+.content > .controlBar > .curPage {
+    font-size:24px;
+    top:8px;
+    right:105px;
+    color:#35B7E8;
+}
+.content > .controlBar > .pageSlash {
+    font-size:20px;
+    top:10px;
+	right:75px;
+    color:#666666;
+}
+.content > .controlBar > .totalPage {
+    font-size:24px;
+    top:8px;
+    right:60px;
+    color:#ffffff;
+}
+
+/* .soundHead{ */
+/* 	width: 20px; */
+/*     height: 20px; */
+/*     background: url(../img/dot.png) no-repeat; */
+/*     position: relative; */
+/*     z-index: 500; */
+/*     left: 775.5px; */
+/*     top: 10px; */
+/* } */
+.content > .controlBar > .nextAlert {
+	position: absolute;
+	width: 145px;
+	height: 32px;
+	right: 35px;
+	bottom: 38px;
+	transition-duration: 1.0s;
+	background: url(../img/moveAlert.png) no-repeat;
+	display: none;
+}
+.content > .controlBar > .timeLine {
+	position: absolute;
+	background: #444444;
+	width: 30%;
+	padding-top: 9px;
+	top: 15px;
+	z-index: 250;
+	right: 600px;
+}
+.content > .controlBar > .timeLine > .progress {
+	background: #35b7e8;
+	width: 0%;
+	position: absolute;
+	padding-top: 9px;
+	top: -0px;
+}
+.content > .controlBar > .soundLine {
+	position: absolute;
+	width: 45px;
+	background: #444444;
+	padding-top : 9px;
+	right : 285px;
+	top: 15px;
+}
+.content > .controlBar > .soundLine > .soundProgress {
+  position: absolute;
+  width: 50%;
+  padding-top: 9px;
+  top: -0px;
+  background: #35b7e8;
+}
+.content > .printBtn {
+  right: 315px;
+  position: absolute;
+  right : 5%;
+  top : 10%;
+  width: 13%;
+  height: 18%;
+  background: url(../img/printBtn.png) no-repeat;
+  background-size: 100% 100%;
+  z-index: 300;
+  display: none;
+}
+.content > .controlBar > .etc1 {
+  left: 210px;
+}
+.content > .controlBar > .etc2 {
+  left : 248px;
+}
+.content > .controlBar > .etc3 {
+  left : 173px;
+}
+.content > .controlBar > .etc1 > button {
+  background: url(../img/etc1.png) no-repeat;
+}
+.content > .controlBar > .etc2 > button {
+  background: url(../img/etc2.png) no-repeat;
+}
+.content > .controlBar > .etc3 > button {
+  background: url(../img/etc3.png) no-repeat;
+}
+
+@media screen and (max-width:870px) {
+  .content > .controlBar > .digClock {
+    font-size : 13px;
+    top : 12px;
+  }
+  .content > .controlBar > .setSpeed{
+    display: none;
+  }
+
+  .content > .controlBar > .speed1 {
+    display: none;
+  }
+
+  .content > .controlBar > .speed2 {
+    display: none;
+  }
+
+  .content > .controlBar > .speed3 {
+    display: none;
+  }
+
+  .content > .controlBar > .speed4 {
+    display: none;
+  }
+}
+.content > .controlBar > div > .tooltips {
+	-webkit-transition: bottom .3s ease-in-out, opacity .3s ease-in-out;
+	-moz-transition: bottom .3s ease-in-out, opacity .3s ease-in-out;
+	transition: bottom .3s ease-in-out, opacity .3s ease-in-out;
+
+/* 	background-color: rgba(0, 0, 0, 0.8); */
+	background-color: #35B7E8;
+
+  -webkit-box-shadow: 0px 0px 3px 1px rgba(50, 50, 50, 0.4);
+	-moz-box-shadow: 0px 0px 3px 1px rgba(50, 50, 50, 0.4);
+	box-shadow: 0px 0px 3px 1px rgba(50, 50, 50, 0.4);
+
+  -webkit-border-radius: 5px;
+	-moz-border-radius: 5px;
+	border-radius: 5px;
+
+  color: #ffffff;
+	font-size: 12px;
+	margin-bottom: 10px;
+	padding: 7px 12px;
+	position: absolute;
+	width: auto;
+	min-width: 60px;
+	max-width: 300px;
+	word-wrap: break-word;
+	z-index: 9999;
+	opacity: 0;
+	left: -9999px;
+	top: -9999px;
+	width: 55px;
+	text-align: center;
+}
+.content > .controlBar > div > .tooltips.hover{
+	position: relative;
+	top: -70px;
+	left: -30px;
+	opacity: 1;
+}
+.content > .controlBar > .button:first-child > .tooltips.hover{
+	left: -20px;
+}
+.content > .controlBar > div > .tooltips::after{    
+    content: "";
+    position: absolute;
+    top: 100%;
+    left: 50%;
+    margin-left: -5px;
+    border-width: 5px;
+    border-style: solid;
+    border-color: #35B7E8 transparent transparent transparent;
+}
+.content > .controlBar > .etc1 {
+  left: 210px;
+}
+.content > .controlBar > .etc2 {
+  left : 248px;
+}
+.content > .controlBar > .etc3 {
+  left : 173px;
+}
+.content > .controlBar > .etc1 > button {
+  background: url(../img/etc1.png) no-repeat;
+}
+.content > .controlBar > .etc2 > button {
+  background: url(../img/etc2.png) no-repeat;
+}
+.content > .controlBar > .etc3 > button {
+  background: url(../img/etc3.png) no-repeat;
+}

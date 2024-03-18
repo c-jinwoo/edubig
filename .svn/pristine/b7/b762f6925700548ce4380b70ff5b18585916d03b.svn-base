@@ -1,0 +1,371 @@
+<%
+/****************************************
+    subject : 신용상담사
+    summary : 신용상담사 : 시험안내
+    author  : SANGS
+    date    : 2018-06-15
+****************************************/
+%>
+<%@ page language="java" contentType="text/html; charset=utf-8" pageEncoding="utf-8"%>
+<%@ include file="/WEB-INF/jsp/ccedu/inc/taglib_inc.jsp"%>
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+	<title>시험안내 > 자격시험 > 신용상담사 > 신용회복위원회 신용교육원</title>
+	<%@ include file="/WEB-INF/jsp/ccedu/inc/head_inc.jsp"%>
+</head>
+
+<body>
+
+<!-- skip nav -->
+	<%@ include file="/WEB-INF/jsp/ccedu/inc/nav_inc.jsp"%>
+<!--// skip nav -->
+
+
+<div id="wrap">
+
+	<!-- header -->
+	<%@ include file="/WEB-INF/jsp/ccedu/inc/header_inc.jsp"%>
+	<!--// header -->
+
+	<!-- container -->
+	<div id="container">
+
+		<!-- location -->
+		<jsp:include page="/WEB-INF/jsp/ccedu/inc/location/loc_03_01.jsp"> 
+		  	<jsp:param name="menuNm" value="시험안내"/> 
+		</jsp:include> 
+		<!--// location -->
+
+		<div class="con_center">
+
+			<!-- lnb -->
+			<div id="lnb">
+				<jsp:include page="/WEB-INF/jsp/ccedu/inc/lnb/lnb_03.jsp"> 
+				  	<jsp:param name="dep2" value="01"/>
+				  	<jsp:param name="dep3" value="02"/> 
+				</jsp:include> 
+			</div>
+			<!--// lnb -->
+
+			<!-- content 본문 -->
+			<div id="content">
+			
+				<!-- 기존 START 2018-08-30  -->
+<!-- 				<h3 class="cont_titile">시험안내</h3> -->
+				<!-- 기존 END 2018-08-30  -->
+				
+				<!-- 2018-08-28 김동인 작업 S --> 
+				<h3 class="cont_titile type03">시험안내<span></span></h3>
+				<!-- 2018-08-28 김동인 작업 E -->
+
+				<!-- 본문내용 -->
+				<div class="cont_body">
+					<!-- start -->
+					
+					<!-- 기존 START 2018-08-30  -->
+<!-- 					<div class="c_section"> -->
+<!-- 						<h4 class="c_tit">자격종류</h4> -->
+<!-- 						<ul class="c_txtlist"> -->
+<!-- 							<li>국가공인 민간자격(금융위원회 제2016-1호)</li> -->
+<!-- 						</ul> -->
+<!-- 					</div> -->
+
+<!-- 					<div class="c_section"> -->
+<!-- 						<h4 class="c_tit">시험과목 및 검정방법</h4> -->
+<!-- 						<div class="table_style_col"> -->
+<!-- 							<table> -->
+<!-- 								<caption>시험과목, 시험내용, 검정방법을 확인할수있는표</caption> -->
+<!-- 								<colgroup> -->
+<!-- 									<col style="width:27%;" /> -->
+<!-- 									<col /> -->
+<!-- 									<col style="width:24%;" /> -->
+<!-- 								</colgroup> -->
+<!-- 								<thead> -->
+<!-- 									<tr> -->
+<!-- 										<th scope="col">시험과목</th> -->
+<!-- 										<th scope="col">시험내용</th> -->
+<!-- 										<th scope="col">검정방법</th> -->
+<!-- 									</tr> -->
+<!-- 								</thead> -->
+<!-- 								<tbody> -->
+<!-- 									<tr> -->
+<!-- 										<td>신용상담의 이해</td> -->
+<!-- 										<td> -->
+<!-- 											<ul class="table_ul"> -->
+<!-- 												<li>신용상담의 의의와 필요성</li> -->
+<!-- 												<li>신용상담방법 및 윤리</li> -->
+<!-- 											</ul> -->
+<!-- 										</td> -->
+<!-- 										<td rowspan="4"> -->
+<!-- 											<ul class="table_ul"> -->
+<!-- 												<li>객관식(5지 선다형)</li> -->
+<!-- 												<li>과목당 25문항</li> -->
+<!-- 												<li>각 문항 1점<br />(주관식 형태는 미출제)</li> -->
+<!-- 												<li>시험시간 100분</li> -->
+<!-- 											</ul> -->
+<!-- 										</td> -->
+<!-- 									</tr> -->
+<!-- 									<tr> -->
+<!-- 										<td>신용상담을 위한 재무관리</td> -->
+<!-- 										<td> -->
+<!-- 											<ul class="table_ul"> -->
+<!-- 												<li>가계재무관리에 대한 이해</li> -->
+<!-- 												<li>신용 및 부채에 대한 이해</li> -->
+<!-- 											</ul> -->
+<!-- 										</td> -->
+<!-- 									</tr> -->
+<!-- 									<tr> -->
+<!-- 										<td>신용상담 관련 법규</td> -->
+<!-- 										<td> -->
+<!-- 											<ul class="table_ul"> -->
+<!-- 												<li>채권채무에 관한 법률관계</li> -->
+<!-- 												<li>신용상담에 관한 생활법률</li> -->
+<!-- 											</ul> -->
+<!-- 										</td> -->
+<!-- 									</tr> -->
+<!-- 									<tr> -->
+<!-- 										<td>다양한 채무자구제제도</td> -->
+<!-- 										<td> -->
+<!-- 											<ul class="table_ul"> -->
+<!-- 												<li>채무자구제제도</li> -->
+<!-- 												<li>다중채무자 금융·복지지원제도</li> -->
+<!-- 											</ul> -->
+<!-- 										</td> -->
+<!-- 									</tr> -->
+<!-- 								</tbody> -->
+<!-- 							</table> -->
+<!-- 						</div> -->
+<!-- 					</div> -->
+
+<!-- 					<div class="c_section"> -->
+<!-- 						<h4 class="c_tit">합격기준</h4> -->
+<!-- 						<ul class="c_txtlist"> -->
+<!-- 							<li>매 과목 <em class="color_orange">40점(100점 만점) 이상</em>으로서 <em class="color_orange">전 과목 평균 60점 이상</em> 득점</li> -->
+<!-- 						</ul> -->
+<!-- 					</div> -->
+
+<!-- 					<div class="c_section"> -->
+<!-- 						<h4 class="c_tit">자격등급</h4> -->
+<!-- 						<ul class="c_txtlist"> -->
+<!-- 							<li>없음</li> -->
+<!-- 						</ul> -->
+<!-- 					</div> -->
+
+<!-- 					<div class="c_section"> -->
+<!-- 						<h4 class="c_tit">시험일정</h4> -->
+<!-- 						<ul class="c_txtlist"> -->
+<!-- 							<li> -->
+<!-- 								매년 1회 이상 실시 -->
+<!-- 								<p class="color_orange">※ 구체적인 시험일정은 시험공고를 참고하세요.</p> -->
+<!-- 							</li> -->
+<!-- 						</ul> -->
+<!-- 					</div> -->
+
+<!-- 					<div class="c_section"> -->
+<!-- 						<h4 class="c_tit">응시자격</h4> -->
+<!-- 						<ul class="c_txtlist"> -->
+<!-- 							<li> -->
+<!-- 								제한없음 -->
+<!-- 								<div class="ntc_ol"> -->
+<!-- 									<span class="txtone">※ 단,</span> -->
+<!-- 									<ol> -->
+<!-- 										<li>가. 자격등록 취소 및 부정행위 처분이 있은 날로 3년이 경과되지 않은 자</li> -->
+<!-- 										<li>나. 파산자로서 복권되지 아니한 자</li> -->
+<!-- 										<li>다. 피한정후견인 및 피성년후견인은 응시가 제한됨</li> -->
+<!-- 									</ol> -->
+<!-- 								</div> -->
+<!-- 							</li> -->
+<!-- 						</ul> -->
+<!-- 					</div> -->
+
+<!-- 					<div class="c_section"> -->
+<!-- 						<h4 class="c_tit">원서접수</h4> -->
+<!-- 						<ul class="c_txtlist"> -->
+						
+<!-- 							<li>인터넷 홈페이지(<a href="http://www.educredit.or.kr" target="_blank" title="새창으로 열립니다." class="line_none">http://www.educredit.or.kr</a>)에서 증명사진( jpg, png )을 첨부하여 접수</li> -->
+<!-- 							<li>수험표 출력 :  신용상담사 > 원서접수 > 수험표 출력 매뉴 이용 (<em class="color_orange">시험시행 10일전부터 출력 가능</em>)</li> -->
+<!-- 						</ul> -->
+<!-- 					</div> -->
+
+<!-- 					<div class="c_section"> -->
+<!-- 						<h4 class="c_tit">응시수수료</h4> -->
+<!-- 						<ul class="c_txtlist"> -->
+<!-- 							<li>4만원 (2018년은 면제)</li> -->
+<!-- 						</ul> -->
+<!-- 					</div> -->
+					
+<!-- 					<div class="c_section"> -->
+<!-- 						<h4 class="c_tit">수험자 유의사항</h4> -->
+<!-- 						<ul class="c_txtlist"> -->
+<!-- 							<li>지참물 : 신분증(주민등록증, 운전면허증, 여권, 공무원증 등), 수험표, 컴퓨터용 검정색 사인펜, 수정테이프(답안지 정정용) </li> -->
+<!-- 							<li>입실 : 시험시작 30분 전까지 입실완료</li> -->
+<!-- 							<li>시험장 : 대중교통 이용/ 주차불가</li> -->
+<!-- 							<li>기타 자세한 사항은 시험공고 또는 전화(02-750-1241, 1242)로 문의</li> -->
+<!-- 						</ul> -->
+<!-- 					</div> -->
+
+<!-- 					<div class="c_section"> -->
+<!-- 						<h4 class="c_tit">수험교재</h4> -->
+<!-- 						<ul class="c_txtlist"> -->
+<!-- 							<li>신용교육원 포털에서 무료 제공(신용상담사 > 고객센터 > 자료실)</li> -->
+<!-- 						</ul> -->
+<!-- 					</div> -->
+
+<!-- 					<div class="c_section"> -->
+<!-- 						<h4 class="c_tit">자격 유효기간</h4> -->
+<!-- 						<ul class="c_txtlist"> -->
+<!-- 							<li>자격의 유효기간은 3년이며, 보수교육 이수 시 3년간 연장됨</li> -->
+<!-- 						</ul> -->
+<!-- 					</div> -->
+					<!-- 기존 END 2018-08-30  -->
+					
+					
+					<!-- 2018-08-28 김동인 작업 S --> 
+					
+					<div class="c_section">
+						<h4 class="c_tit">자격종류</h4>
+						<ul class="c_txtlist">
+							<li><span class="point">자격종류</span> : 국가공인 민간자격(금융위원회 제2016-1호)</li>
+							<li><span class="point">합격기준</span> : 매 과목 40점(100점만점) 이상으로서 전 과목 평균 60점 이상 득점</li>
+							<li><span class="point">자격등급</span> : 없음</li>
+							<li><span class="point">자격유효기간</span> : 자격의 유효기간은 3년이며, 보수교육 이수 시 3년간 연장됨</li>
+						</ul>
+					</div>
+
+					<div class="c_section">
+						<h4 class="c_tit">시험과목 및 검정방법</h4>
+						<div class="table_style_col">
+							<table>
+								<caption>시험과목, 시험내용, 검정방법을 확인할수있는표</caption>
+								<colgroup>
+									<col style="width:27%;" />
+									<col />
+									<col style="width:24%;" />
+								</colgroup>
+								<thead>
+									<tr>
+										<th scope="col">시험과목</th>
+										<th scope="col">시험내용</th>
+										<th scope="col">검정방법</th>
+									</tr>
+								</thead>
+								<tbody>
+									<tr>
+										<td>신용상담의 이해</td>
+										<td>
+											<ul class="table_ul">
+												<li>신용상담의 의의와 필요성</li>
+												<li>신용상담방법 및 윤리</li>
+											</ul>
+										</td>
+										<td rowspan="4">
+											<ul class="table_ul">
+												<li>객관식(5지 선다형)</li>
+												<li>과목당 25문항</li>
+												<li>각 문항 1점<br />(주관식 형태는 미출제)</li>
+												<li>시험시간 100분</li>
+											</ul>
+										</td>
+									</tr>
+									<tr>
+										<td>신용상담을 위한 재무관리</td>
+										<td>
+											<ul class="table_ul">
+												<li>가계재무관리에 대한 이해</li>
+												<li>신용 및 부채에 대한 이해</li>
+											</ul>
+										</td>
+									</tr>
+									<tr>
+										<td>신용상담 관련 법규</td>
+										<td>
+											<ul class="table_ul">
+												<li>채권채무에 관한 법률관계</li>
+												<li>신용상담에 관한 생활법률</li>
+											</ul>
+										</td>
+									</tr>
+									<tr>
+										<td>다양한 채무자구제제도</td>
+										<td>
+											<ul class="table_ul">
+												<li>채무자구제제도</li>
+												<li>다중채무자 금융·복지지원제도</li>
+											</ul>
+										</td>
+									</tr>
+								</tbody>
+							</table>
+						</div>
+						<p class="tb_caption">※ 수험교재는 신용교육원 포털에서 무료 제공 <span>(신용상담사 > 고객센터 > 자료실)</span></p>
+					</div>
+
+					<div class="c_section">
+						<h4 class="c_tit">응시안내</h4>
+						<ul class="c_txtlist">
+							<li>
+								<span class="point">응시자격</span> : 제한없음 
+								<div class="depts2">※ 단, 가. 자격등록 취소 및 부정행위 처분이 있은 날로 3년이 경과되지 않은 자
+									<ul>
+										<li>나. 파산자로서 복권되지 아니한 자</li>
+										<li>다. 피한정후견인 및 피성년후견인은 응시가 제한됨</li>
+									</ul>
+								</div>
+							</li>
+							<li>
+								<span class="point">시험일정</span> : 매년 1회 이상 실시
+								<div class="depts2">※ 구체적인 시험일정은 시험공고 참조	</div>
+							</li>
+							<li><span class="point">원서접수</span>
+								<div class="depts2">
+									<p>인터넷홈페이지 <a href="http://www.educredit.or.kr" title="링크이동">(http://www.educredit.or.kr)</a>에서 접수 (증명사진 첨부/jpg, png, gif파일)</p>
+									<p>수험표 출력: 신용상담사>원서접수>수험표출력 메뉴 이용(시험시행 10일 전부터 출력 가능)</p>
+								</div>
+							</li>
+							<li><span class="point">자격취득을 위한 총비용 : 4만8천원</span>
+								<div class="depts2">
+									<p>①응시(검정)료 : 4만원(2019년 면제)</p>
+									<p>②자격증 발급비 : 8천원</p>
+								</div>
+							</li>
+						</ul>
+					</div>
+					
+					<div class="c_section">
+						<div class="box_type02">
+							<h4>※ 수험자 유의사항</h4>
+							<ul>
+								<li>지참물 : 신분증(주민등록증, 운전면허증, 여권, 공무원증 등), 수험표, 컴퓨터용 검정색 사인펜, 수정테이프(답안지 정정용) </li>
+								<li>입실 : 시험시작 30분 전까지 입실완료</li>
+								<li>시험장 : 대중교통 이용/ 주차불가</li>
+								<li>기타 자세한 사항은 시험공고 또는 전화(02-750-1241, 1242)로 문의</li>
+							</ul>
+						</div>
+					</div>
+					
+					<!-- 2018-08-28 김동인 작업 E -->
+					
+					
+
+					<!--// end -->
+				</div>
+				<!--// 본문내용 -->
+				
+			<!--  -->
+			</div>
+			<!--// content 본문 -->
+		
+		</div>
+	
+	</div>
+	<!--// container -->
+
+	<!-- foot -->
+	<%@ include file="/WEB-INF/jsp/ccedu/inc/footer_inc.jsp"%>
+	<!--// foot end -->
+
+</div>
+
+</body>
+</html>

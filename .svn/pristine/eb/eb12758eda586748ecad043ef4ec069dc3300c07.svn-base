@@ -1,0 +1,133 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes" ?>
+<event>
+<!-- 강조빨간색칠하기-->
+<!-- &lt;span style="color:#ff3300"&gt;&lt;u&gt;않은&lt;&#47;span&gt;&lt;&#47;u&gt; -->
+<!-- 내려쓰기 -->
+<!-- &lt;br&gt; -->
+  <quiz flag="4" >
+      <page num="1" answer="4" type="multiple">
+          <question>
+              <alternate>문제 일.다음 중 분석용도별 재무정보의 유형이 아닌 것은?</alternate>
+			  <symbol>Q1.</symbol>
+              <text>다음 중 분석용도별 재무정보의 유형이 아닌 것은?</text>
+          </question>
+
+          <feedback>
+              <alternate>정답은 삼번입니다. 재무정보의 유형은 활동성, 안정성, 성장성, 수익성으로 나뉜다.</alternate>
+              <answer>
+                  <symbol>정답</symbol>
+                  <text>4</text>
+              </answer>
+              <explain>
+                  <symbol>4</symbol>
+                  <text>재무정보의 유형은 활동성, 안정성, 성장성, 수익성으로 나뉜다.</text>
+              </explain>
+          </feedback>
+
+          <example num="1">
+              <alternate>보기 일번 활동성</alternate>
+              <symbol>1</symbol>
+              <text>활동성</text>
+          </example>
+          <example num="2">
+              <alternate>보기 이번 안정성</alternate>
+              <symbol>2</symbol>
+              <text>안정성</text>
+          </example>
+          <example num="3">
+              <alternate>보기 삼번 성장성</alternate>
+              <symbol>3</symbol>
+              <text>성장성</text>
+          </example>
+          <example num="4">
+              <alternate>보기 사번 경제성</alternate>
+              <symbol>4</symbol>
+              <text>경제성</text>
+          </example>
+      </page>
+
+      <page num="2" answer="4" type="multiple">
+          <question>
+              <alternate>문제 이. 다음 중 기업자산이 얼마나 효율적으로 사용되고 있는가를 측정하는 재무정보 유형은 무엇인가?</alternate>
+			  <symbol>Q2.</symbol>
+              <text>다음 중 기업자산이 얼마나 효율적으로 사용되고 있는가를 측정하는 재무정보 유형은 무엇인가?</text>
+          </question>
+
+          <feedback>
+              <alternate>정답은 일 번입니다. 기업자산이 얼마나 효율적으로 사용되고 있는가를 측정하는 재무정보 유형은 활동성이다.</alternate>
+              <answer>
+                  <symbol>정답</symbol>
+                  <text>4</text>
+              </answer>
+              <explain>
+                  <symbol>4</symbol>
+                  <text>기업자산이 얼마나 효율적으로 사용되고 있는가를 측정하는 재무정보 유형은 활동성이다.</text>
+
+              </explain>
+          </feedback>
+
+          <example num="1">
+              <alternate>보기 일번 수익성</alternate>
+              <symbol>1</symbol>
+              <text>수익성</text>
+          </example>
+          <example num="2">
+		  <alternate>보기 이번 안정성</alternate>
+              <symbol>2</symbol>
+              <text>안정성</text>
+          </example>
+          <example num="3">
+              <alternate>보기 삼번 성장성</alternate>
+              <symbol>3</symbol>
+              <text>성장성</text>
+          </example>
+          <example num="4">
+              <alternate>보기 사번 활동성</alternate>
+              <symbol>4</symbol>
+              <text>활동성</text>
+          </example>
+      </page>
+
+      <page num="3" answer="3" type="multiple">
+          <question>
+              <alternate>문제 삼. 다음 중 인적자원 애널리틱스에 해당하지 않는 것은?</alternate>
+			  <symbol>Q3.</symbol>
+              <text>다음 중 인적자원 애널리틱스에 해당하지 않는 것은?</text>
+          </question>
+
+          <feedback>
+              <alternate>정답일 삼 번입니다. 인적자원 애널리틱스는 인적자원 계획, 인적자원 모집 및 선발, 퇴직 및 이직관리 등이 해당된다.</alternate>
+              <answer>
+                  <symbol>정답</symbol>
+                  <text>3</text>
+              </answer>
+              <explain>
+                  <symbol>3</symbol>
+                  <text>인적자원 애널리틱스는 인적자원 계획, 인적자원 모집 및 선발, 퇴직 및 이직관리 등이 해당된다.</text>
+
+              </explain>
+          </feedback>
+
+          <example num="1">
+              <alternate>보기 일번 인적자원 계획</alternate>
+              <symbol>1</symbol>
+              <text>인적자원 계획</text>
+          </example>
+          <example num="2">
+              <alternate>보기 이번 인적자원 모집 및 선발</alternate>
+              <symbol>2</symbol>
+              <text>인적자원 모집 및 선발</text>
+          </example>
+          <example num="3">
+              <alternate>보기 삼번 급여관리</alternate>
+              <symbol>Q3</symbol>
+              <text>급여관리</text>
+          </example>
+          <example num="4">
+              <alternate>보기 사번 이직관리</alternate>
+              <symbol>4</symbol>
+              <text>이직관리</text>
+          </example>
+      </page>
+  </quiz>
+</event>

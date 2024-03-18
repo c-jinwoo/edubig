@@ -1,0 +1,462 @@
+package com.webapp.academy.service.impl;
+
+import com.sangs.support.DataMap;
+import com.sangs.support.EduMap;
+import com.sangs.support.FrontException;
+import com.sangs.support.SangsProperties;
+import com.sangs.util.ParamUtil;
+import com.webapp.academy.mapper.CommonMapper;
+import com.webapp.academy.mapper.MyClassMapper;
+import com.webapp.academy.mapper.TutorMapper;
+import com.webapp.academy.service.MyClassService;
+import com.webapp.classdesk.mapper.ClassdeskProgMapper;
+import com.webapp.classdesk.mapper.ClassdeskUserExamMapper;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.List;
+import java.util.Map;
+import javax.annotation.Resource;
+import javax.servlet.http.HttpServletRequest;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+import org.springframework.stereotype.Service;
+
+@Service("myClassService")
+public class MyClassServiceImpl
+  implements MyClassService
+{
+  private Logger log = LogManager.getLogger(getClass());
+
+  @Resource(name="myClassMapper")
+  private MyClassMapper myClassMapper;
+
+  @Resource(name="tutorMapper")
+  private TutorMapper tutorMapper;
+
+  @Resource(name="classdeskUserExamMapper")
+  private ClassdeskUserExamMapper classdeskUserExamMapper;
+
+  @Resource(name="classdeskProgMapper")
+  private ClassdeskProgMapper classdeskProgMapper;
+
+  @Resource(name="commonMapper")
+  private CommonMapper commonMapper;
+
+  public List<EduMap> getCourseUserList(DataMap data)
+    throws Exception
+  {
+    if (data.get("loanFindYn").equals("Y")) {
+      return this.myClassMapper.getCourseUserList2(data);
+    }
+    return this.myClassMapper.getCourseUserList(data);
+  }
+
+  public List<EduMap> getLectureList(DataMap data)
+    throws Exception
+  {
+    List lectureList = this.myClassMapper.getLectureList(data);
+    for (int i = 0; i < lectureList.size(); i++) {
+      String mtLctreCode = (String)((EduMap)lectureList.get(i)).get("MT_LCTRE_CODE");
+
+      String mtLctreName2 = "";
+      int cnt = 0;
+
+      if (mtLctreCode != null) {
+        String[] mtLctreName = mtLctreCode.split(",");
+        for (int i2 = 0; i2 < mtLctreName.length; i2++) {
+          if (i2 == 0)
+            mtLctreName2 = this.tutorMapper.getMtLctreName(mtLctreName[0]);
+          else {
+            cnt++;
+          }
+        }
+        if (mtLctreName.length != 1) {
+          mtLctreName2 = mtLctreName2 + " 외 " + cnt + "개";
+        }
+        ((EduMap)lectureList.get(i)).put("mtLctreName", mtLctreName2);
+      }
+    }
+    return lectureList;
+  }
+
+  public List<EduMap> getSpecialLectureTime(DataMap data)
+    throws Exception
+  {
+    return this.myClassMapper.getSpecialLectureTime(data);
+  }
+
+  public List<EduMap> getLectureTimeList(DataMap data)
+    throws Exception
+  {
+    return this.myClassMapper.getLectureTimeList(data);
+  }
+
+  public EduMap getCheckInfo(DataMap data)
+    throws Exception
+  {
+    return this.myClassMapper.getCheckInfo(data);
+  }
+
+  public List<EduMap> getSpecialLectureFile(DataMap data)
+    throws Exception
+  {
+    return this.myClassMapper.getSpecialLectureFile(data);
+  }
+
+  public EduMap getSPecialStatCode(DataMap data)
+    throws Exception
+  {
+    return this.myClassMapper.getSPecialStatCode(data);
+  }
+
+  public EduMap getLectureInfo(DataMap data)
+    throws Exception
+  {
+    EduMap lectureInfo = this.myClassMapper.getLectureInfo(data);
+
+    String mtLctreCode = (String)lectureInfo.get("MT_LCTRE_CODE");
+    String mtLctreName2 = "";
+
+    if (mtLctreCode != null) {
+      String[] mtLctreName = mtLctreCode.split(",");
+      for (int i2 = 0; i2 < mtLctreName.length; i2++) {
+        if (i2 == 0)
+          mtLctreName2 = this.tutorMapper.getMtLctreName(mtLctreName[0]);
+        else {
+          mtLctreName2 = mtLctreName2 + ',' + this.tutorMapper.getMtLctreName(mtLctreName[i2]);
+        }
+      }
+
+      lectureInfo.put("mtLctreName", mtLctreName2);
+    }
+
+    String mtFcltsCode = (String)lectureInfo.get("MT_FCLTS_CODE");
+    String mtFcltsName2 = "";
+
+    if (mtFcltsCode != null) {
+      String[] mtFcltsName = mtFcltsCode.split(",");
+      for (int i2 = 0; i2 < mtFcltsName.length; i2++) {
+        if (i2 == 0)
+          mtFcltsName2 = this.tutorMapper.getMtFcltsName(mtFcltsName[0]);
+        else {
+          mtFcltsName2 = mtFcltsName2 + ',' + this.tutorMapper.getMtFcltsName(mtFcltsName[i2]);
+        }
+      }
+
+      lectureInfo.put("mtFcltsName", mtFcltsName2);
+    }
+
+    return lectureInfo;
+  }
+
+  public List<EduMap> getLectureDate(DataMap data)
+    throws Exception
+  {
+    return this.myClassMapper.getLectureDate(data);
+  }
+
+  public void updateLectureExec(HttpServletRequest request, DataMap data)
+    throws Exception
+  {
+    String eduFacCodeArr = data.getString("eduFacCodeArr");
+    for (int i = 1; i < data.getInt("checkLength"); i++) {
+      if (!data.get("eduFacCodeArr", i).equals("")) {
+        eduFacCodeArr = eduFacCodeArr + "," + data.get("eduFacCodeArr", i);
+      }
+    }
+    data.putString("eduFacCodeArr", eduFacCodeArr);
+
+    this.myClassMapper.updateLectureExec(data);
+    if (data.getString("mtScCode").equals("SC0006"))
+    {
+      this.myClassMapper.updateLectureTime(data);
+    }
+  }
+
+  public void deleteLectureExec(DataMap data)
+    throws Exception
+  {
+    this.myClassMapper.deleteLectureExec(data);
+  }
+
+  public void deleteLectureTimeExec(DataMap data)
+    throws Exception
+  {
+    this.myClassMapper.deleteLectureTimeExec(data);
+  }
+
+  public int getCourseUserCntInfo(DataMap data)
+    throws Exception
+  {
+    return this.myClassMapper.getCourseUserCntInfo(data);
+  }
+
+  public void deleteCourseInfo(DataMap data)
+    throws Exception
+  {
+    try
+    {
+      List courseList = this.myClassMapper.getCourseUserInfoList(data);
+      for (int i = 0; i < courseList.size(); i++) {
+        EduMap courseInfo = (EduMap)courseList.get(i);
+        int cuserNo = courseInfo.getInt("CUSERNO");
+        int userNo = courseInfo.getInt("USERNO");
+
+        data.setInt("USERNO", userNo);
+        data.setInt("CUSERNO", cuserNo);
+
+        this.myClassMapper.deletePmPayment(data);
+        this.myClassMapper.deleteCourseUser(data);
+      }
+    } catch (Exception e) { this.log.debug(e.getMessage()); }
+
+  }
+
+  public void deleteCourseAll(DataMap data)
+    throws Exception
+  {
+    try
+    {
+      this.myClassMapper.deleteCourseUserAll(data); } catch (Exception e) {
+      this.log.debug(e.getMessage());
+    }
+  }
+
+  public void insertAprsltExec(DataMap data, List<Map<String, Object>> dataList)
+    throws Exception
+  {
+    this.myClassMapper.insertAprsltExec(data);
+
+    int sldtno = this.myClassMapper.getMaxBoardNo(data);
+    data.set("slno", Integer.valueOf(sldtno));
+    for (int i = 0; i < dataList.size(); i++)
+    {
+      data.set("eduSdate", ((Map)dataList.get(i)).get("eduSdate"));
+      data.set("eduEdate", ((Map)dataList.get(i)).get("eduEdate"));
+
+      this.myClassMapper.insertAprsltDate(data);
+    }
+  }
+
+  public List<Map<String, Object>> getAreaSidoList(DataMap data) throws Exception {
+    return this.myClassMapper.getAreaSidoList(data);
+  }
+
+  public List<Map<String, Object>> getAreaGuList(DataMap data) throws Exception
+  {
+    return this.myClassMapper.getAreaGuList(data);
+  }
+
+  public List<Map<String, Object>> getAreaDongList(DataMap data) throws Exception
+  {
+    return this.myClassMapper.getAreaDongList(data);
+  }
+
+  public List<Map<String, Object>> getEduLoanGoods(DataMap data) throws Exception
+  {
+    return this.myClassMapper.getEduLoanGoods(data);
+  }
+
+  public List<Map<String, Object>> getEduLoanPrdList(DataMap data) throws Exception
+  {
+    return this.myClassMapper.getEduLoanPrdList(data);
+  }
+
+  public List<EduMap> selectLearningStatusList(DataMap data)
+    throws Exception
+  {
+    data.setInt("rowCount", 10);
+    ParamUtil.setPagingValue(data);
+    return this.myClassMapper.selectLearningStatusList(data);
+  }
+
+  public int selectLearningStatusListCnt(DataMap data)
+    throws Exception
+  {
+    return this.myClassMapper.selectLearningStatusListCnt(data);
+  }
+
+  public void insertProgressCheck(DataMap data)
+    throws Exception
+  {
+    try
+    {
+      if (data.get("addSoyang").equals("Y")) {
+        data.setString("SES_CUSERNO", data.getString("cuserno"));
+        data.setString("SES_CSEQNO", data.getString("cseqno"));
+        data.setString("courseno", data.getString("courseno"));
+        data.setString("cceduDiv", "Y");
+      }
+      else if (data.get("cceduDiv").equals("Y")) {
+        data.setString("SES_CUSERNO", data.getString("cuserno"));
+        data.setString("SES_CSEQNO", data.getString("cseqno"));
+        data.setString("courseno", data.getString("courseno"));
+      }
+      else
+      {
+        data.setString("courseno", data.getString("SES_COURSENO"));
+      }
+
+      EduMap courseInfo = this.myClassMapper.selectCourseInfo(data);
+
+      int evalProgerss = courseInfo.getInt("MIN_PROGRESS");
+
+      float eduTime = data.getFloat("studytime");
+      float totalEduTime = data.getFloat("totalEduTime");
+
+      if (totalEduTime > 0.0F)
+      {
+        int val = 0;
+        val = (int)Math.floor(eduTime / totalEduTime * 100.0F);
+
+        data.setInt("val", val);
+
+        
+        if(eduTime >= totalEduTime){
+        	data.setString("mtProgStatusCode", "PS0003");
+        }
+        else{
+        	data.setString("mtProgStatusCode", "PS0002");
+        }
+        
+        
+        Integer lastVal = this.myClassMapper.selectLastVal(data);
+        Boolean check = Boolean.valueOf(false);
+        if (lastVal != null) {
+          if (lastVal.intValue() <= eduTime) {
+            check = Boolean.valueOf(true);
+          }
+        }
+        else {
+          check = Boolean.valueOf(true);
+        }
+
+        if (check.booleanValue())
+        {
+          this.myClassMapper.insertProgressCheck(data);
+
+          this.myClassMapper.updateCourseUserProgress(data);
+          EduMap boardMap = this.myClassMapper.selectProgressChk(data);
+
+          float finalVal = this.classdeskUserExamMapper.getTotalSumInfo(data);
+          int compVal = this.classdeskUserExamMapper.getCseqCompValInfo(data);
+
+          if ((finalVal >= compVal) && (courseInfo.getString("CLASS_DESK").substring(2, 3).equals("0")) && (boardMap.getString("MIN_PROGRESS_DIV").equals("Y"))) {
+            data.setString("cuserNo", data.getString("SES_CUSERNO"));
+            EduMap uInfo = this.classdeskProgMapper.getLeCourseUserInfo(data);
+
+            if ((!"Y".equals(uInfo.getString("ISPASS"))) && ("".equals(uInfo.getString("COMPCODE"))))
+            {
+              data.setString("isPass", "Y");
+              data.setString("compYN", "Y");
+
+              String gubunCode = (Integer.toString(boardMap.getInt("COURSENO")) + Integer.toString(boardMap.getInt("CSEQNO"))).replace(" ", "");
+
+              data.setString("gubun_code", gubunCode);
+
+              String compCode = "";
+
+              Date d = new Date();
+              SimpleDateFormat date = new SimpleDateFormat("yyyy");
+
+              String year = date.format(d);
+              data.setString("year", year);
+
+              String maxcompcode = this.myClassMapper.getMaxCompCode(data);
+
+              compCode = (year + "-" + gubunCode + "-" + maxcompcode).replace(" ", "");
+
+              data.setString("compSeq", maxcompcode);
+              data.setString("ispass", "Y");
+              data.setString("compCode", compCode);
+              this.myClassMapper.updateLeCourseUserInfo(data);
+              this.myClassMapper.updateMaxCompCode(data);
+
+              if ((data.get("cceduDiv").equals("Y")) && 
+                (!data.get("addSoyang").equals("Y"))) {
+                this.myClassMapper.updateCceduLeCourseUserInfo(data);
+              }
+
+              try
+              {
+                EduMap SmsData = new EduMap();
+
+                EduMap smsInfo = this.commonMapper.selectMaxNextval(SmsData);
+
+                SmsData.put("TMP_TRAN_NEXTVAL", smsInfo.get("TMP_TRAN_NEXTVAL"));
+                SmsData.put("V_TRAN_DAY", smsInfo.get("V_TRAN_DAY"));
+                SmsData.put("TMP_TRAN_DTM", smsInfo.get("TMP_TRAN_DTM"));
+                SmsData.put("V_TRAN_TIME", smsInfo.get("V_TRAN_TIME"));
+                SmsData.put("SSNO", "9999999999998");
+                SmsData.put("smsMsg", "[신용교육원] '" + courseInfo.getString("SEQ_TITLE") + "'수료 " + compCode);
+                SmsData.put("MOBLPHON", courseInfo.getString("MOBLPHON"));
+                SmsData.put("rmNm", courseInfo.getString("MBERNM"));
+                SmsData.put("title", "신용교육원 온라인교육 수료");
+
+                this.commonMapper.insertCdExSmslog(SmsData);
+                this.commonMapper.insertEmTran(SmsData);
+              } catch (Exception e) {
+                this.log.error("sms send error : " + e);
+              }
+            }
+          }
+        }
+      }
+    }
+    catch (Exception e)
+    {
+      throw new FrontException(e);
+    }
+  }
+
+  public List<EduMap> selectClassBoardList(DataMap rMap) throws Exception
+  {
+    return this.myClassMapper.selectClassBoardList(rMap);
+  }
+
+  public EduMap selectCourseInfo(DataMap rMap) throws Exception
+  {
+    return this.myClassMapper.selectCourseInfo(rMap);
+  }
+
+  public List<EduMap> selectMtScCodeList(DataMap rMap)
+    throws Exception
+  {
+    return this.myClassMapper.selectMtScCodeList(rMap);
+  }
+
+  public List<EduMap> selectCourseSeqList(DataMap rMap)
+    throws Exception
+  {
+    return this.myClassMapper.selectCourseSeqList(rMap);
+  }
+
+  public List<EduMap> getClassCourseBbsList(DataMap rMap)
+    throws Exception
+  {
+    rMap.putInt("bcateno", ParamUtil.getIntParam(SangsProperties.getProperty("Globals.bbsBcateClassNotice")));
+    return this.myClassMapper.getClassCourseBbsList(rMap);
+  }
+
+  public EduMap getUserCertPrintInfo(DataMap data)
+    throws Exception
+  {
+    return this.myClassMapper.getUserCertPrintInfo(data);
+  }
+
+  public int getPrintMaxIdx(DataMap data)
+    throws Exception
+  {
+    return this.myClassMapper.getPrintMaxIdx(data);
+  }
+
+  public void insertPrintLog(DataMap data)
+    throws Exception
+  {
+    this.myClassMapper.insertPrintLog(data);
+  }
+
+  public List<EduMap> selectPaymentList(DataMap data) throws Exception {
+    return this.myClassMapper.selectPaymentList(data);
+  }
+}

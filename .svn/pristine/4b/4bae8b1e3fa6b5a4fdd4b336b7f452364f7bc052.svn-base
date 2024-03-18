@@ -1,0 +1,1319 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.webapp.academy.mapper.MyClassMapper">
+
+    <!--일반과정 목록 조회 -->
+    <select id="getCourseUserList" resultType="emap" parameterType="dmap" >
+        SELECT
+           T1.*
+			  , (CASE WHEN (TO_CHAR (SYSDATE, 'YYYYMMDD') BETWEEN TO_CHAR (APPLY_SDATE, 'YYYYMMDD') AND TO_CHAR (APPLY_EDATE, 'YYYYMMDD') ) 
+	  				THEN 'Y'                       
+	             	ELSE 'N'
+	       			END) AS CANCEL_YN
+	       	  , (CASE WHEN (TO_CHAR (SYSDATE, 'YYYYMMDD') > TO_CHAR (STUDY_SDATE, 'YYYYMMDD') ) 
+	  				THEN 'Y'                       
+	             	ELSE 'N'
+	       			END) AS STUDY_START_YN
+			  , OPENTYPE 
+			  ,  NVL(ROUND((T1.FRAMESEQ/T1.FRAMECNT*100),2),0) AS PROG_PER2
+    	FROM 
+    	(	
+    		
+    		SELECT  A.COURSENO
+                 , B.CSEQNO
+                 , C.CUSERNO
+                 , C.USERNO
+                 , B.MT_CSEQ_STATUS_CODE
+                 ,(SELECT MT_SUB_NAME FROM LMS_CD_MT_SUB WHERE MT_SUB_CODE = B.MT_CSEQ_STATUS_CODE)AS MT_CSEQ_STATUS_NM
+                 , B.SEQ_TITLE
+                 , B.SEQ
+                 , DECODE(B.OPENTYPE, 'A', C.STARTDATE, B.STUDY_SDATE) AS STUDY_SDATE
+                 , DECODE(B.OPENTYPE, 'A', C.ENDDATE, B.STUDY_EDATE) AS STUDY_EDATE
+                 , C.ENDDATE+B.REVIEWDAY AS FINAL_EDATE
+                 , B.REVIEWDAY
+                 , B.APPLY_SDATE
+                 , B.APPLY_EDATE
+                 , C.STARTDATE
+                 , C.ENDDATE
+                 , NVL(C.ISPASS, 'N') AS ISPASS
+                 , C.COMPCODE
+                 , C.PAYMENT_UID
+                 , B.OPENTYPE
+                 , B.EDUDAY
+                 , C.USEYN
+                 , (NVL(ROUND((SELECT NVL(SUM(STUDYTIME),0) FROM LMS_LE_TREE_HIST WHERE CUSERNO=C.CUSERNO) /
+                 	DECODE((SELECT NVL(SUM(RUNTIME)*60,0) FROM LMS_ED_COURSE_TREE WHERE COURSENO=A.COURSENO),0,NULL,(SELECT NVL(SUM(RUNTIME)*60,0) FROM LMS_ED_COURSE_TREE WHERE COURSENO=A.COURSENO))*100,2),0)) AS PROG_PER
+                 , 100 * (NVL(C.PROGRESS_VAL / DECODE(B.EVAL_PROGRESS, 0, NULL, B.EVAL_PROGRESS), 0)) AS PROG_PER2
+                 , B.CLASS_DESK
+                 , B.MT_FIELD_CODE
+                 , A.MT_EDUINFO_CODE
+                 , A.EDU_LOAN_SEQ
+                 ,C.WDATE
+                 , ( SELECT NVL(SUM(FRAMESEQ),0) 
+	                	FROM LMS_LE_TREE_HIST 
+	               		WHERE CUSERNO=C.CUSERNO
+		            ) AS FRAMESEQ
+		         ,( SELECT SUM(FRAMECNT)
+		                FROM LMS_ED_COURSE_TREE WHERE
+		                COURSENO= B.COURSENO
+		            ) AS FRAMECNT 
+             FROM LMS_ED_COURSE A, LMS_ED_COURSE_SEQ B, LMS_LE_COURSE_USER C
+             WHERE A.COURSENO = B.COURSENO
+               AND B.CSEQNO = C.CSEQNO
+               AND C.USERNO = #{SES_USERNO}
+               AND C.USEYN = 'Y'
+               AND B.USEYN = 'Y'
+          ) T1 
+          	LEFT OUTER JOIN 
+          		(SELECT 
+                            T1.EDU_LOAN_SEQ
+                            , T2.LOAN_PRD_GRP
+                            , T2.LOAN_PRD_CODE
+                            , t2.LOAN_USE_CODE
+                        FROM LMS_ED_LOAN_MNG T1
+                            INNER JOIN LMS_ED_LOAN_MAPP T2 ON T1.EDU_LOAN_SEQ = T2.EDU_LOAN_SEQ 
+                            INNER JOIN MCSYSTEM01.MCGM_PBI T3  ON T2.LOAN_PRD_GRP = T3.FND_USECD  AND T2.LOAN_PRD_CODE = T3.GDCD
+                        WHERE   T1.USE_YN = 'Y'
+                        AND T2.LOAN_PRD_GRP = #{loanPrdGrp} 
+                        AND T2.LOAN_PRD_CODE = #{loanPrdCode}
+                        AND NVL(T2.LOAN_USE_CODE,'NULL') = #{loanKndCode} 
+                        AND   T2.USE_YN = 'Y'  ) T2 ON T1.EDU_LOAN_SEQ = T2.EDU_LOAN_SEQ
+          
+          	WHERE 1=1
+          	
+          	<if test="loanPrdGrp != null and loanPrdGrp != '' ">
+		   		AND T2.LOAN_PRD_GRP = #{loanPrdGrp}  /* PARAM1 자금용도코드*/
+		   </if>
+		   <if test="loanPrdCode != null and loanPrdCode != '' ">
+		   		AND T2.LOAN_PRD_CODE = #{loanPrdCode}  /* PARAM2 대출상품코드*/ 
+		   </if>
+             <if test="loanKndCode != null and loanKndCode != '' ">
+		   		AND T2.LOAN_USE_CODE = #{loanKndCode}  /* PARAM2 대출상품코드*/ 
+		   </if>
+           ORDER BY T1.WDATE DESC
+          
+    </select>
+    
+    <select id="getCourseUserList2" resultType="emap" parameterType="dmap" >
+    /*getCourseUserListgetCourseUserListgetCourseUserList */
+        SELECT
+           T1.* 
+			  , (CASE WHEN (TO_CHAR (SYSDATE, 'YYYYMMDD') BETWEEN TO_CHAR (APPLY_SDATE, 'YYYYMMDD') AND TO_CHAR (APPLY_EDATE, 'YYYYMMDD') ) 
+	  				THEN 'Y'                       
+	             	ELSE 'N'
+	       			END) AS CANCEL_YN
+	       	  , (CASE WHEN (TO_CHAR (SYSDATE, 'YYYYMMDD') > TO_CHAR (STUDY_SDATE, 'YYYYMMDD') ) 
+	  				THEN 'Y'                       
+	             	ELSE 'N'
+	       			END) AS STUDY_START_YN
+			  , OPENTYPE 
+			  ,  NVL(ROUND((T1.FRAMESEQ/T1.FRAMECNT*100),2),0) AS PROG_PER2
+    	FROM 
+    	(	
+    		
+    		SELECT  A.COURSENO
+                 , B.CSEQNO
+                 , C.CUSERNO
+                 , C.USERNO
+                 , B.MT_CSEQ_STATUS_CODE
+                 ,(SELECT MT_SUB_NAME FROM LMS_CD_MT_SUB WHERE MT_SUB_CODE = B.MT_CSEQ_STATUS_CODE)AS MT_CSEQ_STATUS_NM
+                 , B.SEQ_TITLE
+                 , B.SEQ
+                 , DECODE(B.OPENTYPE, 'A', C.STARTDATE, B.STUDY_SDATE) AS STUDY_SDATE
+                 , DECODE(B.OPENTYPE, 'A', C.ENDDATE, B.STUDY_EDATE) AS STUDY_EDATE
+                 , C.ENDDATE+B.REVIEWDAY AS FINAL_EDATE
+                 , B.REVIEWDAY
+                 , B.APPLY_SDATE
+                 , B.APPLY_EDATE
+                 , C.STARTDATE
+                 , C.ENDDATE
+                 , NVL(C.ISPASS, 'N') AS ISPASS
+                 , C.COMPCODE
+                 , C.PAYMENT_UID
+                 , B.OPENTYPE
+                 , B.EDUDAY
+                 , C.USEYN
+                 , (NVL(ROUND((SELECT NVL(SUM(STUDYTIME),0) FROM LMS_LE_TREE_HIST WHERE CUSERNO=C.CUSERNO) /
+                 	DECODE((SELECT NVL(SUM(RUNTIME)*60,0) FROM LMS_ED_COURSE_TREE WHERE COURSENO=A.COURSENO),0,NULL,(SELECT NVL(SUM(RUNTIME)*60,0) FROM LMS_ED_COURSE_TREE WHERE COURSENO=A.COURSENO))*100,2),0)) AS PROG_PER
+                 , 100 * (NVL(C.PROGRESS_VAL / DECODE(B.EVAL_PROGRESS, 0, NULL, B.EVAL_PROGRESS), 0)) AS PROG_PER2
+                 , B.CLASS_DESK
+                 , B.MT_FIELD_CODE
+                 , A.MT_EDUINFO_CODE
+                 , D.EDU_LOAN_SEQ
+                 ,C.WDATE
+                 , ( SELECT NVL(SUM(FRAMESEQ),0) 
+	                	FROM LMS_LE_TREE_HIST 
+	               		WHERE CUSERNO=C.CUSERNO
+		            ) AS FRAMESEQ
+		         ,( SELECT SUM(FRAMECNT)
+		                FROM LMS_ED_COURSE_TREE WHERE
+		                COURSENO= B.COURSENO
+		            ) AS FRAMECNT 
+             FROM LMS_ED_COURSE A, LMS_ED_COURSE_SEQ B, LMS_LE_COURSE_USER C, LMS_ED_COURSE_LOAN_MAPP D
+             WHERE A.COURSENO = B.COURSENO
+               AND B.CSEQNO = C.CSEQNO
+               AND C.USERNO = #{SES_USERNO}
+               AND A.COURSENO = D.COURSENO
+               AND C.USEYN = 'Y'
+               AND B.USEYN = 'Y'
+          ) T1 
+          	LEFT OUTER JOIN 
+          		(SELECT 
+                            T1.EDU_LOAN_SEQ
+                            , T2.LOAN_PRD_GRP
+                            , T2.LOAN_PRD_CODE
+                            , t2.LOAN_USE_CODE
+                        FROM LMS_ED_LOAN_MNG T1
+                            INNER JOIN LMS_ED_LOAN_MAPP T2 ON T1.EDU_LOAN_SEQ = T2.EDU_LOAN_SEQ 
+                            INNER JOIN MCSYSTEM01.MCGM_PBI T3  ON T2.LOAN_PRD_GRP = T3.FND_USECD  AND T2.LOAN_PRD_CODE = T3.GDCD
+                        WHERE   T1.USE_YN = 'Y'
+                        AND T2.LOAN_PRD_GRP = #{loanPrdGrp} 
+                        AND T2.LOAN_PRD_CODE = #{loanPrdCode}
+                        AND NVL(T2.LOAN_USE_CODE,'NULL') = #{loanKndCode} 
+                        AND   T2.USE_YN = 'Y'  ) T2 ON T1.EDU_LOAN_SEQ = T2.EDU_LOAN_SEQ
+          
+          	WHERE 1=1
+          	
+          	<if test="loanPrdGrp != null and loanPrdGrp != '' ">
+		   		AND T2.LOAN_PRD_GRP = #{loanPrdGrp}  /* PARAM1 자금용도코드*/
+		   </if>
+		   <if test="loanPrdCode != null and loanPrdCode != '' ">
+		   		AND T2.LOAN_PRD_CODE = #{loanPrdCode}  /* PARAM2 대출상품코드*/ 
+		   </if>
+             <if test="loanKndCode != null and loanKndCode != '' ">
+		   		AND NVL(T2.LOAN_USE_CODE,'NULL') = #{loanKndCode}  /* PARAM2 대출상품코드*/ 
+		   </if>
+           ORDER BY T1.WDATE DESC
+          
+    </select>
+
+	<!-- 정규교육내역 목록조회 -->
+    <select id="getLectureList" resultType="emap" parameterType="dmap">
+    	SELECT 
+            A.SLNO
+            , A.APPLY_NO
+            , A.APPLY_NM
+            , A.APPLY_ORGAN_NM
+            , A.SIDO_CODE
+            , A.GU_CODE
+            , A.DONG_CODE
+            , A.APPLY_ORGAN_ADDR
+            , A.APPLY_TEL
+            , A.APPLY_PHONE
+            , A.APPLY_EMAIL
+            , A.EDU_AREA
+            , A.MT_LEC_TARGET_CODE
+            , A.TARGET_ETC
+            , A.PERSON_CNT
+            , (SELECT TO_CHAR(EDU_SDATE,'YYYY-MM-DD HH24:MI') 
+		     	FROM LMS_ED_LECTURE_DATE
+		     	WHERE SLNO = A.SLNO
+		     		AND ROWNUM = 1) AS EDU_SDATE
+		     , (SELECT TO_CHAR(EDU_EDATE,'YYYY-MM-DD HH24:MI') 
+		     	FROM LMS_ED_LECTURE_DATE
+		     	WHERE SLNO = A.SLNO
+		     		AND ROWNUM = 1) AS EDU_EDATE
+            , A.MT_LCTRE_CODE
+            , A.EDU_CONTENTS
+            , A.MT_LEC_STATUS_CODE
+            , (SELECT MT_SUB_NAME FROM LMS_CD_MT_SUB WHERE MT_SUB_CODE = A.MT_LEC_STATUS_CODE) AS LEC_STATUS_NAME 
+            , TO_CHAR(A.DS_SDATE,'YYYY-MM-DD HH:MI') AS DS_SDATE
+            , TO_CHAR(A.DS_EDATE,'YYYY-MM-DD HH:MI') AS DS_EDATE
+            , A.PAY
+            , A.COM_CNT
+            , A.USEYN
+            , (CASE WHEN (TO_CHAR (SYSDATE, 'YYYYMMDD') BETWEEN TO_CHAR (A.EDU_SDATE, 'YYYYMMDD') AND TO_CHAR (A.EDU_EDATE, 'YYYYMMDD') ) 
+	  				THEN 'ING'
+	  				WHEN (TO_CHAR (SYSDATE, 'YYYYMMDD') > TO_CHAR (A.EDU_EDATE, 'YYYYMMDD') ) 
+	  				THEN 'END'                       
+	             	ELSE 'WATING'
+	       			END) AS EDU_STATE
+	       	, A.MT_FCLTS_CODE
+            , A.FCLTS_ETC
+        FROM LMS_ED_LECTURE A
+        WHERE APPLY_NO = #{SES_USERNO}
+        AND USEYN = 'Y' 
+        ORDER BY SLNO DESC     
+    </select>
+    
+    <!-- 특강정보 -->
+    <select id="getLectureInfo" resultType="emap" parameterType="dmap">
+       SELECT 
+            A.SLNO
+            , A.APPLY_NO
+            , A.APPLY_NM
+            , A.APPLY_ORGAN_NM
+            , (SELECT SIDO_NAME FROM LMS_CD_SIDO WHERE SIDO_CODE = A.SIDO_CODE AND USEYN='Y') AS SIDO_NAME
+            , (SELECT GU_NAME FROM LMS_CD_GU WHERE GU_CODE = A.GU_CODE AND USEYN='Y') AS GU_NAME
+            , (SELECT DONG_NAME FROM LMS_CD_DONG WHERE DONG_CODE = A.DONG_CODE AND USEYN='Y') AS DONG_NAME
+            , A.APPLY_ORGAN_ADDR
+            , A.APPLY_TEL
+            , A.APPLY_PHONE
+            , A.APPLY_EMAIL
+            , A.EDU_AREA
+            , A.MT_LEC_TARGET_CODE
+            , (SELECT MT_SUB_NAME FROM LMS_CD_MT_SUB WHERE MT_SUB_CODE = A.MT_LEC_TARGET_CODE) AS LEC_TARET_NAME
+            , A.TARGET_ETC
+            , A.PERSON_CNT
+            , TO_CHAR(A.EDU_SDATE,'YYYY-MM-DD HH:MI')AS EDU_SDATE
+            , TO_CHAR(A.EDU_EDATE,'YYYY-MM-DD HH:MI')AS EDU_EDATE
+            , A.MT_LCTRE_CODE
+            , A.EDU_CONTENTS
+            , A.MT_LEC_STATUS_CODE
+            , TO_CHAR(A.DS_SDATE,'YYYY-MM-DD HH:MI')AS DS_SDATE
+            , TO_CHAR(A.DS_EDATE,'YYYY-MM-DD HH:MI')AS DS_EDATE
+            , A.PAY
+            , A.COM_CNT
+            , A.USEYN
+            , A.EDU_CONTENTS
+            , TO_CHAR(A.EDU_SDATE2,'YYYY-MM-DD HH:MI')AS EDU_SDATE2
+            , TO_CHAR(A.EDU_EDATE2,'YYYY-MM-DD HH:MI')AS EDU_EDATE2
+            , TO_CHAR(A.EDU_SDATE3,'YYYY-MM-DD HH:MI')AS EDU_SDATE3
+            , TO_CHAR(A.EDU_EDATE3,'YYYY-MM-DD HH:MI')AS EDU_EDATE3
+            , MT_FCLTS_CODE
+            , FCLTS_ETC
+            , LE_LNM_ZIP
+	        , LE_LNM_ADRES1
+	        , LE_LNM_ADRES2
+        FROM LMS_ED_LECTURE A 
+        WHERE USEYN = 'Y'
+        AND SLNO = #{slno} 
+    </select>
+    
+     <!-- 특강희망 날짜정보 -->
+    <select id="getLectureDate" resultType="emap" parameterType="dmap">
+        SELECT 
+          SLDTNO
+		  ,SLNO
+		  ,TO_CHAR(EDU_SDATE,'YYYY-MM-DD HH24:MI') AS EDU_SDATE
+          , TO_CHAR(EDU_SDATE, 'YYYY-MM-DD') AS EDU_DAY
+          , TO_CHAR(EDU_SDATE, 'hh24') AS EDU_SDATE_HH
+          , TO_CHAR(EDU_SDATE, 'mi') AS EDU_SDATE_MM
+          , TO_CHAR(EDU_EDATE,'YYYY-MM-DD HH24:MI') AS EDU_EDATE  
+          , TO_CHAR(EDU_EDATE, 'hh24') AS EDU_EDATE_HH
+          , TO_CHAR(EDU_EDATE, 'mi') AS EDU_EDATE_MM
+        FROM LMS_ED_LECTURE_DATE  
+        WHERE SLNO = #{slno} 
+        ORDER BY SLDTNO ASC 
+    </select>
+    
+    
+    
+    
+    <!-- 특강 신청일시 -->
+    <select id="getSpecialLectureTime" resultType="emap" parameterType="dmap">
+		SELECT
+			A.SLNO
+			<!-- , TO_CHAR(A.EDU_DATE,'yyyy-mm-dd') AS EDU_DATE -->
+			, LPAD(A.EDU_SDATE_HOUR ,'2','0') AS EDU_SDATE_HOUR
+			, LPAD(A.EDU_SDATE_MINUTE,'2','0') AS EDU_SDATE_MINUTE
+			, LPAD(A.EDU_EDATE_HOUR ,'2','0') AS EDU_EDATE_HOUR
+			, LPAD(A.EDU_EDATE_MINUTE ,'2','0') AS EDU_EDATE_MINUTE
+			, (SELECT MBERNM FROM LMS_CT_UNITY_MBER B WHERE B.UNITY_MBERNO = LEC_USERNO )AS LEC_USERNM
+			, LEC_PHONE
+			, ETC AS LEC_ETC
+		FROM LMS_ED_LECTURE_TIME A
+		WHERE A.SLNO = #{slno}
+	</select>
+	
+	<!-- 특강시간테이블 조회 -->
+	<select id="getLectureTimeList" resultType="emap" parameterType="dmap">
+		SELECT SLNO 
+			, SLTNO 
+		FROM LMS_ED_LECTURE_TIME
+		WHERE SLNO  = #{slno}
+	</select>
+	
+	<!-- 수정, 삭제시 자신이 작성한글인지 체크  -->
+	<select id="getCheckInfo"  resultType="emap" parameterType="dmap">
+		SELECT * FROM LMS_ED_LECTURE
+		WHERE SLNO = #{slno}
+		AND APPLY_NO = #{SES_USERNO}
+	</select>
+	
+	<!-- 특강 강사첨부파일 -->
+    <select id="getSpecialLectureFile" resultType="emap" parameterType="dmap">
+		SELECT
+			SLNO
+			, SLTNO
+			, FILENO
+			, ORGFILE
+			, SAVFILE
+			, FSIZE
+			, FTYPE
+			, SAVPATH
+			, MT_TUTOR_FILE_CODE
+		FROM LMS_ED_LECTURE_FILE A
+		WHERE A.SLNO = #{slno}
+		AND A.SLTNO = #{sltno}
+		AND MT_TUTOR_FILE_CODE IN ('TF0001' , 'TF0002' , 'TF0006' )
+	</select>
+    
+    <!-- 특강승인완료 조회 -->
+    <select id="getSPecialStatCode" resultType="emap" parameterType="dmap">
+    	SELECT MT_LEC_STATUS_CODE
+		FROM LMS_ED_LECTURE_TIME
+		WHERE SLNO  = #{slno} 
+		AND SLTNO = #{sltno}
+    </select>
+    
+    <!-- 특강시간 정보 수정 -->
+    <update id="updateLectureTime" parameterType="dmap">
+    	UPDATE LMS_ED_LECTURE_TIME SET
+			LEC_USERNO = #{lecUserno}
+			, LEC_USERNM = #{lecUserName}
+			, LEC_PHONE = #{lecPhone}
+			, ADMIN_APPLY_YN = #{adminApplyYn}
+		WHERE SLNO = #{slno}
+		AND SLTNO = #{sltno}
+
+    </update>
+    
+    <!-- 특강관리 정보 수정 -->
+    <update id="updateLectureExec" parameterType="dmap">
+    	UPDATE LMS_ED_LECTURE SET
+			MT_AREA_CODE = #{mtAreaCode}
+			, TITLE = #{title}
+			, EDU_AREA = #{eduArea}
+			, EDU_TARGET = #{eduTarget}
+			, EDU_TIME = #{eduTime}
+			, PERSON_CNT = #{personCnt}
+			, APPLY_ORGAN_ZIPNO = #{applyOrganZipno}
+			, APPLY_ORGAN_NM = #{applyOrganNm}
+			, APPLY_ORGAN_ADDR = #{applyOrganAddr}
+			, APPLY_ORGAN_ADDR2 = #{applyOrganAddr2}
+			, EDU_FAC_CODE = #{eduFacCodeArr}
+			, EDU_FAC_CONTENT = #{eduFacContent}
+			, LEC_PAY = #{lecPay}
+			, PAY_YN = #{checkLecPay}
+			, ETC = #{etc}
+		WHERE SLNO = #{slno}
+		AND MT_SC_CODE = #{mtScCode}
+    </update>
+    
+    <!-- 특강관리 정보 삭제  -->
+    <delete id="deleteLectureExec" parameterType="dmap">
+    	DELETE FROM LMS_ED_LECTURE
+    	WHERE SLNO = #{slno}
+    </delete>
+    
+    <!-- 특강시간 정보 삭제  -->
+    <delete id="deleteLectureTimeExec" parameterType="dmap">
+    	DELETE FROM LMS_ED_LECTURE_TIME
+    	WHERE SLNO = #{slno}
+    	AND SLTNO = #{sltno}
+    </delete>
+    
+    <!-- 수강중인 수 -->
+    <select id="getCourseUserCntInfo" parameterType="dmap" resultType="Integer">
+        SELECT COUNT(*)
+        FROM LMS_LE_COURSE_USER
+        WHERE USERNO = #{USERNO}
+        AND ENDDATE IS NOT NULL
+        AND TO_CHAR(ENDDATE, 'YYYYMMDD') <![CDATA[<]]> TO_CHAR(SYSDATE, 'YYYYMMDD')
+        AND (ISPASS IS NULL OR ISPASS != 'Y')
+        AND USEYN = 'Y'
+    </select>
+
+    <!-- 수강중인 정보 리스트 -->
+    <select id="getCourseUserInfoList" resultType="emap" parameterType="dmap" >
+        SELECT CUSERNO
+            , TO_CHAR(ENDDATE, 'YYYYMMDD') ENDDATE
+            , ISPASS
+            , C.USERNO
+        FROM LMS_LE_COURSE_USER C
+        WHERE USERNO = #{USERNO}
+        AND ENDDATE IS NOT NULL
+        AND TO_CHAR(ENDDATE, 'YYYYMMDD') <![CDATA[<]]> TO_CHAR(SYSDATE, 'YYYYMMDD')
+        AND (ISPASS IS NULL OR ISPASS != 'Y')
+        AND USEYN = 'Y'
+    </select>
+
+
+    <!-- 진도체크 삭제 -->
+    <delete id="deleteCourseTreeHist" parameterType="dmap">
+        DELETE FROM LMS_LE_TREE_HIST WHERE CUSERNO = #{CUSERNO}
+    </delete>
+
+    <!-- 결제 삭제 -->
+    <delete id="deletePmPayment" parameterType="dmap">
+        DELETE FROM PM_PAYMENT
+        WHERE PAYMENT_UID = (SELECT PAYMENT_UID FROM LMS_LE_COURSE_USER WHERE CUSERNO = #{CUSERNO} )
+    </delete>
+
+    <!-- 수강정보 삭제(USEYN='N') -->
+    <delete id="deleteCourseUser" parameterType="dmap">
+        UPDATE LMS_LE_COURSE_USER SET USEYN = 'N' WHERE CUSERNO = #{CUSERNO}  AND USERNO = #{USERNO}
+    </delete>
+
+    <!-- 수강정보 삭제 -->
+    <delete id="deleteCourseUserAll" parameterType="dmap">
+    	UPDATE LMS_LE_COURSE_USER 
+           SET USEYN = 'N'
+           		, CANCEL_REQDATE = SYSDATE
+				, CANCEL_REGDATE = SYSDATE
+           WHERE CUSERNO = #{CUSERNO}
+           	   AND USERNO = #{SES_USERNO}
+    </delete>
+
+	<!-- 다운로드 파일정보 조회 -->
+	<select id="getFileInfo" resultType="emap" parameterType="dmap">
+		SELECT
+			SLNO
+			, SLTNO
+			, FILENO
+			, ORGFILE
+			, SAVFILE
+			, FSIZE
+			, FTYPE
+			, SAVPATH
+			, MT_TUTOR_FILE_CODE
+		FROM LMS_ED_LECTURE_FILE A
+		WHERE A.SLNO = #{slno}
+		AND A.SLTNO = #{sltno}
+		AND A.FILENO = #{fileno}
+	</select>
+	
+	<!-- 특강 신청 -->
+	<insert id="insertAprsltExec" parameterType="dmap">
+		INSERT INTO LMS_ED_LECTURE 
+		  (SLNO
+		   <if test="SES_CUSERNO != null and SES_CUSERNO != '0' ">
+		   , APPLY_NO
+		   </if>
+		   , APPLY_NM
+		   , APPLY_ORGAN_NM
+		   , SIDO_CODE
+		   , GU_CODE
+		   , DONG_CODE
+		   , APPLY_ORGAN_ADDR
+		   , APPLY_TEL
+		   , APPLY_PHONE
+		   , APPLY_EMAIL
+		   , EDU_AREA
+		<!--    , EDU_SDATE
+		   , EDU_EDATE -->
+		   , DS_SDATE
+		   , DS_EDATE
+		   , MT_LEC_TARGET_CODE
+		   , PERSON_CNT
+		   , MT_LCTRE_CODE
+		   , USEYN
+		   , MT_LEC_STATUS_CODE
+		    <if test="etc != null">
+		   , EDU_CONTENTS
+		   </if>
+		   <if test="mtLecTargetCode == 'TG0007'">
+		   , TARGET_ETC
+		   </if>
+		   , REGIST_NO
+		   , REGIST_DT
+		   , MT_LEC_ROUTE_CODE
+		   <if test="mtFcltsCode != null and mtFcltsCode != '' ">
+		   , MT_FCLTS_CODE
+		   </if>
+		     <if test="fcltsEtc != null and fcltsEtc != '' ">
+		   , FCLTS_ETC
+		   </if>
+		   , LE_LNM_ZIP
+	       , LE_LNM_ADRES1
+	       , LE_LNM_ADRES2
+		   ) VALUES (
+		   (SELECT NVL(MAX(SLNO)+1, 1) AS SLNO FROM LMS_ED_LECTURE)
+		   <if test="SES_CUSERNO != null and SES_CUSERNO != '0' ">
+		   , #{SES_USERNO}
+		   </if>
+		   , #{applyNm}
+		   , #{applyOrganNm}
+		   , #{sidoCode}
+		   , #{guCode}
+		   , #{dongCode}
+		   , #{applyOrganAddr}
+		   , #{confirmTel}
+		   , #{confirmMobile}
+		   , #{email}
+		   , #{eduArea}
+		  <!--  , TO_DATE(#{eduSdate},'YYYY-MM-DD HH24:MI')
+		   , TO_DATE(#{eduEdate},'YYYY-MM-DD HH24:MI') -->
+		   , TO_DATE(#{eduSdate},'YYYY-MM-DD HH24:MI')
+		   , TO_DATE(#{eduEdate},'YYYY-MM-DD HH24:MI')
+		   , #{mtLecTargetCode}
+		   , #{personCnt}
+		   , #{mtLctreCode}
+		   , 'Y'
+		   , 'LE0001'
+		   <if test="etc != null">
+		   , #{etc}
+		   </if>
+		   <if test="mtLecTargetCode == 'TG0007'">
+		   , #{targetEtc}
+		   </if>
+		   , #{SES_USERNO} 
+		   , SYSDATE
+		   , #{mtLecRouteCode}
+		    <if test="mtFcltsCode != null and mtFcltsCode != '' ">
+		   , #{mtFcltsCode}
+		   </if>
+		     <if test="fcltsEtc != null and fcltsEtc != '' ">
+		   , #{fcltsEtc}
+		   </if>
+		   , #{lelnmZip}
+	       , #{lelnmAdres1}
+	       , #{lelnmAdres2}
+		   )
+	</insert>
+	
+	 <select id="getMaxBoardNo" resultType="int" >
+      SELECT MAX(SLNO) AS SLNO FROM LMS_ED_LECTURE
+    </select>
+	
+    <select id="selectRunTime" parameterType="dmap" resultType="int">
+        SELECT RUNTIME FROM LMS_ED_COURSE_TREE WHERE COURSENO = #{courseno} AND TREENO = #{treeno}
+    </select>
+    
+	<insert id="insertAprsltDate" parameterType="dmap">
+		INSERT INTO LMS_ED_LECTURE_DATE
+			(SLDTNO
+			,SLNO
+			,EDU_SDATE
+			,EDU_EDATE
+			) VALUES (
+				(SELECT NVL(MAX(SLDTNO),0)+1 FROM LMS_ED_LECTURE_DATE)
+			, #{slno}
+			, TO_DATE(#{eduSdate},'YYYY-MM-DD HH24:MI')
+			, TO_DATE(#{eduEdate},'YYYY-MM-DD HH24:MI')
+			)
+	</insert>
+	
+	
+	<select id="getAreaSidoList" parameterType="dmap" resultType="map">
+		/* my_class.getAreaSidoList */
+    	SELECT 
+    		SIDO_CODE AS CODE
+    		, SIDO_NAME AS NAME
+    		, USEYN 
+    	FROM LMS_CD_SIDO
+    	WHERE USEYN = 'Y'
+    </select>
+    <select id="getAreaGuList" parameterType="dmap" resultType="map">
+    	SELECT 
+    		SIDO_CODE
+    		, GU_CODE AS CODE
+    		, GU_NAME AS NAME
+    		, USEYN 
+    	FROM LMS_CD_GU
+    	WHERE SIDO_CODE =#{sidoCode}
+    </select>
+    
+    <select id="getAreaDongList" parameterType="dmap" resultType="map">
+    	SELECT 
+    		SIDO_CODE
+    		, GU_CODE
+    		, DONG_CODE AS CODE
+    		, DONG_NAME AS NAME
+    		, USEYN FROM LMS_CD_DONG
+    	WHERE GU_CODE = #{guCode}
+    </select>
+    
+    <!-- 대출상품 - 자금용도 코드조회 -->
+    <select id="getEduLoanGoods" parameterType="dmap" resultType="map">
+    	SELECT 
+               FND_USECD
+               ,MCSYSTEM01.FN_CD_NM(FND_USECD) FND_USECD_NM
+           FROM MCSYSTEM01.LSGMEDU_GDCD A
+           WHERE 1=1
+           AND FND_USECD IN ('H2412','H2413','H2414')
+           GROUP BY FND_USECD
+		ORDER BY FND_USECD
+    </select> 
+
+	<!-- 대출상품목록조회 -->
+    <select id="getEduLoanPrdList" parameterType="dmap" resultType="map">
+    	SELECT  /*my_class.getEduLoanPrdList*/
+			EDU_LOAN_SEQ
+			, LOAN_PRD_GRP 
+			, LOAN_PRD_CODE
+			, LOAN_USE_CODE
+			, USE_YN
+			, REGDATE
+			, REGDATE
+			, REGNO
+			, GDCD
+			,FND_USECD
+			,MCSYSTEM01.FN_CD_NM(FND_USECD) FND_USECD_NM
+			,(SELECT GDNM FROM MCSYSTEM01.MCGM_PBI WHERE FND_USECD = A.FND_USECD AND GDCD = A.GDCD ) AS GDNM
+			,NVL(FND_KND_CD,'NULL') FND_KND_CD
+            ,MCSYSTEM01.FN_CD_NM(FND_KND_CD) FND_KND_NM 
+		FROM MCSYSTEM01.LSGMEDU_GDCD A
+			LEFT OUTER JOIN LMS_ED_LOAN_MAPP LELM 
+				ON A.FND_USECD = LELM.LOAN_PRD_GRP  
+				AND  A.GDCD  = LELM.LOAN_PRD_CODE
+			    AND  NVL(A.FND_KND_CD,'NULL')  = NVL(LELM.LOAN_USE_CODE,'NULL')
+		WHERE FND_USECD IN ('H2412','H2413','H2414')	    
+		<if test="fnd_usecd != null and fnd_usecd != ''"> 
+			AND FND_USECD = #{fnd_usecd}    
+		</if>
+		ORDER BY FND_USECD
+	</select>
+	
+    <!-- 강사 게시판 목록 -->
+    <select id="selectLearningStatusList" resultType="emap" parameterType="dmap">
+    /* selectLearningStatusList */
+         SELECT A.*
+                , CASE WHEN PROGRESS_AVG > 0 
+                          THEN 'N'
+                          ELSE 'Y'
+                           END AS CANCEL_AT
+        FROM (
+            SELECT A.CUSERNO
+				     , A.CSEQNO
+				     , A.SEQ_TITLE
+				     , A.EVAL_PROGRESS
+				     , A.EVAL_EXAM_FINAL
+				     , A.COURSENO
+				     , A.ISPASS
+				     , NVL(ROUND(SUM(B.VAL) / COUNT(A.TREENO),0),0) AS PROGRESS_AVG
+				     , A.MT_SC_CODE
+				     , A.MT_SC_NAME
+				     , A.COMP_DATE
+				     , A.STARTDATE
+				     , A.ENDDATE
+				     , ROW_NUMBER() OVER(ORDER BY A.WDATE DESC) RNUM 
+				  FROM ( SELECT A.CUSERNO
+				              , A.WDATE
+				              , NVL(A.ISPASS,'N') AS ISPASS
+				              , B.SEQ_TITLE
+				              , B.CSEQNO
+				              , B.EVAL_PROGRESS
+				              , B.EVAL_EXAM_FINAL
+				              , C.COURSENO
+				              , C.MT_SC_CODE
+				              , FN_GET_CMMN_CODE_NM('SC',C.MT_SC_CODE) AS MT_SC_NAME 
+				              , D.TREENO
+				              , TO_CHAR(A.COMPDATE,'YYYY. MM. DD') AS COMP_DATE
+				              , TO_CHAR(A.STARTDATE,'YYYY. MM. DD') AS STARTDATE
+				              , TO_CHAR(A.ENDDATE,'YYYY. MM. DD') AS ENDDATE
+				           FROM LMS_LE_COURSE_USER A
+				              , LMS_ED_COURSE_SEQ B
+				              , LMS_ED_COURSE C
+				              , LMS_ED_COURSE_TREE D
+				          WHERE 1 = 1
+				            AND A.CSEQNO = B.CSEQNO
+				            AND B.COURSENO = C.COURSENO
+				            AND C.COURSENO = D.COURSENO
+				            AND A.USEYN = 'Y'					
+				            AND A.USERNO = #{SES_USERNO}	
+							<if test='tab == "O"'>
+		                    AND SYSDATE <![CDATA[ <= ]]> A.ENDDATE+1
+							</if> 
+							<if test='tab == "C"'>
+		                    AND SYSDATE <![CDATA[ > ]]> A.ENDDATE+1
+							</if>                     				
+				       ) A
+				    , LMS_LE_TREE_HIST B
+				 WHERE A.CUSERNO = B.CUSERNO (+)
+				   AND A.TREENO  = B.TREENO (+)
+				  GROUP BY A.CUSERNO, A.CSEQNO, A.SEQ_TITLE, A.EVAL_PROGRESS, A.EVAL_EXAM_FINAL
+				              , A.COURSENO, A.WDATE, A.ISPASS, A.MT_SC_CODE, A.MT_SC_NAME, A.COMP_DATE, A.STARTDATE, A.ENDDATE
+				ORDER BY A.WDATE DESC
+                ) A
+        WHERE 1=1
+        <!-- AND RNUM BETWEEN #{startNo} AND #{endNo} -->
+    </select>	
+    
+    <select id="selectLearningStatusListCnt" resultType="int" parameterType="dmap">
+            SELECT COUNT(*)
+                  FROM ( SELECT A.CUSERNO
+                              , A.WDATE
+                              , NVL(A.ISPASS,'N') AS ISPASS
+                              , B.SEQ_TITLE
+                              , B.CSEQNO
+                              , B.EVAL_PROGRESS
+                              , B.EVAL_EXAM_FINAL
+                              , C.COURSENO
+                              , C.MT_SC_CODE
+                              , FN_GET_CMMN_CODE_NM('SC',C.MT_SC_CODE) AS MT_SC_NAME 
+                              , D.TREENO
+                           FROM LMS_LE_COURSE_USER A
+                              , LMS_ED_COURSE_SEQ B
+                              , LMS_ED_COURSE C
+                              , LMS_ED_COURSE_TREE D
+                          WHERE 1 = 1
+                            AND A.CSEQNO = B.CSEQNO
+                            AND B.COURSENO = C.COURSENO
+                            AND C.COURSENO = D.COURSENO
+                            AND C.MT_SC_CODE != 'SC6001'
+				            AND C.MT_SC_CODE != 'SC7001'
+                            AND A.USEYN = 'Y'
+                            AND NVL(A.ISPASS,'N') = #{ispass}
+                            AND A.USERNO = #{SES_USERNO}
+                       ) A
+                    , LMS_LE_TREE_HIST B
+                 WHERE A.CUSERNO = B.CUSERNO (+)
+                   AND A.TREENO  = B.TREENO (+)
+                ORDER BY A.WDATE DESC
+    </select>
+    
+    <update id="insertProgressCheck" parameterType="dmap">
+      MERGE INTO LMS_LE_TREE_HIST A
+             USING DUAL
+                ON ( A.CUSERNO = #{cuserno}
+                 AND A.TREENO  = #{treeno}
+                     )
+              WHEN MATCHED THEN
+           UPDATE 
+                SET A.STUDYTIME = #{studytime}
+                    , A.VAL   = #{val}
+                    , A.EDATE = SYSDATE
+                    , A.FRAMESEQ = #{frameseq}
+                    , A.STUDYCNT = A.STUDYCNT+1
+                    , A.MT_PROG_STATUS_CODE = #{mtProgStatusCode}
+                     <if test=" mtProgStatusCode == 'PS0003' ">
+                    , A.COMP_DATE = SYSDATE
+                     </if>
+             WHEN NOT MATCHED THEN
+            INSERT ( CUSERNO
+                       , TREENO
+                       , FRAMESEQ
+                       , STUDYTIME
+                       , VAL
+                       , SDATE
+                       , EDATE
+                       , STUDYCNT
+                       , MT_PROG_STATUS_CODE
+                       <if test=" mtProgStatusCode == 'PS0003' ">
+                       , COMP_DATE
+                       </if>
+         ) VALUES ( #{cuserno}
+                       , #{treeno}
+                       , #{frameseq}
+                       , #{studytime}
+                       , #{val}
+                       , SYSDATE
+                       , SYSDATE
+                       , '1'
+                       , #{mtProgStatusCode}
+                       <if test=" mtProgStatusCode == 'PS0003' ">
+                       , SYSDATE
+                       </if>
+                       )
+    
+    </update>
+    <!-- 수료 여부 체크 -->
+    <select id="selectProgressChk" parameterType="dmap" resultType="emap">
+           /*selectProgressChk*/
+            SELECT B.CUSERNO
+                     , A.EVAL_PROGRESS
+                     , A.COURSENO
+                     , A.CSEQNO
+                     , A.CLASS_DESK
+                     , NVl(D.MIN_PROGRESS_DIV,'N') AS MIN_PROGRESS_DIV
+              FROM LMS_ED_COURSE_SEQ A
+                    , LMS_LE_COURSE_USER B
+                    , LMS_ED_COURSE C
+                    , ( SELECT CASE WHEN SUM(DECODE(MIN_PROGRESS_PASS_AT,'Y',1,0)) >= COUNT(MIN_PROGRESS_PASS_AT)  
+                                    THEN 'Y'
+                                    ELSE 'N'
+                                     END AS MIN_PROGRESS_DIV
+                             , CUSERNO
+                          FROM ( SELECT CASE WHEN D.VAL >= A.MIN_PROGRESS
+                                             THEN 'Y'
+                                             ELSE 'N'
+                                              END AS MIN_PROGRESS_PASS_AT
+                                      , C.CUSERNO
+                                  FROM LMS_ED_COURSE_TREE A
+                                     , LMS_ED_COURSE_SEQ B
+                                     , LMS_LE_COURSE_USER C
+                                     , LMS_LE_TREE_HIST D
+                                 WHERE 1 = 1
+                                   AND A.COURSENO = B.COURSENO
+                                   AND B.CSEQNO   = C.CSEQNO
+                                   AND C.CUSERNO = D.CUSERNO
+                                   AND C.CUSERNO = #{cuserno}
+                                 GROUP BY A.MIN_PROGRESS, D.VAL, C.CUSERNO
+                               )
+                        GROUP BY CUSERNO
+                      ) D
+           WHERE 1 = 1
+               AND A.CSEQNO   = B.CSEQNO
+               AND A.COURSENO = C.COURSENO
+               AND B.CUSERNO   = D.CUSERNO (+)
+               AND B.CUSERNO = #{cuserno}
+    </select>
+    
+    
+    <!-- 수료코드 키 생성 -->
+    <select id="getMaxCompCode" parameterType="dmap" resultType="String">
+        /*getMaxCompCode*/
+        SELECT TO_CHAR(NVL(MAX(SEQ)+1 ,1),'000000') AS SEQ
+        FROM LMS_LE_COMP_SEQ 
+        WHERE YYYY = TO_CHAR(SYSDATE,'YYYY')
+        AND GUBUN = TO_CHAR(#{gubun_code})
+    </select>
+    
+    
+
+    <update id="updateLeCourseUserInfo" parameterType="dmap">
+    /*updateLeCourseUserInfo*/
+        UPDATE 
+            LMS_LE_COURSE_USER SET 
+                FEDATE = SYSDATE  
+                ,ISPASS = #{ispass}
+                ,RANK = #{rank}
+                <if test='compYN == "Y"'>
+                ,COMPCODE = #{compCode}
+                ,COMPDATE = SYSDATE
+                </if>  
+                <if test='rfrshTrnngYN == "Y"'>
+                , CANCEL_REQDATE = SYSDATE
+                , CANCEL_DESCRIPTION = #{cancelDescription}
+                , CANCEL_REGDATE = SYSDATE
+                </if>
+                <if test='cceduDiv == "Y"'>
+                , USEYN = 'C'
+                </if>
+        WHERE CUSERNO = #{cuserno} 
+    </update>   
+    
+    <update id="updateMaxCompCode" parameterType="dmap">
+        /*updateMaxCompCode*/
+        MERGE INTO LMS_LE_COMP_SEQ A
+        USING DUAL
+            ON ( YYYY = TO_CHAR(SYSDATE,'YYYY') AND GUBUN = TO_CHAR(#{gubun_code})
+        )
+        WHEN MATCHED THEN
+         UPDATE SET
+            SEQ = #{compSeq}
+            , WDATE = SYSDATE
+        WHEN NOT MATCHED THEN
+         INSERT ( GUBUN
+                , YYYY
+                , SEQ
+                , WDATE
+         )
+         VALUES (
+             #{gubun_code}
+            , TO_CHAR(SYSDATE,'YYYY')
+            , #{compSeq}
+            , SYSDATE
+         )
+    </update>
+    
+    <update id="updateCceduLeCourseUserInfo" parameterType="dmap">
+         UPDATE CC_APPLY
+		      SET REFRESH_DT = CASE WHEN ADD_MONTHS(TO_DATE(REFRESH_DT,'YYYY.MM.DD'),36) > SYSDATE
+									              THEN TO_CHAR(ADD_MONTHS(TO_DATE(REFRESH_DT,'YYYY.MM.DD'),36),'YYYY-MM-DD')
+									              ELSE TO_CHAR(SYSDATE,'YYYY-MM-DD')
+									               END 
+		  WHERE UNITY_MBERNO = #{SES_USERNO}
+    </update>
+    
+   <!-- 학습현황 -->
+<!--     <select id="selectProgressChk" parameterType="dmap" resultType="emap"> -->
+<!-- 		SELECT A.CUSERNO -->
+<!-- 			     , A.CSEQNO -->
+<!-- 			     , A.SEQ_TITLE -->
+<!-- 			     , A.EVAL_PROGRESS -->
+<!-- 			     , A.EVAL_EXAM_FINAL -->
+<!-- 			     , A.COURSENO -->
+<!-- 			     , A.ISPASS -->
+<!-- 			     , NVL(ROUND(SUM(B.VAL) / COUNT(A.TREENO),0),0) AS PROGRESS_AVG -->
+<!-- 		  FROM ( SELECT A.CUSERNO -->
+<!-- 				              , A.WDATE -->
+<!-- 				              , B.SEQ_TITLE -->
+<!-- 				              , B.CSEQNO -->
+<!-- 				              , B.EVAL_PROGRESS -->
+<!-- 				              , B.EVAL_EXAM_FINAL -->
+<!-- 				              , A.ISPASS -->
+<!-- 				              , C.COURSENO -->
+<!-- 				              , D.TREENO -->
+<!-- 		                FROM LMS_LE_COURSE_USER A -->
+<!-- 				              , LMS_ED_COURSE_SEQ B -->
+<!-- 				              , LMS_ED_COURSE C -->
+<!-- 				              , LMS_ED_COURSE_TREE D -->
+<!-- 			          WHERE 1 = 1 -->
+<!-- 				           AND A.CSEQNO = B.CSEQNO -->
+<!-- 				           AND B.COURSENO = C.COURSENO -->
+<!-- 				           AND C.COURSENO = D.COURSENO -->
+<!-- 				           AND NVL(A.ISPASS,'N') = #{ispass} -->
+<!-- 				           AND A.USERNO = #{SES_USERNO} -->
+<!-- 			       ) A -->
+<!-- 		    , LMS_LE_TREE_HIST B -->
+<!-- 		 WHERE A.CUSERNO = B.CUSERNO (+) -->
+<!-- 		   AND A.TREENO  = B.TREENO (+) -->
+<!-- 		  GROUP BY A.CUSERNO -->
+<!-- 		     , A.CSEQNO -->
+<!-- 		     , A.SEQ_TITLE -->
+<!-- 		     , A.EVAL_PROGRESS -->
+<!-- 		     , A.EVAL_EXAM_FINAL -->
+<!-- 		     , A.COURSENO -->
+<!-- 		     , A.WDATE -->
+<!-- 		     , A.ISPASS -->
+<!-- 		ORDER BY A.WDATE DESC -->
+        
+<!--     </select> -->
+    
+<!--     <select id="selectProgressChk" parameterType="dmap" resultType="int"> -->
+<!--                 SELECT COUNT(*) -->
+<!--           FROM ( SELECT A.CUSERNO -->
+<!--                               , A.WDATE -->
+<!--                               , B.SEQ_TITLE -->
+<!--                               , B.CSEQNO -->
+<!--                               , B.EVAL_PROGRESS -->
+<!--                               , B.EVAL_EXAM_FINAL -->
+<!--                               , A.ISPASS -->
+<!--                               , C.COURSENO -->
+<!--                               , D.TREENO -->
+<!--                         FROM LMS_LE_COURSE_USER A -->
+<!--                               , LMS_ED_COURSE_SEQ B -->
+<!--                               , LMS_ED_COURSE C -->
+<!--                               , LMS_ED_COURSE_TREE D -->
+<!--                       WHERE 1 = 1 -->
+<!--                            AND A.CSEQNO = B.CSEQNO -->
+<!--                            AND B.COURSENO = C.COURSENO -->
+<!--                            AND C.COURSENO = D.COURSENO -->
+<!--                            AND NVL(A.ISPASS,'N') = #{ispass} -->
+<!--                            AND A.USERNO = #{SES_USERNO} -->
+<!--                    ) A -->
+<!--             , LMS_LE_TREE_HIST B -->
+<!--          WHERE A.CUSERNO = B.CUSERNO (+) -->
+<!--            AND A.TREENO  = B.TREENO (+) -->
+<!--           GROUP BY A.CUSERNO -->
+<!--              , A.CSEQNO -->
+<!--              , A.SEQ_TITLE -->
+<!--              , A.EVAL_PROGRESS -->
+<!--              , A.EVAL_EXAM_FINAL -->
+<!--              , A.COURSENO -->
+<!--              , A.WDATE -->
+<!--              , A.ISPASS -->
+<!--         ORDER BY A.WDATE DESC -->
+<!--     </select> -->
+   
+   <select id="selectClassBoardList" parameterType="dmap" resultType="emap">
+      SELECT A.CUSERNO
+               , A.TREENO
+               , A.SDAY
+               , A.SUBJECT
+               , A.FILE_PATH
+               , A.MEDIA_FILE
+               , A.CLASS_DESK
+               , NVL(B.VAL,0) AS VAL
+               , NVL(TO_CHAR(B.EDATE,'YYYY.MM.DD'), '-') AS EDATE
+               , NVL(B.STUDYTIME,0) AS STUDYTIME
+               , ROWNUM AS RNUM
+        FROM ( SELECT A.CUSERNO
+                            , A.USERNO
+                            , B.CLASS_DESK
+                            , D.TREENO
+                            , D.SDAY
+                            , D.SUBJECT
+                            , D.FILE_PATH
+                            , D.MEDIA_FILE
+                      FROM LMS_LE_COURSE_USER A
+                            , LMS_ED_COURSE_SEQ B
+                            , LMS_ED_COURSE C
+                            , LMS_ED_COURSE_TREE D
+                   WHERE 1 = 1
+                       AND A.CSEQNO = B.CSEQNO
+                       AND B.COURSENO = C.COURSENO
+                       AND C.COURSENO = D.COURSENO
+                       AND A.USERNO = #{SES_USERNO}
+                       AND B.CSEQNO = #{cseqno}
+               ORDER BY D.SDAY , D.TREENO
+                  ) A
+               , LMS_LE_TREE_HIST B
+      WHERE 1 = 1
+          AND A.CUSERNO = B.CUSERNO (+)
+          AND A.TREENO  = B.TREENO (+)
+   </select>
+   
+   <select id="selectCourseInfo" parameterType="dmap" resultType="emap">
+   /* selectCourseInfo */
+   
+	       SELECT A.*
+			 FROM ( SELECT C.CUSERNO
+			            , C.CSEQNO
+			            , B.SEQ
+			            , C.USERNO
+			            , ( SELECT MOBLPHON FROM LMS_CT_UNITY_MBER WHERE UNITY_MBERNO = C.USERNO ) AS MOBLPHON
+			            , ( SELECT MBERNM FROM LMS_CT_UNITY_MBER WHERE UNITY_MBERNO = C.USERNO ) AS MBERNM
+			            , C.STARTDATE
+			            , C.ENDDATE
+			            , B.SEQ_TITLE
+			            , B.COURSENO
+			            , B.CLASS_DESK
+			            , A.MT_SC_CODE
+			            , B.EDUSEQ_YN
+			            , B.EVAL_PROGRESS
+			            , B.EVAL_EXAM_FINAL
+			            , (SELECT SAVFILE FROM LMS_ED_COURSE_FILE WHERE COURSENO =  A.COURSENO AND THUM_YN = 'Y' AND OPEN_AT ='Y') AS SAVFILE 
+			            , CASE WHEN (SELECT COUNT(*) FROM LMS_ED_COURSE_TREE WHERE COURSENO = A.COURSENO ) = (SELECT COUNT(*) FROM LMS_LE_TREE_HIST WHERE CUSERNO = C.CUSERNO AND MT_PROG_STATUS_CODE ='PS0003')
+			                      THEN 'Y'
+			                      ELSE 'N'
+			                       END AS ONLINE_EDU
+			            , D.MIN_PROGRESS
+			          FROM LMS_ED_COURSE A
+			             , LMS_ED_COURSE_SEQ B
+			             , LMS_LE_COURSE_USER C
+			             , (SELECT * FROM LMS_ED_COURSE_TREE  WHERE COURSENO = #{courseno} AND TREENO = #{treeno}) D
+			         WHERE 1 = 1
+			           AND A.COURSENO = B.COURSENO
+			           AND B.CSEQNO   = C.CSEQNO
+			           AND A.COURSENO = D.COURSENO (+)
+			           <if test='cceduDiv != "Y" ' >
+			           AND A.MT_SC_CODE != 'SC6001'
+			           AND A.MT_SC_CODE != 'SC7001'  
+			           </if>
+			           AND C.USEYN = 'Y'
+			           <if test="courseno != null and courseno != ''"> 
+			           AND A.COURSENO = #{courseno}
+			           </if>
+			           <if test="cuserno != null and cuserno != ''"> 
+                       AND C.CUSERNO = #{cuserno}
+                       </if>
+			           <if test="searchCseqno != null and searchCseqno != ''"> 
+			           AND B.CSEQNO   = #{searchCseqno}
+			           </if>
+			           AND C.USERNO   = #{SES_USERNO}
+			      ORDER BY C.WDATE DESC
+			      ) A
+			WHERE ROWNUM = '1'
+   
+   </select>
+   
+   <select id="selectMtScCodeList" parameterType="dmap" resultType="emap">
+        SELECT A.MT_SC_CODE
+		         , FN_GET_CMMN_CODE_NM('SC',A.MT_SC_CODE) AS MT_SC_NAME
+	      FROM LMS_ED_COURSE A
+		         , LMS_ED_COURSE_SEQ B
+		         , LMS_LE_COURSE_USER C
+		         , LMS_ED_COURSE_TREE D
+	     WHERE 1 = 1
+	         AND A.COURSENO = B.COURSENO
+	         AND B.CSEQNO   = C.CSEQNO
+	         AND A.COURSENO = D.COURSENO
+	         AND C.USEYN = 'Y'
+	         AND C.USERNO   = #{SES_USERNO}	         
+	 GROUP BY A.MT_SC_CODE
+	 ORDER BY A.MT_SC_CODE
+		 
+   </select>
+   
+   <select id="selectCourseSeqList" parameterType="dmap" resultType="emap">
+     SELECT B.SEQ_TITLE
+              , B.CSEQNO
+              , B.CLASS_DESK
+              , B.EDUSEQ_YN
+              , A.MT_SC_CODE
+           FROM LMS_ED_COURSE A
+              , LMS_ED_COURSE_SEQ B
+              , LMS_LE_COURSE_USER C
+              , LMS_ED_COURSE_TREE D
+          WHERE 1 = 1
+            AND A.COURSENO = B.COURSENO
+            AND B.CSEQNO   = C.CSEQNO
+            AND A.COURSENO = D.COURSENO
+            AND C.USEYN = 'Y'
+            AND C.USERNO   = #{SES_USERNO}
+	        AND C.STARTDATE <![CDATA[<=]]> SYSDATE
+	        AND SYSDATE <![CDATA[<=]]> C.ENDDATE
+    GROUP BY B.SEQ_TITLE, B.CSEQNO, B.CLASS_DESK, B.EDUSEQ_YN, A.MT_SC_CODE, C.WDATE
+    ORDER BY C.WDATE DESC
+   </select>
+   
+   <select id="getClassCourseBbsList" parameterType="dmap" resultType="emap">
+                      SELECT A.* 
+                        FROM ( SELECT CASE WHEN (CSEQNO = #{cseqno}) 
+                                                      THEN 'N' 
+                                                      ELSE 'Y' 
+                                                       END AS COMYN
+				                            ,  BBSNO, COURSENO, CSEQNO, WRITER, TO_CHAR(WDATE,'YYYY.MM.DD') AS WDATE, TITLE, RCNT, Z.BCATENO, Z.BCATENAME, ANYN, Y.POPYN, Y.POP_PATH, Y.POP_FILE
+				                            , '-' AS USERID, '-' AS SAVPATH, '-' AS SAVFILE, '-' AS ORGFILE, Z.BBSTYPE, Z.INTYPE, GRPNO, REFLEVEL, REFSTEP
+						                    , CASE WHEN (SYSDATE - WDATE <![CDATA[ <= ]]> 1 AND SYSDATE - WDATE <![CDATA[ > ]]> 0) 
+						                              THEN 'new_btn' 
+						                              ELSE 'null_btn'  
+						                               END AS NEWBTN
+						                    , ROWNUM AS RNUM, OPEN_AT, FILECNT
+						                    , TOPYN 
+						                    , ROUND(SYSDATE - WDATE) AS DATE_DIFF
+					                 FROM  ( SELECT * 
+					                                  FROM ( SELECT X.*
+					                                                     , (SELECT COUNT(*) 
+					                                                           FROM LMS_ED_COURSE_FILE B 
+					                                                         WHERE B.BBSNO = X.BNO 
+					                                                            AND B.OPEN_AT = 'Y'
+					                                                       ) AS FILECNT 
+					                                               FROM ( SELECT BBSNO BNO
+					                                                            FROM LMS_ED_BBS
+					                                                          WHERE 1=1
+					                                                              AND BCATENO = #{bcateno}
+					                                                      ORDER BY GRPNO DESC, BBSNO ASC
+					                                                       ) X
+					                                           )X
+					                              ) X
+				                           , LMS_ED_BBS Y
+				                           , LMS_ED_BBS_CATEGORY Z
+				                   WHERE X.BNO = Y.BBSNO 
+				                       AND Z.BCATENO = CASE WHEN LENGTH(Y.BCATENO) > 1 
+				                                                         THEN SUBSTR(Y.BCATENO,3,1) 
+											                             ELSE SUBSTR(Y.BCATENO,1)                 
+											                              END  
+				                       AND Y.COURSENO = #{courseno}
+				                       AND (Y.CSEQNO = #{cseqno} OR Y.CSEQNO= 0 ) 
+                               ORDER BY TOPYN DESC, GRPNO DESC, BBSNO ASC
+                               ) A
+                    WHERE A.OPEN_AT = 'Y'
+   </select>
+   
+     <!-- 과정수료관리 > 수료증발급 > 출력 회원정보 -->
+    <select id="getUserCertPrintInfo" parameterType="dmap" resultType="emap">
+     /* course_study.getUserCertPrintInfo */    
+        SELECT 
+            A.COMPCODE
+            , C.MBERNM AS USERNAME
+            , B.SEQ_TITLE
+            , TO_CHAR(CURRENT_DATE, 'YYYY') AS NOWYEAR
+            , TO_CHAR(CURRENT_DATE, 'MM') AS NOWMONTH
+            , TO_CHAR(CURRENT_DATE, 'DD') AS NOWDAY
+            , C.BRTHDY
+            , B.OPENTYPE
+            , TO_CHAR(B.STUDY_SDATE, 'YYYY-MM-DD') STUDY_SDATE
+            , TO_CHAR(B.STUDY_EDATE, 'YYYY-MM-DD') STUDY_EDATE
+            , TO_CHAR(A.STARTDATE, 'YYYY-MM-DD') STARTDATE
+            , TO_CHAR(A.ENDDATE, 'YYYY-MM-DD') ENDDATE
+            , TO_CHAR(A.WDATE, 'YYYY-MM-DD') AS WDATE
+            , TO_CHAR(A.COMPDATE, 'YYYY-MM-DD') AS COMPDATE
+            , (SELECT SUM(RUNTIME) FROM LMS_ED_COURSE_TREE WHERE COURSENO=B.COURSENO) AS STUDYTIME
+            , (SELECT COUNT(D.TREENO) FROM LMS_ED_COURSE_TREE D WHERE D.COURSENO=B.COURSENO) AS TREECNT
+        FROM  LMS_LE_COURSE_USER A , LMS_ED_COURSE_SEQ B, LMS_CT_UNITY_MBER C
+        WHERE 1=1
+            AND A.CSEQNO = B.CSEQNO
+            AND A.USERNO = C.UNITY_MBERNO
+            <if test="SES_USERNO != null and SES_USERNO != ''">
+            AND C.UNITY_MBERNO = #{SES_USERNO}
+            </if>
+            <if test="cuserNo != null and cuserNo != ''">
+            AND A.CUSERNO = #{cuserNo}
+            </if>
+    </select>
+
+     <select id="getPrintMaxIdx" resultType="int">
+        SELECT NVL(MAX(IDX),0) + 1 IDX FROM LMS_LE_COMP_PRINT
+    </select>
+   
+   
+    <!-- 수료증  로그 insert -->
+    <insert id="insertPrintLog" parameterType="dmap" >
+        INSERT INTO LMS_LE_COMP_PRINT (
+          PRINT_DATE
+          <if test="idx != null and idx != ''">
+          , IDX
+           </if>
+            <if test="cuserNo != null and cuserNo != ''">
+          , CUSERNO
+           </if>
+            <if test="SES_USERNO != null and SES_USERNO != ''">
+          , USERNO
+           </if>
+            <if test="SES_USERID != null and SES_USERID != ''">
+          , USERID
+           </if>
+            <if test="printType != null and printType != ''">
+          , PRINT_TYPE
+           </if>
+        ) VALUES (
+          SYSDATE
+        <if test="idx != null and idx != ''">
+            , #{idx}
+            </if>
+            <if test="cuserNo != null and cuserNo != ''">
+            , #{cuserNo}
+             </if>
+            <if test="SES_USERNO != null and SES_USERNO != ''">
+            , #{SES_USERNO}
+             </if>
+            <if test="SES_USERID != null and SES_USERID != ''">
+            , #{SES_USERID}
+             </if>
+            <if test="printType != null and printType != ''">
+            , #{printType}
+             </if>
+        )
+    </insert>
+    
+    <update id="updateCourseUserProgress" parameterType="dmap">
+        UPDATE LMS_LE_COURSE_USER C
+             SET PROGRESS_VAL = ( ROUND(  ( SELECT EVAL_PROGRESS FROM LMS_ED_COURSE_SEQ WHERE CSEQNO = #{SES_CSEQNO} ) 
+                                                       * ( SELECT NVL(SUM(VAL),0) FROM LMS_LE_TREE_HIST WHERE CUSERNO = #{SES_CUSERNO} )
+                                                       /  ( SELECT COUNT(*) * 100 FROM LMS_ED_COURSE_TREE WHERE COURSENO = #{SES_COURSENO} )
+                                                       , 0) 
+                                           )
+                 , FINAL_VAL = ( ROUND(  ( SELECT EVAL_PROGRESS FROM LMS_ED_COURSE_SEQ WHERE CSEQNO = #{SES_CSEQNO} ) 
+                                                 * ( SELECT NVL(SUM(VAL),0) FROM LMS_LE_TREE_HIST WHERE CUSERNO = #{SES_CUSERNO} )
+                                                 /  ( SELECT COUNT(*) * 100 FROM LMS_ED_COURSE_TREE WHERE COURSENO = #{SES_COURSENO} )
+                                                 , 0) 
+                                      )
+       WHERE CUSERNO = #{cuserno}
+    </update>
+    
+    <update id="updateCourseUserTestVal" parameterType="dmap">
+        UPDATE LMS_LE_COURSE_USER
+             SET EXAM_FINAL_VAL = (  SELECT ROUND(( EVAL_EXAM_FINAL / COUNT(*) ) * SUM(VAL)/ 100,0) 
+												 FROM LMS_LE_EXAM_APPLY A
+												       , LMS_ED_COURSE_SEQ B
+											   WHERE A.CSEQNO = B.CSEQNO
+												   AND CUSERNO = #{SES_CUSERNO}
+										   GROUP BY EVAL_EXAM_FINAL
+                                            )
+                 , FINAL_VAL =  NVL(FINAL_VAL,0) + (  SELECT ROUND(( EVAL_EXAM_FINAL / COUNT(*) ) * SUM(VAL)/ 100,0) 
+						                                                 FROM LMS_LE_EXAM_APPLY A
+						                                                       , LMS_ED_COURSE_SEQ B
+						                                               WHERE A.CSEQNO = B.CSEQNO
+						                                                   AND CUSERNO = #{SES_CUSERNO}
+						                                           GROUP BY EVAL_EXAM_FINAL
+						                                            )
+       WHERE CUSERNO = #{SES_CUSERNO}
+    </update>
+    
+    <select id="selectPaymentList" resultType="emap" parameterType="dmap">    	
+		SELECT A.* ,
+		  CASE 
+		    WHEN MT_TARGET_TYPE = 'TT0001'
+		      THEN (SELECT SEQ_TITLE FROM LMS_ED_COURSE_SEQ WHERE CSEQNO = A.PRODUCT_NO)
+		    WHEN MT_TARGET_TYPE = 'TT0002'
+		      THEN (SELECT TITLE FROM LMS_ED_BOOK WHERE BOOKNO = A.PRODUCT_NO)
+		    END AS TITLE
+		FROM (
+			SELECT 
+				TO_CHAR(REGIST_DT, 'YYYY-MM-DD') REGIST_DT
+				, MT_TARGET_TYPE
+				, PRICE
+				, MT_PAY_TYPE
+				, MT_PAY_STAT  
+      			, PRODUCT_NO
+                , SEND_CODE
+      			, CC_TARGET_NO
+                , AMOUNT
+    		FROM CC_PAYMENT 
+    		WHERE UNITY_MBERNO = #{SES_USERNO} 
+    			AND MT_TARGET_TYPE = #{code} 
+    		ORDER BY CC_PAY_NO DESC
+    		) A
+    </select>
+    
+    
+    
+    
+    <select id="selectLastVal" parameterType="dmap" resultType="int">
+    	SELECT 
+    		STUDYTIME
+    	FROM 
+    		LMS_LE_TREE_HIST
+    	WHERE
+    		CUSERNO = #{cuserno}
+            AND TREENO  = #{treeno}
+    </select>
+</mapper>
+
+

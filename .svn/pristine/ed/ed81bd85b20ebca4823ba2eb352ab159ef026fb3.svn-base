@@ -1,0 +1,181 @@
+<%
+/****************************************
+    subject : 결제내역
+    summary : 마이페이지 > 결제내역
+****************************************/
+%>
+<%@ page language="java" contentType="text/html; charset=utf-8" pageEncoding="utf-8"%>
+<%@ include file="/WEB-INF/jsp/ccedu/inc/taglib_inc.jsp"%>
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+	<%@ include file="/WEB-INF/jsp/ccedu/inc/head_inc.jsp"%>
+
+<script type="text/javascript">
+	function searchList(){
+		$("#frm").submit();
+	}	
+</script>
+</head>
+<body>
+	<!-- header -->
+	<%@ include file="/WEB-INF/jsp/ccedu/inc/header_inc.jsp"%>
+	<!--// header -->
+	
+	<!-- container -->
+	<div id="container">
+		<div class="cont_title_wrapper">
+			<div class="wrapper">
+				<h3 class="cont_title">결제내역</h3>
+			</div>			
+		</div>
+		<div class="con_center">
+			<div class="wrapper">
+				<div id="content">
+					<form name="frm" id="frm" action="/ccedu/mypage/payList.do" method="post">
+						<div class="c_search_section" style="margin-top:50px;">
+							<fieldset>
+								<legend>분류선택보기 여역</legend>
+								<h4 class="sel_tit">구분선택</h4>
+								<select name="search_code" id="search_code" class="select_child1" style="width:100px;">
+									<option value="TT0001" <c:if test="${code eq 'TT0001'}">selected</c:if>>강의</option>
+									<option value="TT0002" <c:if test="${code eq 'TT0002'}">selected</c:if>>교재</option>
+				 				</select>
+				 				<button type="submit" name="button" class="btn_fieldset_search" onclick="searchList();" title="검색">검색</button>
+							</fieldset>
+						</div>
+						<div class="cont_body">	
+							<div class="c_section">
+								<div class="table_style_col">
+									<c:if test="${code eq 'TT0001'}">
+										<table>		
+											<colgroup>
+												<col width="10%"/>
+												<col width=""/>
+												<col width="10%"/>
+												<col width="10%"/>
+												<col width="15%"/>
+												<col width="10%"/>
+											</colgroup>							
+											<thead>
+												<tr>																					
+													<th scope="col">구분</th>
+													<th scope="col">강의명</th>
+													<th scope="col">결제수단</th>
+													<th scope="col">결제금액</th>
+													<th scope="col">결제일</th>
+													<th scope="col">결제상태</th>
+												</tr>
+											</thead>
+											<tbody>
+												<c:if test="${not empty result}">
+													<c:forEach var="list" items="${result}" varStatus="status">
+														<tr>												
+															<td class="align_center">강의</td>
+															<td><c:out value="${list.TITLE}" /></td>
+															<td class="align_center">
+																<c:if test="${list.MT_PAY_TYPE eq '1'}">카드</c:if>
+																<c:if test="${list.MT_PAY_TYPE eq '2'}">계좌이체</c:if>
+																<c:if test="${list.MT_PAY_TYPE eq '3'}">무통장입금</c:if>													
+															</td>
+															<td class="align_center"><c:out value="${list.PRICE}" />원</td>									
+															<td class="align_center"><c:out value="${list.REGIST_DT}" /></td>													
+															<td class="align_center">
+																<c:if test="${list.MT_PAY_STAT eq '1'}">결제완료</c:if>
+																<c:if test="${list.MT_PAY_STAT eq '2'}">입금대기</c:if>
+																<c:if test="${list.MT_PAY_STAT eq '3'}">환불진행</c:if>	
+																<c:if test="${list.MT_PAY_STAT eq '4'}">환불완료</c:if>														
+															</td>
+														</tr>
+													</c:forEach>
+												</c:if>										
+												<c:if test="${empty result}">
+													<tr>
+														<td colspan="6" class="align_center">결제 내역이 없습니다.</td>
+													</tr>
+												</c:if>
+											</tbody>
+										</table>
+									</c:if>
+									<c:if test="${code eq 'TT0002'}">
+										<table>		
+											<colgroup>
+												<col width="8%"/>
+												<col width=""/>
+												<col width="12%"/>
+												<col width="10%"/>
+												<col width="10%"/>
+												<col width="10%"/>
+												<col width="10%"/>
+											</colgroup>							
+											<thead>
+												<tr>																					
+													<th scope="col">구분</th>
+													<th scope="col">교재명</th>
+													<th scope="col">결제수단</th>
+													<th scope="col">결제수량</th>
+													<th scope="col">결제금액</th>
+													<th scope="col">결제일</th>
+													<th scope="col">송장번호</th>
+												</tr>
+											</thead>
+											<tbody>
+												<c:if test="${not empty result}">
+													<c:forEach var="list" items="${result}" varStatus="status">
+														<tr>												
+															<td class="align_center">교재</td>
+															<td><c:out value="${list.TITLE}" /></td>
+															<td class="align_center">
+																<c:if test="${list.MT_PAY_TYPE eq '1'}">카드</c:if>
+																<c:if test="${list.MT_PAY_TYPE eq '2'}">계좌이체</c:if>
+																<c:if test="${list.MT_PAY_TYPE eq '3'}">무통장입금</c:if>													
+															</td>
+															<td class="align_center"><c:out value="${list.AMOUNT}" />권</td>
+															<td class="align_center"><c:out value="${list.PRICE}" />원</td>									
+															<td class="align_center"><c:out value="${list.REGIST_DT}" /></td>													
+															<td class="align_center">
+																<c:if test="${empty list.SEND_CODE}">
+																	배송준비
+																</c:if>	
+																<c:if test="${not empty list.SEND_CODE}">
+																	<c:out value="${list.SEND_CODE}"/>
+																</c:if>					
+															</td>
+														</tr>
+													</c:forEach>
+												</c:if>										
+												<c:if test="${empty result}">
+													<tr>
+														<td colspan="7" class="align_center">결제 내역이 없습니다.</td>
+													</tr>
+												</c:if>
+											</tbody>
+										</table>
+									</c:if>
+								</div>
+		
+								<c:if test="${not empty listData}">
+									<div class="paging">
+										<paging:page cpage="${REQUEST_DATA.cPage}" total="${resultCount}" pageSize="${REQUEST_DATA.rowCount}" link="javascript:move_page"/>
+									</div>
+									<!-- 수강중인 강좌 -->
+									<c:if test="${REQUEST_DATA.ispass ne 'Y'}">
+										<div class="c_btn_right03">
+											<button onclick="fnCancel();" class="btn_blueline03">신청취소</button>
+										</div>
+									</c:if>
+								</c:if>		
+							</div>
+						</div>				
+					</form>
+				</div>
+			</div>		
+		</div>
+	</div>
+	<!--// container -->
+	
+	<!-- foot -->
+	<%@ include file="/WEB-INF/jsp/ccedu/inc/footer_inc.jsp"%>
+	<!--// foot end -->
+</body>
+</html>

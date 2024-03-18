@@ -1,0 +1,241 @@
+<%
+/****************************************
+    subject : 신용상담사
+    summary : 신용상담사 : 시험안내
+    author  : SANGS
+    date    : 2018-06-15
+****************************************/
+%>
+<%@ page language="java" contentType="text/html; charset=utf-8" pageEncoding="utf-8"%>
+<%@ include file="/WEB-INF/jsp/ccedu/inc/taglib_inc.jsp"%>
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+	<title>생생교육현장 > 알림마당 > 신용상담사</title>
+	<%@ include file="/WEB-INF/jsp/ccedu/inc/head_inc.jsp"%>
+
+<script type="text/javascript">
+	$(document).ready(function(){
+		
+	});
+
+	//검색
+	function fnSearch() {
+		$('#schSeqTitleIncode')
+				.val(encodeURIComponent($('#schSeqTitle').val()));
+
+		$('form[name=frm]').attr('target', '_self').attr('action',
+				'/ccedu/notice/thumBoardList.do');
+		$('#frm').submit();
+	}
+
+	function nextPage(){
+
+		var reqcPage =  parseInt($('#reqcPage').val())+1;
+		$('#reqcPage').val(reqcPage);
+		$.ajax({
+            url : "/ccedu/notice/ajaxthumDetailList.do",
+            data : { cPage : reqcPage
+                   , bcateno : '${REQUEST_DATA.bcateno}'
+                   , searchType : $('#reqSearchType').val()
+                   , searchWord : $('#reqSearchWord').val()
+            	   },
+            dataType : "json",
+            type : 'post',
+            success : function(res) { 		            	
+
+            	var append = '';
+
+				for(var i = 0; i < res.length ; i++){
+					
+					append += '<li>';
+					append += '<a href="#" onclick="fnView('+res[i].BBSNO+'); return false;" class="inbox">';
+					append += '<span class="img">';
+					append += '<img src="/att_file/edbbs/'+res[i].BBSNO+'/'+res[i].SAVFILE+'" alt="'+res[i].TITLE+'" />';
+					append += '</span>';
+					append += '<div class="txt">';
+					append += '<span class="tit">'+res[i].TITLE+'</span>';
+					append += '<div class="cmt_date">';
+					append += '<span class="cmt"><span class="alt_text">댓글수 </span>'+res[i].CMTCOUNT+'</span>';
+					append += '<span class="date"><span class="alt_text">작성일 </span>'+res[i].WDATE+'</span>';
+					append += '</div>';
+					append += '</div>';
+					append += '</a>';
+					append += '</li>';
+
+				}
+
+				$('.gallery_list').find('ul').append(append);
+        		
+				if(res[0].ROW_DIV == 'N'){
+					$('#appendThumBtn').hide();
+				}
+
+            },
+            error : function(e) {
+                alert("error :" + e.responseText);
+            }
+        }); 
+	}
+
+	//상세보기
+	function fnView(bbsNo){
+		$("#bbsNo").val(bbsNo);
+		$("#frm").attr("action", "/ccedu/notice/boardCmtView.do").submit();
+	}
+
+</script>
+
+</head>
+
+<body>
+
+<!-- skip nav -->
+	<%@ include file="/WEB-INF/jsp/ccedu/inc/nav_inc.jsp"%>
+<!--// skip nav -->
+
+<div id="wrap">
+
+	<!-- header -->
+	<%@ include file="/WEB-INF/jsp/ccedu/inc/header_inc.jsp"%>
+	<!--// header -->
+
+	<!-- container -->
+	<div id="container">
+
+		<!-- location -->
+		<jsp:include page="/WEB-INF/jsp/ccedu/inc/location/loc_05_04.jsp"> 
+		  	<jsp:param name="menuNm" value="생생교육현장"/> 
+		</jsp:include> 
+		<!--// location -->
+
+		<div class="con_center">
+
+			<!-- lnb -->
+			<div id="lnb">
+				<jsp:include page="/WEB-INF/jsp/ccedu/inc/lnb/lnb_05.jsp"> 
+				  	<jsp:param name="dep2" value="04"/>
+				</jsp:include> 
+			</div>
+			<!--// lnb -->
+
+			<!-- content 본문 -->
+			<div id="content">
+				
+				<!-- 기존 START 2018-08-30  -->
+<!-- 				<h3 class="cont_titile">생생교육현장</h3> -->
+				<!-- 기존 END 2018-08-30  -->
+				
+				<!-- 2018-08-28 김동인 작업 S --> 
+				<h3 class="cont_titile type05">생생교육현장<span></span></h3>
+				<!-- 2018-08-28 김동인 작업 E -->
+				
+				<!-- 본문내용 -->
+				<div class="cont_body">
+					<!-- start -->
+	
+					<c:if test="${not empty listData}">
+					<div class="c_section">
+						<form name="frm" id="frm" action="" method="post">
+							<input type="hidden" name="bcateno" id="bcateno" value="<c:out value='${REQUEST_DATA.bcateno}' />">
+							<input type="hidden" name="cPage" id="cPage" value="<c:out value='${REQUEST_DATA.cPage}' />">
+							<input type="hidden" name="reqcPage" id="reqcPage" value="<c:out value='${REQUEST_DATA.cPage}' />">
+							<input type="hidden" name="reqSearchType" id="reqSearchType" value="<c:out value='${REQUEST_DATA.searchType}' />"/>
+							<input type="hidden" name="reqSearchWord" id="reqSearchWord" value="<c:out value='${REQUEST_DATA.searchWord}' />"/>
+							<input type="hidden" name="bbsNo" id="bbsNo" value=""/>
+						
+						<div class="c_search_section">
+							<fieldset>
+								<legend>게시판 검색영역</legend>
+								<select id="searchType" name="searchType" title="검색분류를 선택하세요.">
+									<option value="CMTUSERID" <c:if test = "${ REQUEST_DATA.searchType eq 'CMTUSERID' }"> selected="selected" </c:if>>댓글아이디</option>
+									<option value="TITLE" <c:if test = "${ REQUEST_DATA.searchType eq 'TITLE' }"> selected="selected"  </c:if>>제목</option>
+									<option value="CONT" <c:if test = "${ REQUEST_DATA.searchType eq 'CONT' }"> selected="selected"  </c:if>>내용</option>
+									<option value="ALL" <c:if test = "${ REQUEST_DATA.searchType eq 'ALL' }"> selected="selected"  </c:if>>제목+내용</option>
+								</select>
+								<input type="text" name="searchWord" id="searchWord" value="${REQUEST_DATA.searchWord}" placeholder="검색어입력" title="검색어를 입력하세요." />
+								<button type="button" onclick="fnSearch();return false" class="btn_search">검색하기</button>
+							</fieldset>
+						</div>
+						
+						<div class="gallery_list">
+							<c:if test="${not empty listData}">	
+									<ul>
+										<c:forEach var="listData" items="${listData}">
+											<li>
+												<a href="#" onclick="fnView('<c:out value='${listData.BBSNO}'/>'); return false;" class="inbox">
+													<span class="img">
+														<img src="/att_file/edbbs/<c:out value="${listData.BBSNO}"/>/<c:out value="${listData.SAVFILE}"/>" alt="<c:out value="${listData.TITLE}"/>" />
+													</span>
+													<div class="txt">
+														<span class="tit"><c:out value='${listData.TITLE}'/></span>
+														<div class="cmt_date">
+															<span class="cmt"><span class="alt_text">댓글수 </span><c:out value='${listData.CMTCOUNT}'/></span>
+															<span class="date"><span class="alt_text">작성일 </span><c:out value='${listData.WDATE}'/></span>
+														</div>
+													</div>
+												</a>
+											</li>
+										</c:forEach>
+									
+									</ul>
+							</c:if>
+						</div>
+							
+						
+						<c:if test="${not empty listData}">
+							<div class="c_btn_center">
+								<c:if test = "${fn:length(listData) > 5}">
+									<button id="appendThumBtn" onclick="nextPage(); return false;" type="button" class="btn_list_more"><span>더 보기</span></button>
+								</c:if>
+							</div>
+						</c:if>
+						
+					</form>
+					</div>
+					</c:if>
+					
+					<c:if test="${empty listData}">
+					<div class="c_search_section">
+						<fieldset>
+							<legend>게시판 검색영역</legend>
+							<select id="searchType" name="searchType" title="검색분류를 선택하세요.">
+								<option value="CMTUSERID" <c:if test = "${ REQUEST_DATA.searchType eq 'CMTUSERID' }"> selected="selected" </c:if>>댓글아이디</option>
+								<option value="TITLE" <c:if test = "${ REQUEST_DATA.searchType eq 'TITLE' }"> selected="selected"  </c:if>>제목</option>
+								<option value="CONT" <c:if test = "${ REQUEST_DATA.searchType eq 'CONT' }"> selected="selected"  </c:if>>내용</option>
+								<option value="ALL" <c:if test = "${ REQUEST_DATA.searchType eq 'ALL' }"> selected="selected"  </c:if>>제목+내용</option>
+							</select>
+							<input type="text" name="searchWord" id="searchWord" value="${REQUEST_DATA.searchWord}" placeholder="검색어입력" title="검색어를 입력하세요." />
+							<button type="button" onclick="fnSearch();return false" class="btn_search">검색하기</button>
+						</fieldset>
+					</div>
+					<br/>
+				
+					<div class="list_none">
+						<div class="img">
+							<p>등록된 게시글이 없습니다.</p>
+						</div>
+					</div>
+					</c:if>
+					<!--// end -->
+				</div>
+				<!--// 본문내용 -->
+				
+			<!--  -->
+			</div>
+			<!--// content 본문 -->
+		
+		
+		</div>
+	
+	</div>
+	<!--// container -->
+
+	<!-- foot -->
+	<%@ include file="/WEB-INF/jsp/ccedu/inc/footer_inc.jsp"%>
+	<!--// foot end -->
+
+</div>
+
+</body>
+</html>

@@ -1,0 +1,19 @@
+<%
+/****************************************
+    subject : 좌측 메뉴
+    summary : 좌측 메뉴 : 회원서비스(07)
+    author  : SANGS
+    date    : 2018-06-12
+****************************************/
+%>
+<%@ page language="java" contentType="text/html; charset=utf-8" pageEncoding="utf-8"%>
+<%
+	String dep2 = (String)request.getParameter("dep2"); 
+%>
+
+<h2>회원서비스</h2>
+<ul class="lnb_menu">
+	<li <%if("01".equals(dep2)) out.print("class=\"on\""); %>><a href="/ccedu/common/login.do"><span>로그인</span></a></li>
+	<%-- <li <%if("02".equals(dep2)) out.print("class=\"on\""); %>><a href="/ccedu/user/memberJoinType.do"><span>회원가입</span></a></li> --%>
+	<li <%if("03".equals(dep2)) out.print("class=\"on\""); %>><a href="/ccedu/user/memberFindIdPw.do"><span>ID/PW 찾기<span></a></li>
+</ul>

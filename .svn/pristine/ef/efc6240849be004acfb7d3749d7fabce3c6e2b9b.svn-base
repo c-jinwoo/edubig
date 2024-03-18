@@ -1,0 +1,612 @@
+var player = new Object();								// 플레이어 객체
+var playerLoaded = false;								// 플레이어 로드 여부
+var playerSeeking = false;								// 플레이어 이동 여부
+var device = connectIndexOfAgentFunc();					// 기기 확인용
+var lastIndex = 201;									// 탭 인덱스 저장용
+var vWidth	= 1280;										// PC, 모바일 창 너비
+var vHeight	= 760;										// PC, 모바일 창 높이
+var playSpeed = 1;										// 재생속도
+var deviceAng = 0;										// 모바일 화면 회전값
+var timeLineWidth = 0;									// 타임바 너비
+var submitInterval = new Object();						// 진도송신용함수
+
+var quizNo = 0;
+var quizType = "";
+var summaryNo = 0;
+var isQuizSubmit = false;
+var isQuizFinish = false;
+var isQuizPage = false;
+var isSummaryPage = false;
+var isVideoPage = false;
+
+(function(){
+	var infoTag = document.createElement("script");
+	infoTag.type = "text/javascript";
+	infoTag.src = "./js/pageInfo.js";
+	$("head").append(infoTag);
+
+	isQuizPage = (_this.$pageInfo[_this.$curPageNumber - 1] == "quiz");
+	isSummaryPage = (_this.$pageInfo[_this.$curPageNumber - 1] == "summary");
+	isVideoPage = (_this.$pageInfo[_this.$curPageNumber - 1] == "video");
+})();
+
+// 퀴즈 페이지 관련
+function quizPageSet(){
+	var quizTag = document.createElement("script");
+	quizTag.type = "text/javascript";
+	quizTag.src = "./js/quizInfo.js";
+	$("head").append(quizTag);
+
+	// 버튼 기능 추가
+	_this.$content = $("body").children(".content");
+	_this.$control = _this.$content.find(".controlBar");
+	_this.$prevBtn = _this.$control.find(".movePrev");
+	_this.$nextBtn = _this.$control.find(".moveNext");	
+	
+    setButton(_this.$prevBtn.children("button"),'',lastIndex++, function(){
+		location.href = itostr(parseInt(_this.$curPageNumber) - 1) + ".html";
+    });
+    setButton(_this.$nextBtn.children("button"),'',lastIndex++, function(){
+		if(isQuizFinish){
+			location.href = itostr(parseInt(_this.$curPageNumber) + 1) + ".html";
+		}
+		else{
+			alert("퀴즈를 모두 푸셔야 진행 가능합니다.");
+		}
+    });	
+	
+	// 시작버튼
+	$(".q_start").click(function(){
+		$(".q_intro").hide();
+		$(".q_wrapper").show();
+	});
+
+	// 퀴즈 세팅
+	quizSet();	
+	$("#quiz").show();	
+}
+function quizSet(){
+	quizNo++;
+
+	// 제출 초기화
+	isQuizSubmit = false;
+	$(".q_input_wrapper, .q_op_wrapper, .q_confirm, .q_next").hide();
+	$(".q_desc_wrapper").css("background","#D8D8D8");
+	$(".q_result").css("opacity","0");
+	$(".q_ans").html("");
+	$(".q_desc").html("");
+	$(".q_input").val("");
+
+	// 문제번호 및 문제제목 
+	var _quizTitle = _this.$quizInfo[quizNo-1][0];
+	$(".q_no").attr("src","../common/img/quiz/Q"+quizNo+".png");
+	$(".q_title").html(_quizTitle); 
+
+	// 문제 타입(주관식 : sub / 객관식 : ob)
+	(_this.$quizInfo[quizNo-1].length < 6) ? quizType = "sub" : quizType = "ob";
+
+	// 이미지 사용여부
+	var isUsingImg = _this.$quizInfo[quizNo-1][_this.$quizInfo[quizNo-1].length-1];
+	if(isUsingImg){	
+		if(quizType == "sub"){
+			$(".q_input_wrapper .q_input").css("left","75%");
+		}
+		else{
+			$(".q_op_wrapper .q_op_inner").css({"width":"460px","margin-left":"790px"});
+		}
+		$(".q_img").attr("src","./img/quiz/"+itostr(quizNo)+".png");
+		$(".q_img_wrapper").show();
+	}
+	else{
+		if(quizType == "sub"){
+			$(".q_input_wrapper .q_input").css("left","50%");
+		}
+		else{
+			$(".q_op_wrapper .q_op_inner").css({"width":"60%","margin-left":"20%"});
+		}
+		$(".q_img_wrapper").hide();
+	}
+
+	// 문제 세팅(주관식)
+	if(quizType == "sub"){
+		$(".q_input_wrapper").show();
+		
+		// 빈칸입력이벤트
+		$(".q_input").on("keydown",function(){
+			if(!isQuizSubmit){
+				$(".q_confirm").show();
+			}
+		});
+	}
+	// 문제 세팅(객관식)
+	else{	
+		var appendHtml = "";
+		for(var i=0;i<4;i++){
+			appendHtml += "<div class='q_op' data-idx='"+(i+1)+"'><div class='q_op_no q_op_no"+(i+1)+"'></div><span class='q_op_content'>"+_this.$quizInfo[quizNo-1][i+1]+"</span></div>";
+		}
+		$(".q_op_wrapper .q_op_inner").html(appendHtml);
+		$(".q_op_wrapper").show();
+
+		// 보기버튼
+		$(".q_op").click(function(){
+			if(!isQuizSubmit){
+				$(".q_op").removeClass("active");
+				$(this).addClass("active");
+				$(".q_confirm").show();
+			}
+		});
+	}
+
+	// 정답확인버튼
+	$(".q_confirm").click(function(){
+		if(!isQuizSubmit){
+			$(this).hide();					
+			$(".q_desc_wrapper").css("background","url('../common/img/quiz/desc.png') no-repeat 100% 100% / 100% 100%");
+
+			(quizType == "sub") ? quizSubmitSub() : quizSubmitOb();
+		}
+	});
+	// 다음문제버튼
+	$(".q_next").click(function(){
+		if(isQuizSubmit){	
+			quizSet();
+		}
+	});
+}
+function quizSubmitSub(){
+	isQuizSubmit = true;
+	$(".q_ans").html(_this.$quizAnsInfo[quizNo-1][0]);
+	$(".q_desc").html(_this.$quizAnsInfo[quizNo-1][1]);
+
+	var myans = "",
+		reans = "",	
+		myansTmp = $(".q_input").val().toString(),
+		reansTmp = _this.$quizAnsInfo[quizNo-1][0].toString();
+
+	for(var i=0;i<myansTmp.length;i++){
+		if(myansTmp[i] != " "){
+			myans += myansTmp[i];
+		}
+	}
+	for(var i=0;i<reansTmp.length;i++){
+		if(reansTmp[i] != " "){
+			reans += reansTmp[i];
+		}
+	}
+
+	// 맞을 경우 음성 및 채점
+	$(".q_result").css("opacity","1");
+	if(myans == reans){
+		setAudio("right");
+		$(".q_result").attr("src","../common/img/quiz/resultO.png");
+	}
+	else{
+		setAudio("wrong");
+		$(".q_result").attr("src","../common/img/quiz/resultX.png");
+	}
+
+	// 마지막 문제 여부 확인
+	(quizNo < _this.$quizInfo.length) ? $(".q_next").show() : isQuizFinish = true;
+}
+function quizSubmitOb(){
+	isQuizSubmit = true;
+	$(".q_ans").html(_this.$quizAnsInfo[quizNo-1][0]);
+	$(".q_desc").html(_this.$quizAnsInfo[quizNo-1][1]);
+
+	var myans = $(".q_op.active").data("idx"); 
+	var reans = _this.$quizAnsInfo[quizNo-1][0];	
+
+	// 맞을 경우 음성 및 채점
+	$(".q_result").css("opacity","1");
+	$(".q_op:nth-child("+reans+")").addClass("ans");
+	if(myans == reans){
+		setAudio("right");
+		$(".q_result").attr("src","../common/img/quiz/resultO.png");
+	}
+	else{
+		setAudio("wrong");
+		$(".q_result").attr("src","../common/img/quiz/resultX.png");
+	}
+
+	// 마지막 문제 여부 확인
+	(quizNo < _this.$quizInfo.length) ? $(".q_next").show() : isQuizFinish = true;
+}
+// 정리하기 페이지 관련
+function summaryPageSet(){
+	// 버튼 기능 추가
+	_this.$content = $("body").children(".content");
+	_this.$control = _this.$content.find(".controlBar");
+	_this.$prevBtn = _this.$control.find(".movePrev");
+	_this.$nextBtn = _this.$control.find(".moveNext");
+	_this.$summaryPrevBtn = _this.$content.find(".summary_prev_btn");
+	_this.$summaryNextBtn = _this.$content.find(".summary_next_btn");
+
+    setButton(_this.$prevBtn.children("button"),'',lastIndex++, function(){
+		location.href = itostr(parseInt(_this.$curPageNumber) - 1) + ".html";
+    });
+    setButton(_this.$nextBtn.children("button"),'',lastIndex++, function(){
+		location.href = itostr(parseInt(_this.$curPageNumber) + 1) + ".html";
+    });	
+    setButton(_this.$summaryPrevBtn,'',lastIndex++, function(){
+		summarySet("prev");
+    });
+    setButton(_this.$summaryNextBtn,'',lastIndex++, function(){
+		summarySet("next");
+    });
+	
+	if(_this.$summaryNo > 1){
+		$(".summary_ctrl").show();
+	}
+
+	summarySet("next");
+	$("#summary").show();
+}
+function summarySet(action){
+	(action == "next") ? summaryNo++ : summaryNo--;	
+	$(".summary_content").attr("src","./img/summary/"+itostr(summaryNo)+".png");	
+
+	$(".summary_page span").html(summaryNo + " / " + _this.$summaryNo);
+	(summaryNo <= 1) ? $(".summary_prev_btn").hide() : $(".summary_prev_btn").show();
+	(summaryNo >= _this.$summaryNo) ? $(".summary_next_btn").hide() : $(".summary_next_btn").show();
+}
+// 플레이어 페이지 세팅
+function videoPageSet(){
+	$(".playerCtrl, .timeLine").show();
+
+	// 플레이어 생성
+	var appendHTML = "";
+		appendHTML += "<video id='my_video_"+_this.$curPageNumber+"' class='video-js' autoplay playsInline width='' height='' data-setup='{}'>";
+		appendHTML += "<source src='"+_this.$moviePath+"' type='application/x-mpegURL'>";
+		appendHTML += "</video>";
+
+	_this.$content = $("body").children(".content");
+	_this.$content.append(appendHTML);
+
+	player = videojs("my_video_"+_this.$curPageNumber);
+	$("#my_video_"+_this.$curPageNumber+", .vjs-tech").css({"width":vWidth, "height":vHeight - 40});
+
+	var fullTarget = _this.$content;					//전체화면 타켓
+
+	// DOM 컨트롤바
+	_this.$control		= _this.$content.find(".controlBar");	_this.$play			= _this.$control.find(".playPause");	
+	_this.$replay		= _this.$control.find(".replay");		_this.$sound		= _this.$control.find(".sound");
+	_this.$script		= _this.$content.find(".script");		_this.$fullSc		= _this.$control.find(".fullScreen");
+	_this.$timeLine		= _this.$control.find(".timeLine");		_this.$timeProgress = _this.$timeLine.children(".progress");
+	_this.$soundLine	= _this.$control.find(".soundLine");	_this.$soundProgress= _this.$soundLine.children(".soundProgress");
+	_this.$timeDrag		= _this.$timeProgress.find(".timeDrag");_this.$curTime		= _this.$control.find(".curTime");
+	_this.$totalTime	= _this.$control.find(".totalTime");	_this.$prevBtn		= _this.$control.find(".movePrev");
+	_this.$nextBtn		= _this.$control.find(".moveNext");		_this.$nextAlert	= _this.$control.find(".nextAlert");
+	_this.$indexMenu	= _this.$content.find(".indexMenu");	_this.$indexList	= _this.$indexMenu.find(".list");
+	_this.$playbackRW	= _this.$control.find(".playbackRW");	_this.$playbackFF	= _this.$control.find(".playbackFF");
+	
+	// 플레이어 이벤트 생성
+	player.on("loadedmetadata", function(){
+		playerLoaded = true;
+		timeLineSize();
+		if(device == "PC"){
+			parent.userInit ? statusNow("1") : statusNow("2");
+		}
+		else{
+			statusNow("2");
+		}
+	});
+	player.on("seeking", function(){
+		if(playerLoaded){playerSeeking = true;}
+	}); 
+	player.on("seeked", function(){	
+		if(playerLoaded){playerSeeking = false;}
+	});
+	player.on("timeupdate", function(){		
+		if(playerLoaded){
+			timeEvent(1);
+		}
+	});		
+	player.on("ended",function(){
+		statusNow("2");        	
+		if(!isQuizPage && !isSummaryPage){
+			if(_this.$curPageNumber != _this.$totPageNumber){            
+				_this.$nextAlert.fadeIn(1500);
+				_this.$nextAlert.css("right","5px");
+			}
+			else if(_this.$curPageNumber == _this.$totPageNumber){            
+				_this.$nextAlert.fadeIn(1500);
+				_this.$nextAlert.css("background","url(./common/img/moveAlert_end.png) no-repeat");
+				_this.$nextAlert.css("right","5px");               
+			}
+		}
+	});	
+	player.on("volumechange", function() {
+		var vol = player.volume();
+		(vol <= 0) ? $(".sound .tooltips").html("소리켜기") : $(".sound .tooltips").html("소리끄기");
+		$(".soundProgress").css("width", vol * 100 + "%");
+	});	
+
+	// 버튼 기능 추가
+    setButton(_this.$prevBtn.children("button"),'',lastIndex++, function() {
+		parent.userInit = true;
+		if(playerLoaded){
+			if(_this.$curPageNumber <= 1){
+				alert("첫번째 페이지 입니다");
+			}
+			else{
+				location.href = itostr(parseInt(_this.$curPageNumber) - 1) + ".html";
+			}
+		}
+    });
+    setButton(_this.$nextBtn.children("button"),'',lastIndex++, function() {
+		parent.userInit = true;
+		if(playerLoaded){
+			if(_this.$curPageNumber >= _this.$totPageNumber) {
+				alert("마지막 페이지 입니다");
+			}
+			else{
+				location.href = itostr(parseInt(_this.$curPageNumber) + 1) + ".html";
+			}
+		}
+    });
+	setButton(_this.$play.children("button"),'',lastIndex++, function() {
+		if(playerLoaded){
+			_this.$bolPlay ? statusNow("2") : statusNow("1");
+		}
+	});
+	setButton(_this.$replay.children("button"),'',lastIndex++, function() {
+		if(playerLoaded){
+			statusNow("3");
+		}
+	});	
+	setButton(_this.$sound.children("button"),'',lastIndex++, function() {
+		if(playerLoaded){
+			if(player.volume() <= 0){
+				player.volume(0.5);
+				$(".soundProgress").css("width", 50+"%");	$(".sound .tooltips").html("소리켜기");
+			}
+			else{
+				player.volume(0);
+				$(".soundProgress").css("width", 0+"%");	$(".sound .tooltips").html("소리끄기");
+			}
+		}
+	});
+    setButton(_this.$playbackRW.children("button"),'',lastIndex++, function() {
+		if(playerLoaded){
+			if(playSpeed > 0.6){
+				let tmp = (playSpeed - 0.2).toFixed(1);
+				playSpeed = parseFloat(tmp);
+				$(".content > .controlBar > .playerCtrl > .playbackRate").html(tmp);
+				player.playbackRate(playSpeed);
+			}
+		}
+    });
+    setButton(_this.$playbackFF.children("button"),'',lastIndex++, function() {
+		if(playerLoaded){
+			if(playSpeed < 2){
+				let tmp = (playSpeed + 0.2).toFixed(1);
+				playSpeed = parseFloat(tmp);
+				$(".content > .controlBar > .playerCtrl > .playbackRate").html(tmp);
+				player.playbackRate(playSpeed);
+			}
+		}
+    });
+	setButton(_this.$fullSc.children("button"),'',lastIndex++, function() {
+		if(playerLoaded){
+			fullSc();
+		}
+	});
+
+	// 사운드 조절
+	_this.$soundLine.on('click', function(event) {
+		var soudWid = _this.$soundLine.css("width").split("px")[0] ;
+		var perSoundX = event.offsetX / soudWid;
+		$(".soundProgress").css("width", perSoundX * 100 + "%");
+		player.volume(perSoundX);
+	});
+	// 시간 조절
+	_this.$timeLine.on('click', function(e) {
+		if(!playerSeeking){
+			var barWid = 0;
+			var perMouseX = 0;
+			barWid = _this.$timeLine.css("width").split("px")[0];
+			barWid = (_this.$bolFullScreen && _this.$browser.indexOf("IE") != -1) ? barWid / 100 : barWid;
+			perMouseX = e.offsetX / barWid;
+
+			var targetTime = player.duration() * perMouseX;
+			player.currentTime(targetTime);
+		}
+	});
+	// 플레이어 전체화면
+	function fullSc(){
+		var targetDom = fullTarget.get(0);
+		var targetDoc = document;
+		if(!_this.$bolFullScreen){
+			if (targetDom.requestFullscreen) targetDom.requestFullscreen();
+			else if (targetDom.msRequestFullscreen) targetDom.msRequestFullscreen();
+			else if (targetDom.mozRequestFullScreen) targetDom.mozRequestFullScreen();
+			else if (targetDom.webkitRequestFullscreen) targetDom.webkitRequestFullscreen();
+		}
+		else{
+			if (targetDoc.exitFullscreen) document.exitFullscreen();
+			else if(targetDoc.msExitFullscreen) document.msExitFullscreen();
+			else if (targetDoc.mozCancelFullScreen) document.mozCancelFullScreen();
+			else if (targetDoc.webkitCancelFullScreen) document.webkitCancelFullScreen();
+		}
+	}	
+	
+	// 화면 전환 시 토글
+	$(document).on('MSFullscreenChange webkitfullscreenchange mozfullscreenchange fullscreenchange', function(e) {
+		_this.$bolFullScreen = !_this.$bolFullScreen;
+		if(!_this.$bolFullScreen){
+			$("#my_video_"+_this.$curPageNumber+", .vjs-tech").css({"width":vWidth, "height":vHeight - 40});
+			$(".controlBar").show();
+		}
+		else{
+			$("#my_video_"+_this.$curPageNumber+", .vjs-tech").css({"width":"100%","height":"100%"});
+			$(".controlBar").hide();
+		}
+	});
+	// 이벤트
+	$(document).keydown(function(keyEvent) {
+		if(playerLoaded){
+			if(!playerSeeking){
+				switch(keyEvent.keyCode){
+					case 38:  //위
+						volTemp = player.volume() + 0.05;
+						if(volTemp >= 1.0){
+							volTemp = 1.0;
+						}
+						player.volume(volTemp);
+						break;
+					case 40:  //아래
+						volTemp = player.volume() - 0.05;
+						if(volTemp <= 0){
+							volTemp = 0;
+						}
+						player.volume(volTemp);
+						break;
+					case 37: //왼
+						if(player.currentTime() - 5 <= 0){
+							player.currentTime(0);
+						}
+						else{
+							player.currentTime(player.currentTime() - 5);
+						}
+						break;
+					case 39: //오른
+						if(player.currentTime() + 5 >= player.duration()){
+							player.currentTime(player.duration());
+						}
+						else{									
+							var targetTime = player.currentTime() + 5;
+							player.currentTime(targetTime);
+						}
+						break;
+					case 13:  //엔터키
+						fullSc();
+						break;
+					case 32:  //스페이스바
+						_this.$bolPlay ? statusNow("2") : statusNow("1");
+						break;
+				}
+			}
+		}
+	}); 
+}
+// 플레이어 타임바 너비
+function timeLineSize(){
+	var totalWidth		= Math.floor($(".controlBar").width());
+	var logoWidth		= Math.ceil($(".logo").width());
+	var playerCtrlWidth	= Math.ceil($(".playerCtrl").width());	
+	var pageCtrlWidth	= ($(".pageCtrl").css("display") == "block") ? Math.ceil($(".pageCtrl").width()) : 0;
+	var logoMargin		= 10;
+	var playerCtrlMargin= 40;
+	var pageCtrlMargin	= 10;
+
+	var result = totalWidth - logoWidth - playerCtrlWidth - pageCtrlWidth - (logoMargin + playerCtrlMargin + pageCtrlMargin);
+
+	$(".timeLine").css("width", result + "px");
+	timeLineWidth = $(".timeLine").width();
+}
+// 플레이어 시간제어
+function statusNow(val){
+	// 정지
+	if(val == "0"){
+		_this.$bolPlay = false;
+		player.currentTime(0);player.pause();
+	}
+	// 재생
+	else if(val == "1"){	
+		_this.$bolPlay = true;			
+		player.play();
+	}
+	// 일시정지
+	else if(val == "2"){		
+		_this.$bolPlay = false;
+		player.pause();
+	}
+	// 다시보기
+	else if(val == "3"){
+		_this.$bolPlay = true;
+		player.currentTime(0);
+	}
+
+	// 액션에 따른 버튼 변경
+	if(_this.$bolPlay){
+		$(".playPause").removeClass("play");
+		$(".playPause").addClass("pause");
+		_this.$play.children(".tooltips").text("일시정지");
+	}
+	else{
+		$(".playPause").removeClass("pause");
+		$(".playPause").addClass("play");
+		_this.$play.children(".tooltips").text("재생");	
+	}
+}
+// 플레이어 시간표시
+function timeEvent(val){
+	var _duration, _currentTime, stickTime, missCurrent, missDuration;			
+	var missCurrent1, missCurrent2 = 0;
+	var missDuration1, missDuration2 = 0;
+	if(val){
+		_duration = player.duration();
+		_currentTime = player.currentTime();
+		stickTime = Math.floor((_currentTime/_duration)*timeLineWidth);
+	}
+	else{
+		_duration = 0;
+		_currentTime = 0;
+		stickTime = 0;
+	}		
+	$(".progress").css("width", stickTime);
+	missCurrent1 = Math.floor(_currentTime/60) ;
+	missCurrent2 = Math.floor(_currentTime%60) ;
+	missDuration1 = Math.floor(_duration/60) ;
+	missDuration2 = Math.floor(_duration%60) ;	
+	missCurrent1 = missSet(missCurrent1);
+	missCurrent2 = missSet(missCurrent2);
+	missDuration1 = missSet(missDuration1);
+	missDuration2 = missSet(missDuration2);	
+	missCurrent = missCurrent1 + ":" + missCurrent2 ;
+	missDuration = missDuration1 + ":" + missDuration2 ;		
+
+	$(".curTime").html(missCurrent);
+	$(".totalTime").html(missDuration);
+}
+// 플레이어 시간표시 유틸
+function missSet(val) {
+	if(val < 10) val = "0" + val;
+	if(!isNaN(val)) return val;
+	else return "00";
+}
+window.addEventListener("orientationchange", function(){
+	setTimeout(function(){
+		resizing($(".content"), true);
+	},500);
+});
+$(document).ready(function(){
+	$(".curPage").html(itostr(_this.$curPageNumber));
+	$(".totalPage").html(itostr(_this.$totPageNumber));
+	
+	if(isQuizPage){
+		quizPageSet();
+	}
+	else if(isSummaryPage){
+		summaryPageSet();
+	}
+	else if(isVideoPage){
+		videoPageSet();
+	}
+	else{
+		alert("페이지 설정 오류");
+	}
+	
+	if(device == "PC"){
+		$(".fullScreen").show();
+	}
+	else{
+		$(".fullScreen").hide();
+		$(window).trigger("orientationchange"); 
+	}	
+	// 반응형
+	$(window).resize(function(){
+		resizing($(".content"), true);
+	});
+	resizing($(".content"), true);
+});

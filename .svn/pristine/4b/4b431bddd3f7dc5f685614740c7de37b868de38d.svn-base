@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes" ?>
+<list>
+  <index>
+    <topic>
+      <list title="main" page="1">소개하기</list>
+      <list title="sub" page="1">마케팅 애널리틱스</list>
+
+      <list title="main" page="2">살펴보기</list>
+      <list title="sub" page="2">마케팅 애널리틱스 개념</list>
+      <list title="sub" page="3">마케팅 애널리틱스 필요성</list>
+	  <list title="sub" page="4">마케팅 애널리틱스 유형과 필요정보</list>
+
+      <list title="main" page="5">정리하기</list>
+      <list title="sub" page="5">학습평가</list>
+      <list title="sub" page="6">학습정리</list>
+    </topic>
+  </index>
+</list>

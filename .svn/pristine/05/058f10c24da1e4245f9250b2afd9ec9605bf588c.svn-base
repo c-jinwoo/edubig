@@ -1,0 +1,195 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.webapp.common.mapper.CommonPollMapper">
+
+
+	<!-- 설문 리스트 -->
+	<select id="getPollList" resultType="emap" parameterType="dmap">
+ 	/* getPollList */
+ 	
+ 		SELECT 
+		      POLLCSEQNO
+		    , ROW_NUMBER() OVER(ORDER BY SDATE ASC) AS RNUM
+		    , MT_POLL_TYPE
+		    , POLL_TARGET_NO
+		    , TITLE
+		    , SDATE
+		    , EDATE
+		    , CNT
+		    , USEYN
+		    , SUMMARY
+		    , WRITER
+		    , WDATE
+		    , CASE WHEN TO_CHAR(TO_DATE(SYSDATE,'YYYY-MM-DD'),'YYYY-MM-DD') BETWEEN TO_CHAR(TO_DATE(SDATE, 'YYYY-MM-DD'),'YYYY-MM-DD') AND TO_CHAR(TO_DATE(EDATE, 'YYYY-MM-DD'),'YYYY-MM-DD')
+                   THEN 'Y'
+                   ELSE 'N'
+                    END AS possibleYn 
+		FROM ED_POLL
+		WHERE MT_POLL_TYPE = #{mtPollType} 
+ 		ORDER BY RNUM DESC
+ 	</select>
+ 
+ 
+ 	<!-- 신용상담사 > 합격여부 > 설문관리 -->
+ 	<select id="getExamPollInfo" resultType="emap" parameterType="dmap">
+ 	/* getExamPollInfo */
+	 SELECT A.*
+	   FROM ( SELECT ROW_NUMBER() OVER( ORDER BY WDATE DESC ) AS RNUM
+				   , A.CC_NO
+				   , A.CC_APP_NO
+				   , A.UNITY_MBERNO
+				   , A.EXAM_NO
+				   , A.POLL_YN
+				   , B.POLLCSEQNO
+				   , B.MT_POLL_TYPE
+				   , B.POLL_TARGET_NO
+				   , B.TITLE
+				   , B.SDATE
+				   , B.EDATE
+				FROM CC_APPLY A
+		  INNER JOIN ED_POLL B ON A.CC_NO = B.POLL_TARGET_NO
+			   WHERE A.CC_NO = #{ccNo}
+				 AND A.UNITY_MBERNO = #{SES_USERNO}
+				 AND A.USEYN = 'Y'
+	  	   ) A
+	   WHERE RNUM = 1
+ 	</select>
+ 	
+ 	<!-- 상시설문_모듈명 조회-->
+ 	<select id="getModuleList" parameterType="dmap" resultType="emap">
+ 	/* getModuleList */
+ 	
+ 		SELECT A.* 
+		FROM
+			(
+			SELECT 
+				CPOLL_TITLE
+				, MIN(QNO) AS MINQNO 
+			FROM ED_POLL_QUIZ 
+			WHERE POLLCSEQNO = #{pollCseQno}
+			GROUP BY CPOLL_TITLE
+			) A
+		ORDER BY A.MINQNO 	
+ 	
+ 	</select>
+ 	
+ 	<!-- 상시설문_문항 조회 -->
+ 	<select id="getEdPollQuizList" resultType="emap" parameterType="dmap">
+ 	/* getEdPollQuizList */
+ 		
+ 		SELECT 
+ 			  POLLCSEQNO
+ 			, QNO
+ 			, MT_CPOLL_CODE
+ 			, SUBJECT
+ 			, USEYN
+ 			, CPOLL_TITLE
+ 			, DOUBLE_AT
+ 			, ORDR
+ 		FROM ED_POLL_QUIZ
+ 		WHERE POLLCSEQNO =#{pollCseQno}
+ 		
+ 	</select>
+ 	
+ 	<!-- 상시설문_문항 보기 -->
+ 	<select id="getEdPollQitemList" resultType="emap" parameterType="dmap">
+ 	/* getEdPollQitemList */
+ 	
+ 		SELECT
+ 			 POLLCSEQNO
+ 			, QNO
+ 			, ITEMNO
+ 			, ITEM_SUBJECT
+ 			, ITEM_ORDR
+ 			, ITEM_VAL
+ 		FROM ED_POLL_QITEM
+ 		WHERE POLLCSEQNO = #{pollCseQno}
+<!--  		AND QNO = #{qno} -->
+ 		
+ 	</select>
+ 	
+ 	<!-- 상시설문 응시내역 -->
+ 	<insert id="insertEdPollApply" parameterType="dmap">
+ 	/* insertEdpollApply */
+ 	
+ 		INSERT INTO ED_POLL_APPLY
+ 			(
+ 				  POLLCSEQNO
+ 				, USERNO
+ 				, OPENDATE
+ 			)
+ 		VALUES
+ 			(
+ 				  #{pollCseQno}
+ 				, #{SES_USERNO}
+ 				, SYSDATE
+ 			)
+ 	</insert>
+ 	
+ 	<!-- 상시설문 응시답안 -->
+ 	<insert id="insertEdPollHist" parameterType="dmap">
+ 	/* insertEdPollHist */
+ 	
+ 		INSERT INTO ED_POLL_HIST
+ 			(
+ 				  USERNO
+ 				, POLLCSEQNO
+ 				, QNO
+ 				, ANSWER
+ 				, ITEMSEQ
+ 			)
+ 			VALUES
+ 			(
+ 				  #{SES_USERNO}
+ 				, #{pollCseQno}
+ 				, #{qno}
+ 				, #{answer}
+ 				, #{itemSeq}
+ 			)
+ 	</insert>
+ 	<select id="selectNoUserNo" resultType="int" parameterType="dmap">
+ 	 SELECT NVL(MAX(USERNO),0)+1 FROM ED_POLL_APPLY WHERE POLLCSEQNO = #{pollCseQno}
+ 	</select>
+ 	
+ 	 <!-- 상시설문 응시내역 -->
+    <insert id="insertEdPollSite" parameterType="dmap">
+    /* insertEdpollApply */
+    
+        INSERT INTO ED_POLL_APPLY
+            (
+                  POLLCSEQNO
+                , USERNO
+                , OPENDATE
+            )
+        VALUES
+            (
+                  #{pollCseQno}
+                , #{noUserNo}
+                , SYSDATE
+            )
+    </insert>
+    
+    <!-- 상시설문 응시답안 -->
+    <insert id="insertEdPollSiteHist" parameterType="dmap">
+    /* insertEdPollHist */
+    
+        INSERT INTO ED_POLL_HIST
+            (
+                  USERNO
+                , POLLCSEQNO
+                , QNO
+                , ANSWER
+                , ITEMSEQ
+            )
+            VALUES
+            (
+                  #{noUserNo}
+                , #{pollCseQno}
+                , #{qno}
+                , #{answer}
+                , #{itemSeq}
+            )
+    </insert>
+ 			
+</mapper>

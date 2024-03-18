@@ -1,0 +1,143 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes" ?>
+<event>
+<!-- 강조빨간색칠하기-->
+<!-- &lt;span style="color:#ff3300"&gt;&lt;u&gt;않은&lt;&#47;span&gt;&lt;&#47;u&gt; -->
+<!-- 내려쓰기 -->
+<!-- &lt;br&gt; -->
+  <quiz flag="9" >
+      <page num="1" answer="1" type="multiple">
+          <question>
+              <alternate>문제 일.다음 중 데이터마이닝 기법에 해당하지 않는 것은 
+무엇인가? </alternate>
+			  <symbol>Q1.</symbol>
+              <text>다음 중 데이터마이닝 기법에 해당하지 않는 것은 
+무엇인가? </text>
+          </question>
+
+          <feedback>
+              <alternate>정답은 삼번입니다. 쿼리는 데이터베이스 활용 기법에 해당된다. </alternate>
+              <answer>
+                  <symbol>정답</symbol>
+                  <text>1</text>
+              </answer>
+              <explain>
+                  <symbol>1</symbol>
+                  <text>쿼리는 데이터베이스 활용 기법에 해당된다.</text>
+              </explain>
+          </feedback>
+
+          <example num="1">
+              <alternate>보기 일번 쿼리(Query)</alternate>
+              <symbol>Q1</symbol>
+              <text>쿼리(Query)</text>
+          </example>
+          <example num="2">
+              <alternate>보기 이번 사례기반추론(Case Base Reasoning)</alternate>
+              <symbol>2</symbol>
+              <text>사례기반추론(Case Base Reasoning)</text>
+          </example>
+          <example num="3">
+              <alternate>보기 삼번 군집분석(Cluster Analysis)</alternate>
+              <symbol>3</symbol>
+              <text>군집분석(Cluster Analysis)</text>
+          </example>
+          <example num="4">
+              <alternate>보기 사번 인공신경망(Neural Networks)</alternate>
+              <symbol>4</symbol>
+              <text>인공신경망(Neural Networks)</text>
+          </example>
+      </page>
+
+      <page num="2" answer="3" type="multiple">
+          <question>
+              <alternate>문제 이. 다음 중 데이터마이닝의 기법으로 정형데이터 
+분석을 다루는 기법이 아닌 것은?</alternate>
+			  <symbol>Q2.</symbol>
+              <text>다음 중 데이터마이닝의 기법으로 정형데이터 
+분석을 다루는 기법이 아닌 것은?</text>
+          </question>
+
+          <feedback>
+              <alternate>정답은 일 번입니다. 웹 마이닝 기법은 비정형데이터 분석을 다루는 방법이다.</alternate>
+              <answer>
+                  <symbol>정답</symbol>
+                  <text>3</text>
+              </answer>
+              <explain>
+                  <symbol>3</symbol>
+                  <text>웹 마이닝 기법은 비정형데이터 분석을 다루는 방법이다.</text>
+
+              </explain>
+          </feedback>
+
+          <example num="1">
+              <alternate>보기 일번 인공신경망 기법</alternate>
+              <symbol>1</symbol>
+              <text>인공신경망 기법</text>
+          </example>
+          <example num="2">
+		  <alternate>보기 이번 의사결정나무 기법</alternate>
+              <symbol>2</symbol>
+              <text>의사결정나무 기법</text>
+          </example>
+          <example num="3">
+              <alternate>보기 삼번 웹 마이닝</alternate>
+              <symbol>3</symbol>
+              <text>웹 마이닝</text>
+          </example>
+          <example num="4">
+              <alternate>보기 사번 사례기반 추론</alternate>
+              <symbol>4</symbol>
+              <text>사례기반 추론</text>
+          </example>
+      </page>
+
+      <page num="3" answer="2" type="multiple">
+          <question>
+              <alternate>문제 삼. 다음 중 데이터마이닝의 특징이 아닌 것은?</alternate>
+			  <symbol>Q3.</symbol>
+              <text>다음 중 데이터마이닝의 특징이 아닌 것은?</text>
+          </question>
+
+          <feedback>
+              <alternate>정답일 일 번입니다. 데이터마이닝은 사용자의 경험이나 판단을 배제하고, 
+전적으로 데이터에 기반하여 지식과 패턴을 추출한다.</alternate>
+              <answer>
+                  <symbol>정답</symbol>
+                  <text>2</text>
+              </answer>
+              <explain>
+                  <symbol>2</symbol>
+                  <text>데이터마이닝은 사용자의 경험이나 판단을 배제하고, 
+전적으로 데이터에 기반하여 지식과 패턴을 추출한다.</text>
+
+              </explain>
+          </feedback>
+
+          <example num="1">
+              <alternate>보기 일번 기업들의 데이터베이스 필요성의 증가</alternate>
+              <symbol>1</symbol>
+              <text>기업들의 데이터베이스 필요성의 증가</text>
+          </example>
+          <example num="2">
+              <alternate>보기 이번 데이터마이닝은 사용자의 경험이나 
+판단을 기반으로 지식과 패턴을 추출</alternate>
+              <symbol>2</symbol>
+              <text>데이터마이닝은 사용자의 경험이나 
+판단을 기반으로 지식과 패턴을 추출</text>
+          </example>
+          <example num="3">
+              <alternate>보기 삼번 기업 업무와 생상의 효율성 증대</alternate>
+              <symbol>Q3</symbol>
+              <text>기업 업무와 생상의 효율성 증대</text>
+          </example>
+          <example num="4">
+              <alternate>보기 사번 활용분야는 카드사의 사기 발견, 
+금융권의 대출 승인, 투자분석</alternate>
+              <symbol>4</symbol>
+              <text>활용분야는 카드사의 사기 발견, 
+금융권의 대출 승인, 투자분석</text>
+          </example>
+      </page>
+  </quiz>
+</event>

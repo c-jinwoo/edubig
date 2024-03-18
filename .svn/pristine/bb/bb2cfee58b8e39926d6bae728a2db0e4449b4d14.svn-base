@@ -1,0 +1,7 @@
+<!-- modal -->
+<link href='/cmmn/modal/css/jquery.modal.css' rel='stylesheet' />
+<link href='/cmmn/modal/css/jquery.modal.theme-atlant.css' rel='stylesheet' />
+<link href='/cmmn/modal/css/jquery.modal.theme-xenon.css' rel='stylesheet' />
+<script src='/cmmn/modal/js/jquery.modal.js'></script>
+<!-- <script src='/cmmn/modal/js/jquery.modal.min.js'></script> -->
+<!-- /. modal -->

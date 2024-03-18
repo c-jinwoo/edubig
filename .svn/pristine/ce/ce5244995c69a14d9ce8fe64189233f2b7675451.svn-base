@@ -1,0 +1,174 @@
+<%
+/****************************************
+    subject : 회원관리
+    summary : 회원관리 : 회원 탈퇴
+****************************************/
+%>
+<%@ page language="java" contentType="text/html; charset=utf-8" pageEncoding="utf-8"%>
+<%@ include file="/WEB-INF/jsp/ccedu/inc/taglib_inc.jsp"%>
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+	<%@ include file="/WEB-INF/jsp/ccedu/inc/head_inc.jsp"%>
+	<script type="text/javascript" src="/cmmn/js/jquery.cookie.js"></script> 
+	<script type="text/javascript">
+		
+		function enterChk() {
+			if(event.keyCode == 13) {
+				go_exec();
+			}
+		}
+		
+		var delay = 1000;
+		var submitted = false;
+		
+		function submitCheck() {
+			if(submitted == true) { 
+				
+				fnModalMsg('로그인 처리중 입니다. 잠시만 기다려주세요.');
+				
+				return; 
+			}
+		  	setTimeout ('go_exec()', delay);
+		  	
+		}
+		
+		function go_exec() {
+			
+			if($('input[name=isMobile]').val() == 'true')	mtk.fillEncData();
+		
+			if($('#secsnCd').val() == ''){
+				fnModalMsg('탈퇴사유를 선택해주세요.',function(){
+			        $('#secsnCd').focus();
+				});
+				
+				return false;
+			}
+				
+			
+			if('' == $('#userPassword').val()) {
+				
+				fnModalMsg('비밀번호를 입력해 주세요.',function(){
+			        $('#userPassword').focus();
+				});
+				
+				return false;
+			}
+		    
+		    submitted = true;
+		    frm.submit();
+			return; 
+		}
+	
+	</script>
+</head>
+
+<body>
+<div id="wrap">
+	<!-- header -->
+	<%@ include file="/WEB-INF/jsp/ccedu/inc/header_inc.jsp"%>
+	<!--// header -->
+	<!-- container -->
+	<div id="container">
+		<div class="con_center">
+			<!-- 메뉴 title -->
+			<div class="cont_title_wrapper">
+				<div class="wrapper">
+					<h3 class="cont_title">회원탈퇴</h3>
+				</div>			
+			</div>
+			<!-- content 본문 -->
+			<div id="content">
+				<div class="wrapper">
+					<!-- 본문내용 -->
+					<div class="cont_body">
+						<!-- start -->
+	
+						<div class="c_section">
+							<ul class="c_txtlist">
+								<li>
+									<h5>해당아이디로 재가입 불가능</h5>
+									<ul class="in_txtul">
+										<li>회원 탈퇴를 신청하시면 해당아이디는 즉시 탈퇴 처리되며 해당 아이디는 영구적으로 사용이 중지되므로 해당 아이디로는 재가입이 불가능합니다.</li>
+									</ul>
+								</li>
+								<li>
+									<h5>입력하신 소중한 개인정보는 회원님의 명백한 동의 없이 공개 또는 제3자에게 제공되지 않습니다.</h5>
+									<ul class="in_txtul">
+										<li>회원탈퇴 즉시 회원정보는 삭제되며 아래 회원제 서비스의 정보도 삭제를 원칙으로 하고 있습니다.</li>
+										<li>
+											인터넷 상담, 금융에로 사항 등 회원께서 입력하신 내용은 모두 삭제되며, 다시 정보의 재이용이 불가능합니다. <br />
+											단, 아래의 공공적 성격의 게시물은 탈퇴 후에도 삭제되지 않습니다.<br />
+											(게시물 등의 삭제를 원하시는 경우에는 반드시 먼저 삭제 처리하신 후, 탙퇴를 신청하시기 바랍니다.)
+										</li>
+									</ul>
+								</li>
+								<li>
+									<h5>불량이용 및 이용제한</h5>
+									<ul class="in_txtul">
+										<li>부적합한 이용 기록 정보는 신용교육원 홈페이지 운영정책에 의해 일정 동안 보관합니다.</li>
+										<li>개인정보 취급 방침에 따라 불량이용 및 이용제한에 관한 기록은 일정기간 보관합니다.</li>
+									</ul>
+								</li>
+							</ul>
+							<div class="table_style_row">
+								<form name="frm" id="frm" action="/ccedu/mypage/secsnExec.do" method="post"  target="_self">
+								<input type="hidden" name="userId" value="<c:out value="${REQUEST_DATA.userId }"/>"/>
+								<input type="hidden" name="isMobile" id="isMobile"/>
+								<table>
+									<caption>회원탈퇴 필수정보를 입력하는 표 입니다.</caption>
+									<colgroup>
+										<col class="col2_1" />
+										<col />
+									</colgroup>
+									<tr>
+										<th scope="row"><span class="required">필수사항 : </span>아이디</th>
+										<td><c:out value="${REQUEST_DATA.userId }"/></td>
+									</tr>
+									<tr>
+										<th scope="row"><span class="required">필수사항 : </span>탈퇴사유</th>
+										<td>
+											<div class="form_field">
+												<select title="탈퇴사유 선택" class="select_out_txt" id="secsnCd" name="secsnCd">
+													<option value="">선택</option>
+	                                                <c:forEach var="emap2" items="${secsnCodeList}" varStatus="status2">
+										        		<option value="${emap2.MT_SUB_CODE}"><c:out value="${emap2.MT_SUB_NAME}"/></option>
+											        </c:forEach>
+												</select>
+											</div>
+										</td>
+									</tr>
+									<tr>
+										<th scope="row"><span class="required">필수사항 : </span>비밀번호</th>
+										<td>
+											<div class="form_field">
+												<input type="password" title="비밀번호 입력" class="input_pw_wid enKey_qwer" id="userPassword" name="userPassword"/>
+											</div>
+										</td>
+									</tr>
+								</table>
+								</form>
+							</div>
+						</div>
+	
+						<div class="c_btn_center">
+							<button onclick="history.go(-1);" class="btn_graybg03">취소</button>
+							<button onclick="go_exec();" class="btn_bluebg03">완료</button>
+						</div>
+	
+						<!--// end -->
+					</div>
+					<!--// 본문내용 -->
+				</div>
+			<!--  -->
+			</div>
+			<!--// content 본문 -->		
+		</div>	
+	</div>
+	<!--// container -->
+	<!-- foot -->
+	<%@ include file="/WEB-INF/jsp/ccedu/inc/footer_inc.jsp"%>
+	<!--// foot end -->
+</div>
+</body>
+</html>

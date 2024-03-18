@@ -1,0 +1,132 @@
+package com.webapp.ccedu.ctrl;
+
+import javax.annotation.Resource;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+
+import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.RequestMapping;
+
+import com.sangs.support.DataMap;
+import com.sangs.support.EduMap;
+import com.sangs.support.FrontException;
+import com.webapp.academy.service.CommonService;
+import com.webapp.ccedu.service.OnlineBookService;
+
+/**
+ * Description : 
+ *
+ * Modification Information
+ * 수정일			수정자			수정내용
+ * -------		-----------------------------------
+ * 2020.09.29	CSLAB		최초작성
+ *
+ */
+
+@Controller
+public class OnlineBookController {
+    @Resource(name = "commonService")
+    private CommonService   commonService;
+    
+    @Resource(name = "onlineBookService")
+    private OnlineBookService onlineBookService; 
+    
+
+    // TODO: 온라인서점 > 리스트
+    @RequestMapping(value = "/ccedu/book/main.do")
+    public String main(HttpServletRequest request, HttpServletResponse res, DataMap rMap) throws FrontException {
+		try {    
+			String mtCode = "SC";
+			String mtSubCode = rMap.getString("mtSubCode");
+			if(mtSubCode == null || mtSubCode == ""){
+				mtSubCode = "SC1001";
+				rMap.putString("mtSubCode", mtSubCode);
+			}
+			request.setAttribute("title", onlineBookService.selectBookType(mtSubCode));
+			request.setAttribute("courseList", onlineBookService.selectCourseList(mtCode));	
+			
+			request.setAttribute("listData", onlineBookService.selectBookList(mtSubCode));			
+			request.setAttribute("REQUEST_DATA", rMap);			
+		} catch (Exception e) {
+		    throw new FrontException(e);
+		}		
+		return "ccedu/book/main";        
+    }  
+    
+    // TODO: 온라인서점 > 상세정보
+    @RequestMapping(value = "/ccedu/book/form.do")
+    public String form(HttpServletRequest request, HttpServletResponse res, DataMap rMap) throws FrontException {
+		try {    
+			String mtCode = "SC";
+			String mtSubCode = rMap.getString("mtSubCode");	
+			EduMap tMap = onlineBookService.selectBookInfo(rMap);
+			
+            if (tMap == null) {
+                request.setAttribute("msg", "잘못된 접근입니다.");
+                request.setAttribute("url", "/ccedu/book/main.do?mtSubCode="+mtSubCode);
+                return "forward:/common/msgForward.do";
+            }			  
+            else{
+            	request.setAttribute("result", tMap);
+            }
+
+			request.setAttribute("title", onlineBookService.selectBookType(mtSubCode));
+			request.setAttribute("courseList", onlineBookService.selectCourseList(mtCode));	
+			request.setAttribute("classList", onlineBookService.selectClassList(mtSubCode));				
+			
+			request.setAttribute("REQUEST_DATA", rMap);
+			
+		} catch (Exception e) {
+		    throw new FrontException(e);
+		}		
+		return "ccedu/book/form";        
+    }   
+    
+    // TODO: 온라인서점 > 상세정보
+    @RequestMapping(value = "/ccedu/book/onlinePayment.do")
+    public String payment(HttpServletRequest request, HttpServletResponse res, DataMap rMap) throws FrontException {
+	    /* 비로그인 시 */
+	  if ("N".equals(rMap.getString("SES_ISLOGIN")) || ("").equals(rMap.getString("SES_USERID"))) {// 로그인 안했다면
+		  request.setAttribute("msg", "로그인이 필요한 페이지 입니다.");
+		  request.setAttribute("url", "/academy/common/login.do");
+		  return "forward:/common/msgForward.do";
+	  }
+		try {    
+			String mtCode = "SC";
+			String mtSubCode = rMap.getString("mtSubCode");	
+			request.setAttribute("title", onlineBookService.selectBookType(mtSubCode));
+			request.setAttribute("courseList", onlineBookService.selectCourseList(mtCode));	
+			request.setAttribute("REQUEST_DATA", rMap);
+			
+			request.setAttribute("userInfo",onlineBookService.selectUserInfo(rMap.getInt("SES_USERNO")));
+			
+		} catch (Exception e) {
+		    throw new FrontException(e);
+		}		
+		return "ccedu/book/online_payment";        
+    }   
+    
+    @RequestMapping(value = "/ccedu/book/onlinePayApprove.do")
+    public String onlinePayApprove(HttpServletRequest request, HttpServletResponse res, DataMap rMap) throws FrontException {
+                
+        request.setAttribute("REQUEST_DATA", rMap);
+        try {
+        	onlineBookService.insertPayment(rMap);
+        	onlineBookService.insertBookInfo(rMap);
+        	String orderno = rMap.getString("allat_order_no");
+        	
+        	Integer price = onlineBookService.getPaymentPrice(orderno);
+        	request.setAttribute("price",Integer.toString(price));        	
+		} catch (Exception e) {
+			System.out.println(e);
+		}
+        
+        return "ccedu/book/allat_approval";
+    }
+    @RequestMapping(value = "/ccedu/book/onlinePayReceive.do")
+    public String onlinePayReceive(HttpServletRequest request, HttpServletResponse res, DataMap rMap) throws FrontException {
+        request.setAttribute("REQUEST_DATA", rMap);
+        return "ccedu/book/allat_receive";
+    }
+    
+}

@@ -1,0 +1,11 @@
+_this.$quizInfo = [
+	["다음 중 Shell(쉘) 명령어에 대한 설명이 <span style='color:#FF0000;'>틀린</span> 것은?","3D Model(모델)의 내부를 비우는 명령어 이다.","선택한 Face(면)이 삭제되고 입력한 두께가 적용된다.","두께는 내부방향과 외부 방향으로만 적용할 수 있다.","특정 Face(면)을 없애지 않고 내부 공간을 비우기 위해서는 Body를 기준으로 선택한다.",false],	
+	["다음 중 Draft(면 기울기)에 대한 설명으로 <span style='color:#FF0000;'>틀린</span> 것은?","3D Model(모델)의 구성 면에 기울기를 적용하는 명령어 이다.","첫 번째 선택한 면이 기준이 되고, 두 번째 선택한 면에 기울기가 적용된다.","Draft Sides(면 방향) 옵션에는 One Side(일 방향), Two Side(양 방향), Symmetric(양 방향) 설정이 있다.","여러 개의 Face(면)을 동시에 기울기를 적용할 수 없다.",false],
+	["다음 중 Draft(면 기울기) 옵션이 <span style='color:#FF0000;'>아닌</span> 것은?","Flip Pull Direction(방향 반전)","Inside Thickness(내부 방향 두께)","Angle(각도)","Draft Sides(기울기 면)",false]
+];
+
+_this.$quizAnsInfo = [
+	[3,"두께를 적용하는 옵션에는 Indide(내부), Out Side(외부), Both(양방향)이 있다."],
+	[4,"여러 개의 Face(면)을 동시에 기울기를 적용할 수 있다."],
+	[2,"Inside Thickness(내부 방향 두께)는 Shell(쉘) 명령어의 옵션이다."]
+];

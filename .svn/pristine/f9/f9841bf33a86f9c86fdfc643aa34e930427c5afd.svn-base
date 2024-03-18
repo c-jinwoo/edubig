@@ -1,0 +1,422 @@
+<%@ page language="java" contentType="text/html; charset=utf-8" pageEncoding="utf-8"%>
+<%@ include file="/WEB-INF/jsp/ccedu/inc/taglib_inc.jsp"%>
+<%@ page import="com.sangs.support.SangsProperties" %>
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+	<%@ include file="/WEB-INF/jsp/ccedu/inc/head_inc.jsp"%>
+</head>
+<script>
+$(document).scroll(function(){
+	var cScroll = document.documentElement.scrollTop;
+	
+	if(cScroll < 2440){
+		$(".main_cont_apply").css("position","fixed");
+	}
+	else{
+		$(".main_cont_apply").css("position","relative");
+	}
+	
+	setTimeout(function(){
+		$(".main_pop").each(function(i){
+			var scTop = cScroll + 300*i;
+			if(i > 0){
+				scTop += 10;
+			}			
+			$(this).css("top",scTop+"px");
+		});			
+	},250);	
+});
+$(document).ready(function(){
+	pevent();
+	/* 상단배너 스크롤 */
+	$(".slide_wrap").slick({
+		autoplay : true,
+		autoplaySpeed : 2500,
+		infinite: true,
+		speed: 500,
+		fade: true,
+		arrows: false,
+		swipe : false,
+		cssEase: 'linear'
+	});	
+	
+	/* 교재 스크롤 */
+	$(".main_book_list").slick({
+		autoplay : true,
+		autoplaySpeed : 2000,
+		infinite: true,
+		arrows: false,
+		slidesToShow: 3,
+		swipe : false,		
+		slidesToScroll: 1
+	});
+	
+	/* 무료인강 스크롤 */
+	$(".main_free_for, .main_free_nav").bind("contextmenu",function(e){ 
+		return false;
+	});
+	$(".main_free_for").slick({
+		slidesToShow: 1,
+		slidesToScroll: 1,
+		arrows: false,
+		fade: true,
+		swipe : false,
+		asNavFor: ".main_free_nav"
+	});
+	$(".main_free_nav").slick({
+		autoplay : false,
+		slidesToShow: 3,
+		slidesToScroll: 1,
+		asNavFor: ".main_free_for",
+		arrows: false,
+		centerMode: true,
+		swipe : false,
+		focusOnSelect: true
+	});	
+	
+	/* 이벤트 스크롤 */
+	$(".info_event_wrapper").slick({
+		autoplay : true,
+		autoplaySpeed : 2000,
+		infinite: true,
+		speed: 500,
+		swipe : false,
+		arrows: false
+	});	
+
+	$(".slide_nav").children().eq(0).addClass("active");
+	$('.slide_wrap').on('beforeChange', function(event, slick, currentSlide, nextSlide){
+		$(".slide_nav").children().eq(nextSlide-1).removeClass("active");
+		$(".slide_nav").children().eq(nextSlide).addClass("active");
+	});
+	
+	$(window).resize(function(){
+		if(window.innerWidth >= 1080){
+			$('.main_pop').css('display','block');				
+		}
+		else{
+			$('.main_pop').css('display','none');	
+		}		
+	});
+});
+function slideGo(_this){	
+	$(".slide_nav a").removeClass("active");
+	$(_this).addClass("active");
+	$(".slide_wrap").slick("slickGoTo",$(_this).index());	
+}
+function setCookie(name, value, expiredays){
+	var todayDate = new Date();
+		todayDate.setDate (todayDate.getDate() + expiredays);
+		document.cookie = name + "=" + escape(value) + "; path=/; expires=" + todayDate.toGMTString() + ";";
+}
+
+function closeWin(cnt){
+	 if($("#close_view"+cnt).is(":checked")){
+		 $.cookie('main_pop'+cnt , 'sunday'+cnt, {expires: new Date(+new Date() + (24 * 60 * 60 * 1000)) });// 쿠키 생성
+		 layerPop(cnt);
+	 } else {
+		 layerPop(cnt);
+	 }
+}
+function layerPop(cnt){
+	$('#main_pop'+cnt).css('display' , 'none');
+}
+function pevent(){	
+	for(var i = 0; i<'${fn:length(bannerList)}';i++){	
+		var name = "sunday"+i ;		
+		
+		getCookie(name);		
+		function getCookie(name){			
+			var nameOfCookie = name + "=";
+			var x = 0;
+			while (x <= document.cookie.length){
+				var y = (x + nameOfCookie.length);
+				if (document.cookie.substring(x, y) == nameOfCookie){
+				if ((endOfCookie = document.cookie.indexOf(";", y)) == -1){
+				endOfCookie = document.cookie.length;
+				}
+				return unescape (document.cookie.substring(y, endOfCookie));
+				}
+				x = document.cookie.indexOf (" ", x) + 1;
+				if (x == 0) break;
+			}
+			return "";
+		}
+		if(getCookie("main_pop"+i) != "sunday"+i){	
+			if(window.innerWidth >= 1080){
+				$('#main_pop'+i).css('display','block');				
+			}
+			else{
+				$('#main_pop'+i).css('display','none');	
+			}			
+		}
+		
+		$("#main_pop"+i).css("left","calc(50% - "+$(".wrapper").width()*0.5+"px - 300px");
+		(i > 0) ? $("#main_pop"+i).css("top",300*i+10+"px") : $("#main_pop"+i).css("top","0px");
+	}
+}
+</script>
+	<!-- header -->
+	<%@ include file="/WEB-INF/jsp/ccedu/inc/header_inc.jsp"%>
+	<!--// header -->
+	
+	<!-- container -->
+	<div id="container">
+		<!-- banner -->
+		<c:forEach items="${bannerList}" var="result" varStatus="status" > 	     
+			<div id="main_pop${status.index}" class="main_pop" style="display:none;">
+				<div style="position:relative; height:100%; overflow:hidden">	
+					<div class="modal-body">			
+						<c:if test="${not empty result.SAVFILE}">                  
+							<img src="/att_file/edbbs/banner/${result.SAVFILE}"/>
+						</c:if>
+					</div>
+					<div class="modal-footer">
+			    		<p class="checks" id="checkBox">
+							<input type="checkbox" name="close_view${status.index}" id ="close_view${status.index}" popNo="<c:out value="${result.POP_NO}"/>" check="0" style="margin-left:10px;" />
+							<label class="modal-label" for="close_view${status.count-1}"> 오늘 하루 이 창을 열지 않음 </label>
+							<button title="닫기" class="mainLayer_btn" onclick="closeWin('<c:out value="${status.index}" />');return false;">
+								<a id="pop-close-btn" class="close_view${status.count-1}" href="javascript:closeWin('<c:out value="${status.index}" />')">닫기</a>
+							</button>
+						</p>
+			        </div>
+			  </div>
+			</div>			 	 
+		</c:forEach>
+		<!--// banner  --> 
+		<!-- m_content -->
+		 <div id="m_content">	
+		 	<div class="main_top_slides">
+				<div class="slide_nav_wrapper">
+					<div class="slide_nav">		
+						<c:forEach var="result" items="${courseList}">
+							<a onClick="slideGo(this);">${result.P_VALUE}</a>		
+						</c:forEach>
+					</div>
+				</div>
+				<ul class="slide_wrap">
+					<li style="background:#161C70;">
+				 		<div class="wrapper">
+							<div class="slide">
+								<a href="/ccedu/online/onlineEducationInfo.do">
+									<img src="/cmmn/images/main_top_slides01.png" alt="경영빅데이터" />
+								</a>
+							</div>
+						</div>
+					</li>
+					<li style="background:#2D313A;">
+				 		<div class="wrapper">
+							<div class="slide">
+								<a href="/ccedu/online/onlineEducationInfo.do?mtSubCode=SC1002">
+									<img src="/cmmn/images/main_top_slides02.png" alt="인터넷윤리" />
+								</a>
+							</div>
+						</div>					
+					</li>
+					<li style="background:#150909;">
+				 		<div class="wrapper">
+							<div class="slide">
+								<a href="/ccedu/online/onlineEducationInfo.do?mtSubCode=SC1003">
+									<img src="/cmmn/images/main_top_slides03.png" alt="3D프린팅" />
+								</a>
+							</div>
+						</div>
+					</li>
+				</ul>
+			</div>
+			<div class="main_div main_div_book">
+				<div class="wrapper">
+					<div class="main_div_title">
+						<h3>에듀빅 교재</h3>
+						<p>자격증 취득을 위한 필수 수험서</p>
+					</div>
+					<div class="main_div_body">
+						<div class="main_book_list">
+							<c:forEach var="result" items="${bookList}">
+								<div class="main_book_slide">
+									<div class="main_book_img">
+										<img src="/att_file/book/<c:out value="${result.SAVFILE}"/>" alt="<c:out value="${result.TITLE}"/>"/>
+									</div>
+									<p class="main_book_slide_title"><c:out value="${result.TITLE}"/></p>
+									<c:if test="${not empty result.PRICE}">
+										<p class="main_book_slide_vprice"><c:out value="${result.PRICE}"/>원</p>
+									</c:if>
+									<p class="main_book_slide_rprice"><c:out value="${result.PRICE_REAL}"/>원</p>									
+								</div>		
+							</c:forEach>
+						</div>
+					</div>
+				</div>
+			</div>	
+			<div class="main_div main_div_teacher">
+				<div class="wrapper">
+					<div class="main_div_title">
+						<h3>에듀빅 강사</h3>
+						<p>에듀빅을 대표하는 강사를 소개합니다</p>
+					</div>
+					<div class="main_div_body">
+						<div class="main_star_list">
+							<ul>
+								<li>
+									<div class="wrap">
+										<div class="img_box">
+											<img src="/cmmn/images/teacher01.png" alt="강사">
+											<span></span>
+										</div>
+										<div class="cont_box">
+											<div class="in_box">
+												<span>경영빅데이터분석사</span>
+												<strong>박성택</strong>	
+												<a href="/ccedu/online/onlineEducationInfo.do" class="btn_type_round">자세히 보기</a>
+											</div>
+										</div>
+									</div>
+								</li>
+								<li>
+									<div class="wrap">
+										<div class="img_box">
+											<img src="/cmmn/images/teacher02.png" alt="강사">
+											<span></span>
+										</div>
+										<div class="cont_box">
+											<div class="in_box">
+												<span>IEQ인터넷윤리지도사</span>
+												<strong>윤미선</strong>	
+												<a href="/ccedu/online/onlineEducationInfo.do" class="btn_type_round">자세히 보기</a>
+											</div>
+										</div>
+									</div>
+								</li>
+								<li>
+									<div class="wrap">
+										<div class="img_box">
+											<img src="/cmmn/images/teacher03.png" alt="강사">
+											<span></span>
+										</div>
+										<div class="cont_box">
+											<div class="in_box">
+												<span>3D프린팅모델링자격</span>
+												<strong>김주화</strong>	
+												<a href="/ccedu/online/onlineEducationInfo.do" class="btn_type_round">자세히 보기</a>
+											</div>
+										</div>
+									</div>
+								</li>
+							</ul>
+						</div>
+					</div>
+				</div>
+			</div>	
+			<div class="main_div main_div_free">
+				<div class="wrapper">
+					<div class="main_div_title">
+						<h3>무료 인강</h3>
+						<p>나에게 맞는 강의를 무료로 체험하세요</p>
+					</div>
+					<div class="main_div_body">
+						<div class="main_free_for">
+							<div class="main_free_slide">
+								<div class="main_free_vid">
+									<iframe width="100%" height="100%" src="https://www.youtube.com/embed/InPMiVlheug" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+								</div>
+							</div>
+							<div class="main_free_slide">
+								<div class="main_free_vid">
+									<iframe width="100%" height="100%" src="https://www.youtube.com/embed/InPMiVlheug" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+								</div>
+							</div>
+							<div class="main_free_slide">
+								<div class="main_free_vid">
+									<iframe width="100%" height="100%" src="https://www.youtube.com/embed/InPMiVlheug" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+								</div>
+							</div>
+						</div>
+						<div class="main_free_nav">
+							<div class="main_free_slide">
+								<img src="/cmmn/images/poster1.png" alt="경영빅데이터분석사" class="thumb"/>
+								<p class="main_free_slide_title">경영빅데이터분석사</p>
+							</div>
+							<div class="main_free_slide">
+								<img src="/cmmn/images/poster2.png" alt="IEQ인터넷윤리지도사" class="thumb"/>
+								<p class="main_free_slide_title">IEQ인터넷윤리지도사</p>
+							</div>
+							<div class="main_free_slide">
+								<img src="/cmmn/images/poster3.png" alt="3D프린팅모델링자격" class="thumb"/>
+								<p class="main_free_slide_title">3D프린팅모델링자격</p>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+			<div class="main_customer">
+			 	<div class="wrapper">
+		 			<div class="info_box info_bbs">
+						<a href="/ccedu/bbs/event/main.do" class="btn_more"></a>
+						<div class="info_title_wrapper">
+							<span class="info_title">이벤트</span>							
+						</div>
+						<div class="info_event_wrapper">
+							<c:forEach var="result" items="${eventList}" step='1' end='5' varStatus="status">
+								<div>
+									<p class="info_event_tit"><c:out value="${result.SUBSTR_TITLE}"/></p>								
+								</div>
+							</c:forEach>
+						</div>
+					</div>
+		 			<div class="info_box info_bbs">
+						<a href="/ccedu/bbs/notice/main.do" class="btn_more"></a>
+						<div class="info_title_wrapper">
+							<span class="info_title">공지사항</span>							
+						</div>
+						<ul id="m_tab1_1">
+						<c:forEach var="result" items="${noticeList}" step='1' end='5' varStatus="status">
+								<li>
+									<a href="/ccedu/bbs/notice/view.do?bcateno=1&bbsNo=<c:out value="${result.BBSNO}"/>">
+										<em class="tit"><c:out value="${result.SUBSTR_TITLE}"/></em>
+										<span class="date_area"><c:out value="${result.WDATE_FM}"/></span>
+									</a>
+								</li>
+							</c:forEach>
+						</ul>
+					</div>
+					<div class="info_box info_call">
+						<div class="info_title_wrapper">
+							<span class="info_title">고객센터</span>
+						</div>
+						<ul>
+							<li>
+								<em>시스템 장애</em>
+								<strong>1544-<span>3705</span></strong>
+							</li>
+							<li>
+								<em>교육 장애</em>
+								<strong>1544-<span>3705</span></strong>
+							</li>
+						</ul>
+						<div class="info_call_time">
+							<p><span>이용시간</span> 월~금 09:00 ~ 18:00</p>
+							<p><span>휴무일</span> 토, 일, 공휴일</p>
+						</div>
+						<p class="ico_call"></p>
+					</div>			
+				</div>
+			</div>
+		</div>
+		<!--// m_content -->		
+		
+		<div class="main_cont_apply">
+			<div class="wrapper">
+				<a href="/ccedu/bbs/event/view.do?bcateno=6&bbsNo=13">
+					<img src="/cmmn/images/cont1_img2_btn.png" alt="수강신청">
+				</a>
+			</div>
+		</div>
+	</div>
+	<!--// container -->
+	
+	<!-- foot -->
+	<%@ include file="/WEB-INF/jsp/ccedu/inc/footer_inc.jsp"%>
+	<!--// foot end -->
+</body>
+</html>

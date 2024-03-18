@@ -1,0 +1,478 @@
+<%
+/****************************************
+    subject : 온라인교육
+    summary : 온라인교육 > 과정 상세
+    author  : SANGS
+    date    : 2018-06-15
+****************************************/
+%>
+<%@ page language="java" contentType="text/html; charset=utf-8" pageEncoding="utf-8"%>
+<%@ include file="/WEB-INF/jsp/ccedu/inc/taglib_inc.jsp"%>
+<%@ include file="/WEB-INF/jsp/ccedu/inc/top_inc.jsp"%>
+<% pageContext.setAttribute("newline", "\n"); %>
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+	<title>온라인서점</title>
+	<%@ include file="/WEB-INF/jsp/ccedu/inc/head_inc.jsp"%>
+	
+<!----- 주소검색 레이어 START----->
+<div id="layer"
+	style="display: none; position: fixed; overflow: hidden; z-index: 9999; -webkit-overflow-scrolling: touch;">
+	<button type="button" id="btnCloseLayer"
+		style="cursor: pointer; position: absolute; right: -3px; top: -3px; z-index: 1; width: 20px; height: 20px; background-image: url( '//t1.daumcdn.net/localimg/localimages/07/postcode/320/close.png' );"
+		onclick="closeDaumPostcode()" alt="닫기 버튼"></button>
+</div>
+<style>
+.table_style_row table th,
+.table_style_row table td{
+	padding:10px;
+	text-align:center;
+}
+.table_style_row table tr:last-child h2{
+	font-size:18px;
+	padding:15px;
+}
+.table_style_row table tr:last-child h2 span{
+	color:#FE642E;
+}
+.table_style_row table label{
+	margin-left:50px;
+	cursor:pointer;
+}
+.table_style_row table input{
+	margin-right:5px;
+	border: 1px solid #000;
+}
+.table_style_row.book_tb table td{
+	text-align:left;
+}
+.table_style_row.book_tb table td{
+	text-align:left;
+}
+.same_check{
+	overflow:hidden;
+}
+.same_check input{
+	float:right;
+}
+.same_check span{
+	float:right;
+	margin-left:5px;
+	margin-top:-2px;
+}
+</style>
+<script	src="https://ssl.daumcdn.net/dmaps/map_js_init/postcode.v2.js?autoload=false"></script>
+<script language=JavaScript charset='euc-kr' src="https://tx.allatpay.com/common/NonAllatPayRE.js"></script>
+<script type="text/javascript">
+
+function isMobile() {
+	return /Android|webOS|iPhone|iPod|BlackBerry|IEMobile|Opera Mini/i
+			.test(navigator.userAgent);
+}
+
+// 우편번호 찾기 화면을 넣을 element
+var element_layer = document.getElementById('layer');
+function closeDaumPostcode() {
+	// iframe을 넣은 element를 안보이게 한다.
+	element_layer.style.display = 'none';
+}
+function openDaumPostcode() {
+
+	daum.postcode.load(function() {
+		new daum.Postcode({
+			oncomplete : function(data) {
+
+				// 각 주소의 노출 규칙에 따라 주소를 조합한다.
+				// 내려오는 변수가 값이 없는 경우엔 공백('')값을 가지므로, 이를 참고하여 분기 한다.
+				var fullAddr = data.address; // 최종 주소 변수
+				var extraAddr = ''; // 조합형 주소 변수
+
+				// 기본 주소가 도로명 타입일때 조합한다.
+				if (data.addressType === 'R') {
+					//법정동명이 있을 경우 추가한다.
+					if (data.bname !== '') {
+						extraAddr += data.bname;
+					}
+					// 건물명이 있을 경우 추가한다.
+					if (data.buildingName !== '') {
+						extraAddr += (extraAddr !== '' ? ', '
+								+ data.buildingName : data.buildingName);
+					}
+					// 조합형주소의 유무에 따라 양쪽에 괄호를 추가하여 최종 주소를 만든다.
+					fullAddr += (extraAddr !== '' ? ' (' + extraAddr + ')'
+							: '');
+				}
+
+				// 우편번호와 주소 정보를 해당 필드에 넣는다.
+				document.getElementById('book_zip').value = data.zonecode; //5자리 새우편번호 사용
+				document.getElementById('book_addr1').value = fullAddr;
+				//document.getElementById('sample2_addressEnglish').value = data.addressEnglish;
+
+				// iframe을 넣은 element를 안보이게 한다.
+				// (autoClose:false 기능을 이용한다면, 아래 코드를 제거해야 화면에서 사라지지 않는다.)
+				element_layer.style.display = 'none';
+
+				closeDaumPostcode();
+			},
+			width : '100%',
+			height : '100%',
+			maxSuggestItems : 5
+		}).embed(element_layer);
+	});
+	// iframe을 넣은 element를 보이게 한다.
+	element_layer.style.display = 'block';
+
+	// iframe을 넣은 element의 위치를 화면의 가운데로 이동시킨다.
+	initLayerPosition();
+}
+// 브라우저의 크기 변경에 따라 레이어를 가운데로 이동시키고자 하실때에는
+// resize이벤트나, orientationchange이벤트를 이용하여 값이 변경될때마다 아래 함수를 실행 시켜 주시거나,
+// 직접 element_layer의 top,left값을 수정해 주시면 됩니다.
+function initLayerPosition() {
+
+	var width = 300; //우편번호서비스가 들어갈 element의 width
+	if (!isMobile()) {
+		width = 620;
+	}
+
+	var height = 400; //우편번호서비스가 들어갈 element의 height
+	var borderWidth = 2; //샘플에서 사용하는 border의 두께
+
+	// 위에서 선언한 값들을 실제 element에 넣는다.
+	element_layer.style.width = width + 'px';
+	element_layer.style.height = height + 'px';
+	element_layer.style.border = borderWidth + 'px solid';
+	// 실행되는 순간의 화면 너비와 높이 값을 가져와서 중앙에 뜰 수 있도록 위치를 계산한다.
+	element_layer.style.left = (((window.innerWidth || document.documentElement.clientWidth) - width)
+			/ 2 - borderWidth - 6)
+			+ 'px';
+	element_layer.style.top = (((window.innerHeight || document.documentElement.clientHeight) - height) / 2 - borderWidth)
+			+ 'px';
+}
+$(document).ready(function(){
+	$('.modal-backdrop').click(function(){
+		$('.modal-backdrop').hide();
+		$('#layer_01').attr('style','display:none;');
+		$('#layer_02').attr('style','display:none;');
+	})
+	$(".vbank").hide();
+
+	$('#book_zip, #book_addr1').click(function(){
+		openDaumPostcode();
+	});
+	onlyNum2('mobile2');
+	onlyNum2('mobile3');
+});
+var beforeChecked = -1;
+$(document).on("click", "input[type=radio]", function(e) {	 
+    var index = $(this).parent().index("label");
+    if(beforeChecked == index) {
+   		beforeChecked = -1;
+    }else{
+    	beforeChecked = index;
+    }
+
+    if($(this).val() == "vbank"){
+    	$(".vbank").show();    	
+    }
+    else{
+    	$(".vbank").hide();
+    }
+ });
+ function formFill(_this){
+	 var isCheck = $(_this).is(":checked");
+	 if(isCheck){
+		 $("#book_receipt_nm").val('${userInfo.MBERNM}');
+		 $("#mobile1").val('${userInfo.MOBLPHON1}').prop("selected", true);
+		 $("#mobile2").val('${userInfo.MOBLPHON2}');
+		 $("#mobile3").val('${userInfo.MOBLPHON3}');
+		 $("#book_zip").val('${userInfo.LNM_ZIP}');
+		 $("#book_addr1").val('${userInfo.LNM_ADRES1}');
+		 $("#book_addr2").val('${userInfo.LNM_ADRES2}');
+	 }
+	 else{
+		 $("#book_receipt_nm").val("");
+		 $("#mobile1 option:eq(0)").prop("selected", true);
+		 $("#mobile2").val("");
+		 $("#mobile3").val("");
+		 $("#book_zip").val("");
+		 $("#book_addr1").val("");
+		 $("#book_addr2").val("");
+	 }
+ }
+//결제
+function ftn_approval(dfm){
+	var st = $("input:radio[name=ptype]:checked").val();
+	if($("#book_receipt_nm").val() == ""){
+		fnModalMsg("수령인을 입력해주시기 바랍니다.");			
+		return;
+	}
+	else if($("#mobile2").val() == "" || $("#mobile3").val() == ""){
+		fnModalMsg("핸드폰 번호를 입력해주시기 바랍니다.");			
+		return;
+	}
+	else if($("#book_zip").val() == "" || $("#book_addr1").val() == ""){
+		fnModalMsg("우편번호 검색을 해주시기 바랍니다.");			
+		return;
+	}
+	else if($("#book_addr2").val() == ""){
+		fnModalMsg("상세주소를 입력해주시기 바랍니다.");			
+		return;
+	}
+	else if(st == null){
+		fnModalMsg("결제 방법을 선택해주시기 바랍니다.");	
+		return;
+	}
+	else{
+		$("#allat_card_yn, #allat_bank_yn, #allat_vbank_yn").val("N");
+		if(st == "card"){			
+			$("#allat_card_yn").val("Y");
+			$("#allat_pay_type").val("1");
+			$("#allat_pay_stat").val("1");
+		}else if(st == "bank"){
+			$("#allat_bank_yn").val("Y");
+			$("#allat_pay_type").val("2");
+			$("#allat_pay_stat").val("1");		
+		}else if(st == "vbank"){
+			$("#allat_vbank_yn").val("Y");
+			$("#allat_pay_type").val("3");
+			$("#allat_pay_stat").val("2");
+		}	
+	}	
+	fnConfirm("결제 하시겠습니까?",function(result){
+		if(result){
+			$.ajax({
+				type : "post",
+	    		url : '/ccedu/online/ajaxFindLastOrderIdx.do',
+	    		success : function(data) {
+	    			var today = new Date();
+	    			var year = today.getFullYear().toString();
+	    			var month = (today.getMonth()+1).toString();
+	    			var date = today.getDate().toString();
+	    			var userno = $("#allat_buyer_no").val();
+	    			var orderIdx = data;
+	    			var orderNo = year+month+date+userno+orderIdx;
+	    			
+	    			$("#allat_order_no").val(orderNo);
+	    			$("#allat_recp_nm").val($("#book_receipt_nm").val());
+	    			$("#allat_recp_addr").val($("#book_addr1").val()+$("#book_addr2").val());
+	    			$("#book_mobile").val($("#mobile1").val()+"-"+$("#mobile2").val()+"-"+$("#mobile3").val());
+	    			AllatPay_Approval(dfm);
+	    			// 결제창 자동종료 체크 시작
+	    			AllatPay_Closechk_Start();	
+	    		}
+	    	}); 		
+		}
+	});
+}
+// 결과값 반환( receive 페이지에서 호출 )
+function result_submit(result_cd,result_msg,enc_data) {
+	// 결제창 자동종료 체크 종료
+	AllatPay_Closechk_End();
+	if( result_cd != '0000'){
+		fnModalMsg("결제에 실패했습니다.");
+	} else {
+		fm.allat_enc_data.value = enc_data;
+		fm.action = "/ccedu/book/onlinePayApprove.do";
+		fm.method = "post";
+		fm.target = "_self";
+		fm.submit();
+	}
+}
+function fnList() {
+	location.href = "/ccedu/book/main.do?mtSubCode="+'${param.mtSubCode}';
+}
+</script>
+</head>
+<body>
+<!-- skip nav -->
+	<%@ include file="/WEB-INF/jsp/ccedu/inc/nav_inc.jsp"%>
+<!--// skip nav -->
+
+<div id="wrap">
+	<!-- header -->
+	<%@ include file="/WEB-INF/jsp/ccedu/inc/header_inc.jsp"%>
+	<!--// header -->
+
+	<!-- container -->
+	<div id="container">
+		<jsp:include page="/WEB-INF/jsp/ccedu/inc/location/loc_15_01.jsp"> 
+		  	<jsp:param name="menuNm" value="${title}"/> 
+		</jsp:include> 
+		<div class="con_center">
+			<!-- lnb -->
+			<div id="lnb">
+				<jsp:include page="/WEB-INF/jsp/ccedu/inc/lnb/lnb_15.jsp"/>
+			</div>
+			<!--// lnb -->
+			<!-- content 본문 -->
+			<div id="content">			
+				<h3 class="cont_titile type01">${title}<span></span></h3>
+				
+				<!-- 본문내용 -->
+				<div class="cont_body">
+					<!-- start -->
+   					<form name="fm"  method=POST action="/ccedu/book/onlinePayApprove.do">
+						<input type="hidden" name="allat_cross_key" value="752b3446617012b238db8e61d6826a99">
+						<input type="hidden" name="allat_shop_id" value="codiedu">
+						<input type="hidden" name="allat_order_no" id="allat_order_no" value="">
+						<input type="hidden" name="allat_amt" value="<c:out value="${REQUEST_DATA.bookprice}"/>"/>
+						<input type="hidden" name="allat_pmember_id" value="<c:out value="${REQUEST_DATA.SES_USERID}"/>"/>
+						<input type="hidden" name="allat_product_cd" value="TT0002"/>
+						<input type="hidden" name="allat_product_nm" value="<c:out value="${REQUEST_DATA.booknm}"/>"/>
+						<input type="hidden" name="allat_buyer_nm" value="<c:out value="${REQUEST_DATA.SES_USERNAME}"/>"/>
+						<input type="hidden" name="allat_buyer_no" id="allat_buyer_no" value="<c:out value="${REQUEST_DATA.SES_USERNO}"/>"/>
+						<input type="hidden" id="allat_recp_nm" name ="allat_recp_nm" value=""/>
+						<input type="hidden" id="allat_recp_addr" name ="allat_recp_addr" value="">
+						<input type="hidden" name="shop_receive_url" value="http://192.168.0.130:8090/ccedu/book/onlinePayReceive.do">
+						<input type=hidden name=allat_enc_data value=''>
+						<input type="hidden" name="allat_encode_type" value="U"/>
+						<input type="hidden" name="allat_card_yn" id="allat_card_yn" value="N">
+						<input type="hidden" name="allat_bank_yn" id="allat_bank_yn" value="N">
+						<input type="hidden" name="allat_vbank_yn" id="allat_vbank_yn" value="N">
+						<input type="hidden" name="allat_hp_yn" value="N">
+						<input type="hidden" name="allat_ticket_yn" value="N">
+						<input type="hidden" name="allat_pay_type" id="allat_pay_type" value="">
+						<input type="hidden" name="allat_pay_stat" id="allat_pay_stat" value="">
+						<!--  테스트 결제 여부 -->
+						<input type="hidden" name="allat_test_yn" value="Y">	
+						
+						<input type="hidden" id="book_no" name="book_no" value="<c:out value="${REQUEST_DATA.bookno}"/>"/>
+						<input type="hidden" id="book_amount" name="book_amount" value="<c:out value="${REQUEST_DATA.amount}"/>"/>
+						<input type="hidden" id="book_mobile" name="book_mobile" value=""/>
+					<div class="c_section">
+						<h4 class="c_tit">교재 결제</h4>
+						<div class="table_style_row">
+							<table>
+								<colgroup>
+									<col width="50%" />
+									<col width="15%" />
+									<col width="35%" />
+								</colgroup>
+								<tr>
+									<th scope="row">교재명</th>
+									<th scope="row">수량</th>
+									<th scope="row">금액</th>
+								</tr>
+								<tr>
+									<td><c:out value="${REQUEST_DATA.booknm}"/></td>
+									<td style="text-align:center;"><c:out value="${REQUEST_DATA.bookamount}"/></td>
+									<td style="text-align:center;"><c:out value="${REQUEST_DATA.bookprice}"/>원</td>
+								</tr>
+								<tr>
+									<td colspan="3">
+										<h2 style="color:#E2450E;font-weight:700;">
+											최종결제금액  : <span><c:out value="${REQUEST_DATA.bookprice}"/></span> 원 (배송비 무료)
+										</h2>										
+									</td>
+								</tr>
+							</table>
+						</div>
+					</div>
+					<div class="c_section">
+						<h4 class="c_tit">결제 정보</h4>
+						<div class="same_check"><span>로그인 정보와 동일합니다.</span><input type="checkbox" id="fillCheck" onclick="formFill(this);"/></div>
+						<div class="table_style_row book_tb">
+							<table>
+								<colgroup>
+									<col width="25%" />
+									<col width="" />
+								</colgroup>
+								<tr>
+									<th scope="row">수령인</th>
+									<td>
+										<input type="text" id="book_receipt_nm" name="book_receipt_nm" style="width:100px;"/>
+									</td>
+								</tr>
+								<tr>
+									<th scope="row">휴대폰</th>
+									<td>
+										<select id="mobile1" name="mobile1" style="width:100px;">
+											<option value="010">010</option>
+											<option value="011">011</option>
+											<option value="016">016</option>
+											<option value="017">017</option>
+											<option value="018">018</option>
+											<option value="019">019</option>										
+										</select>
+										 - 
+										<input type="text" id="mobile2" name="mobile2" style="width:100px;"/>
+										 - 
+										<input type="text" id="mobile3" name="mobile3" style="width:100px;"/>
+									</td>
+								</tr>
+								<tr>
+									<th scope="row">우편번호</th>
+									<td style="text-align:left;">
+										<input type="text" id="book_zip" name="book_zip" style="width:100px;"/>
+										<button class="btn_graybg02 btn_postal_code" onclick="openDaumPostcode(); return false;">우편번호 찾기</button>
+									</td>
+								</tr>
+								<tr>
+									<th scope="row">주소</th>
+									<td>
+										<input type="text" id="book_addr1" name="book_addr1" style="width:75%;"/>
+									</td>
+								</tr>
+								<tr>
+									<th scope="row">상세주소</th>
+									<td>
+										<input type="text" id="book_addr2" name="book_addr2" style="width:75%;"/>
+									</td>
+								</tr>
+								<tr>
+									<th scope="row">요청사항</th>
+									<td>
+										<textarea id="book_text" name="book_text" style="max-width:100%;min-width:100%;"></textarea>
+									</td>
+								</tr>	
+							</table>
+						</div>
+					</div>
+					<div class="c_section" style="margin-top:100px;">
+						<h4 class="c_tit">결제 방법</h4>
+						<div class="table_style_row">
+							<table>
+								<tr>
+									<th scope="row">
+										<label><input type="radio" name="ptype" value="card">신용카드</label>
+										<label><input type="radio" name="ptype" value="bank">실시간계좌이체</label>
+										<label><input type="radio" name="ptype" value="vbank">무통장입금(가상계좌)</label>
+									</th>
+								</tr>
+								<tr class="vbank">
+									<th scope="row">
+										입금계좌 : 신한은행 110-433-998866 / 예금주 : 씨에스랩</br>
+										입금 3일 이후에도 입금처리가 되지 않으면 1544-3705로 연락바랍니다.</br>
+										(평일 운영시간 09:00 ~ 18:00 을 제외한 주말 및 공휴일은 처리가 어렵습니다.)
+									</th>
+								</tr>
+							</table>
+						</div>
+					</div>
+					<div class="c_btn_center">
+						<button type="button" class="btn_bluebg03" onclick="ftn_approval(document.fm);return false;" >결제하기</button>
+						<button type="button" class="btn_blueline03" onclick="fnList(); return false;" title="목록">목록</button>					
+					</div>
+
+				</div>
+				<!--// 본문내용 -->
+				
+			<!--  -->
+			</div>
+			<!--// content 본문 -->
+			
+   			</form>
+		</div>
+	</div>
+	<!--// container -->
+
+	<!-- foot -->
+	<%@ include file="/WEB-INF/jsp/ccedu/inc/footer_inc.jsp"%>
+	<!--// foot end -->
+
+</div>
+
+</body>
+</html>

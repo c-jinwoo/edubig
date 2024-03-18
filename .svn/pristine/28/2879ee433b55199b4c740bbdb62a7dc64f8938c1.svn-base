@@ -1,0 +1,795 @@
+<%
+/****************************************
+    subject : 나의학습실
+    summary : 나의학습실 > 강의실
+    author  : SANGS
+    date    : 2018-06-15
+****************************************/
+%>
+<%@ page language="java" contentType="text/html; charset=utf-8" pageEncoding="utf-8"%>
+<%@ include file="/WEB-INF/jsp/ccedu/inc/taglib_inc.jsp"%>
+<%@ page import="com.sangs.support.DataMap"%>
+<%@ page import="com.sangs.support.EduMap"%>
+<%@ page import="com.sangs.support.SangsProperties" %>
+<%@ page import="com.sangs.util.ParamUtil"%> 
+<%@ page import="com.sangs.util.NumberFormatUtil"%>
+<%@ page import="com.sangs.util.StringUtil"%>
+<%@ page import="java.util.List"%>
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+	<title>나의강의실 > 강의실 > ${REQUEST_DATA.seqTitle}</title>
+	<%@ include file="/WEB-INF/jsp/ccedu/inc/head_inc.jsp"%>
+</head>
+<body>
+<!-- skip nav -->
+	<%@ include file="/WEB-INF/jsp/ccedu/inc/nav_inc.jsp"%>
+<!--// skip nav -->
+<script  type="text/javascript"> 
+
+var progCodeEnd = "";
+var eduseqYn = '${REQUEST_DATA.eduseqYn}';
+var aryData1 = new Array;
+var aryData2 = new Array;
+var aryData3 = new Array;
+var aryData4 = new Array;
+var aryData5 = new Array;
+var aryData6 = new Array;
+var aryData7 = new Array;
+
+
+
+<c:forEach var="result" items="${onResultList}" varStatus="status">
+	aryData1.push('${result.FILE_PATH}');   // 경로
+	aryData2.push('${result.MEDIA_FILE}');  // mp4 파일명
+	aryData3.push('${result.VAL}');  //
+	aryData4.push('${result.TREENO}');     // 목차코드
+	aryData5.push('${result.STUDYTIME}'); // 학습시간
+	aryData6.push('${result.SDAY}'); // 페이지
+	aryData7.push('${result.MT_PROG_STATUS_CODE}'); //합격 여부
+</c:forEach>
+
+$(document).ready(function(e){
+	
+	progCodeEnd = '<%=SangsProperties.getProperty("Globals.mtCode_MT_PROG_STATUS_CODE_END")%>';
+
+	var d = new Date();
+	var sysdate = d.getFullYear() +'-'+ Number(d.getMonth()+1)+'-'+d.getDate();
+    $(".edate").each(function(i, val) { 
+    	var edate = new Date($(this).val());
+    	if(d > edate) {
+    		$(this).parents(".btnAreaC").find("a").attr('class','btn btn-sm btn-gray join');
+    		$(this).parents(".btnAreaC").find("a").text('기간종료');
+    	}
+	});
+	
+	var checkArr = new Array;
+	var histDataArr = new Array;
+	var cnt = 0; 
+	
+	$(".join").each(function(i, val) {
+		var check = $(this).attr('check');
+		checkArr.push(check);
+	});
+	
+	for(var i = 0 ; i < $("#histDataCheck").val() ; i++) {
+		//console.log($("#histData"+i).val());
+		histDataArr.push($("#histData"+i).val());
+	}
+	
+	for(var i = 0 ; i < checkArr.length ; i++) {
+		//console.log("참여완료최초진입 길이="+checkArr.length);
+		for(var j = 0 ; j < histDataArr.length ; j++){
+			//console.log("0부터 길이 까지");
+			if(checkArr[i] == histDataArr[j]){
+				//console.log("일치값 확인");
+				$("#"+ histDataArr[j]).attr('class','btn btn-drkblue btn-sm join');
+				$("#"+ histDataArr[j]).text('참여완료');
+			}
+		}
+	}
+
+	
+});
+
+
+var arySeqTitle = new Array;
+var aryCseqNo = new Array;
+var arryMtScCode = new Array;
+var arryClassDesk = new Array;
+var arryEduseqYn = new Array;
+
+<c:forEach var="result" items="${seqList}" varStatus="status">
+	arySeqTitle.push('${result.SEQ_TITLE}');     //타이틀
+	aryCseqNo.push('${result.CSEQNO}');  		 // 코드
+	arryMtScCode.push('${result.MT_SC_CODE}');   // 과정구분 코드
+	arryClassDesk.push('${result.CLASS_DESK}');  // 클래스데스크(학습, 시험, 설문)
+	arryEduseqYn.push('${result.EDUSEQ_YN}');    // 순차여부
+</c:forEach>
+
+function selectCh(pthis){
+
+	var append = '';
+	var arryIdx = 0;
+	var idx = 0;
+
+	for(var i = 0; i < arryMtScCode.length ; i++){
+		if($(pthis).val() == arryMtScCode[i]){
+			if(idx < 0){
+				idx++
+				arryIdx = i; 
+			}
+			append += '<option value="'+aryCseqNo[i]+'"> '+arySeqTitle[i]+'</option>';
+		}
+	}
+	$('#cseqno').find('option').remove();
+	$('#cseqno').append(append);
+
+}
+
+
+
+
+function pad(nVal) {
+	var tmp = ""+nVal;
+	if (tmp.length < 2) {
+		return "0"+tmp;
+	} else {
+		return tmp;
+	}
+}
+
+function getToday() {
+	var dt = new Date();
+	var yyyy = ""+dt.getFullYear();
+	var mm = pad(dt.getMonth()+1);
+	var dt = pad(dt.getDate());
+	
+	return yyyy + "-" + mm + "-" + dt;
+}
+
+$(document).ready(function(){
+	//간이메뉴 클릭시 원 헤더 복원
+	//헤더열기	
+	$('.menu_toggle').click(function(){
+		//$('.menu_toggle').css('display', 'none');
+		if($('#pmode').val() == 'E'){
+			$('.menu_toggle_close').slideDown(500);
+		}
+	});
+	//헤더 닫기
+	$('.menu_toggle_close').click(function(){
+		if($('#pmode').val() == 'E'){
+			$('.menu_toggle_close').slideUp(500);
+		}
+		//$('.menu_toggle').css('display', 'block');
+	});
+});
+
+function fnPageMove(url){
+	$("#frm").attr("action", url);
+	$("#frm").submit();
+}
+
+function fnApply(pollcseqno,cnt,edate,sdate){
+	
+	for(var i = 0 ; i < $("#histDataCheck").val() ; i++) {
+		if(pollcseqno == $("#histData"+i).val()){
+			fnModalMsg('이미 참여하셨습니다');
+			return false;
+		}
+	}
+	
+	var d = new Date();
+	var day = d.getDate().toString();
+	if(day.length < 2){
+		day = '0'+day;
+	}
+	
+   	var now = new Date(); 
+   	var todayAtMidn = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+
+   	var edate = new Date(edate);
+   	var sdate = new Date(sdate);
+   	
+   	todayAtMidn.setHours(0,0,0,0);
+   	edate.setHours(0,0,0,0);
+   	sdate.setHours(0,0,0,0);
+
+   	if (todayAtMidn.getTime() > edate.getTime() || todayAtMidn.getTime() < sdate.getTime())
+   	{
+   		fnModalMsg('설문 기간이 아닙니다.');
+   		return false;
+   	}
+
+	var frm = document.frm;
+	frm.pollcseqno.value=pollcseqno;
+	frm.cnt.value=cnt;
+	$("#frm").attr("action", "/ccedu/myclass/pollView.do");
+	frm.submit();  
+}
+
+
+// 시험
+
+$(function(){
+	$("#sum").on("click",function(){
+		fnModalMsg("시험을 보셨습니다");
+	});
+});
+
+//진도프로세스
+function progExec(cuserno, treeno, sday, studytime, totalEduTime){
+    $.ajax({
+        url : "/academy/myclass/ajaxProgressCheck.do",
+        data : { cuserno : cuserno
+               , treeno : treeno
+               , studytime : studytime 
+               , totalEduTime : totalEduTime
+               , sday : sday
+        	   },
+        dataType : "json",
+        type : 'post',
+        success : function(res) { 		            	
+        	location.href = $(location).attr('protocol') +"//" + $(location).attr('host')+$(location).attr('pathname') + "?courseno="+'<c:out value="${REQUEST_DATA.SES_COURSENO}"/>'+'&cuserno='+'<c:out value="${REQUEST_DATA.SES_CUSERNO}"/>' +'&searchCseqno='+'<c:out value="${REQUEST_DATA.SES_CSEQNO}"/>' ;
+        },
+        error : function(e) {
+        	fnModalMsg("중복 로그인으로 진도체크가 되지 않았습니다.",function(){
+        		$("#frm").attr("action", "/ccedu/common/login.do");
+        		frm.submit();  
+        	});
+        }
+    }); 
+}
+
+
+//진도 화면
+function fnView(idx){
+	//순차일 경우 
+	if(eduseqYn == 'Y'){
+		if(idx > 0){
+			if( aryData7[idx-1] != progCodeEnd){
+				fnModalMsg("순차적으로 학습하셔야 합니다.");
+				return false;
+			}
+		}
+	}
+	
+	$('#filePath').val(aryData1[idx].split("/")[3]);
+	$('#mediaFile').val(aryData2[idx]);
+	$('#val').val(aryData3[idx]);
+	
+	$('#treeno').val(aryData4[idx]);
+	$('#studytime').val(aryData5[idx]);
+	$('#sday').val(aryData6[idx]);
+	
+	var UserAgent = navigator.userAgent;
+	var html = "index.html";
+	window.open("/edudata/contents/"+$('#filePath').val()+"/"+$('#mediaFile').val()+"/index.html","mediaPop","width=1280,height=760,scrollbars=1,resizable=1");
+}
+	function fnForms(examNo, cmd, edate, examTime, pupType) {
+
+		$("#examEdate").val(edate);
+		$("#examTime").val(examTime);
+		$("#pupType").val(pupType); // 출제방식 (순차, 랜덤)
+
+	   var userPercent = parseInt('<c:out value="${examProgData}"/>'); 
+
+	   var onlineEdu = '<c:out value="${REQUEST_DATA.ONLINE_EDU}"/>'; 
+	   
+
+	    // 시험 결과보기
+		if (cmd == 'review_form') {
+			$('#examNo').val(examNo);
+			$('form[name=frm]').attr('action','/ccedu/myclass/learningExamReviewForm.do').submit();
+		} else {
+			 if (onlineEdu != 'Y') {
+				fnModalMsg('온라인학습을 수료 해주시기 바랍니다.');
+				return;
+			} 
+			$('#examNo').val(examNo);
+			$('form[name=frm]').attr('action','/ccedu/myclass/learningExamForm.do').submit();
+		}
+	}
+
+</script>
+<script type="text/javascript"> 
+
+	function errimg(img){ 
+		img.src='/classdesk/images/thumb_noimage.gif';
+	}
+	
+	$(document).ready(function() {
+
+			$('#schOnline').change(function() {
+					$('#courseSelect').find('option').each(function() {
+					$(this).remove();
+					});
+
+					$('#courseSelect').append('<option value="">선택</option>');
+
+					var selectVal = $(this).val();
+					if (selectVal != '') {
+						var params = $('#frm').serialize();
+
+						$.ajax({
+							url : '/classdesk/main/mainSelect.do',
+							type : "POST",
+							data : params,
+							dataType : "json",
+							success : function(data) {
+								for (var i = 0; i < data.result.length; i++) {
+									$('#courseSelect').append("<option value='"+data.result[i].CUSERNO+","+ data.result[i].CSEQNO+","+ data.result[i].COURSENO+","+ data.result[i].CLASS_DESK+","+ data.result[i].SEQ_TITLE+","+data.result[i].MT_CTYPE_NAME + "'" + "</option>"+data.result[i].SEQ_TITLE);
+									}
+								}	
+							});
+					}
+				})
+	});
+	
+	
+	function fnForm(bbsNo, cmd, select){
+		
+		if(select == 1){
+			$("#select").val("list1");
+		}else {
+			$("#select").val("list2");
+		}
+		
+		$('#bbsNo').val(bbsNo);
+		$("#searchWord").val($("#searchText").val());
+		$('form[name=frm]').attr('action', '/ccedu/myclass/' + cmd + '.do').submit();
+	}
+	
+	
+	function selectTitle(selectTitle){
+		
+		var frm = document.frm;
+		$('#searchCseqno').val($('#cseqno').val());
+		$('#cuserno').val('');
+		frm.submit();
+	}
+	
+	//파일다운로드
+	function filedown(fileId, bbsNo, fileSeq){
+		
+		
+		var frm = document.frm;
+		$("#fileId").val(fileId);
+		$("#fileSeq").val(fileSeq);
+		/* frm.fileId.value = fileId;
+		frm.bbsNo.value = bbsNo;
+		frm.fileSeq.value = fileSeq; */
+		$('#frm').attr('action', '/classdesk/main/fileDown.do').submit(); 
+	} 
+</script>
+
+<div id="wrap">
+
+	<!-- header -->
+	<%@ include file="/WEB-INF/jsp/ccedu/inc/header_inc.jsp"%>
+	<!--// header -->
+
+	<!-- container -->
+	<div id="container">
+
+		<!-- location -->
+		<jsp:include page="/WEB-INF/jsp/ccedu/inc/location/loc_06_01.jsp"> 
+		  	<jsp:param name="menuNm" value="강의실"/> 
+		</jsp:include> 
+		<!--// location -->
+
+		<div class="con_center">
+
+			<!-- lnb -->
+			<div id="lnb">
+				<jsp:include page="/WEB-INF/jsp/ccedu/inc/lnb/lnb_06.jsp"> 
+				  	<jsp:param name="dep2" value="02"/>
+				</jsp:include> 
+			</div>
+			<!--// lnb -->
+			<!-- content 본문 -->
+			<div id="content">
+			
+				
+				<!-- 기존 START 2018-08-30  -->
+<!-- 				<h3 class="cont_titile">강의실</h3> -->
+				<!-- 기존 END 2018-08-30  -->
+				
+				<!-- 2018-08-28 김동인 작업 S --> 
+				<h3 class="cont_titile type06">강의실<span></span></h3>
+				<!-- 2018-08-28 김동인 작업 E -->
+			
+				<!-- 본문내용 -->
+				<div class="cont_body">
+					<!-- start -->
+					<form name="frm" id="frm" action="/ccedu/myclass/learningClassList.do" method="post">
+					 	<input type="hidden" name="cPage" id="cPage" value="<c:out value="${REQUEST_DATA.cPage}"/>"/>
+						<input type="hidden" name="pbcateno" id="pbcateno" value="<c:out value="${REQUEST_DATA.pbcateno}"/>"/>
+						<input type="hidden" name="bcateno" id="bcateno" value="<c:out value="${REQUEST_DATA.pbcateno}"/>"/>
+						<input type="hidden" name="bbsNo" id="bbsNo" value=""/>
+						<input type="hidden" name="select" id="select" value=""/> 
+						<input type="hidden" name="searchWord" id="searchWord" value=""/>
+						<input type="hidden" name="searchCseqno" id="searchCseqno"  value=""/>
+						<input type="hidden" name="CLASSDESK" id="CLASSDESK" 	value="${REQUEST_DATA.CLASSDESK }"/>
+						<input type="hidden" name="seqTitle" id="seqTitle" value="<c:out value="${REQUEST_DATA.seqTitle}"/>"/>
+						<input type="hidden" name="ctypeName" id="ctypeName" value="<c:out value="${REQUEST_DATA.ctypeName}"/>"/>
+					
+						<input type="hidden" id="fileId" name="fileId" value=""/>
+						<input type="hidden" id="fileSeq" name="fileSeq" value=""/>
+
+						<!-- 미디어 -->
+						<input type="hidden" name="filePath" id="filePath" value=""/>
+						<input type="hidden" name="mediaFile" id="mediaFile" value=""/>
+						<input type="hidden" name="treeno" id="treeno" value=""/>
+						<input type="hidden" name="studytime" id="studytime" value=""/>
+						<input type="hidden" name="sday" id="sday" value=""/>
+						<input type="hidden" name="val" id="val" value=""/>
+						<input type="hidden" name="cuserno" id="cuserno" value="${REQUEST_DATA.SES_CUSERNO}">
+						<input type="hidden" name="mediaPath" id="mediaPath" value="${REQUEST_DATA.SES_COURSENO}">		
+						<input type="hidden" name="SAVFILE" id="SAVFILE" value="<c:out value="${REQUEST_DATA.SAVFILE}"/>"/>
+						<input type="hidden" name="SUBTITLE" id="SUBTITLE" value="<c:out value="${subTitle}"/>"/>
+
+						 <!-- 설문 -->
+						<input type="hidden" name="pollcseqno" id="pollcseqno" value=""/> 
+						<input type="hidden" name="cnt" id="cnt" value=""/>
+						<input type="hidden" id="histDataCheck" value="<c:out value="${pollHistData2}"/>"/>
+						
+						<!-- 시험 -->
+						<input type="hidden" name="subcmd" id="subcmd" value=""> 
+						<input type="hidden" name="examNo" id="examNo" value=""> 
+						<input type="hidden" name="examEdate" id="examEdate" value=""> 
+						<input type="hidden" name="examTime" id="examTime" value=""> 
+						<input type="hidden" name="pupType" id="pupType" value=""> 
+						<input type="hidden" name="examType" id="examType" value=""> 
+						<input type="hidden" name="seqTitle" id="seqTitle" value="<c:out value="${REQUEST_DATA.seqTitle}"/>" /> 
+						<input type="hidden" name="ctypeName" id="ctypeName" value="<c:out value="${REQUEST_DATA.ctypeName}"/>" /> 
+						<input type="hidden" name="openType" id="openType" value="<c:out value="${examRowData.OPENTYPE}"/>" />
+
+
+					<div class="c_search_section">
+						<fieldset>
+							<legend>분류선택보기 여역</legend>
+							<h4 class="sel_tit">강의선택</h4>
+							<select name="mtScGnbCode" id="mtScGnbCode" title="1차분류선택"  class="select_child1" onchange="selectCh(this)" style="width:200px;">
+								<c:forEach var="result" items="${mtScCodeList}" varStatus="status2">
+									<option value="<c:out value="${result.MT_SC_CODE}"/>" <c:if test="${REQUEST_DATA.mtScCode == result.MT_SC_CODE}"> selected="selected"</c:if>><c:out value="${result.MT_SC_NAME}"/></option>
+								</c:forEach>
+			 				</select>
+							<select name="cseqno" id="cseqno" title="2차분류선택, 선택시 해당내용을 보여줍니다."  class="select_child2"  style="width:300px;">
+								<c:forEach var="result" items="${seqList}" varStatus="status2">
+									<c:if test="${REQUEST_DATA.mtScCode eq result.MT_SC_CODE}">
+										<option value="<c:out value="${result.CSEQNO}"/>" <c:if test="${REQUEST_DATA.SES_CSEQNO eq result.CSEQNO}"> selected="selected"</c:if>><c:out value="${result.SEQ_TITLE}"/></option>
+									</c:if>
+								</c:forEach>
+			 				</select>
+			 				<button type="submit" name="button" class="btn_fieldset_search" onclick="selectTitle(this);" title="검색">이동</button>
+						</fieldset>
+					</div>
+
+					<div class="c_section">
+						<h4 class="c_tit" id="conSection1">온라인학습</h4>
+						<div class="table_style_col">
+							<table>
+								<caption>번호, 차수명, 진도율, 마지막 수강일, 학습하기 등 항목을 확인 할 수 있는 표 입니다.</caption>
+								<colgroup>
+									<col  />
+									<col  />
+									<col  />
+									<col  />
+									<col  />
+								</colgroup>
+								<thead>
+									<tr>
+										<th scope="col" class="num_col">No.</th>
+										<th scope="col" class="subject_col">차수명</th>
+										<th scope="col">진도율</th>
+										<th scope="col" class="date_col">마지막 수강일</th>
+										<th scope="col" class="btn_col">학습</th>
+									</tr>
+								</thead>
+								<tbody>
+									<c:forEach items="${onResultList}" var="result" varStatus="stat">
+										<tr>
+                                			<td class="align_center">${stat.count}</td>
+                                			<td><c:out value="${result.SUBJECT}" default="-"/></td>
+                                			<td class="align_center"><c:out value="${result.VAL}" default="0"/>%</td>
+                                			<td class="align_center"><c:out value="${result.EDATE}" default="-"/></td>
+                                			<td class="align_center">
+                                				<c:choose>
+													<%-- <c:when test="${result.FRAMECNT == result.FRAMESEQ}"> --%> 
+													<c:when test="${result.MT_PROG_STATUS_CODE eq 'PS0003'}"> 
+														<button type="button" class="btn_bluebg  mobile_ico_book" onclick="fnView('${stat.index}');" title="<c:out value="${stat.index + 1}" /> 차시 <c:out value="${result.SUBJECT}" /> 복습하기" >복습하기</button>
+													</c:when>
+													<c:otherwise>
+														<button type="button" class="btn_blueline mobile_ico_book" onclick="fnView('${stat.index}')" title="<c:out value="${stat.index + 1}" /> 차시 <c:out value="${result.SUBJECT}" /> 학습하기">학습하기</button>
+													</c:otherwise>
+												</c:choose>
+                                			</td>
+                                    	</tr>
+									</c:forEach>
+									<tr>
+										<td colspan="5" class="align_center">
+											<b class="txtbule">(유의사항)</b> <b>온라인 학습 도중에 ∥(일시정지) 또는 X(나가기)를 클릭하지 않고, 새창을 열게되면 진도율이 확인(인정)되지 않습니다.<br>
+											온라인학습 도중 쉬어가고자하는 경우 반드시 ∥(일시정지), X(나가기)버튼을 이용하시기 바랍니다.</b>
+										</td>
+										</tr>
+									<c:if test="${empty onResultList }">
+										<tr>
+											<td class="align_center" colspan="5">온라인 학습 데이터가 없습니다.</td>
+										</tr>
+									</c:if>
+									
+								</tbody>
+							</table>
+						</div>
+					</div>
+
+					<!-- 시험 선택 여부 -->
+					<c:if test="${fn:substring(REQUEST_DATA.classDesk,2,3) eq '1' }">
+						<div class="c_section">
+							<h4 class="c_tit" id="conSection2">시험</h4>
+							<div class="table_style_col">
+								<table>
+									<caption>번호, 시험명, 점수, 제출일, 시험보기 등 항목을 확인 할 수 있는 표 입니다.</caption>
+									<colgroup>
+										<col  />
+										<col  />
+										<c:if test="${REQUEST_DATA.evalExamFinal ne 0}"> 
+											<col  />
+									 </c:if> 
+										<col  />
+										<col  />
+									</colgroup>
+									<thead>
+										<tr>
+											<th scope="col" class="num_col">No.</th>
+											<th scope="col" class="subject_col">시험명</th>
+										 	<c:if test="${REQUEST_DATA.evalExamFinal ne 0}">  
+												<th scope="col">점수</th>
+											 </c:if> 
+											
+											<th scope="col" class="date_col">제출일</th>
+											<th scope="col" class="btn_col"></th>
+										</tr>
+									</thead>
+									<tbody>
+										<c:forEach items="${examListData}" var="result" varStatus="stat">
+	                                	 	<tr>
+												<td class="align_center">${stat.count}</td>
+												<td>${result.TITLE}</td>
+												
+												
+												<c:if test="${REQUEST_DATA.evalExamFinal ne 0}">
+													<td class="align_center">
+														<c:if test="${result.USER_SUBMITYN eq 'Y' }">
+																<c:out value="${result.SCORE}" default="0"/> 점
+		                                	 			</c:if>
+		                                	 			<c:if test="${result.USER_SUBMITYN ne 'Y' }">
+																-
+		                                	 			</c:if>
+													</td>
+												</c:if>
+												
+													<td class="align_center">
+														<c:if test="${result.USER_SUBMITYN eq 'Y' }">
+																${result.EXAM_SDATE}
+		                                	 			</c:if>
+		                                	 			<c:if test="${result.USER_SUBMITYN ne 'Y' }">
+																-
+		                                	 			</c:if>
+													</td>
+												<td class="align_center">
+													<c:choose>
+														<c:when test="${result.ENDYN eq 'Y' && empty result.CUSERNO && empty result.USER_SUBMITYN }">
+															<button type="button" class="btn_blueline mobile_ico_board_write_in" onclick="fnModalMsg('시험기간이 종료 되었습니다.');">시험보기</button>
+														</c:when>
+														<c:when test="${result.USER_SUBMITYN eq 'Y' }">
+															<button type="button" class="btn_bluebg mobile_ico_board_write_off" onclick="fnForms('<c:out value="${result.EXAMNO}"/>','review_form' , '<c:out value="${result.EDATE}"/>' , '<c:out value="${result.EXAM_TIME}"/>', '<c:out value="${result.PUB_TYPE}"/>'); return false;">결과보기</button>
+														</c:when>
+														<c:when test="${result.USER_SUBMITYN eq 'N' || empty result.USER_SUBMITYN}">
+															<button type="button" class="btn_blueline mobile_ico_board_write_in" onclick="fnForms('<c:out value="${result.EXAMNO}"/>','exaim_form' , '<c:out value="${result.EDATE}"/>' , '<c:out value="${result.EXAM_TIME}"/>', '<c:out value="${result.PUB_TYPE}"/>', '<c:out value="${result.EXAM_TYPE}"/>'); return false;">시험보기</button>
+														</c:when>
+													</c:choose>
+												</td>
+											</tr>
+	                                	 </c:forEach>
+	                                	 <c:if test="${empty examListData }">
+											<tr>
+												<td class="align_center" colspan="5">시험 데이터가 없습니다.</td>
+											</tr>
+										</c:if>
+									</tbody>
+								</table>
+							</div>
+						</div>
+					</c:if>   
+
+					<!-- 설문 선택 여부 -->
+					<c:if test="${fn:substring(REQUEST_DATA.classDesk,3,4) eq '1' }">
+						<div class="c_section">
+							<h4 class="c_tit" id="conSection3">설문</h4>
+							<div class="table_style_col">
+								<table>
+									<caption>번호, 설문명, 참여기간, 참여여부 등 항목을 확인 할 수 있는 표 입니다.</caption>
+									<colgroup>
+										<col  />
+										<col  />
+										<col  />
+										<col  />
+									</colgroup>
+									<thead>
+										<tr>
+											<th scope="col" class="num_col">No.</th>
+											<th scope="col" class="subject_col">설문명</th>
+											<th scope="col">참여기간</th>
+											<th scope="col" class="btn_col"><span class="alt_text">참여여부</span></th>
+										</tr>
+									</thead>
+									<tbody>
+
+										<c:choose>
+											<c:when test="${not empty pollResultList}">
+												<c:forEach items="${pollResultList}" var="result" varStatus="status">
+													<tr>
+				                                     	<td class="align_center">${status.count}</td>
+														<td>${result.TITLE}</td>
+														<td class="align_center">${result.SDATE} ~ ${result.EDATE}</td>
+														<td class="align_center">
+															
+
+															<c:choose>
+																<c:when test="${empty pollHistData}">
+																	<c:choose>
+																		<c:when test="${result.DATE_AT eq 'Y'}">
+																			<button type="button" id="<c:out value='${result.POLLCSEQNO}'/>" check="<c:out value='${result.POLLCSEQNO}'/>" onclick="fnApply('<c:out value='${result.POLLCSEQNO}'/>','${result.CNT}','<c:out value="${result.EDATE}"/>','<c:out value="${result.SDATE}" />');" class="btn_blueline mobile_ico_board_in">참여하기</button>
+																		</c:when>
+																	</c:choose>
+																</c:when>
+																<c:otherwise>
+																	<c:set var= "test" value="N"/>
+																	<c:forEach items="${pollHistData}" var="dataList" varStatus="stat">
+																		<input type="hidden" id="histData${stat.index}" value="<c:out value="${dataList.HISTDATA}"/>"/>
+																		<c:if test="${dataList.HISTDATA eq result.POLLCSEQNO }">
+																			<c:set var= "test" value="Y"/>
+																			<button type="button" onclick="fnModalMsg('이미 참여하셨습니다.')" class="btn_blueline mobile_ico_board_in_off" >참여완료</button>
+																		</c:if>
+																	</c:forEach>
+																	<c:if test="${test eq 'N' }">
+																		<c:choose>
+																			<c:when test="${result.DATE_AT eq 'Y'}">
+																				<button type="button" id="<c:out value='${result.POLLCSEQNO}'/>" check="<c:out value='${result.POLLCSEQNO}'/>" onclick="fnApply('<c:out value='${result.POLLCSEQNO}'/>','${result.CNT}','<c:out value="${result.EDATE}"/>','<c:out value="${result.SDATE}" />');" class="btn_blueline mobile_ico_board_in">참여하기</button>
+																			</c:when>
+																		</c:choose>
+																	</c:if>
+																</c:otherwise>
+															</c:choose>
+														</td>
+														<input type="hidden" name="applyDate" id="applyDate" value="<c:out value="${result.APPLY_DATE}"/>"/>
+														<input type="hidden" id="edate" class="edate" value="<c:out value="${result.EDATE}"/>">
+													</tr>
+												</c:forEach>
+											</c:when>
+											<c:when test="${ empty pollResultList}">
+											<tr><td class="align_center" colspan="4">설문 데이터가 없습니다.</td></tr>
+											</c:when>
+										</c:choose>	
+									</tbody>
+								</table>
+							</div>
+						</div>
+					</c:if>
+
+					<c:if test="${fn:substring(REQUEST_DATA.classDesk,4,5) eq '1' }">
+						<div class="c_section">
+							<h4 class="c_tit" id="conSection4">공지사항</h4>
+							<div class="table_style_col">
+								<table>
+									<caption>번호, 제목, 작성일, 조회수 등 항목을 확인 할 수 있는 표 입니다.</caption>
+									<colgroup>
+										<col  />
+										<col  />
+										<col  />
+										<col  />
+									</colgroup>
+									<thead>
+										<tr>
+											<th scope="col" class="num_col">No.</th>
+											<th scope="col">제목</th>
+											<th scope="col" class="date_col">작성일</th>
+											<th scope="col" class="btn_col">조회수</th>
+										</tr>
+									</thead>
+									<tbody>
+										<c:choose>
+											<c:when test="${not empty courselistData}">
+												<c:forEach items="${courselistData}" var="result" varStatus="status">
+			                                		<tr>
+														<td class="align_center">${status.count}</td>
+														<td>
+															<a href="#none" class="noti_tit" onclick="fnForm('<c:out value="${result.BBSNO}"/>','view','1'); return false;" title="<c:out value="${result.TITLE}"/>">
+																<c:out value="${result.TITLE}"/>
+															</a>
+														</td>
+														<td class="align_center"><c:out value="${result.WDATE}" /></td>
+														<td class="align_center"><c:out value="${result.RCNT}"/></td>
+					                                </tr>
+		                                    	</c:forEach>
+		                                    </c:when>
+		                                    <c:when test="${empty courselistData}">
+		                                    <tr><td class="align_center" colspan="4">공지사항 데이터가 없습니다.</td></tr>
+		                                	</c:when>
+	                                    </c:choose>
+									</tbody>
+								</table>
+							</div>
+						</div>
+					</c:if>
+
+					<c:if test="${fn:substring(REQUEST_DATA.classDesk,5,6) eq '1' }">
+						<div class="c_section">
+							<h4 class="c_tit" id="conSection4">자료실</h4>
+							<div class="table_style_col">
+								<table>
+									<caption>번호, 제목, 작성일, 조회수 등 항목을 확인 할 수 있는 표 입니다.</caption>
+									<colgroup>
+										<col  />
+										<col  />
+										<col  />
+										<col  />
+									</colgroup>
+									<thead>
+										<tr>
+											<th scope="col" class="num_col">No.</th>
+											<th scope="col">제목</th>
+											<th scope="col" class="date_col">작성일</th>
+											<th scope="col" class="btn_col">조회수</th>
+										</tr>
+									</thead>
+									<tbody>
+										<c:choose>
+											<c:when test="${not empty courselistData2}">
+												<c:forEach items="${courselistData2}" var="result" varStatus="status">
+			                                		<tr>
+														<td class="align_center">${status.count}</td>
+														<td>
+															<a href="#none" class="noti_tit" onclick="fnForm('<c:out value="${result.BBSNO}"/>','view','2'); return false;" title="<c:out value="${result.TITLE}"/>">
+																<c:out value="${result.TITLE}"/>
+															</a>
+														</td>
+														<td class="align_center"><c:out value="${result.WDATE}" /></td>
+														<td class="align_center"><c:out value="${result.RCNT}"/></td>
+					                                </tr>
+		                                    	</c:forEach>
+		                                    </c:when>
+		                                    <c:when test="${empty courselistData2}">
+		                                    <tr><td class="align_center" colspan="4">자료실 데이터가 없습니다.</td></tr>
+		                                	</c:when>
+	                                    </c:choose>
+									</tbody>
+								</table>
+							</div>
+						</div>
+					</c:if>
+
+					</form>
+					<!--// end -->
+				</div>
+				<!--// 본문내용 -->
+				
+			<!--  -->
+			</div>
+			<!--// content 본문 -->
+			
+		</div>
+	</div>
+	<!--// container -->
+
+	<!-- foot -->
+	<%@ include file="/WEB-INF/jsp/ccedu/inc/footer_inc.jsp"%>
+	<!--// foot end -->
+
+</div>
+
+</body>
+</html>

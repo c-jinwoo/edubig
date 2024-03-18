@@ -1,0 +1,325 @@
+<%
+/****************************************
+    subject : 신용상담사
+    summary : 신용상담사 : 시험안내
+    author  : SANGS
+    date    : 2018-06-15
+****************************************/
+%>
+<%@ page language="java" contentType="text/html; charset=utf-8" pageEncoding="utf-8"%>
+<%@ include file="/WEB-INF/jsp/ccedu/inc/taglib_inc.jsp"%>
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+	<title>수강하기 > 보수교육 > 신용상담사 > 신용회복위원회 신용교육원</title>
+	<%@ include file="/WEB-INF/jsp/ccedu/inc/head_inc.jsp"%>
+
+<script type="text/javascript">
+
+
+		var aryData1 = new Array;
+		var aryData2 = new Array;
+		var aryData3 = new Array;
+		var aryData4 = new Array;
+		var aryData5 = new Array;
+		var aryData6 = new Array;
+		var aryData7 = new Array;
+		var aryData8 = new Array;
+			
+		var aryIdx = 0;
+
+
+		<c:forEach var="result" items="${refreTraiList}" varStatus="status">
+			aryData1.push('${result.FILE_PATH}');   // 경로
+			aryData2.push('${result.MEDIA_FILE}');  // mp4 파일명 
+			aryData3.push('${result.CUSERNO}');    // 수강코드
+			aryData4.push('${result.TREENO}');     // 목차코드
+			aryData5.push('${result.STUDYTIME}');  // 학습시간
+			aryData6.push('${result.SDAY}'); 	   // 페이지
+			aryData7.push('${result.COURSENO}');   // 페이지
+			aryData8.push('${result.CSEQNO}');     // 페이지
+		</c:forEach>
+
+
+	$(document).ready(function(){
+		$('.link-txt a').each(function(){
+		    var replaced = $(this).text().replace(/&lt;/g, '<').replace(/&gt;/g, '>');
+		    $(this).text(replaced);
+		});
+		
+	});
+	
+	function learning(idx) {
+		
+		$('#filePath').val(aryData1[idx]);
+		$('#mediaFile').val(aryData2[idx]);
+		$('#cuserno').val(aryData3[idx]);
+		$('#treeno').val(aryData4[idx]);
+		$('#studytime').val(aryData5[idx]);
+		$('#mediaPath').val(aryData7[idx]);
+		$('#sday').val('1');
+		
+
+		var UserAgent = navigator.userAgent;
+		var html = "";
+		if (UserAgent.match(/iPhone|iPod|Android|Windows CE|BlackBerry|Symbian|Windows Phone|webOS|Opera Mini|Opera Mobi|POLARIS|IEMobile|lgtelecom|nokia|SonyEricsson/i) != null || UserAgent.match(/LG|SAMSUNG|Samsung/) != null)
+		{
+			html = "1002.html";
+		} else {
+			html = "1001.html";
+		}
+	
+		window.open("/edudata/contents/"+html,"mediaPop","width=1000,height=650");
+		
+	}
+	
+	<c:if test="${REQUEST_DATA.SAMPLE_DIV ne 'Y'}">
+	function progExec(cuserno, treeno, sday, studytime, totalEduTime){
+
+        $.ajax({
+            url : "/academy/myclass/ajaxProgressCheck.do",
+            data : { cuserno : cuserno
+	               , treeno : treeno
+	               , studytime : studytime 
+	               , totalEduTime : totalEduTime
+	               , sday : sday
+	               , cceduDiv : 'Y'
+	               , courseno : aryData7[aryIdx]
+	               , cseqno : aryData8[aryIdx]
+            	   },
+            dataType : "json",
+            type : 'post',
+            success : function(res) { 		            	
+            	location.reload();
+            },
+            error : function(e) {
+            	fnModalMsg("중복 로그인으로 진도체크가 되지 않았습니다.",function(){
+            		$("#frm").attr("action", "/ccedu/common/login.do");
+            		frm.submit();  
+            	});
+            }
+        }); 
+    }
+	</c:if>
+
+
+	//수료증 출력 
+	function fnPrint(){		
+
+		var w1 =1070;
+		var h1 = 900;
+		var url = "/ccedu/cc/refreTrainingPrint.do";
+		
+		window.open( url+"?"+$("#frm").serialize()
+			,"cert_pop","width="+w1+" height="+h1+", top=0, left=0, resizable=yes, status=no, menubar=no, toolbar=no, scrollbars=yes, location=no");
+	}
+
+	function fnCourseSampleMovie(idx){
+		
+		$('#filePath').val(aryData1[idx]);
+		$('#mediaFile').val(aryData2[idx]);
+		$('#mediaPath').val(aryData7[idx]);
+		$('#sday').val('1');
+		
+		var UserAgent = navigator.userAgent;
+		var html = "";
+		if (UserAgent.match(/iPhone|iPod|Android|Windows CE|BlackBerry|Symbian|Windows Phone|webOS|Opera Mini|Opera Mobi|POLARIS|IEMobile|lgtelecom|nokia|SonyEricsson/i) != null || UserAgent.match(/LG|SAMSUNG|Samsung/) != null)
+		{
+			html = "1002.html";
+		} else {
+			html = "1001.html";
+		}
+		
+		window.open("/edudata/contents/"+html,"mediaPop","width=1000,height=650");
+	}
+	
+</script>
+
+</head>
+
+<body>
+
+<!-- skip nav -->
+	<%@ include file="/WEB-INF/jsp/ccedu/inc/nav_inc.jsp"%>
+<!--// skip nav -->
+<form id="frm" name="frm" method="post">
+	<input type="hidden" name="filePath" id="filePath" value=""/>
+	<input type="hidden" name="mediaFile" id="mediaFile" value=""/>
+	<input type="hidden" name="cuserno" id="cuserno" value=""/>
+	<input type="hidden" name="treeno" id="treeno" value=""/>
+	<input type="hidden" name="studytime" id="studytime" value=""/>
+	<input type="hidden" name="sday" id="sday" value="1"/>
+	<input type="hidden" name="mediaPath" id="mediaPath" value="">
+	<!-- 미디어 -->
+	<!-- 복습하기 -->
+    <c:if test="${REQUEST_DATA.SAMPLE_DIV eq 'Y'}">
+	 	<input type="hidden" name="progressChk" id="progressChk" value=""/>
+	</c:if>
+	
+	<input type="hidden" name="ccNo" id="ccNo" value="${refreTraiInfo.CC_NO}">
+	<input type="hidden" name="ccAppNo" id="ccAppNo" value="${refreTraiInfo.CC_APP_NO}">
+	<input type="hidden" name="mtAppType" id="mtAppType" value="${refreTraiInfo.MT_APP_TYPE}">
+	
+	
+	
+</form>
+
+<div id="wrap">
+
+	<!-- header -->
+	<%@ include file="/WEB-INF/jsp/ccedu/inc/header_inc.jsp"%>
+	<!--// header -->
+
+	<!-- container -->
+	<div id="container">
+
+		<!-- location -->
+		<jsp:include page="/WEB-INF/jsp/ccedu/inc/location/loc_03_04.jsp"> 
+		  	<jsp:param name="menuNm" value="수강하기"/> 
+		</jsp:include> 
+		<!--// location -->
+
+		<div class="con_center">
+
+			<!-- lnb -->
+			<div id="lnb">
+				<jsp:include page="/WEB-INF/jsp/ccedu/inc/lnb/lnb_03.jsp"> 
+				  	<jsp:param name="dep2" value="04"/>
+				  	<jsp:param name="dep3" value="02"/> 
+				</jsp:include> 
+			</div>
+			<!--// lnb -->
+
+			<!-- content 본문 -->
+			<div id="content">
+				
+				<!-- 기존 START 2018-08-30  -->
+<!-- 				<h3 class="cont_titile">수강하기</h3> -->
+				<!-- 기존 END 2018-08-30  -->
+				
+				<!-- 2018-08-28 김동인 작업 S --> 
+				<h3 class="cont_titile type03">수강하기<span></span></h3>
+				<!-- 2018-08-28 김동인 작업 E -->
+				<!-- 본문내용 -->
+				<div class="cont_body">
+					<!-- start -->
+
+					<div class="c_section">
+						<ul class="c_txtlist">
+							<li>신용상담사 보수교육은 자격증을 연장을 위해 필수적으로 진행해야 하는 교육입니다.</li>
+							<li>자격증 유효기간은 총 3년으로 만료 3개월 전부터 보수교육을 수강할 수 있습니다.</li>
+						</ul>
+
+						<div class="c_msg_left">
+							<div class="img_msg_talk">
+								<p><strong><c:out value="${refreTraiInfo.MBERNM }"/></strong> 님은 <c:out value="${refreTraiInfo.PASS_DT }"/>에 자격증을 취득하셨습니다.<br />자격증 유효기간은 <strong class="color_orange"> <c:out value="${refreTraiInfo.EXPRT_DT }"/>까지</strong>이며, 유효기간 <strong class="color_orange">만료일까지 <fmt:formatNumber value="${refreTraiInfo.PAST_EVENT }" pattern = "00"/>일</strong> 
+								<c:if test="${refreTraiInfo.PAST_EVENT_DIV eq 'N' }">
+								남으셨습니다.
+								</c:if>
+								<c:if test="${refreTraiInfo.PAST_EVENT_DIV eq 'Y'}">
+								경과하였습니다.
+								</c:if>
+
+								</p>
+							</div>
+						</div>
+						
+						<div class="txt_right mt18">
+							<c:if test="${refreTraiInfo.REFRESH_DIV eq 'Y'}">
+                   				<button class="btn_blueline" onclick="fnPrint()"><span>수료증출력</span></button>
+                   			</c:if>
+                   			<c:if test="${refreTraiInfo.REFRESH_DIV ne 'Y'}">
+                   				<button class="btn_blueline_disabled" onclick="fnModalMsg('보수교육은 모든과정의 학습을 완료해야 수료증 출력이 가능합니다.',function(){$('.btn_blueline_disabled').focus();})"><span>수료증출력</span></button>
+                   			</c:if>
+						</div>
+
+						<div class="table_style_col">
+							<table>
+								<caption>번호, 과정명, 학습시간, 학습완료일을 확인할수있고 학습하기 버튼을 클릭할수있는 표 입니다.</caption>
+								<colgroup>
+									<col  />
+									<col  />
+									<col  />
+									<col  />
+									<col  />
+								</colgroup>
+								<thead>
+									<tr>
+										<th scope="col">No.</th>
+										<th scope="col">과정명</th>
+										<th scope="col">학습시간</th>
+										<th scope="col">학습완료일</th>
+										<th scope="col">동영상 수강</th>
+									</tr>
+								</thead>
+								<tbody>
+
+									<c:if test="${not empty refreTraiList}">
+		                          		<c:forEach var="result" items="${refreTraiList}" varStatus="status">
+		                             		<tr>
+			                             		<!--  시험명 -->
+			                                  	<td class="align_center">${result.RNUM}</td>
+			                             		<!--  시험명 -->
+			                                  	<td>${result.SUBJECT}</td>
+			                                	<!-- 접수기간 -->
+			                                  	<td class="align_center">
+			                                  	<c:set var="dataMin" value="${result.RUNTIME/60}" />
+			                                  	<c:set var="dataSec" value="${result.RUNTIME%60}" />
+			                                  	<fmt:parseNumber var = "min"  value = "${dataMin}" integerOnly = "true"/>
+			                                  	<fmt:parseNumber var = "sec"  value = "${dataSec}" integerOnly = "true"/>
+													${min}분  ${sec}초
+		                                  		</td> 
+		                                  		<!-- 선택 -->
+		                                  		<td class="align_center">${result.COMP_DATE}</td>
+		                                  		<td class="align_center"> 
+		                                  			
+		                                  			<!-- 복습하기 -->
+		                                  			<c:if test="${REQUEST_DATA.SAMPLE_DIV eq 'Y'}">
+	                                  					<button onclick="fnCourseSampleMovie('${status.index}'); return false;" class="btn_blueline" <c:if test="${result.COMP_DATE ne null}"> disabled="disabled" </c:if> >복습하기</button>
+		                                  			</c:if>
+		                                  			
+		                                  			<!-- 학습하기 -->
+		                                  			<c:if test="${REQUEST_DATA.SAMPLE_DIV ne 'Y'}">
+		                                  				<c:if test="${refreTraiInfo.REFRESH_DIV eq 'Y'}">
+			                                  				<button class="btn_blueline" disabled="disabled" >학습하기</button>
+			                                  			</c:if>
+			                                  			<c:if test="${refreTraiInfo.REFRESH_DIV ne 'Y'}">
+			                                  				<button onclick="learning('${status.index}'); return false;" class="btn_blueline" <c:if test="${result.COMP_DATE ne null}"> disabled="disabled" </c:if> >학습하기</button>
+			                                  			</c:if>
+		                                  			</c:if>
+		                                  			
+		                                  		</td>
+		                              		</tr>
+		                               	</c:forEach> 
+									</c:if>
+									<c:if test="${empty refreTraiList}">
+										<td class="align_center" colspan="5"> 수료 하셨습니다. </td>
+									</c:if>
+									
+								</tbody>
+							</table>
+						</div>
+					</div>
+
+					<!--// end -->
+				</div>
+				<!--// 본문내용 -->
+				
+			<!--  -->
+			</div>
+			<!--// content 본문 -->
+		
+		
+		</div>
+	
+	</div>
+	<!--// container -->
+
+	<!-- foot -->
+	<%@ include file="/WEB-INF/jsp/ccedu/inc/footer_inc.jsp"%>
+	<!--// foot end -->
+
+</div>
+
+</body>
+</html>

@@ -1,0 +1,11 @@
+_this.$quizInfo = [
+	["다음 중 Application Bar(응용프로그램 막대)에 <span style='color:#FF0000;'>없는</span> 것은?","Data Panel(데이터 패널)","Project(프로젝트)","Save(저장)","Undo/Redo(작업 취소/작업 복구)",false],	
+	["다음 중 Data Panel(데이터 패널)에 <span style='color:#FF0000;'>없는</span> 것은?","Autodesk Account(오토데스크 사용자 계정)","New Project(프로젝트 생성)","People(참여자)","Open on the Web(웹 클라우드 접속)",false],
+	["다음 중 Profile and help(계정 및 도움말)에 <span style='color:#FF0000;'>없는</span> 것은?","Learning and Documentation (학습 및 문서화)","Preferences(환경 설정)","Autodesk Account(오토데스크 사용자 계정)","Samples Project(샘플 프로젝트)",false]
+];
+
+_this.$quizAnsInfo = [
+	[2,"Application Bar(응용프로그램 막대)에는 Project(프로젝트)가 아니라 File(파일) 기능이 있다."],
+	[1,"Autodesk Account(오토데스크 사용자 계정)은 Profile and help(계정 및 도움말)에 있다."],
+	[4,"Samples Project(샘플 프로젝트)은 Data Panel(데이터 패널)에 있다."],
+];

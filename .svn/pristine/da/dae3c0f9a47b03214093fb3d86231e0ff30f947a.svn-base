@@ -1,0 +1,67 @@
+<%@ page language="java" contentType="text/html; charset=utf-8" pageEncoding="utf-8"%>
+<%
+/****************************************
+    subject	: [공통] > 온라인 교육 > LEFT 영역
+    summary	: LEFT 영역
+    author	: SANGS
+    date	: 2015-06-01
+****************************************/
+%>
+<script type="text/javascript">
+    $(document).ready(function(){
+		$('.ul_gnb').find('.gnb_<c:out value="${menu_nm}"/>').addClass('on');
+		$('.leftNavi').find('.lnb_<c:out value="${lnb_menu}"/> a').addClass('active');
+    
+    });
+    
+    $(function(){
+    	
+    	$("#lecture11").on("click",function(){
+    		alert("준비중 입니다.");
+    		$("#lecture11").focus();
+    	});
+    });
+    
+</script>
+<div class="leftMn">
+    <h1 class="ltTitle">
+        <span class="bold">온라인 교육</span>
+    </h1>
+    <nav>
+        <ul class="leftNavi">
+        	<li class="lnb_onMain"><a href="/academy/course/onMain.do" title="교육 소개">교육 소개</a></li>
+        	
+        	<li class="lnb_a">
+        		<a href="/academy/course/onDetail.do?mtScCode=SC1001&ref1=a" title="신용회복위원회이용자">신용회복위원회이용자</a>
+        		<a href="/academy/course/onDetail.do?mtScCode=SC1001&ref1=a" title="대학생·청년 햇살론" class="lnb_2dep">대학생·청년 햇살론</a>
+        		<a href="/academy/course/onDetail.do?mtScCode=SC1002&ref1=a" title="새희망홀씨" class="lnb_2dep">새희망홀씨</a>
+        		<a href="/academy/course/onDetail.do?mtScCode=SC2001&ref1=a" title="신복위 소액금융" class="lnb_2dep">신복위 소액금융</a>
+        	</li>
+        	
+        	<li class="lnb_b">
+        		<a href="/academy/course/onDetail.do?mtScCode=SC2002&ref1=b" title="어린이·청소년">어린이·청소년</a>
+        		<a href="/academy/course/onDetail.do?mtScCode=SC2002&ref1=b" title="초등학생" class="lnb_2dep">초등학생</a>
+        		<a href="/academy/course/onDetail.do?mtScCode=SC3002&ref1=b" title="중학생" class="lnb_2dep">중학생</a>
+        		<a href="/academy/course/onDetail.do?mtScCode=SC3003&ref1=b" title="고등학생" class="lnb_2dep">고등학생</a>
+       		</li>
+        	
+        	<li class="lnb_c">
+        		<a href="/academy/course/onDetail.do?mtScCode=SC3004&ref1=c" title="대학생·일반인">대학생·일반인</a>
+        		<a href="/academy/course/onDetail.do?mtScCode=SC3004&ref1=c" title="대학생" class="lnb_2dep">대학생</a>
+        		<a href="/academy/course/onDetail.do?mtScCode=SC3001&ref1=c" title="일반인" class="lnb_2dep">일반인</a>
+        		<a href="/academy/course/onDetail.do?mtScCode=SC4001&ref1=c" title="군인" class="lnb_2dep">군인</a>
+        	</li>
+        	
+        	<li class="lnb_d">
+        		<a href="/academy/course/onDetail.do?mtScCode=SC4002&ref1=d" title="신용드라마">신용드라마</a>
+        	</li>
+        	
+        	<li class="lnb_e">
+        		<a href="/academy/course/onDetail.do?mtScCode=SC5001&ref1=e" title="비회원 수강하기">비회원 수강하기</a>
+        	</li>
+        	
+        	<!-- <li class="lnb_cnsmr"><a href="/academy/course/onDetail.do?ref1=CNSMR&mtScCode=SC3002" title="일반학습자 교육">일반학습자 교육</a></li>
+        	<li class="lnb_emp"><a href="#none" id="lecture11">전문인력양성 교육</a></li> -->
+        </ul>
+    </nav>
+</div>

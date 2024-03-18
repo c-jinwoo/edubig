@@ -1,0 +1,1619 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.webapp.ccedu.mapper.CcEduExamMapper">
+
+
+	<!-- 시험 정보(1줄) -->
+	<select id="getCcMstInfo" resultType="emap" parameterType="dmap">
+	/* getCcMstInfo */
+		
+  		SELECT   
+			  mst.CC_NO
+			, YEAR
+			, MT_APP_TYPE
+			, FN_GET_CMMN_CODE_NM('CT', MT_APP_TYPE)AS MT_APP_NAME
+			, MT_ROUND
+			, FN_GET_CMMN_CODE_NM('RO', MT_ROUND)AS MT_ROUND_NAME
+			, ROUND_NM
+			, APP_S_DT
+			, APP_S_HOUR
+			, TO_CHAR(TO_DATE(REPLACE(APP_S_DT,'-',''), 'YYYYMMDD'), 'YYYY.MM.DD') AS APPSDT
+			, TO_CHAR(TO_CHAR(TO_DATE(REPLACE(APP_S_DT,'-',''), 'YYYYMMDD'), 'DY', 'NLS_DATE_LANGUAGE=KOREAN')) AS APPSDAY
+			, APP_E_DT
+			, TO_CHAR(TO_DATE(REPLACE(APP_E_DT,'-',''), 'YYYYMMDD'), 'YYYY.MM.DD') AS APPEDT
+			, APP_E_HOUR
+			, TO_CHAR(TO_CHAR(TO_DATE(REPLACE(APP_E_DT,'-',''), 'YYYYMMDD'), 'DY', 'NLS_DATE_LANGUAGE=KOREAN')) AS APPEDAY
+			, TO_CHAR(TO_DATE(REPLACE(APP_E_DT,'-',''), 'YYYYMMDD'), 'YYYY.MM.DD') AS APPSDT
+			, CNL_S_DT
+			, TO_CHAR(TO_DATE(REPLACE(CNL_S_DT,'-',''), 'YYYYMMDD'), 'YYYY.MM.DD') AS CNLSDT
+			, TO_CHAR(TO_CHAR(TO_DATE(REPLACE(CNL_S_DT,'-',''), 'YYYY-MM-DD'), 'DY', 'NLS_DATE_LANGUAGE=KOREAN')) AS CNLSEDAY
+			, CNL_S_HOUR
+			, CNL_E_DT
+			, TO_CHAR(TO_DATE(REPLACE(CNL_E_DT,'-',''), 'YYYYMMDD'), 'YYYY.MM.DD') AS CNLEDT
+			, TO_CHAR(TO_CHAR(TO_DATE(REPLACE(CNL_E_DT,'-',''), 'YYYYMMDD'), 'DY', 'NLS_DATE_LANGUAGE=KOREAN')) AS CNLEEDAY
+			, CNL_E_HOUR
+			, IDN_S_DT
+			, TO_CHAR(TO_DATE(REPLACE(IDN_S_DT,'-',''), 'YYYYMMDD'), 'YYYY.MM.DD') AS IDNSDT
+			, TO_CHAR(TO_CHAR(TO_DATE(REPLACE(IDN_S_DT,'-',''), 'YYYYMMDD'), 'DY', 'NLS_DATE_LANGUAGE=KOREAN')) AS IDNSEDAY
+			, IDN_S_HOUR
+			, IDN_E_DT
+			, TO_CHAR(TO_DATE(REPLACE(IDN_E_DT,'-',''), 'YYYYMMDD'), 'YYYY.MM.DD') AS IDNEDT
+			, TO_CHAR(TO_CHAR(TO_DATE(REPLACE(IDN_E_DT,'-',''), 'YYYYMMDD'), 'DY', 'NLS_DATE_LANGUAGE=KOREAN')) AS IDNEEDAY
+			, IDN_E_HOUR
+			, EXAM_DT
+			, EXAM_S_HOUR
+			, EXAM_S_MIN
+			, EXAM_E_HOUR
+			, EXAM_E_MIN
+			, TO_CHAR(TO_DATE(REPLACE(EXAM_DT,'-','')|| TO_CHAR(EXAM_S_HOUR,'00') || TO_CHAR(EXAM_S_MIN,'00'),'RRRRMMDDHH24MI'),'RRRR.MM.DD HH24:MI') AS EXAMSDATE
+            , TO_CHAR(TO_DATE(REPLACE(EXAM_DT,'-','')|| TO_CHAR(EXAM_E_HOUR,'00') || TO_CHAR(EXAM_E_MIN,'00'),'RRRRMMDDHH24MI'),'RRRR.MM.DD HH24:MI') AS EXAMEDATE
+            , TO_CHAR(TO_CHAR(TO_DATE(REPLACE(EXAM_DT,'-',''), 'RRRR-MM-DD'), 'DY', 'NLS_DATE_LANGUAGE=KOREAN'))AS DAY
+			, PUBLIC_DATE
+			, PUBLIC_HOUR
+			, PRICE
+			, PLACE_TYPE 
+<!-- 	        , CASE WHEN apply.MT_PLACE_CD IS NOT NULL  -->
+<!-- 								         THEN FN_GET_CMMN_CODE_NM('PL', apply.MT_PLACE_CD) -->
+<!-- 								    WHEN mst.PLACE_TYPE = 'Y' THEN '추후공지'  -->
+<!-- 							        ELSE mst.PLACE_TITLE  -->
+<!-- 							    END PLACE_TITLE    -->
+			, PAY_AT
+			, CONTENT
+			, CASE WHEN TO_CHAR(SYSDATE,'RRRRMMDD') BETWEEN REPLACE(CNL_S_DT,'-','') AND REPLACE(CNL_E_DT,'-','')
+                   THEN 'Y'
+                   ELSE 'N'
+                    END AS CNLYN  
+		FROM CC_MST mst
+<!-- 		, CC_APPLY apply -->
+<!-- 		WHERE mst.CC_NO = apply.CC_NO -->
+		WHERE mst.CC_NO = #{ccNo}
+		AND mst.MT_APP_TYPE = #{mtAppType}
+<!-- 		AND apply.UNITY_MBERNO = #{SES_USERNO} -->
+		and rownum =1
+		
+	</select>
+	
+	<!-- 사용자가 접수 등록한 시험 정보 & 사용자 정보(1줄) -->
+	<select id="getCcMstUserInfo" resultType="emap" parameterType="dmap">
+	/* getCcMstUserInfo */
+	
+		SELECT
+              A.CC_NO
+            , ROW_NUMBER() OVER(ORDER BY A.EXAM_DT ASC) AS RNUM
+            , A.YEAR
+            , A.MT_APP_TYPE
+            , FN_GET_CMMN_CODE_NM('CT', MT_APP_TYPE)AS MT_APP_NAME
+            , FN_GET_CMMN_CODE_NM('AM', MT_EDU)AS MT_EDU_NAME
+            , A.MT_ROUND
+            , FN_GET_CMMN_CODE_NM('RO', MT_ROUND)AS MT_ROUND_NAME
+            , A.ROUND_NM
+            , TO_CHAR(TO_DATE(REPLACE(A.EXAM_DT,'-',''), 'RRRR-MM-DD'), 'RRRR"년"MM"월"DD"일"')AS EXAM_DT
+            , TO_CHAR(TO_CHAR(TO_DATE(REPLACE(A.EXAM_DT,'-',''), 'RRRR-MM-DD'), 'DY', 'NLS_DATE_LANGUAGE=KOREAN'))AS DAY
+            , A.EXAM_S_HOUR
+            , A.EXAM_S_MIN
+            , A.EXAM_E_HOUR
+            , A.EXAM_E_MIN
+            , TO_CHAR(TO_DATE(REPLACE(EXAM_DT,'-','')|| TO_CHAR(EXAM_S_HOUR,'00') || TO_CHAR(EXAM_S_MIN,'00'),'RRRRMMDDHH24MI'),'RRRR.MM.DD HH24:MI') AS EXAMSDATE
+            , TO_CHAR(TO_DATE(REPLACE(EXAM_DT,'-','')|| TO_CHAR(EXAM_E_HOUR,'00') || TO_CHAR(EXAM_E_MIN,'00'),'RRRRMMDDHH24MI'),'RRRR.MM.DD HH24:MI') AS EXAMEDATE
+            , TO_CHAR(TO_DATE(REPLACE(A.PUBLIC_DATE,'-',''), 'RRRRMMDD'), 'RRRR.MM.DD') AS PUBLIC_DATE
+            , TO_CHAR(TO_CHAR(TO_DATE(REPLACE(A.PUBLIC_DATE,'-',''), 'RRRRMMDD'), 'DY', 'NLS_DATE_LANGUAGE=KOREAN'))AS PUBLICDAY
+            , A.PUBLIC_HOUR
+            , A.PLACE_TYPE
+            , A.PRICE
+            , A.PAY_AT
+            , A.CONTENT
+            , B.CC_PLACE_NO
+            , B.APP_DT
+            , B.CC_APP_NO
+            , B.UNITY_MBERNO
+            , B.EXAM_NO 
+            , B.DIS_YN
+            , B.STD_YN
+			, B.MT_EDU
+            , B.JOB
+            , B.SAVPATH
+            , B.ORGFILE
+            , B.SAVFILE
+            , B.MOBLPHON
+            , B.TELNO
+            , B.EMAIL
+            , B.MBERNM
+            , B.ADDR_CODE
+            , B.ADDRESS
+            , B.ADDRESS2
+            , B.SUBJECT1
+            , B.LICENSE_NO
+            , B.SUBJECT2
+            , B.SUBJECT3
+            , B.SUBJECT4
+            , B.TOTAL
+            , B.AVERAGE
+            , B.PASS_YN
+            , B.PASS_DT
+            , TO_CHAR(TO_DATE(REPLACE(B.PASS_DT,'-',''),'RRRRMMDD'),'RRRR"년 "MM"월 "DD"일"') AS PASS_DT_FORMAT
+            , B.JUMIN1
+            <!--, DECODE(JUMIN2_2, NULL, '', SUBSTR(pkg_secu.DECRYPT( JUMIN2_2 ),1,1)) AS JUMIN2 -->
+            , B.FIN_SCHOOL_NM
+            , B.MAJOR
+            , B.ETC
+            , FN_GET_CMMN_CODE_NM('AM', MT_EDU)AS MT_EUD_NAME
+            , TO_CHAR(SYSDATE,'RRRR"년 "MM"월 "DD"일"') AS SYSDATE_FORMAT 
+            , CASE WHEN TO_CHAR(SYSDATE,'RRRR-MM-DD') BETWEEN A.CNL_S_DT AND A.CNL_E_DT
+                   THEN 'Y'
+                   ELSE 'N'
+                    END AS CNLYN
+            , (SELECT TO_CHAR(TO_DATE(REPLACE(BRTHDY,'-',''), 'RRRRMMDD'), 'RRRR.MM.DD') FROM LMS_CT_UNITY_MBER C WHERE C.UNITY_MBERNO = B.UNITY_MBERNO ) AS BRTHDY
+            , CASE WHEN JUMIN1 IS NOT NULL
+                   THEN JUMIN1
+                   ELSE SUBSTR((SELECT BRTHDY FROM LMS_CT_UNITY_MBER C WHERE C.UNITY_MBERNO = B.UNITY_MBERNO ),2,6)
+                    END AS BRTHDY_PRINT
+            , REFRESH_DT
+            , TO_CHAR(ADD_MONTHS(TO_DATE(REPLACE(REFRESH_DT,'-',''),'RRRRMMDD'),36),'RRRR.MM.DD') AS EXPRT_DATE
+<!--             , SUBSTR((SELECT TO_CHAR(TO_DATE(REPLACE(BRTHDY,'-',''), 'RRRRMMDD'), 'RRRRMMDD') FROM LMS_CT_UNITY_MBER C WHERE C.UNITY_MBERNO = B.UNITY_MBERNO ), 3 , 8) AS BRTHDY2 -->
+            , CASE WHEN B.JUMIN1 IS NOT NULL
+              THEN TO_CHAR(TO_DATE(B.JUMIN1,'YYMMDD'),'YY.MM.DD')
+              ELSE CASE WHEN LENGTH((SELECT BRTHDY FROM LMS_CT_UNITY_MBER C WHERE C.UNITY_MBERNO = B.UNITY_MBERNO)) = 8
+                   THEN SUBSTR((SELECT BRTHDY FROM LMS_CT_UNITY_MBER C WHERE C.UNITY_MBERNO = B.UNITY_MBERNO),0 ,4) 
+                        || '.'  || 
+                        SUBSTR((SELECT BRTHDY FROM LMS_CT_UNITY_MBER C WHERE C.UNITY_MBERNO = B.UNITY_MBERNO),5 ,2) 
+                        || '.'  ||
+                        SUBSTR((SELECT BRTHDY FROM LMS_CT_UNITY_MBER C WHERE C.UNITY_MBERNO = B.UNITY_MBERNO),7 ,2)
+                   WHEN LENGTH((SELECT BRTHDY FROM LMS_CT_UNITY_MBER C WHERE C.UNITY_MBERNO = B.UNITY_MBERNO)) = 6
+                   THEN SUBSTR((SELECT BRTHDY FROM LMS_CT_UNITY_MBER C WHERE C.UNITY_MBERNO = B.UNITY_MBERNO),1 ,2) 
+                        || '.'  || 
+                        SUBSTR((SELECT BRTHDY FROM LMS_CT_UNITY_MBER C WHERE C.UNITY_MBERNO = B.UNITY_MBERNO),3 ,2) 
+                        || '.'  || 
+                        SUBSTR((SELECT BRTHDY FROM LMS_CT_UNITY_MBER C WHERE C.UNITY_MBERNO = B.UNITY_MBERNO),5 ,2)
+                  ELSE '-'
+                  END 
+           END AS BRTHDY3
+<!-- 	        , CASE WHEN B.MT_PLACE_CD IS NOT NULL 
+								         THEN FN_GET_CMMN_CODE_NM('PL', B.MT_PLACE_CD)
+								    WHEN A.PLACE_TYPE = 'Y' THEN '추후공지' 
+							        ELSE A.PLACE_TITLE 
+							    END PLACE_TITLE  -->
+			, FN_GET_CMMN_CODE_NM('CP', C.MT_CC_PLACE) AS PLACE_LOC
+			, CASE WHEN C.PLACE_TYPE = 'Y' THEN '추후공지'
+				   ELSE C.PLACE_TITLE
+				   END PLACE_TITLE  
+        FROM CC_MST A
+        	, CC_APPLY B
+        	, CC_PLACE C
+        WHERE UNITY_MBERNO = #{SES_USERNO}
+        AND A.CC_NO = B.CC_NO
+	    AND A.CC_NO = #{ccNo}
+       	AND MT_APP_TYPE = #{mtAppType}
+       	AND B.CC_NO = C.CC_NO (+)
+       	AND B.CC_PLACE_NO = C.CC_PLACE_NO (+)
+       	<if test="ccAppNo != null and ccAppNo != '' ">
+       		AND CC_APP_NO = #{ccAppNo}
+       	</if>
+        ORDER BY RNUM DESC
+        
+    </select>
+    
+	
+	<!-- 신용상담사 > 원서접수 > 원서접수 페이지 > 신규검정 & 완화검정 접수가능한 시험정보-->
+	<select id="getCcMstPossible" parameterType="dmap" resultType="emap">
+	/* getCcMstPossible */
+	
+	<![CDATA[
+	
+		SELECT A.*
+	        FROM (
+                SELECT 
+                      CC_NO
+                    , YEAR
+                    , MT_APP_TYPE
+                    , FN_GET_CMMN_CODE_NM('CT', MT_APP_TYPE)AS MT_APP_NAME
+                    , MT_ROUND
+                    , APP_S_DT
+                    , APP_S_HOUR
+                    , APP_E_DT
+                    , APP_E_HOUR
+                    , EXAM_DT
+                    , EXAM_S_HOUR
+                    , EXAM_S_MIN
+                    , EXAM_E_HOUR
+                    , EXAM_E_MIN
+                    , (SELECT NUM_CD FROM LMS_CD_MT_SUB B WHERE B.MT_SUB_CODE = MT_ROUND)AS ROUND
+                    , SUBSTR(APP_S_DT, 6, 2)AS SMONTH
+                    , SUBSTR(APP_S_DT, 9, 2)AS SDAY
+                    , SUBSTR(APP_E_DT, 6, 2)AS EMONTH
+                    , SUBSTR(APP_E_DT, 9, 2)AS EDAY
+                    , ROW_NUMBER() OVER(ORDER BY CC_NO DESC) RNUM 
+                    , CASE WHEN APP_S_HOUR >= 12 THEN '오후' WHEN APP_S_HOUR < 12 THEN '오전' END AS STIME
+                    , CASE WHEN APP_E_HOUR >= 12 THEN '오후' WHEN APP_E_HOUR < 12 THEN '오전' END AS ETIME 
+                    , CASE WHEN TO_CHAR(SYSDATE,'RRRR-MM-DD') BETWEEN APP_S_DT AND APP_E_DT
+                           THEN 'Y'
+                           ELSE 'N'
+                            END AS possibleYn  
+          FROM CC_MST
+          ]]>
+            WHERE 1=1
+            <if test="mtAppType != null and mtAppType != '' ">
+                AND MT_APP_TYPE = #{mtAppType}
+            </if>
+            ) A                  
+            WHERE 1=1
+            AND A.RNUM = 1
+	
+	</select>
+	
+	
+	<!-- 신용상담사 접수 등록 -->
+	<insert id="insertCcApply" parameterType="dmap">
+	/* insertCcApply */
+	
+		INSERT INTO CC_APPLY
+			(
+				  CC_NO
+				, CC_APP_NO
+				, EXAM_NO
+				, UNITY_MBERNO
+				, DIS_YN
+				, STD_YN
+				, MT_EDU
+				, JOB
+				, APP_DT
+				, USEYN
+				, MOBLPHON
+				<if test="telNo != nul and telNo != '' ">
+					, TELNO
+				</if>
+				, EMAIL
+				, MBERNM
+				, PASS_YN
+				, SAVPATH
+				, ORGFILE
+				, SAVFILE
+				, ADDR_CODE
+				, ADDRESS
+				<if test="address2 != null and address2 != '' ">
+					, ADDRESS2
+				</if>
+				, CC_PLACE_NO
+			)
+			VALUES
+			(
+				  #{ccNo}
+				, #{ccAppNo}
+				<if test="mtAppType != null and mtAppType != '' "> <!-- 신규 -->
+					<if test=" 'CT0001' == mtAppType">
+						, (SELECT REPLACE(TO_CHAR(SYSDATE, 'RRRR')||'-10'||'-'||TO_CHAR(NVL(COUNT(CC_NO)+1 ,1),'000000'), ' ', '')
+					      FROM CC_APPLY WHERE CC_NO = #{ccNo})
+					</if>
+					<if test=" 'CT0002' == mtAppType"> 
+						, (SELECT REPLACE(TO_CHAR(SYSDATE, 'RRRR')||'-20'||'-'||TO_CHAR(NVL(COUNT(CC_NO)+1 ,1),'000000'), ' ', '')
+					      FROM CC_APPLY WHERE CC_NO = #{ccNo})
+					</if>
+				</if>
+				, #{unityMberNo}
+				, #{disYn}
+				, #{stdYn}
+				, #{mtEdu}
+				, #{job}
+				, TO_CHAR(SYSDATE, 'RRRR-MM-DD')
+				, 'Y'
+				, #{moblPhon}
+				<if test="telNo != null and telNo != '' ">
+					, #{telNo}
+				</if>
+				, #{email}
+				, #{mberNm}
+				, 'N'
+				, #{savePath}
+				, #{orgFile}
+				, #{saveFile}
+				, #{addrCode}
+				, #{address}
+				<if test="address2 != null and address2 != '' ">
+					, #{address2}
+				</if>
+				, #{cc_place_no}
+			)
+	
+	</insert>
+	
+	
+	<!-- 접수 일련번호 최대값 구하기 -->
+	<select id="maxCcAppNo" parameterType="dmap" resultType="int">
+	/* maxCcAppNo */
+	
+		SELECT NVL(MAX(CC_APP_NO),0) +1 FROM CC_APPLY
+		WHERE CC_NO = #{ccNo}
+		
+	</select>
+	
+	
+	<!-- 신용상담사 접수 등록 -> 결제 -->
+	<insert id="insertCcPayment" parameterType="dmap">
+	/* insertCcPayment */
+	
+		INSERT INTO CC_PAYMENT
+			(
+				  CC_PAY_NO
+				, UNITY_MBERNO
+				, CC_TARGET_NO
+				, MT_TARGET_TYPE
+				, PRICE
+				, MT_PAY_STAT
+				, PAT_NO
+				, MT_PAY_TYPE
+				, REGIST_DT
+				<if test="LGD_TID != null and LGD_TID != '' ">, LGD_TID</if>
+				<if test="LGD_PAYDATE != null and LGD_PAYDATE != '' ">, LGD_PAYDATE</if>
+				<if test="LGD_RESPCODE != null and LGD_RESPCODE != '' ">, LGD_RESPCODE</if>
+				<if test="LGD_FINANCENAME != null and LGD_FINANCENAME != '' ">, LGD_FINANCENAME</if>
+				<if test="LGD_FINANCECODE != null and LGD_FINANCECODE != '' ">, LGD_FINANCECODE</if>
+				<if test="LGD_OID != null and LGD_OID != '' ">, LGD_OID</if>
+				<if test="LGD_PAYER != null and LGD_PAYER != '' ">, LGD_PAYER</if>
+				<if test="LGD_ACCOUNTNUM != null and LGD_ACCOUNTNUM != '' ">, LGD_ACCOUNTNUM</if>
+			)
+		VALUES
+			(
+				  (SELECT NVL(MAX(CC_PAY_NO), 0) + 1 FROM CC_PAYMENT)
+				, #{unityMberNo}
+				, #{ccAppNo}
+				, #{mtTargetType}
+				, #{LGD_AMOUNT}
+				<choose>
+					<when test="LGD_PAYTYPE == 'YT0040' ">
+						,'YS0001'
+					</when>
+					<otherwise>
+						,'YS0002'
+					</otherwise>
+				</choose>
+				, '1234'
+				, #{LGD_PAYTYPE}
+				, SYSDATE
+				<if test="LGD_TID != null and LGD_TID != '' ">, #{LGD_TID}</if>
+				<if test="LGD_PAYDATE != null and LGD_PAYDATE != '' ">, #{LGD_PAYDATE}</if>
+				<if test="LGD_RESPCODE != null and LGD_RESPCODE != '' ">, #{LGD_RESPCODE}</if>
+				<if test="LGD_FINANCENAME != null and LGD_FINANCENAME != '' ">, #{LGD_FINANCENAME}</if>
+				<if test="LGD_FINANCECODE != null and LGD_FINANCECODE != '' ">, #{LGD_FINANCECODE}</if>
+				<if test="LGD_OID != null and LGD_OID != '' ">, #{LGD_OID}</if>
+				<if test="LGD_PAYER != null and LGD_PAYER != '' ">,#{LGD_PAYER}</if>
+				<if test="LGD_ACCOUNTNUM != null and LGD_ACCOUNTNUM != '' ">, #{LGD_ACCOUNTNUM}</if>
+			)
+	
+	</insert>
+	
+	<!-- 최근 접수한 내용 1건 조회 -->
+	<select id="ccApplyRowGet" parameterType="dmap" resultType="emap">
+	/* ccApplyRowGet */
+	
+		SELECT
+			A.CC_NO
+		  , A.YEAR
+		  , A.ROUND_NM
+		  , A.MT_APP_TYPE
+		  , FN_GET_CMMN_CODE_NM('RO', MT_ROUND)AS MT_ROUND_NAME
+		  , A.MT_ROUND
+		  , B.CC_NO
+		  , B.CC_APP_NO
+		  , B.UNITY_MBERNO
+		  , B.EXAM_NO
+		FROM CC_MST A
+		INNER JOIN CC_APPLY B
+		ON A.CC_NO = B.CC_NO
+		WHERE ROWNUM = 1
+		AND UNITY_MBERNO = #{SES_USERNO}
+		ORDER BY B.EXAM_NO DESC
+	</select>
+		
+	
+	<!-- 신용상담사 > 원서접수 > 접수조회/수정 > 접수취소  -->
+	<update id="appliCancel" parameterType="dmap">
+	/* appliCancel */
+	
+		UPDATE CC_APPLY
+		SET USEYN = 'N'
+		WHERE CC_NO = #{ccNo}
+		AND UNITY_MBERNO = #{unityMberNo}
+		AND CC_APP_NO = #{ccAppNo}
+	
+	</update>
+
+
+	<!-- 신용상담사 > 원서접수 > 접수조회/수정 > 접수결제 취소  --> 
+	<update id="appliCancelPayment" parameterType="dmap">
+	/* appliCancelPayment */
+	
+		UPDATE CC_PAYMENT
+		SET 
+			  CNL_DT = SYSDATE
+			, CNL_NO = '1234'
+			, MT_PAY_STAT = 'YT0004'
+		WHERE UNITY_MBERNO = #{SES_USERNO}
+		AND CC_TARGET_NO = #{ccAppNo} 	
+	
+	</update>
+	
+	
+	<!-- 사용자 > 신용상담사 > 사용자가 접수한 리스트 -->
+	<select id="applicationCheck" parameterType="dmap" resultType="emap">
+	/* applicationCheck */
+	
+		SELECT AA.*
+			, CASE WHEN BB.MT_CC_PLACE IS NOT NULL 
+						THEN FN_GET_CMMN_CODE_NM('CP', BB.MT_CC_PLACE)
+					WHEN BB.PLACE_TYPE = 'Y' THEN '추후공지'  
+			  END PLACE_LOC
+			, CASE WHEN BB.PLACE_TYPE = 'Y' THEN '추후공지'
+					WHEN BB.PLACE_TYPE = 'N' THEN BB.PLACE_TITLE
+				 	ELSE '추후공지'
+	   		  END PLACE_TITLE
+		FROM (
+			SELECT
+				  A.CC_NO
+				, ROW_NUMBER() OVER(ORDER BY A.EXAM_DT ASC) AS RNUM
+			    , A.YEAR
+			    , A.MT_APP_TYPE
+			    , FN_GET_CMMN_CODE_NM('CT', MT_APP_TYPE)AS MT_APP_NAME
+			    , FN_GET_CMMN_CODE_NM('RO', MT_ROUND)AS MT_ROUND_NAME
+			    , A.MT_ROUND
+			    , A.ROUND_NM
+			    , TO_CHAR(TO_DATE(REPLACE(A.EXAM_DT,'-',''), 'RRRRMMDD'), 'RRRR-MM-DD')AS EXAM_DT
+			    , A.EXAM_S_HOUR
+			    , A.EXAM_S_MIN
+			    , A.EXAM_E_HOUR
+			    , A.EXAM_E_MIN
+			    , A.MDF_S_DT
+			    , A.MDF_E_DT
+			    , A.MDF_S_HOUR
+			    , A.MDF_E_HOUR
+			    , A.CNL_S_DT
+	            , A.CNL_S_HOUR
+	            , A.CNL_E_DT
+	            , A.CNL_E_HOUR
+			    , A.IDN_S_DT
+			    , A.IDN_S_HOUR
+			    , A.IDN_E_DT
+			    , A.IDN_E_HOUR
+			    , A.PUBLIC_DATE
+			    , B.CC_APP_NO
+			    , B.UNITY_MBERNO
+			    , B.EXAM_NO 
+			    , B.DIS_YN
+			    , B.STD_YN
+			    , B.JOB
+			    , B.SAVPATH
+			    , B.ORGFILE
+			    , B.SAVFILE
+			    , B.MOBLPHON
+			    , B.TELNO
+			    , B.EMAIL
+			    , B.MBERNM
+			    , B.ADDRESS
+			    , B.CC_PLACE_NO
+			    , TO_CHAR(TO_CHAR(TO_DATE(REPLACE(EXAM_DT,'-',''), 'RRRRMMDD'), 'DY', 'NLS_DATE_LANGUAGE=KOREAN'))AS DAY
+			    , CASE WHEN TO_CHAR(SYSDATE,'RRRR-MM-DD') BETWEEN A.IDN_S_DT AND A.IDN_E_DT AND TO_CHAR(SYSDATE,'HH') BETWEEN A.IDN_S_HOUR AND A.IDN_E_HOUR
+                       THEN 'Y'
+                       ELSE 'N'
+                        END AS INDPASSYN
+                , CASE WHEN TO_CHAR(SYSDATE,'RRRR-MM-DD') BETWEEN A.MDF_S_DT AND A.MDF_E_DT AND TO_CHAR(SYSDATE,'HH') BETWEEN A.MDF_S_HOUR AND A.MDF_E_HOUR
+                       THEN 'Y'
+                       ELSE 'N'
+                        END  AS MDFYN
+                , CASE WHEN TO_CHAR(SYSDATE,'RRRR-MM-DD') BETWEEN A.CNL_S_DT AND A.CNL_E_DT AND TO_CHAR(SYSDATE,'HH') BETWEEN A.CNL_S_HOUR AND A.CNL_E_HOUR
+                       THEN 'Y'
+                       ELSE 'N'
+                        END  AS CNLYN
+			FROM CC_MST A
+			INNER JOIN CC_APPLY B
+			ON A.CC_NO = B.CC_NO
+			INNER JOIN CC_PAYMENT C
+            ON B.UNITY_MBERNO = C.UNITY_MBERNO
+            AND B.CC_APP_NO = C.CC_TARGET_NO
+			WHERE B.UNITY_MBERNO = #{SES_USERNO}
+			AND B.USEYN = 'Y'
+			<if test="ccNo != null and ccNo != '' ">
+				AND A.CC_NO = #{ccNo}
+			</if>
+			AND C.MT_TARGET_TYPE = 'TT0001'
+            AND C.MT_PAY_STAT = 'YS0002'
+		) AA , CC_PLACE BB
+		WHERE
+			AA.CC_NO = BB.CC_NO (+)
+		AND
+			AA.CC_PLACE_NO = BB.CC_PLACE_NO (+)
+		ORDER BY EXAM_DT DESC
+		
+	</select> 
+
+
+	<!-- 사용자 > 신용상담사 > 접수조회 > 수정 -->
+	<update id="updateCcApply" parameterType="dmap">
+	/* updateCcApply */
+	
+		UPDATE CC_APPLY
+		SET 
+			  DIS_YN = #{disYn}
+			, STD_YN = #{stdYn}
+			, MT_EDU = #{mtEdu}
+			, JOB = #{job}
+			, MOBLPHON = #{moblPhon}
+			<if test="telNo != null and telNo != '' ">
+				, TELNO = #{telNo}
+			</if>
+			, EMAIL = #{email}
+			, ADDR_CODE = #{addrCode}
+			, ADDRESS = #{address}
+			<if test="address2 != null and address2 !='' ">
+				, ADDRESS2 = #{address2}
+			</if> 
+			<if test="saveFile != null and saveFile !='' ">
+				, SAVPATH = #{savePath}
+				, ORGFILE = #{orgFile}
+				, SAVFILE = #{saveFile}
+			</if>
+			, CC_PLACE_NO = #{cc_place_no}
+		WHERE CC_NO = #{ccNo}
+		AND USEYN = 'Y'
+		AND UNITY_MBERNO = #{SES_USERNO} 		
+	
+	</update>
+
+
+	<!-- 사용자 > 합격자 조회 -->
+	<select id="examPassYnList" parameterType="dmap" resultType="emap">
+	/* examPassYnList */
+	
+		SELECT
+			  A.CC_NO
+			, ROW_NUMBER() OVER(ORDER BY B.EXAM_DT DESC) AS RNUM
+            , A.CC_APP_NO
+            , A.UNITY_MBERNO    
+            , A.EXAM_NO
+            , A.DIS_YN
+            , A.STD_YN
+            , A.MT_EDU
+            , A.JOB 
+            , A.SUBJECT1
+            , A.SUBJECT2
+            , A.SUBJECT3
+            , A.SUBJECT4 
+            , A.TOTAL 
+            , A.AVERAGE
+            , A.PASS_YN
+            , A.PASS_DT
+            , CASE WHEN REPLACE(A.PASS_DT,'-','') <![CDATA[ < ]]> '20170101'
+                   THEN 'Y'
+                   ELSE CASE WHEN TO_CHAR(SYSDATE,'YYYYMMDD') BETWEEN TO_CHAR(C.SDATE,'YYYYMMDD') AND TO_CHAR(C.EDATE,'YYYYMMDD') AND C.USEYN = 'Y'
+                             THEN A.POLL_YN
+                             ELSE 'Y'
+                              END
+                    END AS POLL_YN
+            , B.YEAR
+            , B.MT_APP_TYPE
+            , FN_GET_CMMN_CODE_NM('CT', MT_APP_TYPE)AS MT_APP_NAME
+            , B.ROUND_NM
+            , TO_CHAR(TO_DATE(REPLACE(B.EXAM_DT,'-',''), 'RRRRMMDD'), 'RRRR-MM-DD')AS EXAM_DT
+            , TO_CHAR(TO_CHAR(TO_DATE(REPLACE(B.EXAM_DT,'-',''), 'RRRR-MM-DD'), 'DY', 'NLS_DATE_LANGUAGE=KOREAN'))AS DAY
+<!--             , A.JUMIN2 -->
+            , CASE WHEN REPLACE(B.PUBLIC_DATE,'-','') <![CDATA[ <= ]]> TO_CHAR(SYSDATE,'RRRRMMDD')
+                   THEN 'Y'
+                   ELSE 'N'
+                   END AS PUBLICYN
+			, FN_GET_CMMN_CODE_NM('CP', D.MT_CC_PLACE) AS PLACE_LOC
+			, CASE WHEN D.PLACE_TYPE = 'Y' THEN '추후공지'
+					WHEN D.PLACE_TYPE = 'N' THEN D.PLACE_TITLE
+				 	ELSE '추후공지'
+	   		  END PLACE_TITLE
+        FROM CC_APPLY A, CC_MST B, ED_POLL C, CC_PLACE D
+        WHERE A.CC_NO = B.CC_NO
+        AND A.CC_NO = D.CC_NO (+)
+        AND A.CC_PLACE_NO = D.CC_PLACE_NO (+)
+        AND A.CC_NO = C.POLL_TARGET_NO (+)
+        AND C.MT_POLL_TYPE (+) = 'PT0002'
+       	AND A.UNITY_MBERNO = ${SES_USERNO}
+       	<if test="ccNo != null and ccNo != '' ">
+       		AND A.CC_NO = #{ccNo}
+       	</if>
+       	<if test="ccAppNo != null and ccAppNo != '' ">
+       		AND A.CC_APP_NO = #{ccAppNo}
+       	</if>
+       	<if test="mtAppType != null and mtAppType != '' ">
+       		AND B.MT_APP_TYPE = #{mtAppType}
+       	</if>  
+       	AND A.USEYN = 'Y'
+
+	</select>
+	
+	
+	<!-- 설문조사 완료 -->
+	<update id="updateCcApplyPollYn" parameterType="dmap">
+	/* updateCcApplyPollYn */
+	
+		UPDATE CC_APPLY
+		SET
+			POLL_YN = 'Y'
+		WHERE CC_NO = #{ccNo}
+		AND	UNITY_MBERNO = #{SES_USERNO}
+	
+	</update>
+	
+
+	<!-- 합격한 시험 자격증 발급을 위한 SELECT문 -->
+	<select id="examPassInfo" parameterType="dmap" resultType="emap">
+	/* examPassInfo */
+	
+		SELECT AA.*
+		FROM (
+				SELECT
+				      CC_NO
+				    , CC_APP_NO
+				    , POLL_YN
+				    , REPLACE(PASS_DT,'-') AS PASS_DT
+				    , UNITY_MBERNO
+				    , EXAM_NO
+				    , JUMIN1
+				    <!-- , DECODE(JUMIN2_2, NULL, '', SUBSTR(pkg_secu.DECRYPT( JUMIN2_2 ),1,1)) AS JUMIN2 -->
+				    , SUBJECT1
+				    , SUBJECT2
+				    , SUBJECT3
+				    , SUBJECT4
+				    , TOTAL
+				    , AVERAGE
+				    , PASS_YN 
+				    , ADDR_CODE
+				    , ADDRESS
+				    , ADDRESS2
+				 	, TELNO
+				 	, EMAIL
+				 	, MOBLPHON
+				 	, SAVPATH
+				 	, ORGFILE
+				 	, LICENSE_NO
+			        , CASE WHEN ( SELECT NVL(MAX(SAVFILE),'N') FROM CC_LICENSE E WHERE E.CC_NO = A.CC_NO AND E.CC_APP_NO = A.CC_APP_NO AND LICN_NO = #{licnNo} ) != 'N'
+                           THEN ( SELECT MAX(SAVFILE) FROM CC_LICENSE E WHERE E.CC_NO = A.CC_NO AND E.CC_APP_NO = A.CC_APP_NO AND LICN_NO = #{licnNo} )
+                           ELSE SAVFILE
+                            END SAVFILE
+				 	, MAJOR
+				 	, FIN_SCHOOL_NM
+				 	, CASE WHEN REPLACE(PASS_DT,'-')  <![CDATA[ < ]]>  '20170101'
+		                   THEN 'Y'
+		                   ELSE USER_AGREE_YN
+		                    END AS USER_AGREE_YN
+				 	, CASE WHEN REPLACE(PASS_DT,'-')  <![CDATA[ < ]]>  '20170101'
+		                   THEN 'Y'
+		                   ELSE INFO_AGREE_YN
+		                    END AS INFO_AGREE_YN
+				    , MT_SCHOOL_STAT
+				 	, ROW_NUMBER() OVER(ORDER BY PASS_DT DESC) AS RNUM
+					<!-- , CASE WHEN REPLACE(PASS_DT,'-')  <![CDATA[ < ]]>  '20170101'
+                            THEN 'Y'
+                            ELSE CASE WHEN JUMIN1 IS NULL OR JUMIN2 IS NULL OR LENGTH(pkg_secu.decrypt(JUMIN2_2)) <![CDATA[ < ]]> 2 
+                                        OR MT_SCHOOL_STAT IS NULL OR MAJOR IS NULL
+                                      THEN 'N'
+                                      ELSE 'Y'
+                                       END 
+                             END AS PRIVACY_DIV -->
+				FROM CC_APPLY A
+				WHERE 1 = 1 
+				  AND UNITY_MBERNO = #{SES_USERNO}
+				  AND PASS_YN = 'Y'
+				  AND USEYN = 'Y'
+				<choose>
+		             <when test="ccAppNo != null and ccAppNo != ''">
+		                 AND CC_APP_NO = #{ccAppNo}
+		             </when>
+		             <otherwise>
+		                 AND EXISTS ( SELECT *
+                               FROM CC_MST B
+                              WHERE A.CC_NO = B.CC_NO
+                                AND REPLACE(PUBLIC_DATE,'-','' ) <![CDATA[ <= ]]> TO_CHAR(SYSDATE, 'YYYYMMDD') 
+                            )
+		             </otherwise>
+		         </choose>
+			) AA
+		WHERE 1=1
+        AND AA.RNUM = 1
+		
+	</select>
+	
+	
+	<!-- 자격증 신청하기 전에 합격자 접수 일련번호 가져오기  -->
+	<select id="getccAppNoInfo" parameterType="dmap" resultType="emap">
+	/* getccAppNoInfo */
+	
+		SELECT CC_APP_NO
+		FROM CC_APPLY
+		WHERE CC_NO = #{ccNo}
+		AND UNITY_MBERNO = #{SES_USERNO}
+		AND PASS_YN = 'Y'
+		AND USEYN = 'Y'
+	
+	</select>
+	
+	
+	<!-- 자격증 신청 -->
+	<insert id="ccLicenseInsert" parameterType="dmap">
+	/* ccLicenseInsert */
+		
+		INSERT INTO CC_LICENSE
+			(
+				  CC_NO
+				, CC_APP_NO
+				, LICN_NO
+				, REGIST_DT
+				, USEYN
+				, SAVPATH
+				, ORGFILE
+				, SAVFILE
+				, MOBLPHON
+				<if test="telNo != null and telNo != '' ">
+					, TELNO
+				</if>
+				, EMAIL
+				, ADDR_CODE
+				, ADDRESS
+				, ADDRESS2
+				, MT_LICENCE_TYPE
+				<if test="deliEtc != null and deliEtc != '' ">
+					, DELI_ETC  
+				</if>
+				, ISSYN
+			)
+		VALUES
+			(
+				  #{ccNo}
+				, ( SELECT CC_APP_NO
+					FROM ( SELECT CC_APP_NO
+						        , ROW_NUMBER() OVER( ORDER BY CC_NO DESC ) AS RNUM
+						    FROM CC_APPLY WHERE PASS_YN = 'Y' AND USEYN = 'Y' AND UNITY_MBERNO = #{SES_USERNO}
+						 )
+				  WHERE RNUM = '1'
+					
+				  )
+				, #{licnNo}
+				, SYSDATE
+				, 'Y'
+				, #{savePath}
+				, #{orgFile}
+				, #{saveFile}
+				, #{moblPhon}
+				<if test="telNo != null and telNo != '' ">
+					, #{telNo}
+				</if>
+				, #{email}
+				, #{addrCode}
+				, #{address}
+				, #{address2}
+				, #{mtLicenceType}
+				<if test="deliEtc != null and deliEtc != '' ">
+					, #{deliEtc}
+				</if>
+				, 'S'
+			)
+	
+	</insert>
+	
+	<!-- 결제 CC_PAY_NO MAX값 구하기 -->
+	<select id="getCcPayNoMax" resultType="int">
+	/* getCcPayNoMax */
+	
+		SELECT NVL(MAX(CC_PAY_NO), 0) + 1 FROM CC_PAYMENT
+		
+	</select>
+	
+	<!-- 자격증 및 결제 CC_TARGET_NO / LICN_NO 에 들어갈 MAX값 조회 -->
+	<select id="getLicnNoMax" resultType="int" parameterType="dmap">
+	/* getLicnNoMax */
+	
+		SELECT NVL(MAX(LICN_NO), 0) + 1 
+		FROM CC_LICENSE 
+		WHERE CC_NO = #{ccNo} 
+		AND CC_APP_NO = #{ccAppNo}
+	
+	</select>
+	
+	<!-- 자격증 신청시 결제 -->
+	<insert id="licenCcpaymentInsert" parameterType="dmap">
+	/* licenCcpayment */
+	
+		INSERT INTO CC_PAYMENT
+			(
+				  CC_PAY_NO
+				, UNITY_MBERNO
+				, CC_TARGET_NO
+				, MT_TARGET_TYPE
+				, PRICE
+				, MT_PAY_TYPE
+				, REGIST_DT
+				, MT_PAY_STAT
+				, PAT_NO
+				<if test="LGD_TID != null and LGD_TID != '' ">, LGD_TID</if>
+				<if test="LGD_PAYDATE != null and LGD_PAYDATE != '' ">, LGD_PAYDATE</if>
+				<if test="LGD_RESPCODE != null and LGD_RESPCODE != '' ">, LGD_RESPCODE</if>
+				<if test="LGD_FINANCENAME != null and LGD_FINANCENAME != '' ">, LGD_FINANCENAME</if>
+				<if test="LGD_FINANCECODE != null and LGD_FINANCECODE != '' ">, LGD_FINANCECODE</if>
+				<if test="LGD_OID != null and LGD_OID != '' ">, LGD_OID</if>
+				<if test="LGD_PAYER != null and LGD_PAYER != '' ">, LGD_PAYER</if>
+				<if test="LGD_ACCOUNTNUM != null and LGD_ACCOUNTNUM != '' ">, LGD_ACCOUNTNUM</if>
+			)
+			VALUES
+			(
+				  #{ccPayNo}
+				, #{SES_USERNO}
+				, #{licnNo}
+				, 'TT0002'
+				<choose>
+                    <when test='modulUseYn == "Y"'>
+                        #{LGD_PAYER}
+                    </when>
+                    <otherwise>
+                        , '0'
+                    </otherwise>
+                </choose>
+				, 'YT0004'
+				, SYSDATE
+				, 'YS0001'
+				, '1234'
+				<if test="LGD_TID != null and LGD_TID != '' ">, #{LGD_TID}</if>
+				<if test="LGD_PAYDATE != null and LGD_PAYDATE != '' ">, #{LGD_PAYDATE}</if>
+				<if test="LGD_RESPCODE != null and LGD_RESPCODE != '' ">, #{LGD_RESPCODE}</if>
+				<if test="LGD_FINANCENAME != null and LGD_FINANCENAME != '' ">, #{LGD_FINANCENAME}</if>
+				<if test="LGD_FINANCECODE != null and LGD_FINANCECODE != '' ">, #{LGD_FINANCECODE}</if>
+				<if test="LGD_OID != null and LGD_OID != '' ">, #{LGD_OID}</if>
+				<if test="LGD_PAYER != null and LGD_PAYER != '' ">,#{LGD_PAYER}</if>
+				<if test="LGD_ACCOUNTNUM != null and LGD_ACCOUNTNUM != '' ">, #{LGD_ACCOUNTNUM}</if>
+			)
+			
+	</insert>
+	
+	<!-- 사용자 > 신용상담사 > 자격증 발급 취소  -->
+	<update id="licsensCancel" parameterType="dmap">
+	/* licsensCancel */
+	
+		UPDATE CC_LICENSE
+		SET USEYN = 'N'
+		WHERE CC_NO = #{ccNo}
+<!-- 		AND UNITY_MBERNO = #{unityMberNo} -->
+		AND CC_APP_NO = #{ccAppNo}
+		AND LICN_NO = #{licnNo}
+	
+	</update>
+	
+	<!-- 자격증 신청한 내역 수정 -->
+	<update id="ccLicenseUpdate" parameterType="dmap">
+	/* ccLicenseUpdate */
+	
+		UPDATE CC_LICENSE
+		SET 
+		
+			  MOBLPHON = #{moblPhon}
+			<if test="saveFile != null and saveFile !='' ">
+				, SAVPATH = #{savePath}
+				, ORGFILE = #{orgFile}
+				, SAVFILE = #{saveFile}
+			</if>
+			<if test="telNo != null and telNo != '' ">
+				, TELNO = #{telNo}
+			</if>
+			, EMAIL = #{email}
+			, ADDR_CODE = #{addrCode}
+			, ADDRESS = #{address}
+			, ADDRESS2 = #{address2}
+			<if test="deliEtc != null and deliEtc != '' ">
+				, DELI_ETC = #{deliEtc}
+			</if>
+			, MT_LICENCE_TYPE = #{mtLicenceType}
+		WHERE CC_NO = #{ccNo}
+		AND CC_APP_NO = #{ccAppNo}
+		AND LICN_NO = #{licnNo}
+		
+	</update>
+	
+	
+	<!-- 자격증 신청 내역 -->
+	
+	<select id="ccLicenseList" parameterType="dmap" resultType="emap">
+	/* ccLicenseList */
+		
+		SELECT AA.*
+		FROM (
+			SELECT 
+	            A.CC_NO
+	          , ROW_NUMBER() OVER(ORDER BY B.REGIST_DT ASC) AS RNUM
+	          , A.CC_APP_NO
+	          , A.UNITY_MBERNO
+	          , B.LICN_NO 
+	          , B.ISSYN
+	          , B.LICN_DT
+	          , B.MOBLPHON
+	          , B.MT_LICENCE_TYPE
+	          , FN_GET_CMMN_CODE_NM('CF', MT_LICENCE_TYPE)AS MT_APP_NAME
+	          , C.MT_PAY_STAT
+	          , C.CNL_DT
+	        FROM CC_APPLY A, CC_LICENSE B, CC_PAYMENT C
+	        WHERE A.CC_NO = B.CC_NO  
+	        AND B.LICN_NO = C.CC_TARGET_NO
+			AND A.CC_APP_NO = B.CC_APP_NO
+			AND C.REGIST_DT = B.REGIST_DT
+			AND A.UNITY_MBERNO = C.UNITY_MBERNO
+	        AND A.UNITY_MBERNO = #{SES_USERNO}
+	        AND C.MT_TARGET_TYPE = 'TT0002'
+	    ) AA
+        ORDER BY RNUM DESC 
+	
+	</select>
+	
+	
+	<!-- 자격증 신청내역 정보(1줄) -->
+	<select id="ccLicenseInfo" parameterType="dmap" resultType="emap">
+	/* ccLicenseInfo */
+		
+		SELECT 
+	        A.CC_NO
+	      , A.CC_APP_NO
+	      , A.UNITY_MBERNO
+	      , FN_GET_CMMN_CODE_NM('CF', MT_LICENCE_TYPE)AS MT_APP_NAME
+	      , B.LICN_NO
+	      , B.LICN_DT
+	      , B.MOBLPHON
+	      , B.MT_LICENCE_TYPE
+	      , B.SAVPATH
+	      , B.ORGFILE
+	      , B.ISSYN
+	      , B.SAVFILE
+	      , B.EMAIL
+	      , B.TELNO
+	      , B.ADDRESS
+	      , B.ADDR_CODE
+	      , B.ADDRESS2
+	      , B.DELI_ETC
+          , B.FIN_SCHOOL_NM
+          , B.MAJOR_NM
+          , B.MT_SCHOOL_STAT
+          , (SELECT MT_SUB_NAME FROM LMS_CD_MT_SUB WHERE MT_SUB_CODE = B.MT_SCHOOL_STAT) AS SCHOOL_STAT_NM
+	      , (SELECT MT_PAY_STAT 
+	      		FROM CC_PAYMENT C
+	      		WHERE C.CC_TARGET_NO = #{licnNo}
+				 AND C.UNITY_MBERNO = #{SES_USERNO}
+ 				 AND MT_TARGET_TYPE = 'TT0002' GROUP BY MT_PAY_STAT) AS MT_PAY_STAT
+		FROM CC_APPLY A, CC_LICENSE B
+		WHERE A.CC_NO = B.CC_NO
+		AND A.CC_APP_NO = B.CC_APP_NO
+		AND A.UNITY_MBERNO = #{SES_USERNO}
+		AND A.CC_NO = #{ccNo}	
+<!-- 		AND A.CC_APP_NO = #{ccAppNo} -->
+		<if test="licnNo != null and licnNo != '' ">
+			AND B.LICN_NO = #{licnNo}
+		</if>
+		<if test="ccAppNo != null and ccAppNo != '' ">
+			AND A.CC_APP_NO = #{ccAppNo}
+		</if>
+	
+	</select>
+	
+	
+	<!-- 합격자 > 추가정보 입력 -->
+	<insert id="addInfoUpdate" parameterType="dmap">
+	/* addInfoUpdate */
+	 UPDATE CC_APPLY
+		SET JUMIN1 = #{jumin1}
+		  , FIN_SCHOOL_NM = #{finSchoolNm}
+		  , MAJOR      = #{majorNm}
+		  , MT_SCHOOL_STAT = #{mtSchoolStat} 
+		  , JUMIN2_2 = #{jumin2}
+		WHERE UNITY_MBERNO = #{SES_USERNO}
+		  AND PASS_YN = 'Y'
+		  AND REPLACE(PASS_DT,'-') <![CDATA[ > ]]> '20170101'
+	</insert>
+	
+	
+	<!-- 사용자 > 신용상담사 > 보수교육 > 수강하기 > 사용자 정보 -->
+	<select id="refreTraiInfo" resultType="emap">
+		SELECT A.*
+                 , TO_CHAR( TO_DATE(A.EXPRT_DATE,'RRRR.MM.DD'), 'RRRR"년 "MM"월 "DD"일 "') AS EXPRT_DT
+	             , CASE WHEN PAST_EVENT_CNT > 0
+		                    THEN 'Y' 
+		                    WHEN PAST_EVENT_CNT <![CDATA[ <= ]]> 0
+		                    THEN 'N'
+	                          END AS PAST_EVENT_DIV
+	             , ABS(PAST_EVENT_CNT) AS PAST_EVENT
+		FROM (SELECT ROW_NUMBER() OVER(ORDER BY apply.PASS_DT DESC) AS RNM
+                  , mst.YEAR
+				  , mst.MT_APP_TYPE
+                  , FN_GET_CMMN_CODE_NM('CT', mst.MT_APP_TYPE ) AS MT_APP_TYPE_NAME
+                  , mst.MT_ROUND
+                  , FN_GET_CMMN_CODE_NM('RO', mst.MT_ROUND ) AS MT_ROUND_NAME
+                  , apply.EXAM_NO
+                  , unmem.MBERNM
+                  , CASE WHEN apply.JUMIN1 IS NOT NULL
+                                THEN TO_CHAR(TO_DATE(apply.JUMIN1,'YYMMDD'),'YY.MM.DD')
+                                ELSE CASE WHEN LENGTH(unmem.BRTHDY) = 8
+                                          THEN SUBSTR(unmem.BRTHDY,3,2) || '.'  || SUBSTR(unmem.BRTHDY,5,2) || '.'  || SUBSTR(unmem.BRTHDY,7,2)
+                                          WHEN LENGTH(unmem.BRTHDY) = 6
+                                          THEN SUBSTR(unmem.BRTHDY,1,2) || '.'  || SUBSTR(unmem.BRTHDY,3,2) || '.'  || SUBSTR(unmem.BRTHDY,5,2)
+		                				  ELSE '-'
+		                				   END 
+		                	     END AS BRTHDY
+                  , TO_CHAR(TO_DATE(REPLACE(apply.PASS_DT,'-'),'RRRRMMDD'), 'RRRR"년 "MM"월 "DD"일"') AS PASS_DT 
+                  , TO_CHAR(TO_DATE(REPLACE(apply.PASS_DT,'-'),'RRRRMMDD'), 'RRRR"-"MM"-"DD') AS PASS_DATE
+                  , DECODE(TO_DATE(REPLACE(apply.PASS_DT,'-'),'RRRRMMDD'), TO_DATE(REPLACE(apply.REFRESH_DT,'-'),'RRRRMMDD'), '-', TO_CHAR(TO_DATE(REPLACE(apply.REFRESH_DT,'-'),'RRRRMMDD'),'RRRR.MM.DD') ) AS REFRESH_DT
+                  , TO_CHAR(ADD_MONTHS(TO_DATE(REPLACE(apply.REFRESH_DT,'-'),'RRRRMMDD'),36),'RRRR.MM.DD') AS EXPRT_DATE
+                  , TRUNC(SYSDATE - ADD_MONTHS(TO_DATE(REPLACE(apply.REFRESH_DT,'-'),'RRRRMMDD'),36)) AS PAST_EVENT_CNT
+                  , apply.REFRESH_DT AS SYS_DATE
+                  , unmem.UNITY_MBERNO
+                  , unmem.MOBLPHON
+                  , unmem.EMAIL
+               FROM 
+               		CC_APPLY apply
+                  , LMS_CT_UNITY_MBER unmem
+                  , CC_MST mst
+               WHERE 1 = 1
+               AND apply.UNITY_MBERNO = unmem.UNITY_MBERNO  
+               AND apply.CC_NO = mst.CC_NO
+               AND apply.PASS_YN = 'Y'
+               AND apply. USEYN = 'Y'
+               AND APPLY.UNITY_MBERNO = #{SES_USERNO}) A
+         WHERE 1 = 1
+         AND SYSDATE > ADD_MONTHS(TO_DATE(EXPRT_DATE,'RRRR-MM-DD'),-3)
+         AND RNM = '1'
+	</select>
+	
+	
+	<!--  사용자 > 신용상담사 > 보수교육 > 수강하기 > 보수교육 리스트 -->
+	<select id="refreTraiList" resultType="emap">
+	/* refreTraiList */
+	
+    SELECT A.*
+             , TO_CHAR(B.COMP_DATE,'RRRR-MM-DD') AS COMP_DATE 
+             , B.STUDYTIME
+        FROM ( SELECT A.SUBJECT
+                    , ROW_NUMBER() OVER(ORDER BY TREENO ASC) AS RNUM
+                    , A.RUNTIME
+                    , A.TREENO
+                    , A.FILE_PATH
+                    , A.MEDIA_FILE
+                    , A.SDAY
+                    , D.CUSERNO
+                    , C.CSEQNO
+                    , A.COURSENO
+                    , E.SAVPATH
+                    , E.SAVFILE
+             FROM  LMS_ED_COURSE_TREE A
+                    , LMS_ED_COURSE B
+                    , LMS_ED_COURSE_SEQ C
+                    , LMS_LE_COURSE_USER D 
+                    , LMS_ED_COURSE_FILE E
+            WHERE 1 = 1
+                AND A.COURSENO = B.COURSENO
+                AND B.COURSENO = C.COURSENO
+                AND C.CSEQNO    = D.CSEQNO
+                AND B.COURSENO = E.COURSENO
+                AND D.USERNO     =  #{SES_USERNO}
+                AND D.USEYN = 'Y'
+                AND E.THUM_YN = 'Y'
+                AND B.MT_SC_CODE = 'SC6001'
+              ) A
+            , LMS_LE_TREE_HIST B
+        WHERE 1 = 1
+        AND A.TREENO = B.TREENO (+)
+        AND A.CUSERNO = B.CUSERNO (+)
+      ORDER BY A.TREENO
+
+	</select>
+	
+	<insert id="insertCourseUserInfo" parameterType="dmap">
+	  INSERT INTO LMS_LE_COURSE_USER 
+	  			( CUSERNO
+                , CSEQNO
+                , USERNO
+                , USERID
+                , WDATE
+                , USEYN
+                , REAL_STUDY_ST_DATE
+      			 ) VALUES ( 
+      			( SELECT NVL(MAX(CUSERNO),0)+1 FROM LMS_LE_COURSE_USER )
+                , ( SELECT MAX(B.CSEQNO) FROM LMS_ED_COURSE A, LMS_ED_COURSE_SEQ B WHERE A.COURSENO = B.COURSENO AND A.MT_SC_CODE = 'SC6001' )
+                , #{SES_USERNO}
+                , #{SES_USERID}
+                , SYSDATE
+                , 'Y'
+                , SYSDATE
+                )
+	</insert>
+	
+	<select id="selectCourseUserInfo" parameterType="dmap" resultType="emap">
+	   SELECT A.COURSENO
+			     , C.CSEQNO
+			  FROM LMS_ED_COURSE A
+			     , LMS_ED_COURSE_SEQ B
+			     , LMS_LE_COURSE_USER C
+			 WHERE A.COURSENO = B.COURSENO
+			   AND B.CSEQNO   = C.CSEQNO
+			   AND C.USERNO = #{SES_USERNO}
+			   AND A.MT_SC_CODE = 'SC6001'
+	</select>
+	
+	
+	<!-- 시험(일정)공고 원서접수시, 조회수 1 증가 -->
+	<update id="cntIncrease" parameterType="dmap">
+	/* cntIncrease */
+	
+		UPDATE CC_MST
+			SET CNT = CNT + 1
+		WHERE CC_NO = #{ccNo}
+		
+	</update>
+	
+	
+	<!--  수료증 진위여부 확인 > 개인정보 가져오기  -->
+    <select id="certificateCheck" parameterType="dmap" resultType="emap">
+    /* certificateCheck */
+		SELECT SUBSTR(B.MBERNM,1,1) || LPAD('*',LENGTH(B.MBERNM)-2,'*') || SUBSTR(B.MBERNM, LENGTH(B.MBERNM), 1) AS MBERNM
+             , SUBSTR(B.BRTHDY,1,2) || LPAD('*',LENGTH(B.BRTHDY)-4,'*') || SUBSTR(B.BRTHDY, LENGTH(B.BRTHDY)-1, 2) AS BRTHDY
+		     , E.COURSETITLE
+		     , TO_CHAR(A.COMPDATE,'RRRR.MM.DD') AS COMPDATE
+		  FROM LMS_LE_COURSE_USER A
+		     , LMS_CT_UNITY_MBER B
+		     , LMS_ED_COURSE_SEQ C
+		     , LMS_ED_COURSE E
+		 WHERE A.USERNO = B.UNITY_MBERNO 
+		   AND A.CSEQNO = C.CSEQNO
+		   AND C.COURSENO = E.COURSENO
+		   AND REPLACE(COMPCODE,'-') = REPLACE(#{examNo},'-')
+    </select>
+    
+   
+   	<!--  -->
+   	<select id="applyOldNewChk" parameterType="dmap" resultType="emap">
+   	/* applyOldNewChk */
+   	
+   		SELECT A.* 
+		FROM (
+			SELECT
+				ROW_NUMBER() OVER( ORDER BY APP_DT DESC) AS RNUM  
+		      , CC_NO
+		      , CC_APP_NO
+		      , UNITY_MBERNO
+		      , EXAM_NO
+		      , DIS_YN
+		      , PASS_YN
+		      , PASS_DT
+		      , CASE WHEN TO_CHAR(TO_DATE(REPLACE(PASS_DT,'-'), 'RRRRMMDD'), 'RRRR-MM-DD') <![CDATA[ < ]]>  '2017-01-01'
+			      THEN 'O'
+			      ELSE 'N'
+			      END AS APPLYCHK
+		  	FROM CC_APPLY
+		  	WHERE UNITY_MBERNO = #{SES_USERNO}
+	  	) A
+		WHERE RNUM = 1
+		
+	</select>
+	
+	
+	<!-- 완화시험 > 접수 > 탈락 > 다시 완화로 -->
+	<select id="countOldApply" parameterType="dmap" resultType="int">
+	/* countOldApply */
+	
+		SELECT COUNT(*) 
+        FROM CC_APPLY
+        WHERE PASS_YN = 'Y'
+        AND TO_CHAR(TO_DATE(REPLACE(PASS_DT,'-'), 'RRRRMMDD'), 'RRRR-MM-DD') <![CDATA[ < ]]> '2017-01-01'
+        AND UNITY_MBERNO = #{SES_USERNO}
+	
+	</select>
+	
+		<!-- 결제 상태 변경  -->
+	<update id="updatePaymentStat" parameterType="dmap">
+		/* updatePaymentStat */
+		
+		UPDATE CC_PAYMENT
+		SET MT_PAY_STAT = #{mtPayType}
+		WHERE UNITY_MBERNO = #{userNo}
+		AND CC_TARGET_NO = #{targetNo}
+		AND MT_TARGET_TYPE = #{targetType}
+		<if test="lgdOid != null and lgdOid != '' ">
+		AND LGD_OID        = #{lgdOid}
+		</if>
+	
+	</update>
+
+	<!-- 결제 정보 조회 -->
+   	<select id="selectCcPayment" parameterType="dmap" resultType="emap">
+   	/* selectCcPayment */
+		SELECT CC_PAY_NO,
+		       UNITY_MBERNO,
+		       CC_TARGET_NO,
+		       MT_TARGET_TYPE,
+		       PRICE,
+		       MT_PAY_TYPE,
+		        (SELECT MT_SUB_NAME FROM LMS_CD_MT_SUB WHERE MT_CODE = 'YT' AND MT_SUB_CODE = MT_PAY_TYPE ) AS PAY_TYPE_NM,
+		       MT_CARD_TYPE,
+		       CARD_NUM,
+		       CARD_INS,
+		       BANK_NM,
+		       BANK_NUM,
+		       PAY_DT,
+		       PAT_NO,
+		       PAYBACK_DT,
+		       PAYBACK_BANK_NM,
+		       PAYBACK_BANK_NUM,
+		       PAYBACK_NM,
+		       CNL_DT,
+		       CNL_NO,
+		       MT_PAY_STAT,
+		       (SELECT MT_SUB_NAME FROM LMS_CD_MT_SUB WHERE MT_CODE = 'YS' AND MT_SUB_CODE = MT_PAY_STAT ) AS PAY_STAT_NM,
+		       REGIST_DT,
+		       VR_BANK_NM,
+		       VR_BANK_NUM,
+		       LGD_TID,
+		       LGD_PAYDATE,
+		       LGD_RESPCODE,
+		       LGD_FINANCENAME,
+		       LGD_FINANCECODE,
+		       LGD_OID,
+		       LGD_PAYER,
+		       LGD_ACCOUNTNUM
+		  FROM CC_PAYMENT
+		  WHERE UNITY_MBERNO = #{userNo}
+		  AND CC_TARGET_NO = #{targetNo}
+		  AND MT_TARGET_TYPE = #{targetType}
+		  AND MT_PAY_STAT = 'YS0002'
+		  
+	</select>
+	
+	<!-- uplus 결제 정보 입력 -->
+	<insert id="insertTzUplusPayment" parameterType="dmap">
+	/* insertTzUplusPayment */
+	INSERT INTO TZ_UPLUS_PAYMENT (
+	   LGD_OID, 
+	   LGD_RESPCODE, 
+	   LGD_RESPMSG, 
+	   LGD_MID, 
+	   LGD_TID, 
+	   LGD_AMOUNT, 
+	   LGD_PAYTYPE, 
+	   LGD_PAYDATE, 
+	   LGD_FINANCECODE, 
+	   LGD_FINANCENAME, 
+	   LGD_BUYER, 
+	   LGD_BUYERID, 
+	   LGD_BUYERPHONE, 
+	   LGD_BUYEREMAIL, 
+	   LGD_PRODUCTINFO, 
+	   LGD_CARDNUM, 
+	   LGD_CARDINSTALLMONTH, 
+	   LGD_CARDNOINTYN, 
+	   LGD_FINANCEAUTHNUM, 
+	   LGD_CASHRECEIPTNUM, 
+	   LGD_CASHRECEIPTSELFYN, 
+	   LGD_CASHRECEIPTKIND, 
+	   LGD_ACCOUNTNUM, 
+	   LGD_CASTAMOUNT, 
+	   LGD_CASCAMOUNT, 
+	   LGD_CASFLAG, 
+	   LGD_CASSEQNO) 
+	VALUES (
+		#{LGD_OID},
+	 	#{LGD_RESPCODE},
+	 	#{LGD_RESPMSG},
+	 	#{LGD_MID},
+	 	#{LGD_TID},
+	 	#{LGD_AMOUNT},
+	 	#{LGD_PAYTYPE},
+	 	#{LGD_PAYDATE},
+	 	#{LGD_FINANCECODE},
+	 	#{LGD_FINANCENAME},
+	 	#{LGD_BUYER},
+	 	#{LGD_BUYERID},
+	 	#{LGD_BUYERPHONE},
+	 	#{LGD_BUYEREMAIL},
+	 	#{LGD_PRODUCTINFO},
+	 	#{LGD_CARDNUM},
+	 	#{LGD_CARDINSTALLMONTH},
+	 	#{LGD_CARDNOINTYN},
+	 	#{LGD_FINANCEAUTHNUM},
+	 	#{LGD_CASHRECEIPTNUM},
+	 	#{LGD_CASHRECEIPTSELFYN},
+	 	#{LGD_CASHRECEIPTKIND},
+	 	#{LGD_ACCOUNTNUM},
+	 	#{LGD_CASTAMOUNT},
+	 	#{LGD_CASCAMOUNT},
+	 	#{LGD_CASFLAG},
+	 	#{LGD_CASSEQNO} )
+	</insert>
+
+	<!-- uplus 취소 정보 입력 -->
+	<insert id="insertTzUplusCancel" parameterType="dmap">
+	/* insertTzUplusCancel */
+	INSERT INTO TZ_UPLUS_CANCEL (
+	   LGD_OID, 
+	   LGD_RESPCODE, 
+	   LGD_RESPMSG, 
+	   LGD_PAYTYPE, 
+	   LGD_MID, 
+	   LGD_TID, 
+	   LGD_RESPDATE, 
+	   LGD_CANREQDATE, 
+	   LGD_RESREMAINAMOUNT, 
+	   LGD_CANCELAMOUNT, 
+	   ACCOUNT_NAME, 
+	   ACCOUNT_BANK, 
+	   ACCOUNT_NUM, 
+	   CONFIRM_YN, 
+	   REFUND_YN, 
+   	   REFUND_DATE, 
+   	   REFUND_AMOUNT
+   	   ) VALUES (
+   	    #{LGD_OID},
+		 #{LGD_RESPCODE},
+		 #{LGD_RESPMSG},
+		 #{LGD_PAYTYPE},
+		 #{LGD_MID},
+		 #{LGD_TID},
+		 #{LGD_RESPDATE},
+		 #{LGD_CANREQDATE},
+		 #{LGD_RESREMAINAMOUNT},
+		 #{LGD_CANCELAMOUNT},
+		 #{ACCOUNT_NAME},
+		 #{ACCOUNT_BANK},
+		 #{ACCOUNT_NUM},
+		 #{CONFIRM_YN},
+		 #{REFUND_YN},
+		 #{REFUND_DATE},
+		 #{REFUND_AMOUNT} )
+	</insert>
+   	
+	<select id="selectPrintChkInfo" resultType="emap">
+ 		SELECT A.*
+            , TO_CHAR( TO_DATE(REPLACE(EXPRT_DATE,'.'),'RRRRMMDD'), 'RRRR"년 "MM"월 "DD"일 "') AS EXPRT_DT
+        	, CASE WHEN PAST_EVENT_CNT > 0
+                   THEN 'Y' 
+                   WHEN PAST_EVENT_CNT <![CDATA[ <= ]]> 0
+                   THEN 'N'
+                    END AS PAST_EVENT_DIV
+            , ABS(PAST_EVENT_CNT) AS PAST_EVENT
+            , CASE WHEN REPLACE(PASS_DATE,'-') != REPLACE(REFRESH_DT,'.') AND TO_CHAR(SYSDATE,'RRRRMMDD') BETWEEN TO_CHAR(TO_DATE(REPLACE(A.REFRESH_DT,'.'),'RRRRMMDD'),'RRRRMMDD') AND TO_CHAR(ADD_MONTHS(TO_DATE(REPLACE(A.REFRESH_DT,'.'),'RRRRMMDD'),12),'RRRRMMDD')
+                   THEN 'Y'
+                   ELSE 'N'
+                    END AS REFRESH_DIV
+            , CASE WHEN SYSDATE > ADD_MONTHS(TO_DATE(REPLACE(EXPRT_DATE,'.'),'RRRRMMDD'),-3)
+            	   THEN 'Y'
+            	   ELSE 'N'
+            	    END AS EXPRT_DATE_DIV
+		   FROM ( SELECT mst.YEAR
+				        , mst.MT_APP_TYPE
+		                , FN_GET_CMMN_CODE_NM('CT', mst.MT_APP_TYPE ) AS MT_APP_TYPE_NAME
+		                , mst.MT_ROUND
+		                , FN_GET_CMMN_CODE_NM('RO', mst.MT_ROUND ) AS MT_ROUND_NAME
+		                , apply.EXAM_NO
+		                , unmem.MBERNM
+		                , CASE WHEN apply.JUMIN1 IS NOT NULL
+                                THEN TO_CHAR(TO_DATE(apply.JUMIN1,'YYMMDD'),'YY.MM.DD')
+                                ELSE CASE WHEN LENGTH(unmem.BRTHDY) = 8
+                                          THEN SUBSTR(unmem.BRTHDY,3,2) || '.'  || SUBSTR(unmem.BRTHDY,5,2) || '.'  || SUBSTR(unmem.BRTHDY,7,2)
+                                          WHEN LENGTH(unmem.BRTHDY) = 6
+                                          THEN SUBSTR(unmem.BRTHDY,1,2) || '.'  || SUBSTR(unmem.BRTHDY,3,2) || '.'  || SUBSTR(unmem.BRTHDY,5,2)
+		                				  ELSE '-'
+		                				   END 
+		                	     END AS BRTHDY
+	                    , TO_CHAR(TO_DATE(REPLACE(apply.PASS_DT,'-'),'RRRRMMDD'), 'RRRR"년 "MM"월 "DD"일"') AS PASS_DT 
+	                    , TO_CHAR(TO_DATE(REPLACE(apply.PASS_DT,'-'),'RRRRMMDD'), 'RRRR"-"MM"-"DD') AS PASS_DATE
+	                    , DECODE(TO_DATE(REPLACE(apply.PASS_DT,'-'),'RRRRMMDD'), TO_DATE(REPLACE(apply.REFRESH_DT,'-'),'RRRRMMDD'), '', TO_CHAR(TO_DATE(REPLACE(apply.REFRESH_DT,'-'),'RRRRMMDD'),'RRRR.MM.DD') ) AS REFRESH_DT
+	                    , TO_CHAR(ADD_MONTHS(TO_DATE(REPLACE(apply.REFRESH_DT,'-'),'RRRRMMDD'),36),'RRRR.MM.DD') AS EXPRT_DATE
+	                    , TRUNC(SYSDATE - ADD_MONTHS(TO_DATE(REPLACE(apply.REFRESH_DT,'-'),'RRRRMMDD'),36)) AS PAST_EVENT_CNT
+		                , apply.REFRESH_DT AS SYS_DATE
+		                , unmem.UNITY_MBERNO
+		                , unmem.MOBLPHON
+		                , unmem.EMAIL
+		                , apply.CC_NO
+                		, apply.CC_APP_NO
+		             FROM CC_APPLY apply
+		                , LMS_CT_UNITY_MBER unmem
+		                , CC_MST mst
+		             WHERE 1 = 1
+		             AND apply.UNITY_MBERNO = unmem.UNITY_MBERNO  
+		             AND apply.CC_NO = mst.CC_NO
+		             AND apply.USEYN = 'Y'
+		             AND apply.PASS_YN = 'Y'
+		             AND APPLY.UNITY_MBERNO = #{SES_USERNO}
+<!-- 		             AND REPLACE(apply.PASS_DT,'-') >= '20170101' -->
+		       ) A
+       WHERE 1 = 1 
+         AND REPLACE(PASS_DATE,'-') != REPLACE(REFRESH_DT,'.')
+         AND TO_CHAR(SYSDATE,'RRRRMMDD') BETWEEN TO_CHAR(TO_DATE(REPLACE(A.REFRESH_DT,'.'),'RRRRMMDD'),'RRRRMMDD') AND TO_CHAR(ADD_MONTHS(TO_DATE(REPLACE(A.REFRESH_DT,'.'),'RRRRMMDD'),12),'RRRRMMDD')
+	</select>
+	
+	
+	<!-- 자격증 신청, 추가 입력한 정보들 또 입력 하지 않기 위해 가져오는 값들-->
+	<select id="getuserLicenseInfo" resultType="emap" parameterType="dmap">
+	/* getuserLicenseInfo */
+		SELECT AA.* 
+		FROM (
+				SELECT
+				      A.CC_NO
+				    , A.CC_APP_NO
+				    , A.UNITY_MBERNO
+				    , A.JUMIN1
+<!-- 				    , A.JUMIN2 -->
+				    , A.FIN_SCHOOL_NM
+				    , A.MAJOR_NM
+				    , A.MT_SCHOOL_STAT
+				    , B.SAVPATH
+                    , B.SAVFILE
+				    , ROW_NUMBER() OVER(ORDER BY B.REGIST_DT DESC) AS RNUM
+				FROM CC_APPLY A
+				INNER JOIN CC_LICENSE B
+				ON A.CC_NO = B.CC_NO
+				AND A.CC_APP_NO = B.CC_APP_NO
+				WHERE A.USEYN = 'Y'
+				AND A.UNITY_MBERNO = #{SES_USERNO}
+			) AA
+		WHERE 1=1
+		AND AA.RNUM = 1
+	</select>
+	
+	
+	<!-- 자격증 신청 전, 동의여부 체크 -->
+	<update id="updateaAgreeYn" parameterType="dmap">
+	/* updateaAgreeYn */
+		
+		UPDATE CC_APPLY
+		SET USER_AGREE_YN = 'Y'
+		, INFO_AGREE_YN = 'Y'
+		WHERE UNITY_MBERNO = #{SES_USERNO}
+		AND USEYN = 'Y'
+		
+	</update>
+	
+	<select id="selectCourseAddEduInfo" parameterType="dmap" resultType="emap">
+	   SELECT A.COURSENO
+		    , C.CSEQNO
+		 FROM LMS_ED_COURSE A
+		    , LMS_ED_COURSE_SEQ B
+		    , LMS_LE_COURSE_USER C
+		WHERE A.COURSENO  = B.COURSENO
+		  AND B.CSEQNO    = C.CSEQNO
+		  AND C.USERNO    = #{SES_USERNO}
+		  AND A.MT_SC_CODE = 'SC7001'
+	</select>
+	
+	
+	
+	<insert id="insertAddEduInfo" parameterType="dmap">
+	  INSERT INTO LMS_LE_COURSE_USER 
+	  			( CUSERNO
+                , CSEQNO
+                , USERNO
+                , USERID
+                , WDATE
+                , USEYN
+                , REAL_STUDY_ST_DATE
+      			 ) VALUES ( 
+      			( SELECT NVL(MAX(CUSERNO),0)+1 FROM LMS_LE_COURSE_USER )
+                , ( SELECT MAX(B.CSEQNO) FROM LMS_ED_COURSE A, LMS_ED_COURSE_SEQ B WHERE A.COURSENO = B.COURSENO AND A.MT_SC_CODE = 'SC7001' )
+                , #{SES_USERNO}
+                , #{SES_USERID}
+                , SYSDATE
+                , 'Y'
+                , SYSDATE
+                )
+	</insert>
+	
+	
+	<select id="selectAddEduInfoCnt" parameterType="dmap" resultType="int">
+	   SELECT COUNT(*)
+		 FROM LMS_ED_COURSE A
+            , LMS_ED_COURSE_SEQ B
+            , LMS_LE_COURSE_USER C
+        WHERE A.COURSENO  = B.COURSENO
+          AND B.CSEQNO    = C.CSEQNO
+          AND A.MT_SC_CODE = 'SC7001'
+          AND C.ISPASS = 'Y'
+		  AND C.USERNO    = #{SES_USERNO}
+	</select>
+	
+	<select id="selectPassCnt" parameterType="dmap" resultType="int">
+		SELECT CASE WHEN (SELECT COUNT(*) FROM CC_APPLY WHERE PASS_YN = 'Y' AND UNITY_MBERNO = #{SES_USERNO}) > 1
+					THEN 0
+					ELSE ( SELECT COUNT(*)
+				             FROM CC_APPLY
+				            WHERE 1 = 1
+				              AND REPLACE(PASS_DT,'-') <![CDATA[ < ]]> '20170101'
+				              AND UNITY_MBERNO = #{SES_USERNO}
+					     )
+					  END 
+		  FROM DUAL
+    </select> 
+	
+	<select id="selectAddEduList" resultType="emap">
+		SELECT A.*
+             , TO_CHAR(B.COMP_DATE,'RRRR-MM-DD') AS COMP_DATE 
+             , B.STUDYTIME
+        FROM ( SELECT A.SUBJECT
+                    , ROW_NUMBER() OVER(ORDER BY TREENO ASC) AS RNUM
+                    , A.RUNTIME
+                    , A.TREENO
+                    , A.FILE_PATH
+                    , A.MEDIA_FILE
+                    , A.SDAY
+                    , D.CUSERNO
+                    , C.CSEQNO
+                    , A.COURSENO
+             FROM  LMS_ED_COURSE_TREE A
+                    , LMS_ED_COURSE B
+                    , LMS_ED_COURSE_SEQ C
+                    , LMS_LE_COURSE_USER D 
+            WHERE 1 = 1
+                AND A.COURSENO = B.COURSENO
+                AND B.COURSENO = C.COURSENO
+                AND C.CSEQNO    = D.CSEQNO
+                AND D.USERNO     =  #{SES_USERNO}
+                AND D.USEYN = 'Y'
+                AND B.MT_SC_CODE = 'SC7001'
+              ) A
+            , LMS_LE_TREE_HIST B
+        WHERE 1 = 1
+        AND A.TREENO = B.TREENO (+)
+        AND A.CUSERNO = B.CUSERNO (+)
+      ORDER BY A.TREENO
+	</select>
+	
+	<select id="selectRefreTraiReList" resultType="emap">
+     SELECT A.COURSENO
+          , B.MEDIA_FILE
+          , B.SUBJECT
+          , ROW_NUMBER() OVER(ORDER BY TREENO ASC) AS RNUM
+          , B.RUNTIME
+       FROM (SELECT COURSENO
+                  , ROWNUM AS RNM
+               FROM LMS_ED_COURSE A
+              WHERE MT_SC_CODE = 'SC6001'
+                AND USEYN = 'Y'
+            ) A
+          , LMS_ED_COURSE_TREE B
+        WHERE A.RNM = 1
+          AND A.COURSENO = B.COURSENO
+       ORDER BY TREENO ASC
+	</select>
+	
+	<!-- 응시장소 리스트 조회 -->
+	<select id="getCcPlaceList" parameterType="dmap" resultType="emap">
+	/* getCcPlaceList */
+		SELECT 
+            CC_PLACE_NO
+            , CC_NO 
+            , FN_GET_CMMN_CODE_NM('CP', MT_CC_PLACE)AS MT_CC_PLACE
+            <!-- , (SELECT MT_SUB_NAME FROM LMS_CD_MT_SUB B WHERE A.MT_CC_PLACE = B.MT_SUB_CODE) AS MT_CC_PLACE -->
+            , (SELECT COUNT(*) FROM CC_APPLY B WHERE A.CC_NO = B.CC_NO AND A.CC_PLACE_NO = B.CC_PLACE_NO AND B.USEYN = 'Y') AS APPLY_CNT
+			, PLACE_TYPE
+			, PLACE_TITLE
+			, PLACE_CNT
+		FROM 
+			CC_PLACE A
+		WHERE 
+			CC_NO = #{ccNo}
+		AND
+			USEYN = 'Y'
+        ORDER BY CC_PLACE_NO
+	</select>
+	
+	<!-- 응시장소 응시인원 조회(Ajax) -->
+	<select id="selectAjaxPlaceChk" parameterType="dmap" resultType="emap">
+	/* selectAjaxPlaceChk */
+ 		SELECT
+            CASE WHEN ((SELECT COUNT(*) FROM CC_APPLY WHERE CC_NO = #{ccNo} AND CC_PLACE_NO = #{cc_place_no} AND USEYN = 'Y') <![CDATA[ < ]]> PLACE_CNT)
+            THEN 'Y'
+            ELSE 'N'
+            END AS PLACE_CHK
+            , PLACE_CNT
+            , CASE WHEN PLACE_TYPE = 'Y' THEN '추후공지'
+            		ELSE PLACE_TITLE 
+            		END PLACE_TITLE
+            , CC_PLACE_NO
+            , CC_NO
+            , FN_GET_CMMN_CODE_NM('CP', MT_CC_PLACE)AS MT_CC_PLACE
+        FROM CC_PLACE
+        WHERE CC_NO = #{ccNo}
+        AND CC_PLACE_NO = #{cc_place_no} 
+	</select>
+	
+</mapper>

@@ -1,0 +1,67 @@
+<%
+/****************************************
+    subject : 회원관리
+    summary : 회원관리 : 회원 확인
+    author  : SANGS
+    date    : 2018-06-15
+****************************************/
+%>
+<%@ page language="java" contentType="text/html; charset=utf-8" pageEncoding="utf-8"%>
+<%@ include file="/WEB-INF/jsp/ccedu/inc/taglib_inc.jsp"%>
+<%@ include file="/WEB-INF/jsp/ccedu/inc/head_inc.jsp"%>
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+<script type="text/javascript">
+
+$(function(){
+	
+	var retcode = '${retcode}';
+	if(retcode == 'B000'){
+		certKCBIpin();
+	}else{
+		fnConfirm("일시적인 오류가 발생하였습니다.", function(result) {
+			
+			opener.document.frm.action = '/ccedu/user/memberJoinStep02.do';
+			opener.document.frm.submit();
+			self.close();
+			return false;
+		});
+		return false;
+	}
+	
+});
+
+function certKCBIpin(){
+	
+//	document.kcbInForm.target = "_self";
+
+
+	//KCB 테스트서버를 호출할 경우
+	//document.kcbInForm.action = "https://tipin.ok-name.co.kr:8443/tis/ti/POTI01A_LoginRP.jsp";
+
+	//KCB 운영서버를 호출할 경우
+	document.kcbInForm.action = "https://ipin.ok-name.co.kr/tis/ti/POTI01A_LoginRP.jsp";
+
+	document.kcbInForm.submit();
+	return	;
+}
+</script>
+</head>
+<body>
+
+
+	<form name="kcbInForm" method="post" >
+		<input type="hidden" name="IDPCODE" value="${idpCode}" />
+		<input type="hidden" name="IDPURL" value="${idpUrl }" />
+		<input type="hidden" name="CPCODE" value="${cpCode }" />	
+		<input type="hidden" name="CPREQUESTNUM" value="${curtime }" />
+		<input type="hidden" name="RETURNURL" value="${returnUrl }" />
+		<input type="hidden" name="WEBPUBKEY" value="${pubkey }" />
+		<input type="hidden" name="WEBSIGNATURE" value="${sig }" />
+		<input type="hidden" name="MODULETYPE" value="${moduleType }" />
+	</form>	
+	
+	
+</body>
+</html>

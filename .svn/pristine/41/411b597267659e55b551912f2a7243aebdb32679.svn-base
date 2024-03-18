@@ -1,0 +1,38 @@
+<%
+/****************************************
+    subject : 좌측 메뉴
+    summary : 좌측 메뉴 : 지식마당(04)
+    author  : SANGS
+    date    : 2018-06-27
+****************************************/
+%>
+<%@ page language="java" contentType="text/html; charset=utf-8" pageEncoding="utf-8"%>
+<%
+	String dep2 = (String)request.getParameter("dep2"); 
+	String dep3 = (String)request.getParameter("dep3");
+%>
+
+
+<h2>지식마당</h2>
+	<ul class="lnb_menu">
+		<li <%if("01".equals(dep2)) out.print("class=\"on\""); %>>
+			<a href="#none" onclick="toggleLNB(this); return false;"><span>신용지식UP</span></a>
+			<ul>
+				<li><a href="/ccedu/intellectual/creditTermDctnr.do" <%if("01".equals(dep2) && "01".equals(dep3)) out.print("class=\"on\""); %>><span>신용용어 사전</span></a></li>
+				<li><a href="/ccedu/intellectual/boardList.do?bcateno=9" <%if("01".equals(dep2) && "02".equals(dep3)) out.print("class=\"on\""); %>><span>지식자료실</span></a></li>
+			</ul>
+		</li>
+		<li <%if("02".equals(dep2)) out.print("class=\"on\""); %>>
+			<a href="#none" onclick="toggleLNB(this); return false;"><span>커뮤니티</span></a>
+			<ul>
+				<li><a href="/ccedu/intellectual/cmtBoardList.do?bcateno=10" <%if("02".equals(dep2) && "01".equals(dep3)) out.print("class=\"on\""); %>><span>자유게시판</span></a></li>
+				<li><a href="/ccedu/intellectual/sitePollList.do" <%if("02".equals(dep2) && "02".equals(dep3)) out.print("class=\"on\""); %>><span>설문조사</span></a></li>
+			</ul>
+		</li>
+		<li <%if("03".equals(dep2)) out.print("class=\"on\""); %>>
+			<a href="/ccedu/intellectual/financialCalculator.do" ><span>금융계산기</span></a>
+		</li>
+		<li <%if("04".equals(dep2)) out.print("class=\"on\""); %>>
+			<a href="/ccedu/intellectual/creditHealthCheckupInfo.do" ><span>신용건강검진</span></a>
+		</li>
+	</ul>

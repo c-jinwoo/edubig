@@ -1,0 +1,357 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.webapp.common.mapper.CommonUserMapper">
+
+	<!-- 회원정보(통합회원코드기준)  -->
+	<select id="getUserInfo"  resultType="emap" parameterType="int">
+		SELECT
+            T1.UNITY_MBERNO AS USERNO
+            , T1.UNITY_ID AS USERID
+            , T1.MBERNM AS USERNAME 
+            , T1.EMAIL
+            , T1.MOBLPHON AS MOBILE  
+            , T1.MT_GRADE_CODE  
+            , GET_MTCODE_NAME(T1.MT_GRADE_CODE) MT_GRADE_NAME
+            , T2.NUM_CD MT_GRADE_NUM
+            
+        FROM
+            LMS_CT_UNITY_MBER T1, LMS_CD_MT_SUB T2
+        WHERE 1=1
+            AND T1.MT_GRADE_CODE = T2.MT_SUB_CODE
+			AND T1.USERNO = #{userNo}
+	</select>
+	
+	<!-- 회원정보(LMS회원코드기준)  -->
+	<select id="getUserLmsInfo"  resultType="emap" parameterType="dmap">
+		SELECT
+            T1.UNITY_MBERNO AS USERNO
+            , T1.UNITY_ID AS USERID
+            , T1.MBERNM AS USERNAME 
+            , T1.EMAIL
+            , T1.MOBLPHON AS MOBILE  
+            , T1.MT_GRADE_CODE  
+            , T1.BRTHDY
+            , T1.SESSION_ID
+            <if test="noMtSubCode == null">
+	            , T2.NUM_CD AS MT_GRADE_NUM
+    	    </if>
+            , (SELECT MT_SUB_NAME FROM LMS_CD_MT_SUB T3 WHERE T3.MT_SUB_CODE = T1.MT_GRADE_CODE) MT_GRADE_NAME
+<!--             , (SELECT STATUS_GB FROM LMS_CT_COMPANY WHERE COMNO = T1.COMNO) AS STATUS_GB -->
+
+        FROM
+            LMS_CT_UNITY_MBER T1
+            <if test="noMtSubCode == null">
+            , LMS_CD_MT_SUB T2
+            </if>
+        WHERE 1=1
+	        <if test="noMtSubCode == null">
+		        AND T1.MT_GRADE_CODE = T2.MT_SUB_CODE
+    	    </if>
+            AND T1.UNITY_MBERNO = #{userNo}
+	</select>
+	
+	 <!-- 이메일 인증 승인 -->
+    <update id="updateAuthCodeInfo" parameterType="dmap">
+        UPDATE LMS_CT_UNITY_MBER SET REG_AT = #{regAt}
+        <if test="authCode != null and authCode != ''">
+            , AUTH_CODE = #{authKey}
+        </if>
+        <if test="regUserId != null and regUserId != ''">
+            , UNITY_ID = #{regUserId}
+            , REG_DATE = SYSDATE
+            , EMAIL = #{email}
+        </if>
+        WHERE COMNO = #{comNo} 
+        AND REG_USERID IS NULL
+        AND UNITY_ID = #{regUserId}
+
+    </update>
+    
+	<!-- 로그인 회원정보 가져오기 -->
+	<select id="getLoginUserInfo"  resultType="emap" parameterType="dmap">
+		SELECT 
+             A.UNITY_MBERNO AS USERNO
+            , A.UNITY_ID AS USERID  
+            , UNITY_PASSWORD AS PWD 
+            , A.MT_GRADE_CODE
+            , A.SECSN_AT AS CANCEL_YN 
+            , A.MBERNM AS USERNAME
+            , NVL(LOGIN_FAIL_CNT, 0) AS LOGIN_FAIL_CNT
+            , REG_AT 
+            , CASE WHEN LENGTH(BRTHDY) > 7 THEN SUBSTR(BRTHDY,3)
+           		ELSE BRTHDY END  BRTHDY_CD
+           	, BRTHDY     
+            , SUBSTR(MOBLPHON,1,INSTR(MOBLPHON,'-',1,1)-1) AS MOBLPHON1
+            , SUBSTR(MOBLPHON,INSTR(MOBLPHON,'-',1,1)+1,INSTR(MOBLPHON,'-',1,2)-INSTR(MOBLPHON,'-',1,1)-1) AS MOBLPHON2
+            , SUBSTR(MOBLPHON,INSTR(MOBLPHON,'-',1,2)+1) AS MOBLPHON3
+            , SUBSTR(TELNO,1,INSTR(TELNO,'-',1,1)-1) AS TELNO1
+            , SUBSTR(TELNO,INSTR(TELNO,'-',1,1)+1,INSTR(TELNO,'-',1,2)-INSTR(TELNO,'-',1,1)-1) AS TELNO2
+            , SUBSTR(TELNO,INSTR(TELNO,'-',1,2)+1) AS TELNO3     
+            , SUBSTR(EMAIL,1,INSTR(EMAIL,'@',1,1)-1) AS EMAIL1
+            , SUBSTR(EMAIL,INSTR(EMAIL,'@',1,1)+1) AS EMAIL2  
+            , LNM_ZIP
+            , LNM_ADRES1
+            , LNM_ADRES2   
+            , JOB
+            , USER_PATH
+            , SEX
+            , EMAIL_RECPTN_AT
+            , SMS_RECPTN_AT
+            , USER_ETC
+            , CASE WHEN  SYSDATE <![CDATA[>]]> PW_UPD_DT + 90  THEN 'Y'
+                ELSE 'N' END AS CHANGE_PWD
+			, CASE WHEN  (SELECT COUNT(*) FROM LMS_CT_UNITY_MBER WHERE KCB_DI = #{di})<![CDATA[ > ]]> 0 THEN 'Y'
+                ELSE 'N' END AS JOIN_DUP_CHK  /*중복 가입 여부 체크*/ 
+        FROM LMS_CT_UNITY_MBER A
+        WHERE UNITY_ID = #{userId}
+        AND SECSN_AT = 'N'
+        AND REG_AT = 'Y'
+	</select>
+	
+	
+	<!-- 로그인 회원정보 가져오기 SNS-->
+	<select id="getUserInfoBySNSId"  resultType="emap" parameterType="dmap">
+		SELECT 
+    		A.UNITY_ID
+		FROM 
+   			LMS_CT_UNITY_MBER A
+    		, LMS_CT_UNITY_MBER_SNS B
+		WHERE
+    		A.UNITY_MBERNO = B.UNITY_MBERNO
+    		AND A.SECSN_AT = 'N'
+   			AND B.SNS_ID = #{snsUserId}
+    		AND B.USE_YN = 'Y'
+	</select>	
+    
+	
+	<!-- 이메일 중복체크 -->
+	<select id="getUserInfoDuplByEmail"  resultType="emap" parameterType="dmap">
+		SELECT
+			UNITY_MBERNO
+        FROM
+        	LMS_CT_UNITY_MBER 
+        WHERE
+        	EMAIL = #{email}
+        	AND SECSN_AT = 'N'
+	</select>
+	
+	<!-- 
+	공통 > 개인정보조회이력관리  
+	-->
+	<insert id="insertMbrTransLog"  parameterType="dmap">
+		INSERT INTO LMS_SY_TRANS_LOG (
+	          TRANS_SEQ
+			, SYS_GB
+			, TRANS_USERNO
+			, TRANS_USERID
+			, TRANS_USERNAME
+			, TRANS_IP
+			, TRANS_GB
+			, TRANS_DT
+			, SUMMARY
+			, PROG_ID
+			, PROG_NM
+    	) VALUES (
+          	  (SELECT NVL(MAX(TRANS_SEQ),0) + 1 FROM LMS_SY_TRANS_LOG)
+	        , #{sysGb}
+	        , #{transUserNo}
+	        , #{transUserId}
+	        , #{transUserName}
+	        , #{transIp}
+	        , #{transGb}
+	        , SYSDATE
+	        , #{summary}
+	        , #{progId}
+	        , #{progNm}
+    	)
+	</insert>
+	
+	<!-- 
+	공통 > 로그인이력관리  
+	-->
+	<insert id="insertMbrLoginLog" parameterType="dmap">
+		INSERT INTO LMS_SY_LOGIN_LOG (
+	          LOGIN_SEQ
+			, SYS_GB
+			, TRANS_USERNO
+			, TRANS_USERID
+			, TRANS_USERNAME
+			, TRANS_IP
+			, TRANS_GB
+			, TRANS_DT
+			, SUMMARY
+    	) VALUES (
+          	  (SELECT NVL(MAX(LOGIN_SEQ),0) + 1 FROM LMS_SY_LOGIN_LOG)
+	        , #{sysGb}
+	        , #{transUserNo}
+	        , #{transUserId}
+	        , #{transUserName}
+	        , #{transIp}
+	        , #{transGb}
+	        , SYSDATE
+	        , #{summary}
+    	)
+	</insert>
+	
+	<!-- 사용자테이블 로그인 실패 횟수 업데이트 -->
+	<update id="updateLoginFailCntInfo" parameterType="dmap">
+		UPDATE LMS_CT_UNITY_MBER SET 
+			LOGIN_FAIL_CNT = NVL( (SELECT LOGIN_FAIL_CNT FROM LMS_CT_UNITY_MBER WHERE UNITY_ID = #{userId}) , 0) +1
+		WHERE UNITY_ID = #{userId}
+	</update>
+	
+	<!-- 로그인 성공 (실패횟수 0으로 초기화) -->
+	<update id="updateLoginSuccessInfo" parameterType="dmap">
+		UPDATE LMS_CT_UNITY_MBER SET 
+			LOGIN_FAIL_CNT = 0
+			, LOGIN_DATE = SYSDATE
+		WHERE UNITY_ID = #{userId}
+	</update>
+	
+	<select id="selectLoginFailCntInfo"  resultType="emap" parameterType="dmap">
+		SELECT NVL(LOGIN_FAIL_CNT,0) AS LOGIN_FAIL_CNT
+		FROM LMS_CT_UNITY_MBER
+		WHERE UNITY_ID = #{userId}
+	</select>
+	
+	<!-- 로그인 세션아이디 체크 -->
+	<select id="getLoginSessionInfo"  resultType="emap" parameterType="dmap">
+		SELECT
+			UNITY_MBERNO
+			, SESSION_ID
+			, LOGIN_DATE
+			, MBERNM
+		    , MT_GRADE_CODE
+		    , SNS_LOGIN_TYPE
+		FROM
+			LMS_CT_UNITY_MBER
+		WHERE UNITY_MBERNO = #{SES_USERNO}
+			AND UNITY_ID = #{SES_USERID}
+	</select>
+	
+	
+	<!-- 로그인 회원정보 가져오기 -->
+	<select id="getLoginUserList"  resultType="emap" parameterType="dmap">
+		SELECT 
+             UNITY_MBERNO AS USERNO
+            , UNITY_ID AS USERID 
+        FROM LMS_CT_UNITY_MBER
+        ORDER BY UNITY_MBERNO ASC
+	</select>
+	  
+	  <!-- 로그인 회원정보 가져오기 -->
+	<select id="getCuserNo"  resultType="emap" parameterType="dmap">
+		SELECT CUSERNO FROM LMS_LE_COURSE_USER WHERE USERNO=#{USERNO} AND CSEQNO=#{paramcSeqNo} AND USEYN='Y'
+	</select>
+	
+	  <!-- 설문 참여 이력 조회 -->
+	<select id="getPollHist"  resultType="emap" parameterType="dmap">
+		SELECT COUNT(*) AS POLL_CNT FROM LMS_LE_POLL_APPLY WHERE POLLCSEQNO= #{pollcseqno} AND CUSERNO= #{cuserno}
+	</select>
+	
+	  <!-- 회원 로그인 타입 정보 -->
+	<select id="getUserLoginType"  resultType="String" parameterType="dmap">
+		SELECT SNS_LOGIN_TYPE FROM LMS_CT_UNITY_MBER WHERE EMAIL = #{email}
+	</select>
+		
+	<!-- 세션아이디 저장 -->
+	<update id="updateJsessionId" parameterType="dmap">
+		UPDATE LMS_CT_UNITY_MBER SET
+			 SESSION_ID = #{jessionId}
+		WHERE UNITY_ID = #{userId}
+	</update>
+	
+	<!-- 세션아이디 초기화 -->
+	<update id="deleteJsessionId" parameterType="dmap">
+		UPDATE LMS_CT_UNITY_MBER SET
+			 SESSION_ID = NULL
+		WHERE UNITY_ID = #{SES_USERID}
+	</update>
+	<!-- 비회원 로그인 정보 가져오기 -->
+	<select id="getSessionId"  resultType="String" parameterType="String">
+		SELECT NVL(SESSION_ID,'empty') FROM LMS_CT_UNITY_MBER WHERE UNITY_ID = #{loginId}
+	</select>
+	
+	<!-- 기존회원 정보 재설정 -->
+	<update id="updateOldMemberInfo" parameterType="dmap">
+		UPDATE LMS_CT_UNITY_MBER SET
+			 UNITY_PASSWORD = #{pwd}
+			 ,LOGIN_FAIL_CNT = 0
+			 ,CONFIRM_GUBUN = #{confirmGubun}
+			 ,KCB_DI = #{di}
+		WHERE UNITY_ID = #{userId}
+	</update>
+	
+	<!-- 회원정보 수정 -->
+	<update id="updateMemberInfo" parameterType="dmap">
+	UPDATE LMS_CT_UNITY_MBER SET         
+	        <if test="pwd != null">
+             UNITY_PASSWORD = #{pwd}
+            </if>                 
+             , LOGIN_FAIL_CNT = 0                         
+             , MOBLPHON = #{moblphon}             
+	        <if test="telno != null">
+             , TELNO = #{telno}
+            </if>    
+	        <if test="lnmZip != null">      
+             , LNM_ZIP = #{lnmZip} 
+            </if>     
+	        <if test="lnmAdres1 != null">                       
+             , LNM_ADRES1 = #{lnmAdres1}
+            </if>     
+	        <if test="lnmAdres2 != null">
+             , LNM_ADRES2 = #{lnmAdres2}
+            </if>     
+	        <if test="job != null">
+             , JOB = #{job}
+            </if>     
+	        <if test="userPath != null">
+             , USER_PATH = #{userPath}
+            </if>     
+	        <if test="emailRecptnAt != null">
+             , EMAIL_RECPTN_AT = #{emailRecptnAt}
+            </if>     
+	        <if test="smsRecptnAt != null">
+             , SMS_RECPTN_AT = #{smsRecptnAt}
+            </if>     
+            <if test="userEtc != null and userEtc != '' ">
+            , USER_ETC = #{userEtc}
+            </if>
+            <if test="userName != null and userName != '' ">
+            , MBERNM = #{userName}
+            </if>
+            <if test="sex != null and sex != '' ">
+            , SEX = #{sex}
+            </if>
+            <if test="brthdy != null and brthdy != '' ">
+            , BRTHDY = #{brthdy}
+            </if>            
+        WHERE UNITY_ID = #{userId}
+	</update>
+	
+	<!-- 비밀번호 변경일자 업데이트 -->
+	<update id="updatePwdUpdDt" parameterType="dmap">
+	UPDATE LMS_CT_UNITY_MBER SET
+             PW_UPD_DT = SYSDATE
+        WHERE UNITY_ID = #{userId}
+	</update>
+	
+	<!-- 회원정보 탈퇴 처리 -->
+	<update id="updateMemberSecsn" parameterType="dmap">
+	UPDATE LMS_CT_UNITY_MBER SET
+	  SECSN_DATE = SYSDATE 
+	  , MT_SECSN_CODE = #{secsnCd}
+	  , SECSN_AT = 'Y'     
+	  , UNITY_ID = #{secsnID}
+	  WHERE UNITY_ID = #{userId}
+	</update>
+	
+	<!-- 회원정보 탈퇴 처리 -->
+	<delete id="deleteMemberSecsnSNS" parameterType="Integer">
+	DELETE FROM
+		LMS_CT_UNITY_MBER_SNS
+	WHERE 
+		UNITY_MBERNO = #{userNo}
+	</delete>
+</mapper>

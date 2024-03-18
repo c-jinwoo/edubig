@@ -1,0 +1,18 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>	
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width,height=device-height,user-scalable=no" />
+<title>테스트</title>
+</head>
+<body>
+<input type="text" id="input"/>
+<a onclick="go();">열기</a>
+</body>
+<script>
+	function go(){
+		window.open('./01/index.html?usrId=jihn011258&crsClsId=0000004&tocNum='+document.getElementById("input").value+'&curPageNum=3&stdySttCd=E&acmlStdyPd=0','','width=1280,height=760');
+	}
+</script>
+</html>

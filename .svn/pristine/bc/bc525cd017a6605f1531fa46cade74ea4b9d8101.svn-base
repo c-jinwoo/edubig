@@ -1,0 +1,12 @@
+_this.$pageInfo = [
+	"video",
+	"video",
+	"video",
+	"video",
+	"video",
+	"video",
+	"quiz",
+	"summary"
+];		
+_this.$totPageNumber= _this.$pageInfo.length;
+_this.$summaryNo	= 4;

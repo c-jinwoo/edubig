@@ -1,0 +1,251 @@
+<%--
+    Description : 기존회원 패스워드 재설정
+     
+    Modification Information
+  	 수정일     		수정자         수정내용
+    -------     -----------------------------------
+    2018.06.04  이성현                 최초작성
+
+--%>
+<%@ page language="java" contentType="text/html; charset=utf-8" pageEncoding="utf-8"%>
+<%@ include file="/WEB-INF/jsp/common/inc/taglib_inc.jsp"%>
+<%@ include file="/WEB-INF/jsp/academy/cmmn/inc/top_inc.jsp"%>
+<%@ include file="/WEB-INF/jsp/academy/cmmn/inc/header_inc.jsp"%>
+<script type="text/javascript" src="/academy/common/js/rsa/jsbn.js"></script>
+<script type="text/javascript" src="/academy/common/js/rsa/prng4.js"></script>
+<script type="text/javascript" src="/academy/common/js/rsa/rng.js"></script>
+<script type="text/javascript" src="/academy/common/js/rsa/rsa.js"></script>
+<script type="text/javascript" src="/academy/common/js/rsa/base64.js"></script>
+<script type="text/javascript">
+
+var delay = 1000;
+var submitted = false;
+
+function submitCheck() {
+	if(submitted == true) { 
+		alert('로그인 처리중 입니다. 잠시만 기다려주세요.');
+		return; 
+	}
+  	setTimeout ('go_exec()', delay);
+  	
+}
+
+function go_exec() {
+
+	if(!fnValiCheck($('#userPassword'),'비밀번호를 입력 해 주세요.')) return false;
+	if(!fnValiCheck($('#userPassword2'),'비밀번호확인을 입력 해 주세요.')) return false;
+	if(!passwordCheck($('#userPassword'))) return false;
+	if(!passwordCompare($('#userPassword'),$('#userPassword2'))) return false;
+	
+	if(!fnCheckboxChecked($('#termAgree'),'회원이용약관에 동의 해 주세요.')) return false;
+	if(!fnCheckboxChecked($('#protectAgree'),'개인정보취급방침에 동의 해 주세요.')) return false;
+	
+	if(!fnValiCheck($('#confirmGubun'),'실명인증을 해주세요.')) return false;
+	
+    var securedPassword      = fn_encrypt(encodeURIComponent($('#userPassword').val()));
+ 
+    var rsaPublicKeyModulus  = $("#rsaPublicKeyModulus").val();
+    var rsaPublicKeyExponent = $("#rsaPublicKeyExponent").val();
+    
+    submitted = true;
+    
+    submitEncryptedForm(securedPassword, rsaPublicKeyModulus, rsaPublicKeyExponent);
+    
+    submitted = false;
+    
+	return; 
+}
+
+function submitEncryptedForm(password, rsaPublicKeyModulus, rsaPpublicKeyExponent) {
+    var rsa = new RSAKey();
+    rsa.setPublic(rsaPublicKeyModulus, rsaPpublicKeyExponent);
+
+    var securedPassword = rsa.encrypt(password);
+
+    var frm = document.getElementById("frm");
+    frm.securedPassword.value = securedPassword;
+    
+    frm.submit();
+}
+
+// 공인인증서 팝업
+function fnCertFormSubmit(){
+	var certForm = document.certForm;
+
+	window.open("", "auth_popup", "width=432,height=560,scrollbar=yes");
+
+	certForm.target = "auth_popup";
+	certForm.submit();
+}
+
+//인증 유형 설정
+function fnCertType(type){
+	$('#confirmGubun').val(type);
+	$('#certYn').html('인증');
+}
+
+</script>
+
+
+<div class="container" id="Subcontent">
+  <article class="subArea">
+      <div class="subCntWrap">
+      	<%@ include file="/WEB-INF/jsp/academy/cmmn/inc/lnb_etc.jsp"%>
+      	  <div class="path">
+              <ul>
+                  <li><span class="home text-hide">홈</span></li>
+                  <li>로그인</li>
+                  <li class="active currentNavi">로그인</li>
+              </ul>
+          </div>
+          <div class="subConts" id="sub-content">
+               <section class="bgTop_cate07"><!--   카테고리별 이미지 추가  -->
+	            		<div class="contTop">
+	            			 <h2 class="h2_tit">로그인</h2>
+	            		</div>           	
+	          	  </section>
+	          	  
+	        	<form name="certForm" action="/kcbtest/hscert2.jsp" method="post">
+					<input type="hidden" name="hs_cert_msr_cd" value="30"> <!-- 인증요청수단 (00:전체, 10:휴대폰, 20:신용카드, 30:공인인증서) -->
+					<input type="hidden" name="ssn" id="ssn" value="8911131157026">			 <!-- 주민번호 -->
+				</form>  	  	
+	          	  
+	          	  
+              
+              <form name="frm" id="frm" action="/academy/common/oldmemCertExec.do" method="post"  target="_self">
+				<input type="hidden" name="securedPassword" id="securedPassword" value="" />
+				<input type="hidden" id="rsaPublicKeyModulus" value="<c:out value="${publicKeyModulus}"/>" />
+				<input type="hidden" id="rsaPublicKeyExponent" value="<c:out value="${publicKeyExponent}"/>" />
+				<input type="hidden" name="authCheckYn" id="authCheckYn" value="N" /><!-- 인증여부 -->
+				<input type="hidden" name="userId" value="<c:out value="${REQUEST_DATA.userId}"/>" />
+				<input type="hidden" name="brthdyCd" value="<c:out value="${REQUEST_DATA.brthdyCd}"/>" />
+				
+				<input type="hidden" name="confirmGubun" id="confirmGubun" value="" />
+				
+				<!-- 공인인증 데이터 START -->
+				<input type="hidden" name="idcf_mbr_com_cd" 		value="" 	/>
+		        <input type="hidden" name="hs_cert_svc_tx_seqno" 	value=""	/>
+		        <input type="hidden" name="hs_cert_msr_cd" 		value="" 	/>
+		        <input type="hidden" name="rst_cd" 				value="" 	/>
+		        <input type="hidden" name="rst_msg" 				value="" 	/>
+				<input type="hidden" name="di" 				value="" 	/>
+				<!-- 공인인증 데이터 END -->
+              <div id="loginArea">
+	              <section>
+                     <fieldset>
+	              		<h3 class="sub_tit mrg_t30">기존회원 로그인 안내</h3>
+	              		<div class="terms" tabindex="0">
+                            <h4 class="fnt15 po_C6">실명인증</h4>
+                            <p>
+                            	중복가입을 방지하기 위하여 실명인증을 해주시기 바랍니다.
+                            </p>
+                            <h4 class="fnt15 po_C6">실명인증</h4>
+                            <p>
+                            	비밀번호 규칙(~~~~~~~)에 맞게 비밀번호를 변경해주시기 바랍니다.
+                            	
+                            </p>
+                        </div>
+	              
+	              		<h3 class="sub_tit mrg_t30">필수 입력정보</h3>
+	              
+	              		<div class="tblWrap" style="margin-bottom: 30px;">
+                           <table class="writeForm">
+                               <caption>회원가입양식입력(가입인증,인증번호 발송,인증번호,아이디 등 입력)</caption>
+                               <colgroup>
+                                   <col style="width:25%">
+                                   <col style="width:*">
+                               </colgroup>
+                               <tbody>
+                                   <tr>
+                                       <th scope="row"><label for="userPassword">비밀번호</label></th>
+                                       <td>
+                                           <div class="form-inline">
+                                               <div class="form-group w30">
+                                                   <input type="password" autocomplete="off" class="form-control" id="userPassword" name="userPassword">
+                                               </div>
+                                           </div>
+                                           <p class="po_C2 mrg_t5 fnt13">※ 비밀번호는 영문/숫자/특수문자를 포함(공백, &amp; 제외)하여 9~14자 사이로 입력하시기 바랍니다.</p>
+                                       </td>
+                                   </tr>
+                                   <tr>
+                                       <th scope="row"><label for="userPassword2">비밀번호확인</label></th>
+                                       <td>
+                                           <div class="form-inline">
+                                               <div class="form-group w30">
+                                                   <input type="password" autocomplete="off" class="form-control" id="userPassword2" name="userPassword2">
+                                               </div>
+                                           </div>
+                                       </td>
+                                   </tr>
+                                   <tr>
+                                       <th scope="row" rowspan="2">실명인증</th>
+                                       <td id="certYn">
+                                   			미인증
+                                   		</td>
+                                   </tr>
+                                   <tr>
+                                   		<td>
+                                       		<button onclick="fnCertFormSubmit(); return false;">공인인증서</button>
+                                       		<button onclick="alert('준비중 입니다.'); retuen false;">아이핀</button>
+                                       		<button onclick="alert('준비중 입니다.'); retuen false;">휴대폰인증</button>
+<!--                                                    <div class="form-inline"> -->
+<!--                                                        <div class="form-group w30"> -->
+<!--                                                            <input type="text" class="form-control" id="userName" name="userName"> -->
+<!--                                                        </div> -->
+<!--                                                    </div> -->
+                                       </td>
+                                   </tr>
+                               </tbody>
+                           </table>
+                       </div>
+	              
+	              
+	              
+	              
+		                <h3 class="sub_tit mrg_t30">회원이용약관</h3>
+						<div class="borBox">
+                               <div class="terms" tabindex="0">
+                                   <p> 회원가입 하시기 전에 이용약관을 반드시 읽어주시기 바랍니다. 서비스 약관은 통지 없이 수시로 갱신될 수 있사오니, 회원 여러분께서는 방문 시 수시로 그 내용을 확인해 보시기 바랍니다. </p> <br>
+                                   <h4 class="fnt15 po_C6">제 1장 총칙</h4>
+                                   <h5 class="po_C9 fnt13">제 1 조 (목적)</h5>
+							<p>이 약관은 2017년 9월 18일부터 시행합니다.</p>
+                               </div>
+
+                               <div class="agreeCheck text-right">
+                                   <input title="동의" type="checkbox" value="" id="termAgree">
+                                   <label title="동의" for="termAgree">동의합니다</label>
+                               </div>
+                           </div>
+                           
+                           
+                       <h3 class="sub_tit mrg_t30">개인정보취급방침</h3>
+						<div class="borBox">
+                               <div class="terms" tabindex="0">
+                                   <p> 회원가입 하시기 전에 이용약관을 반드시 읽어주시기 바랍니다. 서비스 약관은 통지 없이 수시로 갱신될 수 있사오니, 회원 여러분께서는 방문 시 수시로 그 내용을 확인해 보시기 바랍니다. </p> <br>
+                                   <h4 class="fnt15 po_C6">제 1장 총칙</h4>
+                                   <h5 class="po_C9 fnt13">제 1 조 (목적)</h5>
+							<p>이 약관은 2017년 9월 18일부터 시행합니다.</p>
+                               </div>
+
+                               <div class="agreeCheck text-right">
+                                   <input title="동의" type="checkbox" value="" id="protectAgree">
+                                   <label title="동의" for="protectAgree">동의합니다</label>
+                               </div>
+                           </div>
+                           
+                           <div class="btnAreaC mrg_t30">
+	                           <button type="button" name="button" onclick="go_exec();return false;" class="btn btn-lg btn-blue" title="확인">확인</button>
+	                            <button type="button" name="button" onclick="location.href='/academy/common/login.do';" class="btn btn-lg btn-blue" title="취소">취소</button>
+	                       </div>
+	                      </fieldset>
+	              </section>
+			  </div>
+			</form>
+          </div>
+      </div>
+  </article>
+</div>
+
+<!-- 풋터 영역 -->
+<%@ include file="/WEB-INF/jsp/academy/cmmn/inc/footer_inc.jsp"%>
+<!-- // 풋터 영역 -->

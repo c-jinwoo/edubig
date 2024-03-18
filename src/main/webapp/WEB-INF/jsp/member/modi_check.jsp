@@ -1,0 +1,93 @@
+<%
+/****************************************
+    subject : 회원관리
+    summary : 회원관리 : 회원 확인
+****************************************/
+%>
+<%@ page language="java" contentType="text/html; charset=utf-8" pageEncoding="utf-8"%>
+<%@ include file="/WEB-INF/jsp/inc/taglib_inc.jsp"%>
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+	<%@ include file="/WEB-INF/jsp/inc/head_inc.jsp"%>
+	<script type="text/javascript" src="/cmmn/js/jquery.cookie.js"></script>
+	<script type="text/javascript">		
+		function enterChk() {
+			if(event.keyCode == 13) {
+				go_exec();
+			}
+		}
+		
+		var delay = 1000;
+		var submitted = false;
+		
+		function submitCheck() {
+			if(submitted == true) { 
+				fnModalMsg('로그인 처리중 입니다. 잠시만 기다려주세요.');
+				return; 
+			}
+		  	setTimeout ('go_exec()', delay);
+		  	
+		}
+		
+		function go_exec() {
+			
+			if($('input[name=isMobile]').val() == 'true')	mtk.fillEncData();
+		
+			if('' == $('#pwd').val()) {
+				fnModalMsg('비밀번호를 입력해 주세요');
+				$('#pwd').focus();
+				return;
+			}
+		    
+		    submitted = true;
+		    frm.submit();
+			return; 
+		}
+	
+	</script>
+</head>
+<body>
+	<!-- header -->
+	<%@ include file="/WEB-INF/jsp/inc/header_inc.jsp"%>
+	<!--// header -->
+	
+	<!-- container -->
+	<div id="container">
+		<div class="con_center">
+			<div class="cont_title_wrapper">
+				<div class="wrapper">
+					<h3 class="cont_title">개인정보관리</h3>
+				</div>			
+			</div>
+			<div id="content">
+				<div class="wrapper">
+					<div class="cont_body">
+						<div class="c_section">
+							<form name="frm" id="frm" action="/user/modiForm.do" method="post"  target="_self">
+								<input type="hidden" name="isMobile" value=""/>
+	 							<div class="c_my_login" style="width:60%;margin:0 auto;">
+									<div class="con_login">
+										<p class="nt">본인 확인을 위해 비밀번호를 입력해 주세요.</p>
+										<input type="text" title="아이디" value="<c:out value="${REQUEST_DATA.userId }"/>" disabled="disabled" />
+										<input type="password" title="비밀번호 입력" placeholder="PASSWORD" id="pwd" name="pwd" class="enKey_qwer"/>
+									</div>
+								</div>
+								<div class="c_btn_center">
+									<button type="button" onclick="history.back(-1);" class="btn_graybg03">취소</button>
+									<button type="button" onclick="submitCheck()" class="btn_bluebg03">본인확인</button>
+								</div>
+							</form>
+						</div>
+					</div>
+				</div>
+			</div>		
+		</div>	
+	</div>
+	<!--// container -->
+	
+	<!-- foot -->
+	<%@ include file="/WEB-INF/jsp/inc/footer_inc.jsp"%>
+	<!--// foot end -->
+</body>
+</html>

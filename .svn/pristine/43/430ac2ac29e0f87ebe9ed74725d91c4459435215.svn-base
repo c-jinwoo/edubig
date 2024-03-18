@@ -1,0 +1,143 @@
+<%
+/****************************************************
+	system	: 우편번호 찾기
+	summary	:	
+	wdate	: 2018-06-21
+	writer	: sangs
+*****************************************************/
+%>
+<%@ page language="java" contentType="text/html; charset=utf-8" pageEncoding="utf-8"%>
+<script type="text/javascript">
+
+	 var zip = "";
+
+	 $(document).ready(function(){
+		
+		 zip = $("#zipTable").html();
+		 
+	 	// 엔터 검색
+		$('#srchText').bind('keydown', function(e) {
+            if (e.keyCode == 13) { // enter key
+            	getAddr();
+                return false;
+            }
+        });
+	});
+
+	 function getAddr(currentPage){
+		 
+		 $("#currentPage").val(currentPage);
+		 
+		if( $("#srchText").val() == '') {
+			fnModalMsg('도로명이나 지역명을 입력해주세요.');
+			$("#srchText").focus();
+		}
+		else {
+			$('#zipTable').showLoading();
+			
+			var apiUrl = 'https://www.juso.go.kr/addrlink/addrLinkApi.do?currentPage=&countPerPage=100000&confmKey=U01TX0FVVEgyMDE1MDgyODE1NDIzNg==&keyword='+encodeURI($('#srchText').val());
+			
+			$.ajax({
+			     url :apiUrl
+				,type:"get"
+				,dataType:"xml"
+				,success:function(xmlStr){
+					$('#zipBody').html('');
+		        	$('#zipTable').hideLoading();
+		            if ($(xmlStr).find('totalCount').text() == '0'){
+		            	fnModalMsg('검색결과가 없습니다. 검색어에 잘못된 철자가 없는지, 정확한 주소인지 다시 한번 확인해 주세요.');
+		            	return;
+		            }
+					if(xmlStr != null){
+						makeList(xmlStr);
+					}
+				}
+			});
+		}
+	}
+	
+	function makeList(xmlStr){
+		var htmlStr = "";
+		var pageStr = "";
+		$(xmlStr).find("juso").each(function(){
+			var zipNo = $(this).find('zipNo').text();
+			
+			var roadAddr = $(this).find('roadAddr').text();
+			htmlStr += "<tr>";
+			htmlStr += "<td class='ts_th'>"+$(this).find('zipNo').text() +"</td>";
+			htmlStr += "<td class='ts_td'><a href='#none' onclick='fnZipSelect("+'"'+zipNo+'"'+',"'+roadAddr+'"'+"); return false;' title='주소'><span class='txt_blue'>"+$(this).find('roadAddr').text() +"</span></a><br/>"+ $(this).find('jibunAddr').text()+"</td>";
+			htmlStr += "</tr>";
+			
+		});
+		$("#zipBody").html(htmlStr);
+		
+	}
+	
+	/*   
+	function fnZipSelect(zipNo,roadAddr) {
+		  
+ 		  if(zipNo.charAt(0) == '0') {
+			 $("#lnmZip").val("0"+zipNo);
+		 } else {
+			 $("#lnmZip").val(zipNo);
+		 } 
+ 		$("#lnmZip").val(zipNo);
+		$("#lnmAdres1").val(roadAddr);
+		$("#srchText").val('');
+		$("#zipBody").html("<tr><td class='ts_th' colspan='2'>검색어를 입력하세요.</td></tr>");
+		$("#popPost").find("#close").click();
+	}  
+
+ */
+</script>
+
+
+<form name="form" id="form" method="post">
+	<input type="hidden" id="cPage" name="cPage" value="<c:out value="${REQUEST_DATA.cPage}"/>"/>
+	<input type="hidden" id="currentPage" name="currentPage" value="1"/><!-- 현재 페이지. -->
+	<input type="hidden" id="countPerPage" name="countPerPage" value="100000"/> <!-- 페이지당 출력 목록 수. 기본값은 10 -->
+
+<!-- layer pop 우편번호찾기 -->
+<div class="layerpop post" id="popPost" tabindex="-1" data-tooltip-con="poppost01" data-focus="poppost01" data-focus-prev="poppost01-close">
+	<div class="layer_mask"></div><!-- 블랙mask영역 -->
+	<div class="layer_cont">
+		<div class="lc_head">
+			<h4 class="lc_tit">우편번호 찾기</h4>
+		</div>
+		<div class="lc_cont">
+
+			<div class="pop_con_search">
+				<p class="nt_tit">
+					도로명이나 지역명을 이용해서 검색해 보세요.<br />
+					건물번호, 번지를 함께 입력하시면 더욱 정확한 결과가 검색됩니다. <span class="txt_ex">예) 가정북로90, 장동 23-7</span>
+				</p>
+				<fieldset>
+					<legend>우편번호 검색</legend>
+					<input type="text" id="srchText" name="srchText" title="주소상관 검색어를 입력하세요." />
+					<button class="btn_graybg02" type="button" name="button" onclick="getAddr();return false;" >찾기</button>
+				</fieldset>
+				<div class="result_box">
+					<table class="table_style_row02" id="zipTable">
+						<caption>우편번호, 주소 등 검색결과를 보여줍니다.</caption>
+						<thead>
+							<tr>
+								<th scope="col" class="ts_th">우편번호</th>
+								<th scope="col" class="ts_td">주소</th>
+							</tr>
+						</thead>
+						<tbody id="zipBody">
+							<tr>
+								<td class="ts_th" colspan="2">검색어를 입력하세요.</td>
+							</tr>
+						</tbody>
+					</table>
+				</div>
+			</div>
+
+		</div>
+	</div>
+	<button class="btn_close tooltip-close" id="close" data-focus="poppost01-close" data-focus-next="poppost01">닫기</button>
+</div>
+<!--// layer pop -->
+
+</form>

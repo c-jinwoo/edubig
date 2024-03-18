@@ -1,0 +1,136 @@
+<%
+/****************************************
+    subject : 리뷰
+    summary : 리뷰
+****************************************/
+%>
+<%@ page language="java" contentType="text/html; charset=utf-8" pageEncoding="utf-8"%>
+<%@ include file="/WEB-INF/jsp/inc/taglib_inc.jsp"%>
+<%@ include file="/WEB-INF/jsp/inc/top_inc.jsp"%>
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+	<title>에듀빅 :: 수강후기</title>
+	<%@ include file="/WEB-INF/jsp/inc/head_inc.jsp"%>
+	<script type="text/javascript">
+		function frmSubmit(query){
+			if($(".starR.on").length < 1){
+				fnModalMsg('평점을 입력해주세요.');
+			}
+			else{
+				$("#rvScore").val($(".starR.on").length);
+			}
+			if($("#rvContent").val().replaceAll(" ","").length < 20){
+				fnModalMsg("최소 20자이상 작성해주세요.");
+				return;
+			}
+						
+			$("#rvQuery").val(query);
+			$("#frm").submit();
+		}		
+		
+		$(document).ready(function() {
+			$(".starRev span").click(function(e){
+			      $(this).parent().children("span").removeClass("on");			      
+			      $(this).addClass("on").prevAll("span").addClass("on");
+			      return false;
+		    });
+			
+			if($("#rvScore").val() == null || $("#rvScore").val() == ""){
+				$(".starR").addClass("on");
+			}
+			else{
+				for(var i=0;i<$(".starR").length;i++){
+					if(i < parseInt($("#rvScore").val())){
+						$(".starR").eq(i).addClass("on");
+					}
+					else{
+						$(".starR").eq(i).removeClass("on");
+					}
+				}
+			}
+		});
+	</script>
+</head>
+<body>
+	<!-- header -->
+	<%@ include file="/WEB-INF/jsp/inc/header_inc.jsp"%>
+	<!--// header -->
+	
+	<div id="container">
+		<div class="con_center">
+			<div class="cont_title_wrapper">
+				<div class="wrapper">
+					<h3 class="cont_title">수강후기</h3>
+				</div>			
+			</div>
+			<div id="content">
+				<div class="wrapper">		
+					<div class="cont_body">
+						<form name="frm" id="frm" method=POST action="/review/exec.do">
+							<div class="c_section">
+								<input type="hidden" id="searchCseqno" name="searchCseqno" value="<c:out value="${REQUEST_DATA.searchCseqno}"/>"/>
+								<input type="hidden" id="courseno" name="courseno" value="<c:out value="${REQUEST_DATA.courseno}"/>"/>
+								<input type="hidden" id="rvQuery" name="rvQuery" value="<c:out value="${REQUEST_DATA.rvQuery}"/>"/>
+								<div class="rv_box">
+									<table>
+										<colgroup>
+											<col width="20%" />
+											<col width="" />
+										</colgroup>
+										<tr>
+											<th scope="row">후기를 남겨주세요.</th>
+											<td>
+												<textarea placeholder="내용을 입력하세요." id="rvContent" name="rvContent"><c:out value="${review.CONTENT}"/></textarea>
+											</td>
+										</tr>
+										<tr>
+											<th scope="row">강의는 만족스러우셨나요?</th>
+											<td>
+												<input type="hidden" id="rvScore" name="rvScore" value="<c:out value="${review.SCORE}"/>"/>
+												<div class="starRev" id="rvScore">
+													<span class="starR" id="star1"></span>
+													<span class="starR" id="star2"></span>
+													<span class="starR" id="star3"></span>
+													<span class="starR" id="star4"></span>
+													<span class="starR" id="star5"></span>
+												</div>
+											</td>
+										</tr>
+									</table>
+								</div>
+								<div class="c_btn_center">
+									<c:if test="${REQUEST_DATA.rvQuery eq 'insert'}">
+										<a class="rvContent_btn" onclick="frmSubmit('insert'); return false;">
+											등록
+										</a>
+										<a class="rvContent_btn" onclick="history.back(); return false;">
+											취소
+										</a>
+									</c:if>
+									<c:if test="${REQUEST_DATA.rvQuery eq 'update'}">
+										<a class="rvContent_btn" onclick="frmSubmit('update'); return false;">
+											수정
+										</a>
+										<a class="rvContent_btn" onclick="frmSubmit('delete'); return false;">
+											삭제
+										</a>
+										<a class="rvContent_btn" onclick="history.back(); return false;">
+											취소
+										</a>
+									</c:if>
+								</div>
+							</div>
+						</form>
+					</div>
+				</div>
+			</div>			
+		</div>
+	</div>
+	<!--// container -->
+	
+	<!-- foot -->
+	<%@ include file="/WEB-INF/jsp/inc/footer_inc.jsp"%>
+	<!--// foot end -->
+</body>
+</html>

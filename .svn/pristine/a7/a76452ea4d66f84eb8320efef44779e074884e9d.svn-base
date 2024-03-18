@@ -1,0 +1,11 @@
+_this.$quizInfo = [
+	["다음 중 Scale(축척) 명령어에 대한 설명이 <span style='color:#FF0000;'>틀린</span> 것은?","3D Model(모델)의 크기를 조정하는 명령어 이다.","Point(기준점)과 크기 Scale Factor(비율)을 이용해 조정한다.","Axis(축) 방향으로 크기를 조정할 수 있다.","Point(기준점)의 위치는 자동으로 시정되며, 사용자가 재지정할 수 없다.",false],	
+	["다음 중 Scale(축척)에 대한 설정에 대한 설명으로 <span style='color:#FF0000;'>틀린</span> 것은?","Entities(객체): 객체의 크기를 조정할 Body를 선택한다.","Point(기준점): 객체 크기 조정의 기준점을 선택한다.","Scale Type(축척 유형): 객체의 크기 조정 유형을 설정한다.","Scale Factor(축척 비율): 길이 값을 입력한다.",false],
+	["다음 중 Combine(결합)에 대한 설명으로 <span style='color:#FF0000;'>틀린</span> 것은?","3D Model(모델)을 다양한 유형으로 결합하는 명령어 이다.","Target Body(대상 형상)은 결합 후에도 형상이 유지된다.","Operation(결합 유형)에서 Join은 차집합을 의미한다.","Operation(결합 유형)에서 Intersect은 교집합을 의미한다.",false]
+];
+
+_this.$quizAnsInfo = [
+	[4,"Point(기준점)의 위치는 사용자가 재지정 할 수 있다."],
+	[4,"Scale Factor(축척 비율)은 크기에 대한 비율을 입력한다."],
+	[3,"Operation(결합 유형)에서 Join은 합집합을 의미한다."],
+];

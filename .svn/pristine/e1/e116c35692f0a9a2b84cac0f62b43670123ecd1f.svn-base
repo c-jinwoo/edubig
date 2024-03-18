@@ -1,0 +1,139 @@
+<%@ page language="java" contentType="text/html; charset=utf-8" pageEncoding="utf-8"%>
+<%@ include file="/WEB-INF/jsp/ccedu/inc/taglib_inc.jsp"%>
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+	<%@ include file="/WEB-INF/jsp/ccedu/inc/head_inc.jsp"%>
+	 <script type="text/javascript">
+	//<![CDATA[
+	    
+	     $(document).ready(function(){
+		    if('<c:out value="${type}"/>' == 'POP') {
+		        if('<c:out value="${msg}"/>' != '') {
+		            fnModalMsg( ( ('<c:out value="${msg}"/>').replace('<br/>', '\n') ).replace('&lt;br&gt;', '\n') , fnTypePop);
+		        }else{
+		        	fnTypePop();
+		        }
+		    } else if('<c:out value="${type}"/>' == 'POP_JS') {
+		        if('<c:out value="${msg}"/>' != '') {
+		            fnModalMsg( ( ('<c:out value="${msg}"/>').replace('<br/>', '\n') ).replace('&lt;br&gt;', '\n') , fnTypePopJs);
+		        }else{
+		        	fnTypePopJs();
+		        }
+		    } else if('<c:out value="${type}" escapeXml='false' />' == 'PARENT') {
+		    	if('<c:out value="${msg}"/>' != '') {
+		            fnModalMsg( ( ('<c:out value="${msg}"/>').replace('<br/>', '\n') ).replace('&lt;br&gt;', '\n') , fnTypeParent);
+		        }else{
+		        	fnTypeParent();
+		        }
+		    } else if('<c:out value="${type}" escapeXml='false' />' == 'BACK') {
+		    	if('<c:out value="${msg}"/>' != '') {
+		            fnModalMsg( ( ('<c:out value="${msg}"/>').replace('<br/>', '\n') ).replace('&lt;br&gt;', '\n') , fnTypeBack);
+		        }else{
+		        	fnTypeBack();
+		        }
+		    } else {
+		    	if('<c:out value="${msg}"/>' != '') {
+		            /* fnModalMsg( ( ('<c:out value="${msg}"/>').replace('<br/>', '\n') ).replace('&lt;br&gt;', '\n') , fnTypeElse); */
+		            
+		            fnModalMsg( ( ('<c:out value="${msg}"/>').replace('&lt;', '<').replace('&gt;', '>') ).replace('&lt;', '<').replace('&gt;', '>'), fnTypeElse);
+		            
+		        }else{
+		        	fnTypeElse();
+		        }
+		    } 
+	    })
+	    
+	    function fnTypePop(){
+	    	if('<c:out value="${url}" escapeXml='false' />' != '') {
+	            opener.location.href = '<c:out value="${url}" escapeXml='false' />';
+	        }
+	        self.close();
+	    }
+	    
+	    function fnTypePopJs(){
+	    	 if('<c:out value="${js}" escapeXml='false' />' != '') {
+	             eval('<c:out value="${js}"/>');
+	         }           
+	         self.close();
+	    }
+	    
+	    function fnTypeParent(){
+	    	parent.location.href = '<c:out value="${url}" escapeXml='false' />';
+	    }
+	    
+	    function fnTypeBack(){
+	    	history.go(-1);
+	    }
+	    
+	    
+	    function fnTypeElse(){
+	    	if('<c:out value="${url}" escapeXml='false' />' != '') {
+	            $('#frm').attr('action' , '<c:out value='${url}' escapeXml='false' />');
+	            $('#frm').submit();
+	        }
+	    }
+	    
+	//]]>
+	</script>
+	
+</head>
+
+<body>
+
+<!-- skip nav -->
+	<%@ include file="/WEB-INF/jsp/ccedu/inc/nav_inc.jsp"%>
+<!--// skip nav -->
+
+<div id="wrap">
+
+	<!-- header -->
+	<%@ include file="/WEB-INF/jsp/ccedu/inc/header_inc.jsp"%>
+	<!--// header -->
+
+	<!-- container -->
+	<div id="container">
+
+		<!-- location -->
+		<jsp:include page="/WEB-INF/jsp/ccedu/inc/location/loc_08.jsp"> 
+		  	<jsp:param name="menuNm" value=" "/> 
+		</jsp:include> 
+		<!--// location -->
+
+		<div class="con_center">
+
+			<!-- lnb -->
+			<div id="lnb">
+				<jsp:include page="/WEB-INF/jsp/ccedu/inc/lnb/lnb_08.jsp"> 
+				  	<jsp:param name="dep2" value="01"/>
+				  	<jsp:param name="dep3" value="01"/> 
+				</jsp:include> 
+			</div>
+			<!--// lnb -->
+
+			<!-- content 본문 -->
+			<div id="content">
+
+				<h3 class="cont_titile" style="display: none;">안내</h3>
+				
+				<form name="frm" id="frm" method="post" action="<c:out value='${url}' escapeXml='false' />">
+				     <c:out value='${paramInputs}' escapeXml='false' />
+				 </form>
+				
+			<!--  -->
+			</div>
+			<!--// content 본문 -->
+		
+		</div>
+	
+	</div>
+	<!--// container -->
+
+	<!-- foot -->
+	<%@ include file="/WEB-INF/jsp/ccedu/inc/footer_inc.jsp"%>
+	<!--// foot end -->
+
+</div>
+
+</body>
+</html>

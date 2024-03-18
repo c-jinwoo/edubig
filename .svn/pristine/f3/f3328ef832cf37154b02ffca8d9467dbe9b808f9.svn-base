@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes" ?>
+<list>
+  <index>
+    <topic>
+      <list title="main" page="1">소개하기</list>
+      <list title="sub" page="1">비지니스 프로세스 의사결정</list>
+
+      <list title="main" page="2">살펴보기</list>
+      <list title="sub" page="2">비지니스 프로세스 이해</list>
+      <list title="sub" page="3">의사결정의 이해 정보역할</list>
+	  <list title="sub" page="4">비지니스 인텔리전스(BI)</list>
+
+      <list title="main" page="5">정리하기</list>
+      <list title="sub" page="5">학습평가</list>
+      <list title="sub" page="6">학습정리</list>
+    </topic>
+  </index>
+</list>

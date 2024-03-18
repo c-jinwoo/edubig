@@ -1,0 +1,96 @@
+<%
+/****************************************
+    subject : 회원가입
+    summary : 회원가입 : 연령선택
+****************************************/
+%>
+<%@ page language="java" contentType="text/html; charset=utf-8" pageEncoding="utf-8"%>
+<%@ include file="/WEB-INF/jsp/ccedu/inc/taglib_inc.jsp"%>
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+	<%@ include file="/WEB-INF/jsp/ccedu/inc/head_inc.jsp"%>
+</head>
+<body>
+	<!-- header -->
+	<%@ include file="/WEB-INF/jsp/ccedu/inc/header_inc.jsp"%>
+	<!--// header -->
+	
+	<!-- container -->
+	<div id="container">
+		<div class="con_center">
+			<div class="cont_title_wrapper">
+				<div class="wrapper">
+					<h3 class="cont_title">회원가입</h3>
+				</div>			
+			</div>
+			<div id="content">
+				<form name="frm" id="frm" action="/ccedu/user/memberJoinStep01.do" method="post">
+					<input type="hidden" id="mberType" name="mberType" value=""/>
+					<input type="hidden" id="snsType" name="snsType" value=""/>
+					<div class="wrapper">
+						<div class="cont_body">
+							<div class="c_section">	
+								<div class="join_type_box">
+									<p class="welcome">에듀빅에 오신 것을 환영합니다</p>
+									<ul class="c_txtlist line_height">
+										<li>에듀빅에서는 다양한 계층을 대상으로 각종 교육콘텐츠와 정보를 제공하고 있습니다.<br />에듀빅을 통해서 서비스를 마음껏 이용하시기 바랍니다.</li>
+									</ul>
+									<div class="join_type">
+										<ul>
+											<li>
+												<div class="inbox">
+													<img src="/cmmn/images/sub/img_join_type01.png" alt="일반 회원가입"/>
+													<strong>일반 회원가입</strong>
+													<span>만 14세 이상 내국인</span>
+													<a href="#none" onclick="fnSelectType(); return false;" class="btn_bluebg03">회원가입하기</a>
+												</div>
+											</li>
+											<li>
+												<div class="inbox">
+													<img src="/cmmn/images/sub/img_join_type02.png" alt="소셜 회원가입"/>
+													<strong>소셜 회원가입</strong>
+													<span>카카오 이용자</span>
+													<a href="#none" onclick="joinKakao();return false;" class="btn_bluebg03">카카오 가입하기</a>
+												</div>
+											</li>
+										</ul>
+									</div>
+								</div>	
+							</div>
+						</div>	
+					</div>
+				</form>
+			</div>		
+		</div>	
+	</div>
+	<!--// container -->
+
+	<!-- foot -->
+	<%@ include file="/WEB-INF/jsp/ccedu/inc/footer_inc.jsp"%>
+	<!--// foot end -->
+</body>
+<script>
+	function fnSelectType(){
+		$("#mberType").val("Y");	
+		$('#frm').submit();
+	}
+	function fnSelectSnsType(type){	
+		$("#snsType").val(type);		
+		fnSelectType();
+	}			
+	function joinKakao(){
+		Kakao.Auth.login({
+			success: function(authObj){			  	
+				Kakao.Auth.setAccessToken(authObj.access_token);
+				fnSelectSnsType("KAKAO");
+			},
+			fail: function(err) {
+			  	console.log("KAKAO login fail");
+			},
+		});
+	}
+	function joinNaver(){	
+	}
+</script>
+</html>

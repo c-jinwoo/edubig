@@ -1,0 +1,205 @@
+<%
+/****************************************
+    subject : 온라인서점
+    summary : 온라인서점
+****************************************/
+%>
+<%@ page language="java" contentType="text/html; charset=utf-8" pageEncoding="utf-8"%>
+<%@ include file="/WEB-INF/jsp/ccedu/inc/taglib_inc.jsp"%>
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+	<%@ include file="/WEB-INF/jsp/ccedu/inc/head_inc.jsp"%>
+<style type="text/css">	
+	.noneDataImg { width: 100%; margin-top: 45px; height: 400px; background:url('/cmmn/images/contentspage-no_pc.png') no-repeat center center;  }
+	
+	@media screen and (max-width:767px) {
+		.noneDataImg { width: 100%; margin-top: 25px; height: 450px; background:url('/cmmn/images/contentspage-no_mobile.png') no-repeat center center;  }
+	}
+</style>
+<script type="text/javascript">
+	$(document).ready(function(){
+		
+	});
+	
+	$(function() {
+		if ('${REQUEST_DATA.loan}' != "" && '${REQUEST_DATA.schSeqTitle}' == '' && '${REQUEST_DATA.mtScCode}' != "") {
+			    var bodyHS = $('html').height(); 
+			    $("#join_pop").css('display', 'block');
+			    $('.modal-backdrop').attr('style','height:'+bodyHS+'px; '+'z-index:100;');
+		} else {
+			$("#join_pop").css('display', 'none');
+		}
+	});
+
+	// 팝업 닫기
+	function layerPop() {
+		$("#join_pop").css('display', 'none');
+		$('#schSeqTitle').focus();
+		$('.modal-backdrop').hide();
+		/* $('body').css({overflow:'unset'}).unbind('touchmove') */
+	  
+	}
+
+	//검색
+	function fnSearch() {
+		$('#schSeqTitleIncode')
+				.val(encodeURIComponent($('#schSeqTitle').val()));
+
+		$('form[name=frm]').attr('target', '_self').attr('action',
+				'<c:out value="${ctx}"/>/academy/course/onDetail.do');
+		$('#frm').submit();
+	}
+
+	//과정신청
+	function fnCourseApply(courseno, cseqno, cancelYn) {
+		$('#cseqno').val(cseqno);
+		$('#courseno').val(courseno);
+		$('#mttype').val('온라인과정');
+		$('#cancelYn').val(cancelYn);
+		$('form[name=frm]').attr('target', '_self').attr('action','/ccedu/online/onlineDetailForm.do');
+		$('#frm').submit();
+
+	}
+	
+	function nextPage(){
+
+		var cPage =  parseInt($('#cPage').val())+1;
+		$('#cPage').val(cPage);
+		$.ajax({
+            url : "/ccedu/online/ajaxOnlineDetailList.do",
+            data : { cPage : cPage
+                   , mtScCode : '${REQUEST_DATA.mtScCode}'
+                   , mtCseqStatusCode : '${REQUEST_DATA.mtCseqStatusCode}'
+            	   },
+            dataType : "json",
+            type : 'post',
+            success : function(res) { 		            	
+
+            	var append = '';
+
+				for(var i = 0; i < res.length ; i++){
+					0
+					append += '<li><div class="inbox">';
+					append += '<a href="/ccedu/online/onlineDetailForm.do?courseno='+ res[i].COURSENO + '&cseqno='+ res[i].CSEQNO + '&mtScCode='+ res[i].MT_SC_CODE  + '" class="imgtxt" title="' + res[i].SEQ_TITLE + '상세보기">';
+					append += '<span class="img">';
+					append += '<img src="/att_file/course/'+res[i].SAVFILE+'" alt="'+ res[i].SEQ_TITLE + '" />'
+					append += '</span>';
+					append += '<span class="tit">'+res[i].SEQ_TITLE+'</span>';
+					append += '</a>';
+					append += '<div class="txt"><dl>';
+					append += '<dt>재생시간 : </dt>';
+					append += '<dd>'+res[i].SUM_RUNTIME+'분</dd>';
+					append += '</dl><dl>';
+					append += '<dt>난이도 : </dt>';
+					append += '<dd>'+res[i].MT_LEVEL_NAME+'</dd>';
+					append += '</dl>';
+					append += '<a href="#none" class="btn_blueline btn_detail" onclick="fnCourseApply('+ res[i].COURSENO + ','+ res[i].CSEQNO + ','+ res[i].CANCEL_YN + ')"   title=" '+ res[i].SEQ_TITLE + ' 상세보기">상세보기</a>';
+					append += '</div></div>';
+					append +='</div></li>';
+
+				}
+
+				$('.g_list').append(append);
+        		
+				if(res[0].ROW_DIV == 'N'){
+					$('#appendBtn').hide();
+				}
+
+            },
+            error : function(e) {
+                alert("error :" + e.responseText);
+            }
+        }); 
+	}
+
+</script>
+
+</head>
+
+<body>
+<!-- skip nav -->
+	<%@ include file="/WEB-INF/jsp/ccedu/inc/nav_inc.jsp"%>
+<!--// skip nav -->
+<div id="wrap">
+	<!-- header -->
+	<%@ include file="/WEB-INF/jsp/ccedu/inc/header_inc.jsp"%>
+	<!--// header -->
+	<!-- container -->
+	<div id="container">
+		<jsp:include page="/WEB-INF/jsp/ccedu/inc/location/loc_15_01.jsp"> 
+		  	<jsp:param name="menuNm" value="${title}"/> 
+		</jsp:include> 
+		<div class="con_center">
+			<!-- lnb -->
+			<div id="lnb">
+				<jsp:include page="/WEB-INF/jsp/ccedu/inc/lnb/lnb_15.jsp"/>
+			</div>
+			<!-- 본문 -->
+			<div id="content">
+				<h3 class="cont_titile type01">${title}</h3>
+				<!-- 본문내용 -->				
+				<div class="cont_body">
+					<!-- start -->
+					<c:if test = "${not empty listData}">
+						<table class="book_table">
+							<colgroup>
+								<col width="15%"/>
+								<col width=""/>
+								<col width="15%"/>	
+							</colgroup>		
+							<c:forEach items="${listData}" var="result" varStatus="stat">
+								<%-- <c:set value="${result.ROW_DIV}" var="rowDiv"/> --%>
+								<tr>
+									<td><img src="/att_file/book/<c:out value="${result.SAVFILE}"/>" alt="<c:out value="${result.TITLE}"/>" /></td>
+									<td>												
+										<a href="/ccedu/book/form.do?mtSubCode=<c:out value="${param.mtSubCode}"/>&bookno=<c:out value="${result.BOOKNO}"/>" title="<c:out value="${result.TITLE}"/> 상세보기">
+											<span class="book_title"><c:out value="${result.TITLE}"/></span></br>
+											<span class="book_sub"><c:out value="${result.B_WRITER}"	/> 저</span>	/ <span class="book_sub"><c:out value="${result.B_COMP}"/></span>									
+										</a>
+									</td>
+									<td>
+										<span class="price_b"><c:out value="${result.PRICE}"/>원</span>
+										</br>
+										<span class="price_a"><c:out value="${result.PRICE_REAL}"/>원</span>
+									</td>
+								</tr>
+							</c:forEach>
+						</table>
+						<%-- <div class="c_btn_center">
+							<c:if test="${rowDiv == 'Y'}">
+								<button type="button" id="appendBtn" onclick="nextPage(); return false;" class="btn_list_more"><span>더 보기</span></button>
+							</c:if>
+						</div> --%>
+					</c:if>
+				
+					<c:if test = "${empty listData }">
+						<div class="cont_none">
+							<div class="img">
+								<p>등록된 교재가 없습니다.</p>
+							</div>
+						</div>
+					</c:if>
+					<!--// end -->
+				</div>
+				<!--// 본문내용 -->
+			</div>
+			<!--// content 본문 -->	
+		</div>
+	</div>
+	<!--// container -->
+
+
+
+
+
+
+
+	<!-- foot -->
+	<%@ include file="/WEB-INF/jsp/ccedu/inc/footer_inc.jsp"%>
+	<!--// foot end -->
+
+</div>
+
+</body>
+</html>

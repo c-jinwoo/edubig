@@ -1,0 +1,1140 @@
+<%@page import="java.util.Date"%>
+<%
+/****************************************
+    subject : 찾아가는 교육
+    summary : 찾아가는 교육 > 교육신청
+    author  : SANGS
+    date    : 2018-06-15
+****************************************/
+%>
+<%@ page language="java" contentType="text/html; charset=utf-8" pageEncoding="utf-8"%>
+<%@ include file="/WEB-INF/jsp/ccedu/inc/taglib_inc.jsp"%>
+<%@ page import="java.text.SimpleDateFormat"%>
+<%
+	Date date = new Date();
+	SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
+	String toDay = dateFormat.format(date);
+	
+	request.setAttribute("toDay", toDay);
+%>
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+	<c:if test="${REQUEST_DATA.pageMode eq '' }">
+		<title>교육신청 > 찾아가는 교육 > 신용회복위원회 신용교육원</title>
+	</c:if>
+	<c:if test="${REQUEST_DATA.pageMode eq 'inquiry' }">
+		<title>신청결과 확인 > 찾아가는 교육 > 신용회복위원회 신용교육원</title>
+	</c:if>
+	<%@ include file="/WEB-INF/jsp/ccedu/inc/head_inc.jsp"%>
+<!-- 	<script type="text/javascript" src="/academy/common/js/jquery.showLoading.js"></script> -->
+<%-- 	<%@ include file="/WEB-INF/jsp/common/pop_office.jsp"%> --%>
+
+  	<!----- 주소검색 레이어 START----->
+	<div id="layer" style="display:none;position:fixed;overflow:hidden;z-index:9999;-webkit-overflow-scrolling:touch;">
+	<img src="//t1.daumcdn.net/localimg/localimages/07/postcode/320/close.png" id="btnCloseLayer" style="cursor:pointer;position:absolute;right:-3px;top:-3px;z-index:1" onclick="closeDaumPostcode()" alt="닫기 버튼">
+	</div>
+	
+	<script src="https://ssl.daumcdn.net/dmaps/map_js_init/postcode.v2.js?autoload=false"></script>
+	<script>
+		function isMobile() {
+		    return /Android|webOS|iPhone|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+		}
+		
+	    // 우편번호 찾기 화면을 넣을 element
+	    var element_layer = document.getElementById('layer');
+	
+	    function closeDaumPostcode() {
+	        // iframe을 넣은 element를 안보이게 한다.
+	        element_layer.style.display = 'none';
+	    }
+	
+	    function openDaumPostcode() {
+	    	
+	    	daum.postcode.load(function(){
+		        new daum.Postcode({
+		            oncomplete: function(data) {
+		
+		                // 각 주소의 노출 규칙에 따라 주소를 조합한다.
+		                // 내려오는 변수가 값이 없는 경우엔 공백('')값을 가지므로, 이를 참고하여 분기 한다.
+		                var fullAddr = data.address; // 최종 주소 변수
+		                var extraAddr = ''; // 조합형 주소 변수
+		
+		                // 기본 주소가 도로명 타입일때 조합한다.
+		                if(data.addressType === 'R'){
+		                    //법정동명이 있을 경우 추가한다.
+		                    if(data.bname !== ''){
+		                        extraAddr += data.bname;
+		                    }
+		                    // 건물명이 있을 경우 추가한다.
+		                    if(data.buildingName !== ''){
+		                        extraAddr += (extraAddr !== '' ? ', ' + data.buildingName : data.buildingName);
+		                    }
+		                    // 조합형주소의 유무에 따라 양쪽에 괄호를 추가하여 최종 주소를 만든다.
+		                    fullAddr += (extraAddr !== '' ? ' ('+ extraAddr +')' : '');
+		                }
+		                
+		                // 우편번호와 주소 정보를 해당 필드에 넣는다.
+		                document.getElementById('compPostNo').value = data.zonecode; //5자리 새우편번호 사용
+		                document.getElementById('compAddr1').value = fullAddr;
+		                //document.getElementById('sample2_addressEnglish').value = data.addressEnglish;
+		
+		                // iframe을 넣은 element를 안보이게 한다.
+		                // (autoClose:false 기능을 이용한다면, 아래 코드를 제거해야 화면에서 사라지지 않는다.)
+		                element_layer.style.display = 'none';
+		                
+		                closeDaumPostcode();
+		            },
+		            width : '100%',
+		            height : '100%',
+		            maxSuggestItems : 5
+		        }).embed(element_layer);
+	    	});
+	        // iframe을 넣은 element를 보이게 한다.
+	        element_layer.style.display = 'block';
+	
+	        // iframe을 넣은 element의 위치를 화면의 가운데로 이동시킨다.
+	        initLayerPosition();
+	    }
+	
+	    // 브라우저의 크기 변경에 따라 레이어를 가운데로 이동시키고자 하실때에는
+	    // resize이벤트나, orientationchange이벤트를 이용하여 값이 변경될때마다 아래 함수를 실행 시켜 주시거나,
+	    // 직접 element_layer의 top,left값을 수정해 주시면 됩니다.
+	    function initLayerPosition(){
+	    	
+	        var width = 300; //우편번호서비스가 들어갈 element의 width
+	    	if (!isMobile()) {
+	    		width = 620;
+	    	}
+	    	
+	        var height = 400; //우편번호서비스가 들어갈 element의 height
+	        var borderWidth = 2; //샘플에서 사용하는 border의 두께
+	
+	        // 위에서 선언한 값들을 실제 element에 넣는다.
+	        element_layer.style.width = width + 'px';
+	        element_layer.style.height = height + 'px';
+	        element_layer.style.border = borderWidth + 'px solid';
+	        // 실행되는 순간의 화면 너비와 높이 값을 가져와서 중앙에 뜰 수 있도록 위치를 계산한다.
+	        element_layer.style.left = (((window.innerWidth || document.documentElement.clientWidth) - width)/2 - borderWidth - 6) + 'px';
+	        element_layer.style.top = (((window.innerHeight || document.documentElement.clientHeight) - height)/2 - borderWidth) + 'px';
+	    }
+	</script>
+	<!----- 주소검색 레이어 END----->
+	
+	<script type="text/javascript">
+	
+		
+		$(document).ready(function(){
+
+			$("#mtCompDept2").hide();
+			
+			$('#telNo2, #telNo3, #mobile2, #mobile3, #slPcnt').keyup(function () { 
+			    this.value = this.value.replace(/[^0-9]/g,'');
+			});
+			
+			
+			$('.input_board_cld').datepicker({dateFormat: 'yy-mm-dd'});
+			
+			if('${REQUEST_DATA.slno}' != null && '${map.SL_NO}' != null && '${map.SL_NO}' != ''){
+				$("#choiceDate").val('${map.HOPE_ODR}')
+			}
+			
+			onlyNumAlpha('email1');
+			fnValiEmail('email2');
+			
+		});
+		
+		
+	 	   function autoHypen(pthis) {
+		   
+			   var html = '';
+		       var eduSdate = $(pthis).val();
+	        
+		       if(eduSdate.length == 4) {
+		    	   html += eduSdate.substr(0, 4);
+		           html += '-';
+		           $(pthis).val(html);
+		       } else if(eduSdate.length == 7) {
+		    	   
+		    	   html += eduSdate.substr(0, 4);
+			 	   html += '-';
+			 	   html += eduSdate.substr(5, 2);
+			 	   html += '-';
+			 	   $(pthis).val(html);
+		       }
+			 	   
+	  	 }
+		
+		function mtEqu(tVal,obj) {
+			
+			console.log(obj);		
+					
+			if(tVal == 'VE0001'){
+				$("input[name^='mtFcltsCodeArr']").each(function(){
+					
+					if($(this).val() != tVal){
+						$(this).attr('checked',false);
+					}
+					
+				});
+			}else{
+				
+				if($("input:checkbox[mtKind='VE0001']").prop('checked')){
+					$("input:checkbox[mtKind='VE0001']").attr('checked',false);
+// 					$("input:checkbox[mtKind='VE0006']").attr('checked',false);
+				}
+				
+				$(obj).attr('checked',true);
+				
+			}
+	
+		}
+		
+		$.datepicker.setDefaults({
+			monthNames: ['1월','2월','3월','4월','5월','6월','7월','8월','9월','10월','11월','12월'],
+			dayNamesMin: ['일', '월', '화', '수', '목', '금', '토'],
+			changeMonth: true,
+			changeYear: true,
+			showMonthAfterYear: true,
+			monthNamesShort: ['1월','2월','3월','4월','5월','6월','7월','8월','9월','10월','11월','12월'],
+			dateFormat: 'yy-mm-dd', 
+			minDate: 1
+		}); 
+		
+	
+		
+		/* function timeHope(type, number){
+			
+			var hopeOdr = $(this).val(number);
+			
+			 if($("#eduSdate"+number).val() == ''){
+				modal({
+					type: 'alert',
+					title: '알림',
+					text: "날짜를 입력해주세요.",
+					callback: function(result) {
+						$('#hopeOdr'+number).attr("checked",true);
+						$("#eduSdate"+number).focus();
+					}
+				});
+				return false;
+			}
+				
+			$("#choiceDate").val(number);
+		}
+		 */
+		
+		//이메일 셀렉트박스 세팅
+	    function emailSelect(val){
+	        $('#email2').val(val);
+	    }
+	    function userEmailSelect(val){
+	        $('#userEmail2').val(val);
+	    }
+	    
+	
+	 	// 초기화 버튼 클릭
+		function allClear() {
+			fnConfirm("정말로 초기화를 하시겠습니까?", function(result) {
+				$("#frm")[0].reset();
+			})
+		}
+	 	
+	 	// 수강신청 버튼 클릭
+	 	function insertLecture() {
+	 		
+	 		  
+	 		
+	 		
+	 		if(!fnValiCheck($("#mtCompDept1"), "단체기관을 선택해주시기 바랍니다.")) {
+	 			return false;
+	 		}
+	 		if($("#mtCompDept1").val() == 'CD0001') {
+		 		if(!fnValiCheck($("#mtCompDept2"), "학교를 선택해주시기 바랍니다.")) return false;
+	 		}
+	 		if(!fnValiCheck($("#compNm"), "단체명을 확인해주시기 바랍니다.")) return false;
+	 		if(!fnValiCheck($("#slAppNm"), "담당자명 성명을 확인해주시기 바랍니다.")) return false;
+	 		if(!fnValiCheck($("#mobile2"), "휴대폰 가운데번호를 확인해주시기 바랍니다.")) return false;
+	 		if(!fnValiCheck($("#mobile3"), "휴대폰 뒷번호를 확인해주시기 바랍니다.")) return false;
+	 		
+	 		if($("#telNo2").val() != '' || $("#telNo3").val() ) {
+	    		if(!fnValiMinCheck($("#telNo2"), "유선전화 가운데 번호를 입력해주세요.", 3 )) return false;
+	    		if(!fnValiMinCheck($("#telNo3"), "유선전화 뒷 번호를 입력해주세요.", 4 )) return false;
+    		} 
+	 		
+	 		if(!fnValiCheck($("#email1"), "이메일 아이디를 확인해주시기 바랍니다.")) return false;
+	 		if(!fnValiCheck($("#email2"), "이메일 주소를 확인해주시기 바랍니다.")) return false; 
+	 		
+	 		$("#slAppEmail").val($("#email1").val()+"@"+$("#email2").val());
+	 		
+	 		if(!fnValiEmail($("#slAppEmail"), "이메일 형식이 올바르지않습니다.")) return false;
+			
+	 		if(!fnValiCheck($("#eduSdate1"), "교육희망1일시를 입력해주세요.")) return false;
+	 		
+	 		
+	 		$("input[name^=eduSdate]").each(function(i) {
+	 			if($("input[name^=eduSdate"+(i+1)+"]").val() != '') {
+	 				var choiceDate = $("input[name^=eduSdate"+(i+1)+"]").val();
+ 	 				if('${toDay}' >= $("#eduSdate"+(i+1)).val()) {
+		 				modal({
+		 	                type: 'alert',
+		 	                title: '알림',
+		 	                text: "오늘날짜 이후로 입력해주시기 바랍니다.",
+		 	                callback: function(result) {
+		 	                    $(':input:text[name^=eduSdate'+(i+1)+']').focus();
+		 	                }
+		 	            });
+		 				return false;
+	 				}
+	 			}
+	 		});
+	 	    
+	 		if(!compare(1)) return false;
+	 		if(!compare(2)) return false;
+	 		if(!compare(3)) return false;
+	 		
+	 	    if(!$('input:radio[name=slLocCd]:checked').val()) {
+	 	        modal({
+	 	                type: 'alert',
+	 	                title: '알림',
+	 	                text: "교육장소를 선택해주세요.",
+	 	                callback: function(result) {
+	 	                    $(':input:radio[name=slLocCd]').focus();
+	 	                }
+	 	            });
+	 	            return false;	
+	 	    }
+	 	    
+	 	    if($('input:radio[id=slLocCd_4]:checked').val()) {
+	 	    	if(!fnValiCheck($("#slLocEtc"), "교육장소를 입력해주시기 바랍니다.")) return false;
+	 	    }
+	 	    
+	 	    if(!$('input:radio[name=slTargetCd]:checked').val()) {
+	 	        modal({
+	 	                type: 'alert',
+	 	                title: '알림',
+	 	                text: "대상자를 선택해주세요.",
+	 	                callback: function(result) {
+	 	                    $(':input:radio[name=slTargetCd]').focus();
+	 	                }
+	 	            });
+	 	            return false;	
+	 	    }
+	 	    
+	 	    if(!fnValiCheck($('#slPcnt'),'참석인원을 입력해주세요.')) return false;
+	 	    
+	 	    if($("#slPcnt").val() == '0') {
+	 	    	modal({
+	 	    		type: 'alert',
+	 	            title: '알림',
+	 	            text: "참석인원이 0명이 될 수 없습니다.",
+	 	            callback: function(result) {
+	 	            	$(':input:text[name=slPcnt]').focus();
+	 	            }
+	 	        });
+	 	    	
+	 	    	return false;
+	 	    }
+
+	 	    if(!$('input:checkbox[name=mtFcltsCodeArr]:checked').val()) {
+	 	    	modal({
+	 	    		type: 'alert',
+	 	            title: '알림',
+	 	            text: "교육 시설정보를 선택해주세요.",
+	 	            callback: function(result) {
+	 	            	$(':input:radio[name=mtFcltsCodeArr]').focus();
+	 	            }
+	 	        });
+	 	    	
+	 	    	return false;	
+	 	    }
+	 	    
+	 	    if(!$('input:radio[name=slVpathCd]:checked').val()) {
+	 	        modal({
+	 	                type: 'alert',
+	 	                title: '알림',
+	 	                text: "방문경로를 선택해주세요.",
+	 	                callback: function(result) {
+	 	                    $(':input:radio[name=slVpathCd]').focus();
+	 	                }
+	 	            });
+	 	           
+	 	        return false;	
+	 	    }
+	 	    
+	 	   if($('input:radio[id=slVpathCd_4]:checked').val()) {
+	 	    	if(!fnValiCheck($("#slVpathEtc"), "방문경로를 입력해주시기 바랍니다.")) return false;
+	 	    }
+	 	   
+	 	   if(!fnCheckboxChecked($('#agree2'), "개인정보 수집 및 이용에 동의해<br>주시기 바랍니다.")) return false;
+	 	    
+	 		var eduCount = 0;
+	 		
+	 		$("input[id^=eduSdate]").each(function(i){
+	 			if($(this).val() != '') eduCount++;
+	 		});
+	 		$('#eduCount').val(eduCount);
+			
+	 		fnConfirm("등록하시겠습니까?", function(result) {
+	 			
+	 			if(result) {
+		 		
+		 			$("#pageMode").val("insert");
+			 		$("#slAppEmail").val($("#email1").val()+"@"+$("#email2").val());
+		 			$("#slAppTel1").val($("#mobile1").val()+"-"+$("#mobile2").val()+"-"+$("#mobile3").val());
+		 			if($("#telNo2").val() != '' && $("#telNo3").val() != '') {
+		 				$("#slAppTel2").val($("#telNo1").val()+"-"+$("#telNo2").val()+"-"+$("#telNo3").val());
+		 			}
+		 			
+		 			var ckbs2 = $("input[name='mtFcltsCodeArr']:checked");
+		 			ckbs2 = ckbs2.map(function(){
+		 				var value = $(this).val();
+		 				return value;
+		 			}).get().join(",");
+		 			
+		 			$("#mtFcltsCode").val(ckbs2); 
+		 			
+		 			
+		 		// 교육희망 일시 JSON 형식으로 넘기기
+		 			var list = [];
+		 			
+		 			$('input[name^=eduSdate]').each(function(i){
+		 				
+		 				var data = {};  
+		 				
+		 				data.eduSdate = $('input[name=eduSdate'+(i+1)+']').val().replace(/-/g,"").toString()
+		 								+ $('select[name=eduSdate_hh'+(i+1)+']').val().toString()
+		 								+ $('select[name=eduSdate_mm'+(i+1)+']').val().toString();
+		 				
+		 				data.eduEdate = $('input[name=eduSdate'+(i+1)+']').val().replace(/-/g,"").toString()
+		 				+ $('select[name=eduEdate_hh'+(i+1)+']').val().toString()
+		 				+ $('select[name=eduEdate_mm'+(i+1)+']').val().toString();
+		 				
+		 				list.push(data);
+		 				
+		 			});
+		 			
+		 			$('#listParam').val(JSON.stringify(list));
+		 			$("#frm").attr("action", "/ccedu/visit/insertLecture.do"); 
+		 			$("#frm").submit();
+	 			} else {
+	 				fnModalMsg("찾아가는 교육신청을 취소하셨습니다.");
+					return false;
+	 			}
+	 		});
+	 	}
+	 	
+	 	
+	 	// 신청취소
+// 	 	function calcleLecture() {
+// 	 		$("#frm").attr("action", "/ccedu/visit/deleteLecture.do");
+// 	 		$("#frm").submit();
+	 		
+// 	 	}
+	 	
+	 	// 목록으로 이동
+	 	function goLectureCheckForm() {
+	 		$("#frm").attr("action", "/ccedu/visit/againCheckList.do");
+	 		$("#frm").submit();
+	 	}
+	
+	 	
+	 	function compare(idx) {
+	 		var eduSdate_hh = $("#eduSdate_hh"+idx).val() + $("#eduSdate_mm"+idx).val();
+	 		var eduEdate_hh = $("#eduEdate_hh"+idx).val() + $("#eduEdate_mm"+idx).val();
+	 		if(eduSdate_hh > eduEdate_hh) {
+	 			  modal({
+	 	                type: 'alert',
+	 	                title: '알림',
+	 	                text: "시작시간이 종료시간보다 클 수는 없습니다."
+	 	            });
+	 	            return false;	
+	 		}
+	 		return true;
+	 	}
+	 	
+	 	
+	 // 단체명 학교가 아닐시, DEPT2 비활
+	 	function changeComp1(choose) {
+	 		if(choose == 'CD0001') {
+	 			$("#mtCompDept2").show();
+	 		} else {
+	 			$("#mtCompDept2").hide();
+	 		}
+	 	}
+	</script>
+</head>
+
+<body>
+
+<!-- skip nav -->
+	<%@ include file="/WEB-INF/jsp/ccedu/inc/nav_inc.jsp"%>
+<!--// skip nav -->
+
+
+<div id="wrap">
+
+	<!-- header -->
+	<%@ include file="/WEB-INF/jsp/ccedu/inc/header_inc.jsp"%>
+	<!--// header -->
+
+	<!-- container -->
+	<div id="container">
+
+		<!-- location -->
+		<c:if test="${REQUEST_DATA.pageMode eq ''}">
+			<jsp:include page="/WEB-INF/jsp/ccedu/inc/location/loc_02_02.jsp">
+				<jsp:param name="menuNm" value="교육신청"/> 
+			</jsp:include> 
+		</c:if> 
+		<c:if test="${REQUEST_DATA.pageMode eq 'inquiry'}">
+			<jsp:include page="/WEB-INF/jsp/ccedu/inc/location/loc_02_03.jsp">
+				<jsp:param name="menuNm" value="신청결과 확인"/> 
+			</jsp:include> 
+		</c:if>
+		<!--// location -->
+
+		<div class="con_center">
+
+			<!-- lnb -->
+			<div id="lnb">
+				<c:if test="${REQUEST_DATA.pageMode eq ''}">
+					<jsp:include page="/WEB-INF/jsp/ccedu/inc/lnb/lnb_02.jsp">
+						<jsp:param name="dep2" value="02"/>
+					</jsp:include>
+				</c:if>
+				<c:if test="${REQUEST_DATA.pageMode eq 'inquiry'}">
+					<jsp:include page="/WEB-INF/jsp/ccedu/inc/lnb/lnb_02.jsp">
+						<jsp:param name="dep2" value="03"/>
+					</jsp:include>
+				</c:if>
+			</div>
+			<!--// lnb -->
+			
+			<form name="frm" id="frm" method="post" action="" enctype="multipart/form-data">
+				<input type="hidden" name="qu" id="qu" value=""/>
+				<input type="hidden" name="listParam" id="listParam" value=""/>
+				<input type="hidden" name="slAppEmail" id="slAppEmail" value=""/>
+				<input type="hidden" name="slAppTel1" id="slAppTel1" value=""/>
+				<input type="hidden" name="slAppTel2" id="slAppTel2" value=""/>
+				<input type="hidden" name="pageMode" id="pageMode" value="<c:out value='${REQUEST_DATA.pageMode}'/>"/>
+				<input type="hidden" name="mtFcltsCode" id="mtFcltsCode" value=""/>
+<!-- 				<input type="hidden" name="choiceDate" id="choiceDate" value=""/> -->
+				<input type="hidden" name="eduCount" id="eduCount" value=""/>
+				<input type="hidden" name="slNo" id="slNo" value="<c:out value='${lectureInfo.SL_NO }'/>"/>
+				<input type="hidden" name="$searchEmail" id="searchEmail" value="<c:out value='${lectureInfo.SL_APP_EMAIL}'/>"/>
+				<input type="hidden" name="$searchNm" id="searchNm" value="<c:out value='${lectureInfo.SL_APP_NM}'/>"/>
+<!-- 				<input type="hidden" name="hopeOdr" id="hopeOdr" value="1"> -->
+			
+			<!-- content 본문 -->
+			<div id="content">
+			
+				<c:if test="${REQUEST_DATA.pageMode eq '' }">
+					<!-- 기존 START 2018-08-30  -->
+<!-- 				<h3 class="cont_titile">교육신청</h3> -->
+					<!-- 기존 END 2018-08-30  -->
+					
+					<!-- 2018-08-28 김동인 작업 S --> 
+					<h3 class="cont_titile type02">교육신청<span></span></h3>
+					<!-- 2018-08-28 김동인 작업 E -->
+				</c:if>
+				<c:if test="${REQUEST_DATA.pageMode eq 'inquiry'}">
+					
+					<!-- 기존 START 2018-08-30  -->
+<!-- 				<h3 class="cont_titile">신청결과 확인</h3> -->
+					<!-- 기존 END 2018-08-30  -->
+					
+					<!-- 2018-08-28 김동인 작업 S --> 
+					<h3 class="cont_titile type02">신청결과 확인 <span></span></h3>
+					<!-- 2018-08-28 김동인 작업 E -->
+				</c:if>
+				<!-- 본문내용 -->
+				<div class="cont_body">
+					<!-- start -->
+
+					<c:if test="${REQUEST_DATA.pageMode eq ''}">
+						<div class="c_section">
+							<h4 class="c_tit">찾아가는교육 신청 시 유의사항 </h4>
+							<ul class="c_txtlist">
+								<li>
+									교육일시는 희망하는 날짜와 시간을 1,2,3지망으로 구분하여 각각 기재해주시기 바랍니다. <br />
+									1지망으로 신청하신 일자에 우선적으로 방문교육을 실시합니다.
+								</li>
+								<li>교육 참석 인원 20명 이상부터 신청이 가능합니다(20명 미만은 협의 필요)</li>
+								<li>교육기자재 보유현황에는 기관에서 보유한 기자재 유무를 체크해주십시오.</li>
+								<li>접수 및 문의처 :  신용교육원 02) 750-1231~3</li>
+							</ul>
+						</div>
+	
+						<div class="c_section">
+							<h4 class="c_tit">찾아가는교육 신청 프로세스</h4>
+							<div class="c_txtstep">
+								<ol>
+									<li>교육신청</li>
+									<li>협의</li>
+									<li>교육준비</li>
+									<li>교육실시</li>
+									<li>교육평가</li>
+								</ol>
+							</div>
+						</div>
+					</c:if>
+
+					<div class="c_section">
+						<h4 class="c_tit">기본정보</h4>
+						<div class="table_style_row">
+							<table>
+								<caption>기업명, 주소 항목이 있는 표 입니다.</caption>
+								<colgroup>
+									<col class="col2_1" />
+									<col />
+								</colgroup>
+								<tr>
+									<th scope="row">단체명</th>
+									<td>
+<!-- 										<input type="hidden" id="compNo" name="compNo" value=""/> -->
+<!-- 										<input type="hidden" id="compPostNo" name="compPostNo" value=""  title="주소" maxlength="100"  readonly="readonly" > -->
+<!-- 						        		<input type="hidden" id="compAddr1" name="compAddr1" value="" title="주소" maxlength="100" readonly="readonly"> -->
+<!-- 						        		<input type="hidden" id="compAddr2" name="compAddr2" value="" title="주소" maxlength="100"> -->
+										<div class="form_field">
+											<!-- 단체명 입력하는 란 -->
+											<c:if test="${REQUEST_DATA.pageMode ne 'inquiry'}">
+<!-- 												<input type="text" id="compNm" name="compNm" value="" style="cursor: default;" readonly="readonly" maxlength="250" title="기업명 입력" class="wid_1" /> -->
+<!-- 												<button class="btn_graybg02 search_btn" data-tooltip="popsearch03">검색</button> -->
+												<select id="mtCompDept1" name="mtCompDept1" title="단체 구분 선택" onchange="changeComp1(this.value);" class="select_email_domain" style="margin-left: 0px;">
+													<option value="">선택</option>
+													<c:forEach items="${mtCompDeptCode1 }" var="mtCompDeptCode1">
+														<option value="${mtCompDeptCode1.MT_SUB_CODE}"><c:out value="${mtCompDeptCode1.MT_SUB_NAME}"/></option>
+													</c:forEach>
+												</select>
+												<select id="mtCompDept2" name="mtCompDept2" title="학교 구분 선택" class="select_email_domain" style="margin-right: 10px;">
+													<option value="">선택</option>
+													<c:forEach items="${mtCompDeptCode2 }" var="mtCompDeptCode2">
+														<option value="${mtCompDeptCode2.MT_SUB_CODE}"><c:out value="${mtCompDeptCode2.MT_SUB_NAME}"/></option>
+													</c:forEach>
+												</select>
+												<input type="text" name="compNm" id="compNm" maxlength="25" value="" title="기관명 입력" style="margin-left: 5px;" class="wid_1" />
+											</c:if>
+											<c:if test="${REQUEST_DATA.pageMode eq 'inquiry'}">
+												<c:out value='${lectureInfo.COMP_NM}'/>
+											</c:if>
+										</div>
+									</td>
+								</tr>
+								<tr>
+									<th scope="row">주소</th>
+									<td>
+										<div class="form_field">
+											<c:if test="${REQUEST_DATA.pageMode ne 'inquiry'}">
+												<!--  hidden으로 처리하고 나중에 c:out을 처리하자 -->
+<!-- 												<span id="compAddr"> -->
+<!-- 												</span> -->
+												<input type="text" title="우편번호 입력" class="input_postal_code" id="compPostNo" name="compPostNo" value="" title="우편번호" readonly="readonly"/>
+												<button class="btn_graybg02 btn_postal_code" onclick="openDaumPostcode(); return false;">우편번호 찾기</button>
+												<div class="address_box">
+													<input type="text" title="주소 입력" class="input_address" id="compAddr1" name="compAddr1" title="주소" value=""readonly="readonly"/>
+													<input type="text" title="상세주소 입력" class="input_detail_address" value="" id="compAddr2" name="compAddr2" maxlength="300"/>
+												</div>
+											</c:if>
+											<c:if test="${REQUEST_DATA.pageMode eq 'inquiry'}">
+							        			<c:out value="(${lectureInfo.COMP_POSTNO})"/><br>
+							        			<c:out value="${lectureInfo.COMP_ADDR1}"/>&nbsp;&nbsp;<c:out value="${lectureInfo.COMP_ADDR2}"/>
+						        			</c:if>
+										</div>
+									</td>
+								</tr>
+							</table>
+						</div>
+					</div>
+
+					<div class="c_section">
+						<h4 class="c_tit">신청내용</h4>
+						<div class="table_style_row">
+							<table>
+								<caption>신청자, 신청자 연락처1, 신청자 연락처2, 신청자 이메일, 교육 희망일시, 교육장소, 대상자, 인원, 특이사항, 교육기자재, 방문경로 등 항목을 작성하는 표 입니다.</caption>
+								<colgroup>
+									<col class="col2_1" />
+									<col />
+								</colgroup>
+								<tr>
+									<th scope="row">담당자명</th>
+									<td>
+										<div class="form_field">
+											<c:if test="${REQUEST_DATA.pageMode ne 'inquiry'}">
+												<input type="text" name="slAppNm"  id="slAppNm" maxlength="25"  value="" title="담당자명 입력" class="wid_1" />
+											</c:if>
+											<c:if test="${REQUEST_DATA.pageMode eq 'inquiry'}">
+				            					<c:out value="${lectureInfo.SL_APP_NM }"/>
+				            				</c:if>
+										</div>
+									</td>
+								</tr>
+								<tr>
+									<th scope="row">신청자 연락처1</th>
+									<td>
+										<div class="form_field maxwid360">
+											 <c:if test="${REQUEST_DATA.pageMode ne 'inquiry'}">
+				            					<select id="mobile1" name="mobile1" style="width:22%;" title="휴대폰번호 앞자리 선택">
+				            						 <option value="010">010</option>
+						                             <option value="011">011</option>
+						                             <option value="016">016</option>
+						                             <option value="017">017</option>
+						                             <option value="018">018</option>
+						                             <option value="019">019</option>
+                        	    				</select>		
+												<span class="widbox" style="width:8%;">-</span>
+												<input type="tel" name="mobile2"  id="mobile2" value="<c:out value="${map.SL_APP_TEL1 }"/>" maxlength="4" title="휴대폰번호 가운데 4자리 입력"  style="width:31%;" />
+												<span class="widbox" style="width:8%;">-</span>
+												<input type="tel" name="mobile3"  id="mobile3" value="<c:out value="${map.SL_APP_TEL1 }"/>" maxlength="4" title="휴대폰번호 마지막 4자리 입력"  style="width:31%;" />
+											</c:if>
+											
+				            				<c:if test="${REQUEST_DATA.pageMode eq 'inquiry'}">
+				            					<c:out value='${lectureInfo.SL_APP_TEL1}'/>
+				            				</c:if>
+										</div>
+									</td>
+								</tr>
+								<tr>
+									<th scope="row">신청자 연락처2</th>  
+									<td>
+										<div class="form_field maxwid360">
+											<c:if test="${REQUEST_DATA.pageMode ne 'inquiry'}">
+											
+												<select id="telNo1" name="telNo1" title="유선전화 앞자리 선택" style="width:22%;">
+													<option value="02">02</option>
+							                        <option value="031">031</option>
+							                        <option value="032">032</option>
+							                        <option value="033">033</option>
+							                        <option value="041">041</option>
+							                        <option value="042">042</option>
+							                        <option value="043">043</option>
+							                        <option value="044">044</option>
+							                        <option value="051">051</option>
+							                        <option value="052">052</option>
+							                        <option value="053">053</option>
+							                        <option value="054">054</option>
+							                        <option value="055">055</option>
+							                        <option value="061">061</option>
+							                        <option value="062">062</option>
+							                        <option value="063">063</option>
+							                        <option value="064">064</option>
+							                        <option value="070">070</option>
+												</select>
+												<span class="widbox" style="width:8%;">-</span>
+												<input type="tel" name="telNo2" id="telNo2"  value="<c:out value="${map.SL_APP_TEL2 }"/>" maxlength="4" title="유선전화 가운데자리 입력"  style="width:31%;" />
+												<span class="widbox"  style="width:8%;">-</span>
+												<input type="tel" name="telNo3" id="telNo3"  value="<c:out value="${map.SL_APP_TEL3 }"/>" maxlength="4" title="유선전화 마지막자리 입력"  style="width:31%;" />
+											</c:if>
+											<c:if test="${REQUEST_DATA.pageMode eq 'inquiry'}">
+				            					<c:out value='${lectureInfo.SL_APP_TEL2}'/>
+				            				</c:if>
+										</div>
+									</td>
+								</tr>
+								<tr>
+									<th scope="row">이메일</th>
+									<td>
+										<c:if test="${REQUEST_DATA.pageMode ne 'inquiry'}">
+											<div class="form_field">
+												<c:set var="emailId" value="${fn:substringBefore(examUserMap.EMAIL, '@')}"/> 
+												<input type="text" id="email1" name="email1" value="<c:out value='${emailId}'/>" maxlength="30" title="이메일 아이디 입력" class="input_email_id" />
+												<span class="widbox widbox_email">@</span>
+												<c:set var="emailAddr" value="${fn:substringAfter(examUserMap.EMAIL, '@')}"/>
+												<input type="text"  id="email2" name="email2" maxlength="20" value="<c:out value='${emailAddr }'/>" title="도메인 입력" class="input_email_domain" />
+												<select id="email3" name="email3" onchange="emailSelect(this.value);return false;" title="직접입력 할 수 있는 도메인 선택" class="select_email_domain">
+													<c:forEach var="emap2" items="${mtEmailCodeList}" varStatus="status2">
+														<option value="${emap2.MT_SUB_NAME}" <c:if test="${emap2.MT_SUB_NAME eq emailAddr}"> selected="selected" </c:if>><c:out value="${emap2.MT_SUB_NAME}"/></option>
+												    </c:forEach>
+												    <option value="">직접입력</option>
+												</select>
+											</div>
+										</c:if>
+										<c:if test="${REQUEST_DATA.pageMode eq 'inquiry' }">
+											<c:out value="${lectureInfo.SL_APP_EMAIL }"/>
+										</c:if>
+									</td>
+								</tr>
+								<tr>
+									<th scope="row">교육 희망일시</th>
+									<td>
+										<!-- 1지망 시작 -->
+										<div class="form_field">
+											<div class="date_line">
+												<c:if test="${REQUEST_DATA.pageMode ne 'inquiry' }">
+													<div class="ff_radio">1지망</div>
+													<input type="text" class="input_board_cld" name="eduSdate1" onkeyup="autoHypen(this);"  maxlength="10" id="eduSdate1" value="${dateResult[0].HOPE_DAY }" title="교육 희망일시 1지망 입력" />
+													<div class="time_interval">
+	
+														<select name="eduSdate_hh1" id="eduSdate_hh1" title="시작하는 시 선택" class="select_board_time">
+															<c:forEach var="sh" begin="8" end="22" step="1">
+																<c:if test="${sh < 10}"><c:set var="sh">0${sh}</c:set></c:if>
+																<option value="<c:out value='${sh}' />" <c:if test="${dateResult[0].HOPE_ST_HOUR == sh}"> selected="selected"</c:if>><c:out value="${sh}" /></option>
+															</c:forEach>
+														</select>
+														
+														<span class="float_txt">:</span>
+														<select name="eduSdate_mm1" id="eduSdate_mm1" title="시작하는 분 선택" class="select_board_time">
+															<c:forEach var="sh" begin="0" end="55" step="5">
+																<c:if test="${sh < 10}"><c:set var="sh">0${sh}</c:set></c:if>
+																<option value="<c:out value='${sh}' />" <c:if test="${dateResult[0].HOPE_ST_MIN == sh}"> selected="selected"</c:if>><c:out value="${sh}" /></option>
+															</c:forEach>
+														</select>
+	
+														<span class="widbox">~</span>
+	
+														<select name="eduEdate_hh1" id="eduEdate_hh1" title="종료하는 시 선택" class="select_board_time">
+															<c:forEach var="sh" begin="8" end="22" step="1">
+																<c:if test="${sh < 10}"><c:set var="sh">0${sh}</c:set></c:if>
+																<option value="<c:out value='${sh}' />" <c:if test="${dateResult[0].HOPE_ED_HOUR == sh}"> selected="selected"</c:if>><c:out value="${sh}" /></option>
+															</c:forEach>
+														</select>
+														<span class="float_txt">:</span>
+														<select name="eduEdate_mm1" id="eduEdate_mm1" title="종료하는 분 선택" class="select_board_time">
+															<c:forEach var="sh" begin="0" end="55" step="5">
+																<c:if test="${sh < 10}"><c:set var="sh">0${sh}</c:set></c:if>
+																<option value="<c:out value='${sh}' />" <c:if test="${dateResult[0].HOPE_ED_MIN == sh}"> selected="selected"</c:if>><c:out value="${sh}" /></option>
+															</c:forEach>
+														</select>
+													</div>  
+												</c:if>
+												
+												<c:if test="${REQUEST_DATA.pageMode eq 'inquiry'}">
+													<c:if test="${hopeDateList[0] ne null}">
+														<c:if test="${lectureInfo.HOPE_ODR eq '1'}">
+															<p class="color_orange"><strong>[1지망]</strong> 
+																<c:out value="${hopeDateList[0].HOPE_DAY}"/>&nbsp; 
+																<c:out value="${hopeDateList[0].HOPE_ST_HOUR}"/> : <c:out value="${hopeDateList[0].HOPE_ST_MIN}"/> ~
+																<c:out value="${hopeDateList[0].HOPE_ED_HOUR}"/> : <c:out value="${hopeDateList[0].HOPE_ED_MIN}"/> 
+															</p>
+														</c:if>
+														<c:if test="${lectureInfo.HOPE_ODR ne '1'}">
+															<p><strong>[1지망]</strong>
+															<c:out value="${hopeDateList[0].HOPE_DAY}"/>&nbsp; 
+															<c:out value="${hopeDateList[0].HOPE_ST_HOUR}"/> : <c:out value="${hopeDateList[0].HOPE_ST_MIN}"/> ~
+															<c:out value="${hopeDateList[0].HOPE_ED_HOUR}"/> : <c:out value="${hopeDateList[0].HOPE_ED_MIN}"/> 
+														</c:if>
+	 				            					</c:if>
+				            					</c:if>
+											</div>
+											<!-- 1지망 끝 -->
+											
+											<!-- 2지망 시작 -->
+											<div class="date_line">
+												<c:if test="${REQUEST_DATA.pageMode ne 'inquiry' }">
+													<div class="ff_radio">2지망</div>
+													<input type="text" class="input_board_cld"  maxlength="10" onkeyup="autoHypen(this);" name="eduSdate2" id="eduSdate2" value="${dateResult[1].HOPE_DAY }" title="교육 희망일시 2지망 입력" />
+													<div class="time_interval">
+	
+														<select name="eduSdate_hh2" id="eduSdate_hh2" title="시작하는 시 선택" class="select_board_time">
+															<c:forEach var="sh" begin="8" end="22" step="1">
+																<c:if test="${sh < 10}"><c:set var="sh">0${sh}</c:set></c:if>
+																<option value="<c:out value='${sh}' />" <c:if test="${dateResult[1].HOPE_ST_HOUR == sh}"> selected="selected"</c:if>><c:out value="${sh}" /></option>
+															</c:forEach>
+														</select>
+														
+														<span class="float_txt">:</span>
+														<select name="eduSdate_mm2" id="eduSdate_mm2" title="시작하는 분 선택" class="select_board_time">
+															<c:forEach var="sh" begin="0" end="55" step="5">
+																<c:if test="${sh < 10}"><c:set var="sh">0${sh}</c:set></c:if>
+																<option value="<c:out value='${sh}' />" <c:if test="${dateResult[1].HOPE_ST_MIN == sh}"> selected="selected"</c:if>><c:out value="${sh}" /></option>
+															</c:forEach>
+														</select>
+	
+														<span class="widbox">~</span>
+	
+														<select name="eduEdate_hh2" id="eduEdate_hh2" title="종료하는 시 선택" class="select_board_time">
+															<c:forEach var="sh" begin="8" end="22" step="1">
+																<c:if test="${sh < 10}"><c:set var="sh">0${sh}</c:set></c:if>
+																<option value="<c:out value='${sh}' />" <c:if test="${dateResult[1].HOPE_ED_HOUR == sh}"> selected="selected"</c:if>><c:out value="${sh}" /></option>
+															</c:forEach>
+														</select>  
+														<span class="float_txt">:</span>
+														<select name="eduEdate_mm2" id="eduEdate_mm2" title="종료하는 분 선택" class="select_board_time">
+															<c:forEach var="sh" begin="0" end="55" step="5">
+																<c:if test="${sh < 10}"><c:set var="sh">0${sh}</c:set></c:if>
+																<option value="<c:out value='${sh}' />" <c:if test="${dateResult[1].HOPE_ED_MIN == sh}"> selected="selected"</c:if>><c:out value="${sh}" /></option>
+															</c:forEach>
+														</select>
+													</div>
+												</c:if>
+												<c:if test="${REQUEST_DATA.pageMode eq 'inquiry'}">
+													<c:if test="${hopeDateList[1] ne null}">
+														<c:if test="${lectureInfo.HOPE_ODR eq '2'}">
+															<p class="color_orange"><strong>[2지망]</strong> 
+																<c:out value="${hopeDateList[1].HOPE_DAY}"/>&nbsp; 
+																<c:out value="${hopeDateList[1].HOPE_ST_HOUR}"/> : <c:out value="${hopeDateList[1].HOPE_ST_MIN}"/> ~
+																<c:out value="${hopeDateList[1].HOPE_ED_HOUR}"/> : <c:out value="${hopeDateList[1].HOPE_ED_MIN}"/> 
+															</p>
+														</c:if>
+														<c:if test="${lectureInfo.HOPE_ODR ne '2'}">
+															<p><strong>[2지망]</strong>
+															<c:out value="${hopeDateList[1].HOPE_DAY}"/>&nbsp; 
+															<c:out value="${hopeDateList[1].HOPE_ST_HOUR}"/> : <c:out value="${hopeDateList[1].HOPE_ST_MIN}"/> ~
+															<c:out value="${hopeDateList[1].HOPE_ED_HOUR}"/> : <c:out value="${hopeDateList[1].HOPE_ED_MIN}"/> 
+														</c:if>
+	 				            					</c:if>
+				            					</c:if>
+											</div>
+											<!-- 2지망 완료 -->
+											
+											<!-- 3지망 시작 -->
+											<div class="date_line">
+												<c:if test="${REQUEST_DATA.pageMode ne 'inquiry' }">
+													<div class="ff_radio">3지망</div>
+													<input type="text" class="input_board_cld" maxlength="10" onkeyup="autoHypen(this);" name="eduSdate3" id="eduSdate3" value="${dateResult[2].HOPE_DAY }" title="교육 희망일시 3지망 입력" />
+													<div class="time_interval">
+	
+														<select name="eduSdate_hh3" id="eduSdate_hh3" title="시작하는 시 선택" class="select_board_time">
+															<c:forEach var="sh" begin="8" end="22" step="1">
+																<c:if test="${sh < 10}"><c:set var="sh">0${sh}</c:set></c:if>
+																<option value="<c:out value='${sh}' />" <c:if test="${dateResult[2].HOPE_ST_HOUR == sh}"> selected="selected"</c:if>><c:out value="${sh}" /></option>
+															</c:forEach>
+														</select>
+														
+														<span class="float_txt">:</span>
+														<select name="eduSdate_mm3" id="eduSdate_mm3" title="시작하는 분 선택" class="select_board_time">
+															<c:forEach var="sh" begin="0" end="55" step="5">
+																<c:if test="${sh < 10}"><c:set var="sh">0${sh}</c:set></c:if>
+																<option value="<c:out value='${sh}' />" <c:if test="${dateResult[2].HOPE_ST_MIN == sh}"> selected="selected"</c:if>><c:out value="${sh}" /></option>
+															</c:forEach>
+														</select>
+	
+														<span class="widbox">~</span>
+	
+														<select name="eduEdate_hh3" id="eduEdate_hh3" title="종료하는 시 선택" class="select_board_time">
+															<c:forEach var="sh" begin="8" end="22" step="1">
+																<c:if test="${sh < 10}"><c:set var="sh">0${sh}</c:set></c:if>
+																<option value="<c:out value='${sh}' />" <c:if test="${dateResult[2].HOPE_ED_HOUR == sh}"> selected="selected"</c:if>><c:out value="${sh}" /></option>
+															</c:forEach>
+														</select>
+														<span class="float_txt">:</span>
+														<select name="eduEdate_mm3" id="eduEdate_mm3" title="종료하는 분 선택" class="select_board_time">
+															<c:forEach var="sh" begin="0" end="55" step="5">
+																<c:if test="${sh < 10}"><c:set var="sh">0${sh}</c:set></c:if>
+																<option value="<c:out value='${sh}' />" <c:if test="${dateResult[2].HOPE_ED_MIN == sh}"> selected="selected"</c:if>><c:out value="${sh}" /></option>
+															</c:forEach>
+														</select>
+													</div>
+												</c:if>
+												<c:if test="${REQUEST_DATA.pageMode eq 'inquiry'}">
+													<c:if test="${hopeDateList[2] ne null}">
+														<c:if test="${lectureInfo.HOPE_ODR eq '3'}">
+															<p class="color_orange"><strong>[3지망]</strong> 
+																<c:out value="${hopeDateList[2].HOPE_DAY}"/>&nbsp; 
+																<c:out value="${hopeDateList[2].HOPE_ST_HOUR}"/> : <c:out value="${hopeDateList[2].HOPE_ST_MIN}"/> ~
+																<c:out value="${hopeDateList[2].HOPE_ED_HOUR}"/> : <c:out value="${hopeDateList[2].HOPE_ED_MIN}"/> 
+															</p>
+														</c:if>
+														<c:if test="${lectureInfo.HOPE_ODR ne '3'}">
+															<p><strong>[3지망]</strong>
+															<c:out value="${hopeDateList[2].HOPE_DAY}"/>&nbsp; 
+															<c:out value="${hopeDateList[2].HOPE_ST_HOUR}"/> : <c:out value="${hopeDateList[2].HOPE_ST_MIN}"/> ~
+															<c:out value="${hopeDateList[2].HOPE_ED_HOUR}"/> : <c:out value="${hopeDateList[2].HOPE_ED_MIN}"/> 
+														</c:if>
+	 				            					</c:if>
+				            					</c:if>
+											</div>
+											<!-- 3지망 완료 -->
+										</div>
+										<p class="board_nt color_orange">* 1지망은 필수입력입니다. 2,3지망은 선택입력입니다.</p>
+									</td>
+								</tr>
+								<tr>
+									<th scope="row">교육장소</th>
+									<td>
+										<c:if test="${REQUEST_DATA.pageMode ne 'inquiry' }">
+											<div class="form_field">
+												<div class="ff_radio">
+													<c:forEach var="result"  items="${mtLocCode}" varStatus="status">
+				            							<input type="radio" name="slLocCd" id="slLocCd_${status.count}" value="${result.MT_SUB_CODE}" <c:if test="${result.MT_SUB_CODE eq map.MT_SUB_CODE_LOC}" >checked="checked" </c:if>>&nbsp;
+														<label for="slLocCd_${status.count}">${result.MT_SUB_NAME}</label>&nbsp;
+				            						</c:forEach>
+				            						<input type="text" name="slLocEtc" id="slLocEtc" value="" title="교육장소 기타" />	
+												</div>
+											</div>
+										</c:if>
+										<c:if test="${REQUEST_DATA.pageMode eq 'inquiry' }">
+											<c:if test="${lectureInfo.SL_LOC_NAME ne '기타'}">
+												<c:out value='${lectureInfo.SL_LOC_NAME }'/>
+											</c:if>
+											<c:if test="${lectureInfo.SL_LOC_NAME eq '기타'}">
+				          						<c:out value="${lectureInfo.SL_LOC_ETC}"/>
+				          					</c:if>
+				            			</c:if>
+									</td>
+								</tr>
+								<tr>
+									<th scope="row">대상자</th>
+									<td>
+										<div class="form_field">
+											<div class="ff_radio">
+												<c:if test="${REQUEST_DATA.pageMode ne 'inquiry' }">
+													<c:forEach var="result"  items="${cmTargets}" varStatus="status">
+					            						<input type="radio" name="slTargetCd" id="slTargetCd_${status.count}" value="${result.MT_SUB_CODE}" <c:if test="${result.MT_SUB_CODE eq map.SL_TARGET_CD}" >checked="checked" </c:if>>&nbsp;
+														<label for="slTargetCd_${status.count}">${result.MT_SUB_NAME}</label>&nbsp;
+					            					</c:forEach>
+					            				</c:if>
+					            				<c:if test="${REQUEST_DATA.pageMode eq 'inquiry' }">
+				          							<c:out value="${lectureInfo.SL_TARGET_NAME}"/>
+				            					</c:if>
+											</div>
+										</div>
+									</td>
+								</tr>
+								<tr>
+									<th scope="row">인원</th>
+									<td>
+										<div class="form_field">
+											<c:if test="${REQUEST_DATA.pageMode ne 'inquiry' }">
+												<input type="text" name="slPcnt"  id="slPcnt" value="" maxlength="4" title="인원수 입력" />
+												<span class="float_txt mgl10">명</span>
+											</c:if>
+											<c:if test="${REQUEST_DATA.pageMode eq 'inquiry' }">
+				          						<c:out value="${lectureInfo.SL_PCNT}"/>명
+				            				</c:if>
+										</div>
+									</td>
+								</tr>
+								<tr>
+									<th scope="row">특이사항</th>
+									<td>
+										<div class="form_field">
+											<c:if test="${REQUEST_DATA.pageMode ne 'inquiry' }">
+												<textarea id="slEtcCont" name="slEtcCont" cols="" rows="" title="특이사항 입력" class="textarea"></textarea>
+											</c:if>
+											<c:if test="${REQUEST_DATA.pageMode eq 'inquiry' }">
+				          		 				<c:out value="${lectureInfo.SL_ETC_CONT}"/>
+				            				</c:if>
+										</div>
+									</td>
+								</tr>
+								<tr>
+									<th scope="row">교육기자재</th>
+									<td>
+										<div class="form_field">
+											<c:if test="${REQUEST_DATA.pageMode ne 'inquiry' }">
+												<c:forEach var="mtEquCode" items="${mtEquCode}" varStatus="status">	
+													<div class="ff_check">
+														<input type="checkbox" onclick="mtEqu(this.value,this);" mtKind="${mtEquCode.MT_SUB_CODE}" name="mtFcltsCodeArr" id="mtFcltsCodeArr_${status.count}" value="${mtEquCode.MT_SUB_CODE}"/>
+														<label for="mtFcltsCodeArr_${status.count}">${mtEquCode.MT_SUB_NAME}</label>
+													</div>
+												</c:forEach>
+												<input type="text" name="etc" id="etc" value="" maxlength="250" title="교육기자재 기타" />
+											</c:if>	
+										
+											<c:if test="${REQUEST_DATA.pageMode eq 'inquiry' }">
+												<c:forEach var="toolList" items="${toolList}" varStatus="status">
+													<c:if test="${!status.last}">${toolList.MT_SUB_NAME}, &nbsp;</c:if>
+													<c:if test="${status.last}">${toolList.MT_SUB_NAME}</c:if>
+													<c:if test="${not empty toolList.ETC}">
+														(<c:out value='${toolList.ETC }'/>)
+													</c:if>
+												</c:forEach>
+											</c:if>
+										</div>
+									</td>
+								</tr>
+								<tr>
+									<th scope="row">방문경로</th>
+									<td>
+										<div class="form_field">
+											<c:if test="${REQUEST_DATA.pageMode ne 'inquiry' }">
+												<c:forEach var="result"  items="${mtVpathCode}" varStatus="status">
+													<div class="ff_radio">
+														<input type="radio" name="slVpathCd" id="slVpathCd_${status.count}" value="${result.MT_SUB_CODE}" <c:if test="${result.MT_SUB_CODE eq map.MT_SUB_CODE_PATH}" > checked="checked" </c:if>/> 
+														<label for="slVpathCd_${status.count}">${result.MT_SUB_NAME}</label>&nbsp;
+													</div>
+												</c:forEach>
+												<input type="text" name="slVpathEtc" id="slVpathEtc" value="" title="방문교육 기타정보" />	
+											</c:if>
+											<c:if test="${REQUEST_DATA.pageMode eq 'inquiry' }">
+												<c:if test="${lectureInfo.SL_VPATH_NAME ne '기타' }">
+													<c:out value='${lectureInfo.SL_VPATH_NAME}'/>
+												</c:if>
+				          		 				<c:if test="${lectureInfo.SL_VPATH_NAME eq '기타'}">
+				          		 					<c:out value='${lectureInfo.SL_VPATH_ETC}'/>
+				          		 				</c:if>
+				            				</c:if>
+										</div>
+									</td>
+								</tr>
+							</table>
+							<p class="board_nt color_orange">* 교육은 PPT를 이용한 강의식으로 진행되므로, 필요한 기자재를 준비해주시기 바랍니다.</p>
+						</div>
+					</div>
+					
+					<c:if test="${REQUEST_DATA.pageMode eq ''}">
+					<!--2018-07-12 / 개인정보안내추가 이희연-->
+						<div class="c_section">
+							<h4 class="c_tit">개인정보 수집 및 이용 동의</h4>
+							<div class="agreement_type02" tabindex="0">
+								<ol>
+									<li class="bold">
+										- 개인정보의 수집·이용 목적
+										<ol>
+											<li>찾아가는교육 / 신용회복위원회 일반교육</li>
+										</ol>
+									</li>
+									<br>
+									<li class="bold">
+										- 수집하는 개인정보의 항목
+										<ol>
+											<li>신청자 성명, 신청자 연락처(유선, 휴대폰, 이메일) </li>
+										</ol>
+									</li>
+									<br>
+									<li class="bold">
+										- 개인정보의 보유 및 이용기간
+										<ol>
+											<li>신용회복위원회의 교육 신청과 관련하여 수집한 개인정보는 관계법령 등의 규정에 의하여 기록·보전하고, 기간이 경과할 경우 「개인정보보호법」등에서 정하는 바에 따라 파기합니다. 단, 관계법령에서 의하여 정보보유사유가 발생한 때에는 법률에서 정한 기간 동안 정보를 보존합니다. 귀하는 개인정보 수집·이용 동의를 거부하실 수 있으며, 다만 이 경우 본 사업의 참여 및 관련 서비스 이용을 할 수 없습니다.</li>
+										</ol>
+									</li>
+								</ol>							
+							</div>
+							<div class="agree_check">
+								<input type="radio" id="agree1" name="agree1">
+								<label for="agree1">동의하지 않음</label>
+								<input type="radio" id="agree2" name="agree1">
+								<label for="agree2">동의함</label>
+							</div>
+						</div>
+						<!--2018-07-12 / 개인정보안내추가 이희연--><!--2018-07-12-->
+					</c:if>
+					
+					<div class="c_btn_center">
+						<c:if test="${REQUEST_DATA.pageMode ne 'inquiry' }">
+							<button type="button" onclick="allClear(); return false;" class="btn_blueline03">초기화</button>
+							<button type="button" onclick="insertLecture(); return false;" class="btn_bluebg03">교육신청</button>
+						</c:if>
+						
+						<c:if test="${REQUEST_DATA.pageMode eq 'inquiry'}">
+<%-- 							<c:if test="${lectureInfo.SL_STAT_CD eq 'LE0001'}"> --%>
+<!-- 								<button type="button" onclick="calcleLecture(); return false;" class="btn_blueline03">신청취소</button> -->
+<%-- 							</c:if> --%>
+							<button type="button" onclick="goLectureCheckForm(); return false;" class="btn_bluebg03">목록</button>
+						</c:if>
+						
+					</div>
+
+					<!--// end -->
+				</div>
+				<!--// 본문내용 -->
+				
+			<!--  -->
+			</div>
+			<!--// content 본문 -->
+			</form>
+			
+		</div>
+	
+	</div>
+	<!--// container -->
+
+	<!-- foot -->
+	<%@ include file="/WEB-INF/jsp/ccedu/inc/footer_inc.jsp"%>
+	<!--// foot end -->
+
+</div>
+
+</body>
+</html>

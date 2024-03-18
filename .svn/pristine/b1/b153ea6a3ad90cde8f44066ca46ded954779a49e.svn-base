@@ -1,0 +1,329 @@
+<%@ page language="java" contentType="text/html; charset=utf-8" pageEncoding="utf-8"%>
+<%@ include file="/WEB-INF/jsp/ccedu/inc/taglib_inc.jsp"%>
+<%@ include file="/WEB-INF/jsp/ccrs/cmmn/inc/top_inc.jsp"%>
+<%@ include file="/WEB-INF/jsp/ccrs/cmmn/inc/header_inc.jsp"%>
+
+<script type="text/javascript">
+    $(document).ready(function(){
+
+        //테스트
+        $('body').find('a').not($('.tab').find('a')).on('click',function(){
+            modal({
+                    type: 'alert',
+                    title: '',
+                    text: "준비중입니다.",
+                    callback: function(result) {
+                    }
+                });
+            $('.modal-btn').focus();
+        });
+
+        $('body').find('button').not($('#btn-sidebar')).on('click',function(){
+            modal({
+                    type: 'alert',
+                    title: '',
+                    text: "준비중입니다.",
+                    callback: function(result) {
+                    }
+                });
+            $('.modal-btn').focus();
+        });
+
+
+        $('.more').on('click',function(){
+            modal({
+                    type: 'alert',
+                    title: '',
+                    text: "준비중입니다.",
+                    callback: function(result) {
+                    }
+                });
+            $('.modal-btn').focus();
+        });
+
+
+        var $tab_list = $('.tab.list');
+        $tab_list.removeClass('jx').find('ul ul').hide();
+        $tab_list.find('li li.active').parents('li').addClass('active');
+        $tab_list.find('li.active>ul').show();
+        $tab_list.each(function(){
+            var $this = $(this);
+        });
+        function listTabMenuToggle(event){
+            var $this = $(this);
+            $this.next('ul').show().parent('li').addClass('active').siblings('li').removeClass('active').find('>ul').hide();
+            if($this.attr('href') === '#'){
+                return false;
+            }
+        }
+        $tab_list.find('>ul>li>a').click(listTabMenuToggle).focus(listTabMenuToggle);
+
+        $('.main_edu_wrap .in_wrap span').on('click',function(){
+            $('.main_edu_wrap .in_wrap span').removeClass('on');
+            $(this).addClass('on');
+        });
+
+    })
+</script>
+        <div id="Maincontent" class="main_wrap">
+            <div class="main_visual">
+                <div class="ly_center">
+                    <h2 class="main_visual_tit">
+                        <span>밝고 건강한</span> <span>신용사회</span><br>
+                        신용회복위원회가 만들어가겠습니다.
+                    </h2>
+                    <section class="main_quick_link clearfix">
+                        <ul>
+                            <li class="quick_1">
+                                <a href="#">
+                                    <span class="top">온라인교육수강</span>
+                                    <span class="mid"></span>
+                                    <span class="bottom"><span>신용을 지키는 기본기,<br>온라인과정을 통해 다져보세요!!</span></span>
+                                </a>
+                            </li>
+                            <li class="quick_2">
+                                <a href="#">
+                                    <span class="top">찾아가는교육</span>
+                                    <span class="mid"></span>
+                                    <span class="bottom"><span>전문강사가 직접 현장을 방문하여<br>신용교육을 진행합니다.</span></span>
+                                </a>
+                            </li>
+                            <li class="quick_3">
+                                <a href="#">
+                                    <span class="top">국가공인 신용상담사</span>
+                                    <span class="mid"></span>
+                                    <span class="bottom"><span>국가공인으로 지정된 신용상담사<br>자격증을 취득할 수 있습니다.</span></span>
+                                </a>
+                            </li>
+                            <li class="quick_4">
+                                <a href="#">
+                                    <span class="top">신용건강검진</span>
+                                    <span class="mid"></span>
+                                    <span class="bottom"><span>자신의 신용 이해도를 진단해보고 신용도를 높이기 위한 올바른 방법을 배워봅니다.</span></span>
+                                </a>
+                            </li>
+                        </ul>
+                    </section>
+                </div>
+            </div>
+
+            <section class="main_noti_wrap">
+                <div class="ly_center clearfix">
+                    <div class="noti_board">
+                        <div class="respon_wrap">
+                            <span class="respon_tit">신용교육</span>
+                            <div class="tab list">
+                                <ul>
+                                    <li class="active"><a href="#"><span>공지사항</span></a>
+                                        <ul style="display: block;">
+                                            <li class="more"><a href="#"><span>더보기</span></a></li>
+
+                                            <c:forEach var="result" items="${noticeList}" step='1' end='3' varStatus="status">
+                                                <li><a href="#"><c:out value="${result.SUBSTR_TITLE}"/></a><span class="time"><c:out value="${result.WDATE}"/></span></li>
+                                            </c:forEach>
+
+                                            <c:if test="${empty noticeList}">
+                                                게시글이 없습니다.
+                                            </c:if>
+                                            
+                                        </ul>
+                                    </li>
+                                    <li class=""><a href="#"><span>지식자료실</span></a>
+                                        <ul style="display: none;">
+                                            <li class="more"><a href="#"><span>더보기</span></a></li>
+                                            <c:forEach var="result" items="${dataRoomList}" step='1' end='3' varStatus="status">
+                                                <li><a href="#"><c:out value="${result.SUBSTR_TITLE}"/></a><span class="time"><c:out value="${result.WDATE}"/></span></li>
+                                            </c:forEach>
+
+                                            <c:if test="${empty noticeList}">
+                                                게시글이 없습니다.
+                                            </c:if>
+                                        </ul>
+                                    </li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="noti_board">
+                        <div class="respon_wrap">
+                            <span class="respon_tit">국가공인 신용상담사</span>
+                            <div class="tab list">
+                                <ul>
+                                    <li class="active"><a href="#"><span>공지사항</span></a>
+                                        <ul style="display: block;">
+                                            <li class="more"><a href="#"><span>더보기</span></a></li>
+                                            <c:forEach var="result" items="${cceduNoticeList}" step='1' end='3' varStatus="status">
+                                                <li><a href="#"><c:out value="${result.SUBSTR_TITLE}"/></a><span class="time"><c:out value="${result.WDATE}"/></span></li>
+                                            </c:forEach>
+
+                                            <c:if test="${empty noticeList}">
+                                                게시글이 없습니다.
+                                            </c:if>
+                                        </ul>
+                                    </li>
+                                    <li class=""><a href="#"><span>자료실</span></a>
+                                        <ul style="display: none;">
+                                            <li class="more"><a href="#"><span>더보기</span></a></li>
+                                            <c:forEach var="result" items="${cceduDataRoomList}" step='1' end='3' varStatus="status">
+                                                <li><a href="#"><c:out value="${result.SUBSTR_TITLE}"/></a><span class="time"><c:out value="${result.WDATE}"/></span></li>
+                                            </c:forEach>
+
+                                            <c:if test="${empty noticeList}">
+                                                게시글이 없습니다.
+                                            </c:if>
+                                        </ul>
+                                    </li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="noti_board">
+                        <div class="respon_wrap">
+                            <div class="banner">
+                                <script type="text/javascript">
+                                    $(document).ready(function(){
+                                        $('.slide_img').show();
+                                        $('#slide-counter').prepend('<strong class="current-index"></strong> / ');
+
+                                        var slider = $('.main_slide').bxSlider({
+                                            auto: true,
+                                            autoControls:true,
+                                            onSliderLoad: function (currentIndex){
+                                                $('#slide-counter .current-index').text(currentIndex + 1);
+                                            },
+                                            onSlideBefore: function ($slideElement, oldIndex, newIndex){
+                                                $('#slide-counter .current-index').text(newIndex + 1);
+                                            }
+                                        });
+
+                                        $('#slide-counter').append(slider.getSlideCount());
+
+                                    })
+                                </script>
+                                <!-- 배너 슬라이드 -->
+                                <div class="main_slide_wrap" tabindex="-1">
+                                    <div class="main_slide" tabindex="-1">
+                                        <c:forEach var="result" items="${bannerList}" varStatus="status">
+                                            <div tabindex="-1" class="slide_img">
+                                                <a title="" href="#none" class="pc_banner"><img tabindex="-1" src="/ccrsedu/att_file/edbbs/banner/<c:out value='${result.SAVFILE}'/>" alt="<c:out value='${result.TITLE}'/>"></a>
+                                            </div>        
+                                        </c:forEach>
+                                    </div>
+                                    <div id="slide-counter"></div>
+                                </div>
+                            </div>
+                            <div class="quick_link">
+                                <div class="row">
+                                    <a href="#" class="col-md-6 col-sm-6 col-xs-6">
+                                        <span class="quick_in_wrap">
+                                            <span class="ico_paper"></span>
+                                            <span>수료증출력</span>
+                                        </span>
+                                    </a>
+                                    <a href="#" class="col-md-6 col-sm-6 col-xs-6">
+                                        <span class="quick_in_wrap">
+                                            <span class="ico_more"></span>
+                                            <span>자주묻는 질문</span>
+                                        </span>
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <section class="main_edu_wrap">
+                <div class="ly_center clearfix">
+                    <span class="edu_tit">온라인교육 바로가기</span>
+                    <div class="edu_wrap">
+                        <div class="in_wrap">
+                            <span>어린이 / 청소년</span>
+                            <ul>
+                                <li>
+                                    <a href="#">
+                                        <span class="ico_img"></span>
+                                        <span class="edu_in_tit">초등학생</span>
+                                        <span class="edu_ico_go"></span>
+                                    </a>
+                                </li>
+                                <li>
+                                    <a href="#">
+                                        <span class="ico_img"></span>
+                                        <span class="edu_in_tit">중학생</span>
+                                        <span class="edu_ico_go"></span>
+                                    </a>
+                                </li>
+                                <li>
+                                    <a href="#">
+                                        <span class="ico_img"></span>
+                                        <span class="edu_in_tit">고등학생</span>
+                                        <span class="edu_ico_go"></span>
+                                    </a>
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+                    <div class="edu_wrap">
+                        <div class="in_wrap">
+                            <span class="on">서민금융이용자</span>
+                            <ul>
+                                <li>
+                                    <a href="#">
+                                        <span class="ico_img"></span>
+                                        <span class="edu_in_tit">대학생<br>청년햇살론</span>
+                                        <span class="edu_ico_go"></span>
+                                    </a>
+                                </li>
+                                <li>
+                                    <a href="#">
+                                        <span class="ico_img"></span>
+                                        <span class="edu_in_tit">새희망홀씨</span>
+                                        <span class="edu_ico_go"></span>
+                                    </a>
+                                </li>
+                                <li>
+                                    <a href="#">
+                                        <span class="ico_img"></span>
+                                        <span class="edu_in_tit">신용회복위원회<br>소액금융</span>
+                                        <span class="edu_ico_go"></span>
+                                    </a>
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+                    <div class="edu_wrap">
+                        <div class="in_wrap">
+                            <span class="">대학생 / 일반인</span>
+                            <ul>
+                                <li>
+                                    <a href="#">
+                                        <span class="ico_img"></span>
+                                        <span class="edu_in_tit">대학생</span>
+                                        <span class="edu_ico_go"></span>
+                                    </a>
+                                </li>
+                                <li>
+                                    <a href="#">
+                                        <span class="ico_img"></span>
+                                        <span class="edu_in_tit">일반인</span>
+                                        <span class="edu_ico_go"></span>
+                                    </a>
+                                </li>
+                                <li>
+                                    <a href="#">
+                                        <span class="ico_img"></span>
+                                        <span class="edu_in_tit">군인</span>
+                                        <span class="edu_ico_go"></span>
+                                    </a>
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+                    <a href="#" class="edu_btn_more"><em></em> 더보기</a>
+                </div>
+            </section>
+
+        </div>
+
+<%@ include file="/WEB-INF/jsp/ccrs/cmmn/inc/footer_inc.jsp"%>

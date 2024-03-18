@@ -1,0 +1,243 @@
+<%
+/****************************************
+    subject : 결제내역
+    summary : 마이페이지 > 결제내역
+****************************************/
+%>
+<%@ page language="java" contentType="text/html; charset=utf-8" pageEncoding="utf-8"%>
+<%@ include file="/WEB-INF/jsp/ccedu/inc/taglib_inc.jsp"%>
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+	<%@ include file="/WEB-INF/jsp/ccedu/inc/head_inc.jsp"%>
+
+<script type="text/javascript">
+	function searchList(){
+		$("#frm").submit();
+	}	
+</script>
+</head>
+<body>
+<div id="wrap">
+	<!-- header -->
+	<%@ include file="/WEB-INF/jsp/ccedu/inc/header_inc.jsp"%>
+	<!--// header -->
+	<!-- container -->
+	<div id="container">
+		<!-- 메뉴 title -->
+		<div class="cont_title_wrapper">
+			<div class="wrapper">
+				<h3 class="cont_title">결제내역</h3>
+			</div>			
+		</div>
+		<div class="con_center">
+			<div class="wrapper">
+				<!-- content 본문 -->
+				<div id="content">
+	
+					<!-- layer pop 수료증 출력안내 -->
+					<div class="layerpop print" tabindex="0" data-tooltip-con="guide01" data-focus="guide01" data-focus-prev="guide01-close">
+						<div class="layer_mask tooltip-close"></div><!-- 블랙mask영역 -->
+						<div class="layer_cont">
+							<div class="lc_head">
+								<h4 class="lc_tit">수료증 출력 안내</h4>
+							</div>
+							<div class="lc_cont">
+	
+								<ol class="pop_step">
+									<li>
+										<p><span class="ico_num">1<span>.</span></span> 수료증 최상단 빈 공간에서 마우스 오른쪽 클릭 &gt; <em class="color_orange">인쇄미리보기</em> 선택 </p>
+										<div class="step_img"><img src="/cmmn/images/sub/img_print_step01.jpg" alt="PC 익스웹브라우저중 수료증위에 마우스 우측클릭한다음 인쇄미리보기를 선택하는 화면" /></div>
+									</li>
+									<li>
+										<p><span class="ico_num">2<span>.</span></span> <em class="color_orange">페이지 설정 버튼 클릭</em>하여 아래와 동일하게 설정</p>
+										<ol>
+											<li>
+												* 용지옵션
+												<ol>
+													<li>1. 가로</li>
+													<li class="color_orange">2. 배경색 및 이미지 인쇄(C) 체크</li>
+													<li>3. 크기에맞게 축소사용(S) 체크</li>
+												</ol>
+											</li>
+											<li>
+												* 여백(밀리미터)
+												<ol>
+													<li>1. 왼쪽, 오른쪽, 위쪽,아래쪽 모두 0으로 설정</li>
+												</ol>
+											</li>
+											<li>
+												* 머리글 / 바닥글
+												<ol>
+													<li>1. 모두 - 비어 있음 - 선택</li>
+												</ol>
+											</li>
+										</ol>
+										<div class="step_img"><img src="/cmmn/images/sub/img_print_step02.jpg" alt="인쇄미리보기 화면중 페이지 설정하는 화면" /></div>
+									</li>
+									<li>
+										<p><span class="ico_num">3<span>.</span></span> 상단의 <em class="color_orange">인쇄버튼</em>을 눌러인쇄 </p>
+										<div class="step_img"><img src="/cmmn/images/sub/img_print_step03.jpg" alt="인쇄버튼을 누르는 화면" /></div>
+									</li>
+								</ol>
+	
+							</div>
+						</div>
+						<button class="btn_close tooltip-close" data-focus="guide01-close" data-focus-next="guide01">닫기</button>
+					</div>
+					<!--// layer pop -->
+					<h3 class="cont_titile type06">결제내역조회<span></span></h3>				
+					<form name="frm" id="frm" action="/ccedu/myclass/payList.do" method="post">
+						<div class="c_search_section" style="margin-top:50px;">
+							<fieldset>
+								<legend>분류선택보기 여역</legend>
+								<h4 class="sel_tit">구분선택</h4>
+								<select name="search_code" id="search_code" class="select_child1" style="width:100px;">
+									<option value="TT0001" <c:if test="${code eq 'TT0001'}">selected</c:if>>강의</option>
+									<option value="TT0002" <c:if test="${code eq 'TT0002'}">selected</c:if>>교재</option>
+				 				</select>
+				 				<button type="submit" name="button" class="btn_fieldset_search" onclick="searchList();" title="검색">검색</button>
+							</fieldset>
+						</div>
+					<!-- 본문내용 -->
+					<div class="cont_body">
+						<!-- start -->
+	
+						<div class="c_section">
+							<div class="table_style_col">
+								<c:if test="${code eq 'TT0001'}">
+									<table>		
+										<colgroup>
+											<col width="8%"/>
+											<col width=""/>
+											<col width="12%"/>
+											<col width="10%"/>
+											<col width="10%"/>
+											<col width="10%"/>
+										</colgroup>							
+										<thead>
+											<tr>																					
+												<th scope="col">구분</th>
+												<th scope="col">강의명</th>
+												<th scope="col">결제수단</th>
+												<th scope="col">결제금액</th>
+												<th scope="col">결제일</th>
+												<th scope="col">결제상태</th>
+											</tr>
+										</thead>
+										<tbody>
+											<c:if test="${not empty result}">
+												<c:forEach var="list" items="${result}" varStatus="status">
+													<tr>												
+														<td class="align_center">강의</td>
+														<td><c:out value="${list.TITLE}" /></td>
+														<td class="align_center">
+															<c:if test="${list.MT_PAY_TYPE eq '1'}">카드</c:if>
+															<c:if test="${list.MT_PAY_TYPE eq '2'}">계좌이체</c:if>
+															<c:if test="${list.MT_PAY_TYPE eq '3'}">무통장입금</c:if>													
+														</td>
+														<td class="align_center"><c:out value="${list.PRICE}" />원</td>									
+														<td class="align_center"><c:out value="${list.REGIST_DT}" /></td>													
+														<td class="align_center">
+															<c:if test="${list.MT_PAY_STAT eq '1'}">결제완료</c:if>
+															<c:if test="${list.MT_PAY_STAT eq '2'}">입금대기</c:if>
+															<c:if test="${list.MT_PAY_STAT eq '3'}">환불진행</c:if>	
+															<c:if test="${list.MT_PAY_STAT eq '4'}">환불완료</c:if>														
+														</td>
+													</tr>
+												</c:forEach>
+											</c:if>										
+											<c:if test="${empty result}">
+												<tr>
+													<td colspan="6" class="align_center">결제 내역이 없습니다.</td>
+												</tr>
+											</c:if>
+										</tbody>
+									</table>
+								</c:if>
+								<c:if test="${code eq 'TT0002'}">
+									<table>		
+										<colgroup>
+											<col width="8%"/>
+											<col width=""/>
+											<col width="12%"/>
+											<col width="10%"/>
+											<col width="10%"/>
+											<col width="10%"/>
+										</colgroup>							
+										<thead>
+											<tr>																					
+												<th scope="col">구분</th>
+												<th scope="col">교재명</th>
+												<th scope="col">결제수단</th>
+												<th scope="col">결제금액</th>
+												<th scope="col">결제일</th>
+												<th scope="col">송장번호</th>
+											</tr>
+										</thead>
+										<tbody>
+											<c:if test="${not empty result}">
+												<c:forEach var="list" items="${result}" varStatus="status">
+													<tr>												
+														<td class="align_center">교재</td>
+														<td><c:out value="${list.TITLE}" /></td>
+														<td class="align_center">
+															<c:if test="${list.MT_PAY_TYPE eq '1'}">카드</c:if>
+															<c:if test="${list.MT_PAY_TYPE eq '2'}">계좌이체</c:if>
+															<c:if test="${list.MT_PAY_TYPE eq '3'}">무통장입금</c:if>													
+														</td>
+														<td class="align_center"><c:out value="${list.PRICE}" />원</td>									
+														<td class="align_center"><c:out value="${list.REGIST_DT}" /></td>													
+														<td class="align_center">
+															<c:if test="${empty list.SEND_CODE}">
+																배송준비
+															</c:if>	
+															<c:if test="${not empty list.SEND_CODE}">
+																<c:out value="${list.SEND_CODE}"/>
+															</c:if>					
+														</td>
+													</tr>
+												</c:forEach>
+											</c:if>										
+											<c:if test="${empty result}">
+												<tr>
+													<td colspan="6" class="align_center">결제 내역이 없습니다.</td>
+												</tr>
+											</c:if>
+										</tbody>
+									</table>
+								</c:if>
+							</div>
+	
+							<c:if test="${not empty listData}">
+								<div class="paging">
+									<paging:page cpage="${REQUEST_DATA.cPage}" total="${resultCount}" pageSize="${REQUEST_DATA.rowCount}" link="javascript:move_page"/>
+								</div>
+								<!-- 수강중인 강좌 -->
+								<c:if test="${REQUEST_DATA.ispass ne 'Y'}">
+									<div class="c_btn_right03">
+										<button onclick="fnCancel();" class="btn_blueline03">신청취소</button>
+									</div>
+								</c:if>
+							</c:if>
+	
+						</div>
+	
+						<!--// end -->
+					</div>
+					<!--// 본문내용 -->
+				
+					</form>
+				</div>
+			<!--  -->
+			</div>
+			<!--// content 본문 -->		
+		</div>
+	</div>
+	<!--// container -->
+	<!-- foot -->
+	<%@ include file="/WEB-INF/jsp/ccedu/inc/footer_inc.jsp"%>
+	<!--// foot end -->
+</div>
+</body>
+</html>

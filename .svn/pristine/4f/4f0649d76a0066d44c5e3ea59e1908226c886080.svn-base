@@ -1,0 +1,228 @@
+
+<%
+	/****************************************************
+	 system	: 일반교육 > 온라인과정
+	 title	: 일반과정 신청 및 수강안내 목록
+	 summary	:	
+	 wdate	: 
+	 writer	: 
+	 *****************************************************/
+%>
+<%@ page language="java" contentType="text/html; charset=utf-8"
+	pageEncoding="utf-8"%>
+<%@ include file="/WEB-INF/jsp/common/inc/taglib_inc.jsp"%>
+<%@ include file="/WEB-INF/jsp/academy/cmmn/inc/top_inc.jsp"%>
+<%@ include file="/WEB-INF/jsp/academy/cmmn/inc/header_inc.jsp"%>
+<c:set var="courseURL"
+	value="/academy/course/public/main.do?mtCtypeCode=${REQUEST_DATA.mtCtypeCode}&form=E100" />
+<script type="text/javascript">
+	$(document).ready(function(){
+		
+	});
+	
+	$(function() {
+		if ('${REQUEST_DATA.loan}' != "" && '${REQUEST_DATA.schSeqTitle}' == '' && '${REQUEST_DATA.mtScCode}' != "") {
+			    var bodyHS = $('html').height(); 
+			    $("#join_pop").css('display', 'block');
+			    $('.modal-backdrop').attr('style','height:'+bodyHS+'px; '+'z-index:100;');
+		} else {
+			$("#join_pop").css('display', 'none');
+		}
+	});
+
+	// 팝업 닫기
+	function layerPop() {
+		$("#join_pop").css('display', 'none');
+		$('#schSeqTitle').focus();
+		$('.modal-backdrop').hide();
+		/* $('body').css({overflow:'unset'}).unbind('touchmove') */
+	  
+	}
+
+	//검색
+	function fnSearch() {
+		$('#schSeqTitleIncode')
+				.val(encodeURIComponent($('#schSeqTitle').val()));
+
+		$('form[name=frm]').attr('target', '_self').attr('action',
+				'<c:out value="${ctx}"/>/academy/course/onDetail.do');
+		$('#frm').submit();
+	}
+
+	//과정신청
+	function fnCourseApply(courseno, cseqno, cancelYn) {
+		$('#cseqno').val(cseqno);
+		$('#courseno').val(courseno);
+		$('#mttype').val('온라인과정');
+		$('#cancelYn').val(cancelYn);
+		$('form[name=frm]').attr('target', '_self').attr('action',
+				'<c:out value="${ctx}"/>/academy/course/onForm.do');
+		$('#frm').submit();
+
+	}
+
+	function nextPage(){
+		$.ajax({
+            url : "/academy/course/ajaxOnDetailList.do",
+            data : { cPage : parseInt($('#cPage').val())+1
+                   , mtScCode : '${REQUEST_DATA.mtScCode}'
+                   , mtCseqStatusCode : '${REQUEST_DATA.mtCseqStatusCode}'
+            	   },
+            dataType : "json",
+            type : 'post',
+            success : function(res) { 		            	
+
+
+            	$('#cPage').val(parseInt($('#cPage').val())+1);
+            	
+            	var rowLen = $('.row').last().children('div').length;
+            	var append = '';
+            	var lastRow = 0;
+
+				for(var i = 0; i < res.length ; i++){
+					if( (i+1) % 3 == 0){
+						lastRow = lastRow+1;
+						append += '<div class="row">';
+					}
+
+
+					append += '<div class="col-md-3 col-sm-3 col-xs-12"><div class="crdBox online"><div class="boxInner"><dl><dt class="dt_tit"><span class="po_C6 bold fnt19">';
+					append += '[' + res[i].MT_SC_NAME + ']' + res[i].SEQ_TITLE ;
+					append += '</span></dt><dd class="dd_app"><ul><li class="li_dot2"><span class="ellipsis"><strongclass="po_C7">교육시간</strong> : ';
+					append += res[i].SUM_RUNTIME;
+					append += '분 </span></li><li class="li_dot2"><strong class="po_C7">난이도</strong> : ';
+					append += res[i].MT_LEVEL_NAME;
+					append += '</li></ul></dd></dl><div class="btnAreaC"><a href="#none" class="btn btn-lg btn-blue" onclick="fnCourseApply('+ res[i].COURSENO + ',' + res[i].CSEQNO + ','+  res[i].CANCEL_YN + ')" title=' + res[i].SEQ_TITLE + '상세보기">상세보기</a></div></div></div></div>';
+
+					if((i+1) % (3*lastRow) == 0 ){
+						append +='</div>';
+					} else if( res.length  == i ){
+						append +='</div>';
+					}
+
+				}
+
+				$('.form3row').append(append);
+        		
+
+
+				if(res.length < 5){
+					$('#appendBtn').hide();
+				}
+
+            },
+            error : function(e) {
+                alert("error :" + e.responseText);
+            }
+        }); 
+	}
+
+</script>
+<form name="frm" id="frm" action="" method="post">
+	
+		<input type="hidden" name="cseqno" id="cseqno" value="">
+		<input type="hidden" name="courseno" id="courseno" value="">
+		<input type="hidden" name="mttype" id="mttype" value="">
+		<input type="hidden" name="cancelYn" id="cancelYn" value="">
+		<input type="hidden" name="cPage" id="cPage" value="<c:out value='${REQUEST_DATA.cPage}' />">
+</form>
+<div class="container" id="Subcontent">
+	<article class="subArea">
+		<div class="subCntWrap">
+			<%@ include file="/WEB-INF/jsp/academy/cmmn/inc/lnb_online.jsp"%>
+			<div class="path">
+				<ul>
+					<li><span class="home text-hide">홈</span></li>
+					<li>온라인 교육</li>
+					<li class="active"><c:out value="${depthName.REF2}" /></li>
+				</ul>
+			</div>
+
+			<div class="subConts" id="sub-content">
+				<section class="bgTop_cate01">
+					<!--   카테고리별 이미지 추가  -->
+					<div class="contTop">
+						<h2 class="h2_tit" id="TT">
+							<c:out value="${depthName.REF2}" />
+						</h2>
+					</div>
+				</section>
+				<hr>
+				<section>
+					<c:choose>
+						<c:when test="${not empty listData}">
+							<div class="crdBoard form3row"><!-- hidden_row 더보기 class -->
+								<c:set var="lastRow" value="0" />
+								<c:forEach items="${listData}" var="result" varStatus="stat">
+									<c:if test="${stat.first || stat.index % 3 == 0}">
+										<c:if test="${stat.index % 3 == 0}">
+											<c:set var="lastRow" value="${lastRow+1 }" />
+										</c:if>
+										<div class="row">
+									</c:if>
+									<div class="col-md-3 col-sm-3 col-xs-12">
+										<div class="crdBox online">
+											<div class="boxInner">
+												<dl>
+													<dt class="dt_tit">
+														<span class="po_C6 bold fnt19">[${result.MT_SC_NAME}]${result.SEQ_TITLE}</span>
+													</dt>
+													<dd class="dd_app">
+														<ul>
+															<li class="li_dot2"><span class="ellipsis"><strong
+																	class="po_C7">교육시간</strong> : <c:if
+																		test="${result.OPENTYPE == 'A'}">
+																		<c:out value="${result.SUM_RUNTIME}" />분
+																	</c:if></span></li>
+															<li class="li_dot2">
+																<strong class="po_C7">난이도</strong> : ${result.MT_LEVEL_NAME}</li>
+														</ul>
+													</dd>
+												</dl>
+												<div class="btnAreaC">
+													<a href="#none" class="btn btn-lg btn-blue" onclick="fnCourseApply('<c:out value="${result.COURSENO}"/>', '<c:out value="${result.CSEQNO}"/>', '<c:out value="${result.CANCEL_YN}"/>'); return false;" title="<c:out value="${result.SEQ_TITLE}"/> 상세보기">상세보기</a>
+												</div>
+											</div>
+											<!-- .boxInner -->
+										</div>
+										<!-- .crdBox -->
+									</div>
+
+									<!-- .col-md-6 col-sm-6 col-xs-12 -->
+									<c:choose>
+										<c:when test="${stat.count % (3*lastRow) == 0}">
+											</div>
+										</c:when>
+										<c:when test="${fn:length(listData) == stat.count}">
+											</div>
+										</c:when>
+									</c:choose>
+							</c:forEach>
+							<c:if test = "${fn:length(listData) > 5}">
+								<a href="#none" class="btn btn-lg btn-blue" id ="appendBtn" onclick="nextPage(); return false;" title="초등학생 의무 교육 3차 상세보기">더보기</a>	
+							</c:if>
+							
+						</div>
+					</c:when>
+					<c:otherwise>
+						<c:if test="${REQUEST_DATA.schSeqTitle ne ''}">
+							<hr>
+							<table class="boardList">
+								<tr>
+									<td class="text-center"><strong class="fnt16 po_C7">검색
+											결과가 없습니다.</strong></td>
+								</tr>
+							</table>
+						</c:if>
+					</c:otherwise>
+				</c:choose>
+			</section>
+</div>
+<!-- //sub-contents -->
+</div>
+<!-- //sub-wrap -->
+</article>
+</div>
+<!-- 풋터 영역 -->
+<%@ include file="/WEB-INF/jsp/academy/cmmn/inc/footer_inc.jsp"%>
+<!-- // 풋터 영역 -->

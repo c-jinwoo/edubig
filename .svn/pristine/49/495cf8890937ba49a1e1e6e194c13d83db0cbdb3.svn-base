@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title></title>
+	<meta charset="UTF-8">
+	<meta http-equiv="X-UA-Compatible" content="IE=Edge">
+	<link href="../common/css/skin.css" rel="stylesheet">
+	<link href="../common/css/menu.css" rel="stylesheet">
+	<link href="../common/css/track.css" rel="stylesheet">
+	<meta name="apple-mobile-web-app-capable" content="yes">
+	<meta name="apple-mobile-web-app-status-bar-style" content="black">
+</head>
+	
+<body ondragstart="return false" onselectstart="return false" oncontextmenu="return false" onload="startContent();">
+	
+	<div class="content" id="content">
+<!-- 		<video class="video1" style="display: block;" src="./mov/ZD02_01.mp4" playsinline="true"></video> -->
+		<div class="controlBar"></div>
+		
+	</div> 
+		 
+		 <script type="text/javascript" src="../common/js/jquery-1.12.3.min.js"></script>
+ 		 <script type="text/javascript" src="../common/js/application.js"></script>
+ 		 <script type="text/javascript" src="../common/js/config.js"></script>
+		 <script type="text/javascript" src="../common/js/setInit.js"></script>
+ 		 <script type="text/javascript" src="../common/js/setPage.js"></script>
+		 <script type="text/javascript" src="../common/js/audio.js"></script>
+		 <script type="text/javascript" src="../common/js/video.js"></script> 
+		 <script type="text/javascript" src="../common/js/videojs-flash.js"></script>
+		 <script type="text/javascript" src="../common/js/videojs-contrib-hls.js"></script> 
+
+  </body>
+</html>

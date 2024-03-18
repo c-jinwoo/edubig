@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title></title>
+	<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+	<meta http-equiv="X-UA-Compatible" content="IE=edge">
+	<meta name="viewport" content="width=device-width,user-scalable=no,initial-scale=1.0" />
+	<link href="../common/css/skin.css" rel="stylesheet">
+	<link href="../common/css/menu.css" rel="stylesheet">
+	<link href="../common/css/quiz.css" rel="stylesheet">
+	<link href="../common/css/summary.css" rel="stylesheet">
+	<link href="../common/css/video-js.css" rel="stylesheet">
+	<script type="text/javascript" src="../common/js/jquery-1.12.3.min.js"></script>
+	<script type="text/javascript" src="../common/js/video.js"></script> 
+	<script type="text/javascript" src="../common/js/videojs-flash.js"></script>
+	<script type="text/javascript" src="../common/js/util.js"></script>
+	<script type="text/javascript" src="../common/js/config.js"></script>
+	<script type="text/javascript" src="../common/js/setPage.js"></script>
+</head>	
+<body ondragstart="return false" onselectstart="return false" oncontextmenu="return false">	
+	<div class="content" id="content">
+		<div id="quiz">
+			<div class="q_intro">
+				<div class="q_start"></div>
+			</div>
+			<div class="q_wrapper">
+				<div class="q_title_wrapper">
+					<img class="q_no" src="../common/img/quiz/Q1.png"/>
+					<img class="q_result" src=""/> 
+					<div class="q_title_outer">
+						<div class="q_title_inner">
+							<span class="q_title"></span>
+						</div>
+					</div>
+				</div>
+				<div class="q_img_wrapper">
+					<img class="q_img" src=""/>
+				</div>
+				<div class="q_input_wrapper">
+					<input type="text" class="q_input"/>
+				</div>
+				<div class="q_op_wrapper">
+					<div class="q_op_inner">
+					</div>
+				</div>
+				<div class="q_desc_wrapper">
+					<span class="q_ans"></span>
+					<span class="q_desc"></span>
+					<div class="q_confirm"></div>
+					<div class="q_next"></div>
+				</div>
+			</div>
+		</div>
+		<div id="summary">
+			<div class="summary_content_wrapper">
+				<img class="summary_content" src=""/>
+			</div>
+			<div class="summary_ctrl summary_prev_btn"></div>
+			<div class="summary_ctrl summary_page"><span></span></div>
+			<div class="summary_ctrl summary_next_btn"></div>
+		</div>
+		<div class="controlBar">			
+			<div class="fl logo"></div>
+			<div class="fl timeLine timeLinePadding">
+				<div class="progress timeLinePadding"></div>
+			</div>
+			<div class="fr pageCtrl">
+				<div class="fl nFS_btn movePrev">				<button></button><div class="tooltips">이전페이지</div></div>
+				<div class="fl digClock curPage">00</div>
+				<div class="fl digClock pageSlash">/</div>
+				<div class="fl digClock totalPage">00</div>
+				<div class="fl nFS_btn moveNext">				<button></button><div class="tooltips">다음페이지</div></div>
+			</div>
+			<div class="fr playerCtrl">
+				<div class="fl clock curTime">00:00</div>
+				<div class="fl clock slash">|</div>
+				<div class="fl clock totalTime">00:00</div>
+				<div class="fl ctrl_btn play playPause">		<button></button><div class="tooltips">재생</div></div>
+				<div class="fl ctrl_btn replay">				<button></button><div class="tooltips">다시보기</div></div>
+				<div class="fl ctrl_btn playbackRW">			<button></button><div class="tooltips">속도감소</div></div>
+				<div class="fl playbackRate">1.0</div>
+				<div class="fl ctrl_btn playbackFF">			<button></button><div class="tooltips">속도증가</div></div>
+				<div class="fl ctrl_btn fullScreen">			<button></button><div class="tooltips">전체화면</div></div>
+				<div class="fl ctrl_btn sound">					<button></button><div class="tooltips">소리끄기</div></div>
+				<div class="fl soundLine soundLinePadding">
+					<div class="soundProgress soundLinePadding"></div>
+				</div>
+			</div>
+			<div class="nextAlert"></div>
+		</div>	
+		<button class="openMenu"></button>
+		<div class="indexMenu">
+			<button class="closeMenu"></button>
+			<div class="list">
+			</div>
+		</div>
+	</div> 		
+</body>
+</html>

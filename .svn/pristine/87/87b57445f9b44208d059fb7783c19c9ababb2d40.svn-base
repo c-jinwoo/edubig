@@ -1,0 +1,68 @@
+<%
+/****************************************
+	subject	: 과정수료관리 > 수료증발급(온라인)
+	summary	: 수료증 발급
+    author  : SANGS
+    date    : 2018-06-15
+*****************************************************/
+%>
+<%@ page language="java" contentType="text/html; charset=utf-8" pageEncoding="utf-8"%>
+<%@ include file="/WEB-INF/jsp/ccedu/inc/taglib_inc.jsp"%>
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+	<title>자격소개 > 자격시험 > 신용상담사</title>
+	<%@ include file="/WEB-INF/jsp/ccedu/inc/head_inc.jsp"%>
+</head>
+
+<body>
+
+<div class="pop_certificate type2">
+	<p>
+		<span class="alt_text">제</span>
+		<span class="ce_number">${userExamInfo.LICENSE_NO}</span>
+		<span class="alt_text">호</span>
+	</p>
+
+	<h1 class="alt_text">수료증</h1>
+
+	<dl>
+		<dt class="alt_text">과정명</dt>
+		<dd>
+			<span class="ce_dd01">신용상담사 보수교육</span>
+		</dd>
+	</dl>
+	<dl>
+		<dt class="alt_text">성명</dt>
+		<dd>
+			<span class="ce_dd02">${userExamInfo.MBERNM}</span>
+		</dd>
+	</dl>
+	<dl>
+		<dt class="alt_text">생년월일</dt>
+		<dd>
+			<span class="ce_dd03">${userExamInfo.BRTHDY_PRINT}</span>
+		</dd>
+	</dl>
+	<dl>
+		<dt class="alt_text">교육기간</dt>
+		<dd>
+			<span class="ce_dd04">${userExamInfo.REFRESH_DT} ~ ${userExamInfo.EXPRT_DATE}</span>
+		</dd>
+	</dl>
+	<p class="ce_year">${userExamInfo.PASS_DT_FORMAT}</p>
+
+	<p class="alt_text">위 사람은 신용회복위원회에서 시행하는 "마이크로크레딧(MC) 창업컨설팅11 교육" 을 성실히 이수하였기에 이 증서를 수여합니다.</p>
+
+	<p class="ce_date">${userExamInfo.SYSDATE_FORMAT}</p>
+
+	<p class="alt_text">신용회복위원회</p>
+
+</div>
+
+<script type="text/javascript">
+	window.print();
+</script>
+
+</body>
+</html>

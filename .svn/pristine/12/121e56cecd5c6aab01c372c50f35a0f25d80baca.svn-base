@@ -1,0 +1,321 @@
+<%
+/****************************************
+    subject : 찾아가는 교육
+    summary : 찾아가는 교육 > 교육소개
+    author  : SANGS
+    date    : 2018-06-15
+****************************************/
+%>
+<%@ page language="java" contentType="text/html; charset=utf-8" pageEncoding="utf-8"%>
+<%@ include file="/WEB-INF/jsp/ccedu/inc/taglib_inc.jsp"%>
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+	<title>교육소개 > 찾아가는교육 > 신용회복위원회 신용교육원</title>
+	<%@ include file="/WEB-INF/jsp/ccedu/inc/head_inc.jsp"%>
+	<style type="text/css">
+	
+		#underLine:hover {
+			text-decoration : underline;
+		}
+	
+	</style>
+	
+	<script type="text/javascript">
+	
+		function intro(){
+			var form = document.frm;
+			$("#frm").attr("action", "/ccedu/introFiledown.do").submit();
+		}
+	
+		
+	</script>
+</head>
+
+<body>
+
+<!-- skip nav -->
+	<%@ include file="/WEB-INF/jsp/ccedu/inc/nav_inc.jsp"%>
+<!--// skip nav -->
+
+
+<div id="wrap">
+
+	<!-- header -->
+	<%@ include file="/WEB-INF/jsp/ccedu/inc/header_inc.jsp"%>
+	<!--// header -->
+
+	<!-- container -->
+	<div id="container">
+
+		<!-- location -->
+		<jsp:include page="/WEB-INF/jsp/ccedu/inc/location/loc_02_01.jsp">
+			<jsp:param name="menuNm" value="교육소개"/> 
+		</jsp:include> 
+		<!--// location -->
+
+		<div class="con_center">
+
+			<!-- lnb -->
+			<div id="lnb">
+				<jsp:include page="/WEB-INF/jsp/ccedu/inc/lnb/lnb_02.jsp">
+					<jsp:param name="dep2" value="01"/>
+				</jsp:include>
+			</div>
+			<!--// lnb -->
+			
+			
+			
+			<!-- content 본문 -->
+			<div id="content">
+
+				<form name="frm" id="frm" method="post" action="/ccedu/introFiledown.do">
+					<input type="hidden" name="filename" id="filename" value="(방문교육소개 하단)신용교육원 소개.pdf"/>
+				</form>
+					
+				
+				<!-- 기존 START 2018-08-30  -->
+<!-- 				<h3 class="cont_titile">교육소개</h3> -->
+				<!-- 기존 END 2018-08-30  -->
+				
+				<!-- 2018-08-28 김동인 작업 S --> 
+				<h3 class="cont_titile type02">교육소개 <span></span></h3>
+				<!-- 2018-08-28 김동인 작업 E -->
+				<!-- 본문내용 -->
+				<div class="cont_body">
+					<!-- start -->
+
+					<div class="c_section">
+						<!-- 기존 END 2018-08-30  -->
+<!-- 						<h4 class="c_tit">교육소개</h4> -->
+<!-- 						<ul class="c_txtlist"> -->
+<!-- 							<li> -->
+<!-- 								현대사회에서 신용교육은 선택이 아닌 필수입니다.<br /> -->
+<!-- 								신용회복위원회는 신용교육 전문강사가 청소년과 경제활동의 주체인 일반인을 대상으로 교육현장을 직접 방문하여 신용교육을 실시하고 있습니다.<br /> -->
+<!-- 								신용관리에 대한 교육이 필요한 대상이라면 누구나 신청하실 수 있습니다. -->
+<!-- 							</li> -->
+<!-- 						</ul> -->
+						<!-- 기존 END 2018-08-30  -->	
+						
+						
+						<!-- 2018-08-28 김동인 작업 S --> 
+						<div class="c_txtbox">
+							<h4 class="c_tit">교육소개</h4>
+							<p>현대사회에서 신용교육은 선택이 아닌 필수입니다.</p>
+							<p>신용회복위원회는 신용교육 전문강사가 청소년과 경제활동의 주체인 일반인을 대상으로 교육현장을 직접 방문하여 다음과 같이 신용교육을 실시하고 있습니다.</p>
+							<p>신용관리에 대한 교육이 필요한 대상이라면 누구나 신청하실 수 있습니다.</p>
+						</div>
+						<!-- 2018-08-28 김동인 작업 E -->
+					</div>
+					
+					
+					<!-- 기존 START 2018-08-30  -->
+<!-- 					<div class="c_section"> -->
+<!-- 						<ul class="c_txtlist"> -->
+<!-- 							<li id="underLine" onclick="intro(); return false;"> -->
+<!-- 								신용교육원 소개 -->
+<!-- 							</li> -->
+<!-- 						</ul> -->
+<!-- 					</div> -->
+					<!-- 기존 END 2018-08-30  -->
+						
+					<div class="c_section">
+						<h4 class="c_tit">신청대상</h4>
+						<ul class="c_txtlist">
+							<li>초·중·고등 및 대학교와 일반기업체를 포함한 각종 단체·기관 등 신용관리에 대한 교육이 필요한 대상이라면 누구나 신청 가능</li>
+						</ul>
+					</div>
+
+					<div class="c_section">
+						<h4 class="c_tit">교육시간</h4>
+						<ul class="c_txtlist">
+							<li>1~2시간 내외(신청에 따라 교육시간 조절 가능)</li>
+						</ul>
+					</div>
+
+					<div class="c_section">
+						<h4 class="c_tit">교육프로그램</h4>
+						<ul class="c_txtlist">
+							<li>찾아가는 신용교육, 1사 1교, 신용체험교실 등</li>
+						</ul>
+					</div>
+					
+					<!-- 기존 START 2018-08-30  -->
+<!-- 					<div class="c_section"> -->
+<!-- 						<h4 class="c_tit">교육내용</h4> -->
+<!-- 						<ul class="c_txtlist"> -->
+<!-- 							<li> -->
+<!-- 								아래의 내용을 바탕으로 교육 대상자 특성을 반영하여 교육 내용을 결정 -->
+<!-- 								<div class="c_field"> -->
+<!-- 									<ul> -->
+<!-- 										<li> -->
+<!-- 											<div class="inbox"> -->
+<!-- 												<h6>일반인 등 </h6> -->
+<!-- 												<ul class="c_field_in_list"> -->
+<!-- 													<li>신용관리방법</li> -->
+<!-- 													<li>합리적 소비와 저축</li> -->
+<!-- 													<li>부채관리방법과 올바른 신용카드 사용법</li> -->
+<!-- 													<li>채무자구제제도</li> -->
+<!-- 													<li>금융사기피해예방법</li> -->
+<!-- 													<li>재무설계의 필요성과 방법</li> -->
+<!-- 												</ul> -->
+<!-- 											</div> -->
+<!-- 										</li> -->
+<!-- 										<li> -->
+<!-- 											<div class="inbox"> -->
+<!-- 												<h6>초 · 중 · 고</h6> -->
+<!-- 												<ul class="c_field_in_list"> -->
+<!-- 													<li>올바른 용돈관리방법</li> -->
+<!-- 													<li>일생이 행복한 돈관리의 첫 단추</li> -->
+<!-- 													<li>신용있는 사람으로 성장하기</li> -->
+<!-- 													<li>어린이·청소년 신용체험교실</li> -->
+<!-- 												</ul> -->
+<!-- 											</div> -->
+<!-- 										</li> -->
+<!-- 										<li> -->
+<!-- 											<div class="inbox"> -->
+<!-- 												<h6>대학생</h6> -->
+<!-- 												<ul class="c_field_in_list"> -->
+<!-- 													<li>내 학금은 내 스스로!</li> -->
+<!-- 													<li>예비사회인으로서 알아야 할 신용 · 금융상식</li> -->
+<!-- 													<li>사회초년생 신용관리방법</li> -->
+<!-- 												</ul> -->
+<!-- 											</div> -->
+<!-- 										</li> -->
+<!-- 										<li> -->
+<!-- 											<div class="inbox"> -->
+<!-- 												<h6>군장병</h6> -->
+<!-- 												<ul class="c_field_in_list"> -->
+<!-- 													<li>군복무 중 놓치기 쉬운 신용관리 요령 안내</li> -->
+<!-- 													<li>전역 후 합리적인 경제생활을 위한 금융상식 안내</li> -->
+<!-- 												</ul> -->
+<!-- 											</div> -->
+<!-- 										</li> -->
+<!-- 									</ul> -->
+<!-- 								</div> -->
+<!-- 							</li> -->
+<!-- 						</ul> -->
+<!-- 					</div> -->
+					<!-- 기존 END 2018-08-30  -->
+					
+					<!-- 2018-08-28 김동인 작업 S --> 
+					<div class="c_section">
+						<h4 class="c_tit">교육내용</h4>
+						<ul class="c_txtlist type02">
+							<li>
+								아래의 내용을 바탕으로 교육 대상자 특성을 반영하여 교육 내용을 결정
+								<div class="c_field">
+									<ul>									
+										<li>
+											<div class="inbox">
+												<h6>일반인 등</h6>
+												<div class="ico_c_field10"></div>
+												<p>신용관리방법</p><p> 합리적 소비와 저축</p><p> 부채관리방법과 올바른 신용카드 사용법</p><p> 채무자구제제도</p><p> 금융사기피해예방법</p><p>재무설계의 필요성과 방법</p>
+											</div>
+										</li>
+										<li>
+											<div class="inbox">
+												<h6>초 · 중 · 고</h6>
+												<div class="ico_c_field08"></div>
+												<p>올바른 용돈관리방법</p><p> 일생이 행복한 돈관리의 첫 단추</p><p> 신용있는 사람으로 성장하기</p><p> 어린이·청소년 신용체험교실</p>
+											</div>
+										</li>
+										<li>
+											<div class="inbox">
+												<h6>대학생</h6>
+												<div class="ico_c_field09"></div>
+												<p>내 학금은 내 스스로!</p><p>예비사회인으로서 알아야 할 신용 · 금융상식</p><p>사회초년생 신용관리방법</p>
+											</div>
+										</li>
+										<li>
+											<div class="inbox">
+												<h6>군장병</h6>
+												<div class="ico_c_field11"></div>
+												<p>군복무 중 놓치기 쉬운 신용관리 요령 안내</p>
+												<p>전역 후 합리적인 경제생활을 위한 금융상식 안내</p>
+											</div>
+										</li>
+									</ul>
+								</div>
+							</li>
+						</ul>
+					</div>
+					<!-- 2018-08-28 김동인 작업 E -->
+					
+					<div class="c_section">
+						<h4 class="c_tit">신청비용</h4>
+						<ul class="c_txtlist">
+							<li>신용교육 특강은 별도의 신청비용없이 무료로 진행됩니다.</li>
+						</ul>
+					</div>
+
+
+					<div class="c_section">
+						<h4 class="c_tit">찾아가는 교육 프로세스</h4>
+						<div class="c_txtstep">
+							<ol>
+								<li>교육신청</li>
+								<li>협의</li>
+								<li>교육준비</li>
+								<li>교육실시</li>
+								<li>교육평가</li>
+							</ol>
+						</div>
+					</div>
+
+					<div class="c_section">
+						<h4 class="c_tit">신청방법</h4>
+						<ul class="c_txtlist">
+							<!-- 기존 START 2018-08-30  -->
+<!-- 							<li> -->
+<!-- 								신용교육원 포털사이트를 통해 온라인 신청<br /> -->
+<!-- 								교육관련 문의 02)750-1232,1233 -->
+<!-- 							</li> -->
+							<!-- 기존 END 2018-08-30  -->
+							
+							<!-- 2018-08-28 김동인 작업 S --> 
+							<li>신용교육원 포털사이트를 통해 온라인 신청</li>
+							<li class="point">교육관련 문의 02)750-1232,1233</li>	
+							<!-- 2018-08-28 김동인 작업 E -->
+						</ul>
+					</div>
+					
+					<!-- 2018-08-28 김동인 작업 S -->
+					<div class="c_section">
+						<h4 class="c_tit">신용회복위원회 신용교육원 안내자료</h4>
+						<button class="btn_ico_file" onclick="intro();"><span></span>신용교육원 안내자료 다운로드</button>
+					</div>
+					<!-- 2018-08-28 김동인 작업 E -->
+					
+					<!-- 기존 START 2018-08-30  -->
+<!-- 					<div class="c_btn_center"> -->
+<!-- 						<a href="/ccedu/visit/lectureApplyForm.do" class="c_btnstyle01"><span>교육신청 바로가기</span></a> -->
+<!-- 					</div> -->
+					<!-- 기존 END 2018-08-30  -->
+					
+					<!-- 2018-08-28 김동인 작업 S -->
+					<div class="c_btn_center">
+						<a href="/ccedu/visit/lectureApplyForm.do" class="btn_01" style="display: inline !important;">교육신청 바로가기<span></span></a>
+					</div>
+					<!-- 2018-08-28 김동인 작업 E -->
+					<!--// end -->
+				</div>
+				<!--// 본문내용 -->
+				
+			<!--  -->
+			</div>
+			<!--// content 본문 -->
+		
+		</div>
+	
+	</div>
+	<!--// container -->
+
+	<!-- foot -->
+	<%@ include file="/WEB-INF/jsp/ccedu/inc/footer_inc.jsp"%>
+	<!--// foot end -->
+
+</div>
+
+</body>
+</html>

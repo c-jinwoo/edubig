@@ -1,0 +1,191 @@
+<%@ page language="java" contentType="text/html; charset=utf-8" pageEncoding="utf-8"%>
+<%@ include file="/WEB-INF/jsp/ccedu/inc/taglib_inc.jsp"%>
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+	<c:if test="${REQUEST_DATA.bcateno eq '12'}">
+		<title>알림마당 > 자주묻는질문(FAQ)</title>
+	</c:if>
+	<c:if test="${REQUEST_DATA.bcateno eq '5'}">
+		<title>알림마당 > 자주묻는질문(FAQ)</title>
+	</c:if>
+	<%@ include file="/WEB-INF/jsp/ccedu/inc/head_inc.jsp"%>
+	<script type="text/javascript">
+	
+		function tabMove(count) {
+			$("#tabNo").val(count);
+			if("5" == $("#bcateno").val()) {
+				$("#frm").attr("action", "/ccedu/notice/faqList.do");
+			} else if("12" == $("#bcateno").val()) {
+				$("#frm").attr("action", "/ccedu/cc/faqList.do");
+			}
+			
+			$("#frm").submit();
+		}
+		
+
+		
+	</script>
+</head>
+
+<body>
+
+<!-- skip nav -->
+	<%@ include file="/WEB-INF/jsp/ccedu/inc/nav_inc.jsp"%>
+<!--// skip nav -->
+
+
+<div id="wrap">
+
+	<!-- header -->
+	<%@ include file="/WEB-INF/jsp/ccedu/inc/header_inc.jsp"%>
+	<!--// header -->
+
+	<!-- container -->
+	<div id="container">
+
+		<!-- location -->
+		<c:if test="${REQUEST_DATA.bcateno eq '12'}">
+			<jsp:include page="/WEB-INF/jsp/ccedu/inc/location/loc_03_05.jsp"> 
+			  	<jsp:param name="menuNm" value="FAQ"/> 
+			</jsp:include> 
+		</c:if>
+		<!--  사이트관리 -->
+		<c:if test="${REQUEST_DATA.bcateno eq '5'}">
+			<jsp:include page="/WEB-INF/jsp/ccedu/inc/location/loc_05_05.jsp"> 
+			  	<jsp:param name="menuNm" value="자주묻는질문"/> 
+			</jsp:include> 
+		</c:if>
+		<!--// location -->
+
+		<div class="con_center">
+
+			<!-- lnb -->
+			<div id="lnb">
+				<!--  사이트관리  -->
+				<c:if test="${REQUEST_DATA.bcateno eq '5'}">
+					<jsp:include page="/WEB-INF/jsp/ccedu/inc/lnb/lnb_05.jsp"> 
+					  	<jsp:param name="dep2" value="05"/>
+					</jsp:include>
+				</c:if>
+				<!-- 신용상담사 -->
+				<c:if test="${REQUEST_DATA.bcateno eq '12'}">
+					<jsp:include page="/WEB-INF/jsp/ccedu/inc/lnb/lnb_03.jsp"> 
+					  	<jsp:param name="dep2" value="05"/>
+					  	<jsp:param name="dep3" value="02"/> 
+					</jsp:include>
+				</c:if>
+			</div>
+			
+			<!--// lnb -->
+			<form name="frm" id="frm" action="" method="post">
+				<input type="hidden" name="bcateno" id="bcateno" value="${REQUEST_DATA.bcateno}"/>
+				<input type="hidden" name="bbsNo" id="bbsNo" value=""/>
+				<input type="hidden" name="fileId" id="fileId" value=""/>
+				<input type="hidden" name="fileSeq" id="fileSeq" value=""/>
+				<input type="hidden" id="tabNo" name="tabNo" value="<c:out value='${REQUEST_DATA.tabNo}'/>">
+			</form>
+
+			<!-- content 본문 -->
+			<div id="content">
+				<c:if test="${REQUEST_DATA.bcateno eq '5'}">
+					
+					<!-- 기존 START 2018-08-30  -->
+<!-- 					<h3 class="cont_titile">자주묻는 질문</h3> -->
+					<!-- 기존 END 2018-08-30  -->
+					
+					<!-- 2018-08-28 김동인 작업 S --> 
+					<h3 class="cont_titile type05">자주묻는 질문<span></span></h3>
+					<!-- 2018-08-28 김동인 작업 E -->
+					
+				</c:if>
+				<c:if test="${REQUEST_DATA.bcateno eq '12'}">
+					<!-- 기존 START 2018-08-30  -->
+<!-- 					<h3 class="cont_titile">FAQ</h3> -->
+					<!-- 기존 END 2018-08-30  -->
+					
+					<!-- 2018-08-28 김동인 작업 S --> 
+					<h3 class="cont_titile type03">FAQ<span></span></h3>
+					<!-- 2018-08-28 김동인 작업 E -->
+				</c:if>
+				<!-- 본문내용 -->
+				<div class="cont_body">
+					<!-- start -->
+
+					<div class="c_section">
+						<c:if test="${REQUEST_DATA.bcateno eq '5' }">
+							<!-- 기존 START 2018-08-30  -->
+<!-- 							<div class="c_tab col4"> -->
+							<!-- 기존 END 2018-08-30  -->
+							
+							<!-- 2018-08-28 김동인 작업 S -->
+								<div class="c_tab col5">
+							<!-- 2018-08-28 김동인 작업 E -->
+						</c:if>
+						<c:if test="${REQUEST_DATA.bcateno eq '12'}">
+							<!-- 기존 START 2018-08-30  -->
+<!-- 							<div class="c_tab col4"> -->
+							<!-- 기존 END 2018-08-30  -->
+							
+							<!-- 2018-08-28 김동인 작업 S -->
+								<div class="c_tab col5">
+							<!-- 2018-08-28 김동인 작업 E -->
+						</c:if>
+							<ul>
+								<li><a href="#" onclick="tabMove('0')" <c:if test="${REQUEST_DATA.tabNo eq '' || REQUEST_DATA.tabNo eq 0 }"> class="on" title="현재페이지" </c:if> >전체</a></li>
+								<c:forEach varStatus="stauts" items="${codeList}" var="codeList">
+									<li>
+										<a href="#" onclick="tabMove('<c:out value='${stauts.count}'/>')" <c:if test="${REQUEST_DATA.tabNo eq stauts.count}"> class="on" title="현재페이지" </c:if> value="<c:out value='${codeList.MT_SUB_CODE}'/>">
+											<c:out value='${codeList.MT_SUB_NAME}'/>
+										</a>
+									</li>
+								</c:forEach>
+							</ul>	
+						</div>
+
+
+						
+						<div class="toggle_list">
+							<p class="alt_text">자주 질문해주시는 내용을 모아 보다 편리하게 궁금증을 알아볼 수 있습니다.</p>
+							<ul>
+								<c:forEach var="listData" items="${listData}">
+										<li><!-- 디폴트 활성화 필요시 class="open" -->
+										
+											<div class="q">
+												<span class="i">질문</span>
+												<a href="#faq_1"><c:out value="${listData.TITLE }" escapeXml="false"/></a>
+											</div>
+											<div class="a" id="faq_1">
+												<span class="alt_text">대답</span>
+<%-- 											<p>${listData.CONTENT}</p> --%>
+												<div class="a_con">${listData.CONTENT}</div>
+											</div>
+											
+										</li>
+								</c:forEach>
+							</ul>
+						</div>
+
+					</div>
+
+					<!--// end -->
+				</div>
+				<!--// 본문내용 -->
+				
+			<!--  -->
+			</div>
+			<!--// content 본문 -->
+		
+		</div>
+	
+	</div>
+	<!--// container -->
+
+	<!-- foot -->
+	<%@ include file="/WEB-INF/jsp/ccedu/inc/footer_inc.jsp"%>
+	<!--// foot end -->
+
+</div>
+
+</body>
+</html>

@@ -1,0 +1,327 @@
+<%
+/****************************************
+    subject : 회원가입
+    summary : 회원가입 : 실명인증
+    author  : SANGS
+    date    : 2018-06-15
+****************************************/
+%>
+<%@ page language="java" contentType="text/html; charset=utf-8" pageEncoding="utf-8"%>
+<%@ include file="/WEB-INF/jsp/ccedu/inc/taglib_inc.jsp"%>
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+	<title>회원가입 > 신용교육원</title>
+	<%@ include file="/WEB-INF/jsp/ccedu/inc/head_inc.jsp"%>
+	<script type="text/javascript">
+		$(document).ready(function(){
+			onlyNum2('ssn1');
+		});
+	
+		function fnSelectType(type){
+			$('input[name=mberType]').val(type);
+			$('#frm').submit();
+		}
+		
+		// 공인인증서 팝업
+		function fnCertFormSubmit(){
+			var certForm = document.certForm;
+	
+			$('#ssn').val($('#ssn1').val()+$('#ssn2').val());
+			window.open("", "auth_popup", "width=432,height=560,scrollbar=yes");
+	
+			certForm.target = "auth_popup";
+			certForm.submit();
+		}
+		
+		//인증 유형 설정
+		function fnCertType(type){
+			
+			var mT = $('input[name=mberType]').val();
+			$('#confirmGubun').val(type);
+			
+			ajaxSubmit('/ccedu/user/memberDupChkAjax.do',
+			        {  confirmGubun : $('#confirmGubun').val()
+						, di : $('input[name=di]').val()
+			        }, 'json',
+			        eval('resultDupChk')
+			);
+			
+		}
+		
+		function fnGoSubmit(){
+			if(!fnValiCheck($('#confirmGubun'),'실명인증을 해주세요.')) return false;
+			if(!fnValiCheck($('input[name=di]'),'실명인증을 해주세요.')) return false;
+
+			$('#frm').submit();
+		}
+		
+	
+		function resultDupChk(data){
+			
+			var mT = $('input[name=mberType]').val();
+			
+			if(mT == 'N'){
+			    if(data > 0) {
+			    	fnConfirm("가입정보가 있습니다.<br> 로그인 페이지로 이동하시겠습니까?", function(result) {
+		    			if(result){
+			    			$("#frm").attr("action", '/ccedu/common/login.do');
+			    			$("#frm").submit();
+		    			}
+		    			return false;
+					});
+		    		return false;
+			    }else if(data == 0) {
+			    	fnGoSubmit();
+			    }
+			}else{
+				fnGoSubmit();
+			}
+			
+		}
+	
+		
+		//레이어 초기화
+		function fnLayerClean(){
+			$('#mberNm').val('');
+			$('#ssn').val('');
+			$('#ssn1').val('');
+			$('#ssn2').val('');
+		}
+	<%--
+		// Ipin
+ 		function authIpin(){	
+ 			var popupWindow = window.open("/ccedu/common/kcbIpin.do?joinYn=Y", "kcbIpinPop", "left=200, top=100, status=0, width=450, height=550");
+ 			popupWindow.focus()	;
+ 		}
+	--%>
+		 
+		// Mobile
+		function authMobile(){
+			var popupWindow = window.open("/ccedu/common/kcbMobileCheck.do?joinYn=Y", "kcbMobilePop", "left=200, top=100, status=0, width=404, height=508");
+			popupWindow.focus()	;
+		}
+	</script>	
+	
+</head>
+
+<body>
+
+<!-- skip nav -->
+	<%@ include file="/WEB-INF/jsp/ccedu/inc/nav_inc.jsp"%>
+<!--// skip nav -->
+
+
+<div id="wrap">
+
+
+	
+
+		<!-- layer pop 실명인증팝업 -->
+		<div class="layerpop company" tabindex="0" data-tooltip-con="popauth01" data-focus="popauth01" data-focus-prev="popauth01-close" style="top: 140px;">
+			<div class="layer_mask tooltip-close"></div><!-- 블랙mask영역 -->
+			<div class="layer_cont">
+				<div class="lc_head">
+					
+				</div>
+				<div class="lc_cont">
+	
+					<div class="company_con_search">
+						
+						<div class="table_style_row">
+							<table>
+								<caption>실명인증 정보를 입력하는 표 입니다.</caption>
+								<colgroup>
+									<col class="col2_1" />
+									<col />
+								</colgroup>
+								<tr>
+									<th scope="row">성명</th>
+									<td>
+										<div class="form_field pc_max230">
+											<input type="text" title="성명 입력" name="mberNm" id="mberNm" style="width:100%;" />
+										</div>
+									</td>
+								</tr>
+								<tr>
+									<th scope="row">주민번호</th>
+									<td>
+										<div class="form_field pc_max230">
+											<input type="text" title="주민번호 앞자리 입력" id="ssn1" name="ssn1" style="width:44%;" maxlength="6" />
+											<span class="widbox" style="width:12%;">-</span>
+											<input type="password" title="주민번호 뒷자리 입력" id="ssn2" name="ssn2" style="width:44%;" maxlength="7"/>
+										</div>
+									</td>
+								</tr>
+							</table>
+							<sapn style="color : #ef5400; font-size:14px;">* 공인인증서를 통한 실명인증 시에는 익스플로러 버전(IE9 이상) 환경에서만 가능합니다.<br/>&nbsp;&nbsp;&nbsp;이 점 참고하여 진행하여 주시기 바랍니다.</sapn>
+						</div>
+	
+						<p class="pop_error_msg" id="notMatch" style="display:none;">입력하신 성명과 주민번호가 일치하지 않습니다. </p>
+	
+						<div class="c_btn_center">
+							<button class="btn_blueline02 tooltip-close" onclick="fnLayerClean(); return false;">취소</button>
+							<button class="btn_bluebg02" onclick="fnCheckOkname(); return false;">확인</button>
+						</div>
+	
+					</div>
+	
+				</div>
+			</div>
+			<button class="btn_close tooltip-close" data-focus="popauth01-close" data-focus-next="popauth01" onclick="fnLayerClean(); return false;">닫기</button>
+		</div>
+		<!--// layer pop -->
+
+
+	<!-- header -->
+	<%@ include file="/WEB-INF/jsp/ccedu/inc/header_inc.jsp"%>
+	<!--// header -->
+
+	<!-- container -->
+	<div id="container">
+		<!-- location -->
+		<jsp:include page="/WEB-INF/jsp/ccedu/inc/location/loc_07.jsp"> 
+		  	<jsp:param name="menuNm" value="회원가입"/> 
+		</jsp:include> 
+		<!--// location -->
+
+		<div class="con_center">
+
+			<!-- lnb -->
+			<div id="lnb">
+				<jsp:include page="/WEB-INF/jsp/ccedu/inc/lnb/lnb_07.jsp"> 
+				  	<jsp:param name="dep2" value="02"/>
+				</jsp:include> 
+			</div>
+			<!--// lnb -->
+
+			<!-- content 본문 -->
+			<div id="content">
+			
+				<!-- 공인인증서 모듈 폼 START -->
+	        	<form name="certForm" action="/kcbtest/hscert2.jsp" method="post">
+					<input type="hidden" name="hs_cert_msr_cd" value="30"> <!-- 인증요청수단 (00:전체, 10:휴대폰, 20:신용카드, 30:공인인증서) -->
+					<input type="hidden" name="ssn" id="ssn" value="">			 <!-- 주민번호 -->
+					
+				</form>
+				<!-- 공인인증서 모듈 폼 END --> 
+
+	            <form name="frm" id="frm" action="/ccedu/user/memberJoinStep03.do" method="post"  target="_self">
+					<input type="hidden" name="mberType" value="<c:out value="${REQUEST_DATA.mberType }"/>"/>
+					<input type="hidden" name="userName" value=""/>
+					<input type="hidden" name="confirmGubun" id="confirmGubun" value="" />
+					<input type="hidden" name="brthdy" id="brthdy" value="">
+					<input type="hidden" name="sex" id="sex" value="">
+					<input type="hidden" name="ssnCd" id="ssnCd" value="">
+					
+					
+					<input type="hidden" name="moblphon2" id="moblphon2" value="">
+					<input type="hidden" name="moblphon3" id="moblphon3" value="">
+					
+					
+					<!-- 공인인증 데이터 START -->
+					<input type="hidden" name="idcf_mbr_com_cd" 		value="" 	/>
+			        <input type="hidden" name="hs_cert_svc_tx_seqno" 	value=""	/>
+			        <input type="hidden" name="hs_cert_msr_cd" 		value="" 	/>
+			        <input type="hidden" name="rst_cd" 				value="" 	/>
+			        <input type="hidden" name="rst_msg" 				value="" 	/>
+					<input type="hidden" name="di" 				value="" 	/>
+					<input type="hidden" name="dataGubun" 				value="" 	/>
+					
+					<!-- 공인인증 데이터 END -->
+				</form>
+
+				<!-- 기존 START 2018-08-30  -->
+<!-- 				<h3 class="cont_titile">회원가입</h3> -->
+				<!-- 기존 END 2018-08-30  -->
+				
+				<!-- 2018-08-28 김동인 작업 S -->
+				<h3 class="cont_titile type09">회원가입<span></span></h3>
+				<!-- 2018-08-28 김동인 작업 E -->
+				
+				<!-- 본문내용 -->
+				<div class="cont_body">
+					<!-- start -->
+
+					<div class="c_section">
+						<div class="c_head_step">
+							<ol>
+								<li><a href="#none"><span class="num">1. </span>약관동의</a></li>
+								<li class="on"><a href="#none" title="현재페이지"><span class="num">2. </span>실명/가입확인</a></li>
+								<li><a href="#none"><span class="num">3. </span>회원정보 등록</a></li>
+								<li><a href="#none"><span class="num">4. </span>회원가입 완료</a></li>
+							</ol>
+						</div>
+					</div>
+
+					<div class="c_section">
+
+						<div class="join_type_wrap">
+							<ul class="sel_type">
+								<li>
+									<a href="#none" data-tooltip="popauth01">
+										<span class="label_img01"></span>
+										<span class="txt">공인인증서를 통한<br />실명인증</span>
+									</a>
+								</li>
+								<%--
+<!-- 								<li> -->
+<!--  									<a href="#none" onclick="authIpin();return false;">  -->
+<!-- 									<button disabled="disabled"> -->
+<!-- 										<span class="label_img02"></span> -->
+<!-- 										<span class="txt">아이핀을 통한<br />실명인증</span> -->
+<!-- 									</button> -->
+<!-- 									</a> -->
+									
+<!-- 								</li> -->
+								--%>
+								<li>
+ 									<a href="#none" onclick="authMobile();return false;"> 
+<!-- 									<button disabled="disabled"> -->
+										<span class="label_img03"></span>
+										<span class="txt">휴대폰인증을 통한<br />실명인증</span>
+<!-- 									</button> -->
+ 									</a> 
+								</li>
+								
+							</ul>
+						</div>
+
+					</div>
+					
+
+					<div class="c_section">
+						<h4 class="c_tit">실명 인증 안내</h4>
+						<ul class="c_txtlist">
+							<li>
+								<h5>신용회복위원회에서는 깨끗하고 안전한 인터넷 서비스 이용 환경을 위해  실명 인증을 받고 있습니다. </h5>
+								<ul class="in_txtul">
+									<li>인증시 사용되는 귀하의 주민등록번호는 도용 등을 방지하기 위한  실명확인 용도로만 사용됩니다.</li>
+									<li>타인의 정보 및 주민등록번호를 부정하게 사용하는 경우 3년 이하의 징역 또는 1천만원 이하의 벌금에 처해지게 됩니다.</li>
+									<li>홈페이지 회원가입은 최초 1회만 가능합니다.</li>
+								</ul>
+							</li>
+						</ul>
+					</div>
+
+					<!--// end -->
+				</div>
+				<!--// 본문내용 -->
+				
+			<!--  -->
+			</div>
+			<!--// content 본문 -->
+		
+		</div>
+	
+	</div>
+	<!--// container -->
+
+	<!-- foot -->
+	<%@ include file="/WEB-INF/jsp/ccedu/inc/footer_inc.jsp"%>
+	<!--// foot end -->
+
+</div>
+
+</body>
+</html>

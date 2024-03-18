@@ -1,0 +1,11 @@
+_this.$quizInfo = [
+	["다음 중 Joint Origin(조인트 원점) 대한 설명으로 <span style='color:#FF0000;'>틀린</span> 것은?","Component(구성요소)를 기준으로 기준점을 생성하는 기능이다.","Joint Origin(원점)은 Joint(조인트) 생성 시 이를 참조할 수 있다.","생성된 Joint Origin(조인트 원점)은 Browser에서 확인할 수 있다.","Mode(모드)에는 Simple, Between two faces, Two Edge Intersection 옵션이 있다.",false],	
+	["다음 중 Rigid Group(강체 그룹)에 대한 설명으로 <span style='color:#FF0000;'>틀린</span> 것은?","Component(구성요소)들을 그룹화 하여 위치를 고정하는 기능이다.","Rigid Group(강체 그룹)은 Browser의 [Joints] 폴더에서 확인할 수 있다.","Rigid Group(강체 그룹)된 Component(구성요소) 중 하나를 이동(Move)하면 Component(구성요소) 전체가 이동한다.","Rigid Group(강체 그룹)된 Component(구성요소) 중 하나를 Joint(조인트)하면 Component(구성요소) 전체가 이동한다.",false],
+	["다음 중 Enable Contact Sets(접촉 세트 만들기)에 대한 설명으로 <span style='color:#FF0000;'>틀린</span> 것은?","Component(구성요소)의 접촉 분석을 활성화 한다.","Joint(조인트)의 Motion(이동)을 서로 연결하여 구동 범위를 설정한다.","두 개 이상의 Component(구성요소)를 선택해야 한다.","Component(구성요소)끼리 간섭이 발생될 때 더 이상 움직이지 않도록 한다.",false]
+];
+
+_this.$quizAnsInfo = [
+	[3,"Browser에서는 생성된 Joint(조인트)를 확인할 수 있다."],
+	[3,"Rigid Group(강체 그룹)된 Component(구성요소) 중 하나를 이동(Move)하면 해당 Component(구성요소)만 이동한다."],
+	[2,"Joint(조인트)의 Motion(이동)을 서로 연결하여 구동 범위를 설정하는 기능은 Motion Link(모션 링크)이다."],
+];

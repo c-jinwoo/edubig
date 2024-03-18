@@ -1,0 +1,249 @@
+<%
+/****************************************
+    subject : 신용상담사
+    summary : 신용상담사 : 보수교육 > 교육안내
+    author  : SANGS
+    date    : 2018-06-15
+****************************************/
+%>
+<%@ page language="java" contentType="text/html; charset=utf-8" pageEncoding="utf-8"%>
+<%@ include file="/WEB-INF/jsp/ccrs/cmmn/inc/taglib_inc.jsp"%>
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+	<title>교육안내 > 보수교육 > 신용상담사 > 신용회복위원회 신용교육원</title>
+	<%@ include file="/WEB-INF/jsp/ccedu/inc/head_inc.jsp"%>
+	
+	<script type="text/javascript">
+	
+	</script>
+</head>
+
+
+<body>
+
+<!-- skip nav -->
+	<%@ include file="/WEB-INF/jsp/ccedu/inc/nav_inc.jsp"%>
+<!--// skip nav -->
+
+
+<div id="wrap">
+
+	<!-- header -->
+	<%@ include file="/WEB-INF/jsp/ccedu/inc/header_inc.jsp"%>
+	<!--// header -->
+
+	<!-- container -->
+	<div id="container">
+
+		<!-- location -->
+		<jsp:include page="/WEB-INF/jsp/ccedu/inc/location/loc_03_04.jsp"> 
+		  	<jsp:param name="menuNm" value="교육안내"/> 
+		</jsp:include>
+		<!--// location -->
+
+		<div class="con_center">
+
+			<!-- lnb -->
+			<div id="lnb">
+				<jsp:include page="/WEB-INF/jsp/ccedu/inc/lnb/lnb_03.jsp"> 
+				  	<jsp:param name="dep2" value="04"/>
+				  	<jsp:param name="dep3" value="01"/> 
+				</jsp:include>
+			</div>
+			<!--// lnb -->
+			
+			
+			<!-- content 본문 -->
+			<div id="content">
+			
+				<!-- 기존 START 2018-08-30  -->
+<!-- 				<h3 class="cont_titile">보수교육 안내</h3> -->
+				<!-- 기존 END 2018-08-30  -->
+				
+				<!-- 2018-08-28 김동인 작업 S --> 
+				<h3 class="cont_titile type03">보수교육 안내<span></span></h3>
+				<!-- 2018-08-28 김동인 작업 E -->
+
+				<!-- 본문내용 -->
+				<div class="cont_body">
+					<!-- start -->
+
+					<div class="c_section">
+						<h4 class="c_tit">보수교육 안내</h4>
+						<div class="table_style_col">
+							<table>
+								<caption>보수교육 대상, 보수교육 유효기간, 자격의 종류, 비고 를 확인할수있는 표 입니다.</caption>
+								<colgroup>
+									<col  />
+									<col  />
+									<col  />
+									<col  />
+								</colgroup>
+								<thead>
+									<tr>
+										<th scope="col">보수교육 대상</th>
+										<th scope="col">보수교육 유효기간</th>
+										<th scope="col">자격의 종류</th>
+										<th scope="col">비고</th>
+									</tr>
+								</thead>
+								<tbody>
+									<tr>
+										<td>2010년 자격취득자</td>
+										<td class="align_center">2년</td>
+										<td class="align_center">등록 민간자격</td>
+										<td class="align_center"></td>
+									</tr>
+									<tr>
+										<td>2011년~ 2016년 자격취득자</td>
+										<td class="align_center">3년</td>
+										<td class="align_center">등록 민간자격</td>
+										<td class="align_center"></td>
+									</tr>
+									<tr>
+										<td>2017년 이후 자격취득자</td>
+										<td class="align_center">3년</td>
+										<td class="align_center">공인 민간자격</td>
+										<td class="align_center"></td>
+									</tr>
+								</tbody>
+							</table>
+						</div>
+						<ul class="c_txtlist">
+							<li><strong>자격의 유효기간</strong>: 합격일로부터 3년</li>
+							<li>
+								<h5>보수교육 유효기간</h5>
+								<ul class="in_txtul">
+									<li>유효기간 만료일 3개월 전 보수교육 이수자 : 만료일로부터 3년간 연장</li>
+									<li>유효기간 만료일 경과 후 보수교육 이수자 : 보수교육 이수일로부터 3년간 연장</li>
+								</ul>
+							</li>
+							<li><strong>보수교육 수강가능기간</strong> : 유효기간 만료일 3개월 전부터</li>
+							<li><strong>보수교육 미이수자</strong> : 만료일 다음날부터 보수교육 이수일까지 자격정지</li>
+							<li><strong>보수교육 이수방법</strong> : 인터넷을 통한 온라인 동영상 무료수강</li>
+						</ul>
+						<div class="c_btn_center">
+							<!-- 기존 START 2018-08-30  -->
+<!-- 							<a href="/ccedu/cc/refreTraining.do" class="c_btnstyle01"><span>보수교육 바로가기</span></a> -->
+							<!-- 기존 END 2018-08-30  -->
+							
+							<!-- 2018-08-28 김동인 작업 S --> 
+							<a href="/ccedu/cc/refreTraining.do" class="btn_01">보수교육 바로가기<span></span></a>
+							<!-- 2018-08-28 김동인 작업 E -->
+						</div>
+					</div>
+
+					<div class="c_section">
+						<h4 class="c_tit">보수교육 수강내용 안내</h4>
+						<div class="table_style_col">
+							<table>
+								<caption>수강과목, 교육방법, 학습시간, 평가방법 을 안내하는 표 입니다.</caption>
+								<colgroup>
+									<col  />
+									<col  />
+									<col  />
+									<col  />
+								</colgroup>
+								<thead>
+									<tr>
+										<th scope="col">수강과목</th>
+										<th scope="col">교육방법</th>
+										<th scope="col">학습시간</th>
+										<th scope="col">평가방법</th>
+									</tr>
+								</thead>
+								<tbody>
+									<tr>
+										<td>신용상담의 이해 Ⅰ</td>
+										<td class="align_center">온라인수강</td>
+										<td class="align_center">21분 28초</td>
+										<td class="align_center">온라인평가</td>
+									</tr>
+									<tr>
+										<td>신용상담의 이해 Ⅱ</td>
+										<td class="align_center">온라인수강</td>
+										<td class="align_center">28분 28초</td>
+										<td class="align_center">온라인평가</td>
+									</tr>
+									<tr>
+										<td>신용상담을 위한 재무관리Ⅰ</td>
+										<td class="align_center">온라인수강</td>
+										<td class="align_center">21분 36초</td>
+										<td class="align_center">온라인평가</td>
+									</tr>
+									<tr>
+										<td>신용상담을 위한 재무관리Ⅱ</td>
+										<td class="align_center">온라인수강</td>
+										<td class="align_center">20분 44초</td>
+										<td class="align_center">온라인평가</td>
+									</tr>
+									<tr>
+										<td>신용상담 관련 법규Ⅰ</td>
+										<td class="align_center">온라인수강</td>
+										<td class="align_center">31분 42초</td>
+										<td class="align_center">온라인평가</td>
+									</tr>
+									<tr>
+										<td>신용상담 관련 법규Ⅱ</td>
+										<td class="align_center">온라인수강</td>
+										<td class="align_center">46분 51초</td>
+										<td class="align_center">온라인평가</td>
+									</tr>
+									<tr>
+										<td>다양한 채무자 구제제도Ⅰ</td>
+										<td class="align_center">온라인수강</td>
+										<td class="align_center">24분 50초</td>
+										<td class="align_center">온라인평가</td>
+									</tr>
+									<tr>
+										<td>다양한 채무자 구제제도Ⅱ</td>
+										<td class="align_center">온라인수강</td>
+										<td class="align_center">31분 4초</td>
+										<td class="align_center">온라인평가</td>
+									</tr>
+								</tbody>
+							</table>
+						</div>
+					</div>
+					
+					<!-- 기존 START 2018-08-30  -->
+<!-- 					<div class="c_section"> -->
+<!-- 						<h4 class="c_tit">보수교육 수료확인 및 자격증 갱신</h4> -->
+<!-- 						<ul class="c_txtlist"> -->
+<!-- 							<li>보수교육을 완료하신 분은 반드시 신용교육원 홈페이지'내강의실‘에서 나의 학습이력을 클릭하여 수료여부를 확인해 주시기 바랍니다.</li> -->
+<!-- 							<li>보수교육을 수료 하시면 자격증 갱신을 하지 않더라도 자격 유효기간은 보수교육 수료일을 기준으로 3년간 연장됩니다.</li> -->
+<!-- 						</ul> -->
+<!-- 					</div> -->
+					<!-- 기존 END 2018-08-30  -->
+					
+					<!-- 2018-08-28 김동인 작업 S -->
+					<div class="c_section">
+						<h4 class="c_tit">보수교육 수료확인 및 자격증 갱신</h4>
+						<ul class="c_txtlist">
+							<li>보수교육을 수료 하시면 자격증 갱신을 하지 않더라도 자격 유효기간은 보수교육 수료일을 기준으로 3년간 연장됩니다.</li>
+						</ul>
+					</div>
+					<!-- 2018-08-28 김동인 작업 E -->	
+
+					<!--// end -->
+				</div>
+				<!--// 본문내용 -->
+				
+			<!--  -->
+			</div>
+			<!--// content 본문 -->
+		<!-- con_cneter end -->
+		</div>
+	
+	</div>
+	<!--// container -->
+
+	<!-- foot -->
+	<%@ include file="/WEB-INF/jsp/ccedu/inc/footer_inc.jsp"%>
+	<!--// foot end -->
+
+</div>
+
+</body>
+</html>

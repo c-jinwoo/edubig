@@ -1,0 +1,321 @@
+<%
+/****************************************
+    subject : 신용상담사
+    summary : 신용상담사 : 원서접수 > 원서접수 > 원서접수 등록 > 완료
+    author  : SANGS
+    date    : 2018-06-15
+****************************************/
+%>
+<%@ page language="java" contentType="text/html; charset=utf-8" pageEncoding="utf-8"%>
+<%@ include file="/WEB-INF/jsp/ccedu/inc/taglib_inc.jsp"%>
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+	<title>합격자조회 > 합격자조회/자격증신청 > 신용상담사 > 신용회복위원회 신용교육원</title>
+	<%@ include file="/WEB-INF/jsp/ccedu/inc/head_inc.jsp"%>
+	<script type="text/javascript">
+	
+		$(document).ready(function() {
+			
+			if(${empty passYnMap}) {
+				fnModalMsg("접수한 내용이 없습니다.");
+			}
+			
+		});
+	
+		// 결과확인
+ 		function resultCheck(ccNo, passYn, mtAppType, ccAppNo) {
+//		function resultCheck(ccNo, mtAppType, ccAppNo) {
+			
+			var ccNo = $("#ccNo").val(ccNo);
+			var mtPollType = $("#mtPollType").val('PT0002');
+			var mtAppType = $("#mtAppType").val(mtAppType);
+			var ccAppNo = $("#ccAppNo").val(ccAppNo);
+			var msg = "합격자 조회를 하시려면,<br /> 설문에 참여하셔야 합니다.<br /> 계속 진행하시겠습니까?";
+			
+			
+			
+			
+			
+ 			if('Y' == passYn) {
+ 				msg = "합격자 조회를 하시려면,추가정보 입력 후 설문에 참여하셔야 합니다.계속 진행하시겠습니까?";
+ 			} else if('N' == passYn) {
+ 				msg = "합격자 조회를 하시려면, 설문에 참여하셔야 합니다.계속 진행하시겠습니까?";
+ 			}
+
+			modal({
+				type: 'confirm',
+				title: '알림',
+				text: ""+msg+"",
+				callback: function(result) {
+					if(result) {
+ 						if('Y' == passYn) {
+ 							$("#frm").attr("action", "/ccedu/cc/addInfo.do");
+ 							$("#frm").submit();
+							
+						} else {
+							$("#frm").attr("action", "/ccedu/cc/getPollList.do");
+							$("#frm").submit();
+						}
+
+						$("#frm").attr("action", "/ccedu/cc/getPollList.do");
+						$("#frm").submit();
+						
+					}
+				} //  callback
+			});	//modal
+			
+		}
+		
+		
+		// 결과 상세보기
+		function resultDetailInfo(ccNo, passYn, mtAppType, ccAppNo) {
+			
+			var ccNo = $("#ccNo").val(ccNo);
+			var mtPollType = $("#mtPollType").val('PT0002');
+			var mtAppType = $("#mtAppType").val(mtAppType);
+			var ccAppNo = $("#ccAppNo").val(ccAppNo);
+			
+			$("#frm").attr("action", "/ccedu/cc/resultDetailInfo.do");
+			$("#frm").submit();		
+		}
+		
+		// 합격증 출력하기
+		function printCertifi(ccNo, ccAppNo, mtAppType) {
+			
+/* 			$('#ccNo').val(ccNo);
+			$('#ccAppNo').val(ccAppNo);
+			$("#mtAppType").val(mtAppType);
+			var w1 =1070;
+			var h1 = 900;
+			var url = "/ccedu/cc/certifiPrint.do";
+			
+			window.open( url+"?"+$("#frm").serialize()
+				,"cert_pop","width="+w1+" height="+h1+", top=0, left=0, resizable=yes, status=no, menubar=no, toolbar=no, scrollbars=yes, location=no");*/
+		} 
+			
+	
+	</script>
+</head>
+
+<body>
+
+<!-- skip nav -->
+	<%@ include file="/WEB-INF/jsp/ccedu/inc/nav_inc.jsp"%>
+<!--// skip nav -->
+
+
+<div id="wrap">
+
+	<!-- header -->
+	<%@ include file="/WEB-INF/jsp/ccedu/inc/header_inc.jsp"%>
+	<!--// header -->
+
+	<!-- container -->
+	<div id="container">
+
+		<!-- location -->
+			<jsp:include page="/WEB-INF/jsp/ccedu/inc/location/loc_03_03.jsp">
+			  	<jsp:param name="menuNm" value="합격자조회"/> 
+			</jsp:include>
+		<!--// location -->
+
+		<div class="con_center">
+
+			<!-- lnb -->
+			<div id="lnb">
+				<jsp:include page="/WEB-INF/jsp/ccedu/inc/lnb/lnb_03.jsp">  
+				  	<jsp:param name="dep2" value="03"/>
+				  	<jsp:param name="dep3" value="01"/> 
+				</jsp:include>
+			</div>
+			<!--// lnb -->
+			
+			
+			<form id="frm" name="frm" method="post">
+				<input type="hidden" name="mtAppType" id="mtAppType" value=""/>
+				<input type="hidden" name="mtPollType" id="mtPollType" value=""/>
+				<input type="hidden" name="ccNo" id="ccNo" value=""/>
+				<input type="hidden" name="ccAppNo" id="ccAppNo" value=""/>
+				<input type="hidden" name="paramUrl" id="paramUrl" value="/ccedu/cc/examPassYnList.do"/>
+				
+			
+			<!-- content 본문 -->
+			<div id="content">
+				<!-- 기존 START 2018-08-30  -->
+<!-- 				<h3 class="cont_titile">합격자 조회</h3> -->
+				<!-- 기존 END 2018-08-30  -->
+				
+				<!-- 2018-08-28 김동인 작업 S --> 
+				<h3 class="cont_titile type03">합격자 조회<span></span></h3>
+				<!-- 2018-08-28 김동인 작업 E -->
+
+				<!-- 본문내용 -->
+				<div class="cont_body">
+					<!-- start -->
+
+					<div class="c_section">
+						<div class="table_style_col2 mgt0">
+							<table>
+								<caption>번호, 구분, 시험명, 시험일, 합격여부를 확인 할 수 있고 상세정보보기 버튼이 있는표</caption>
+								<colgroup>
+									<col  />
+									<col  />
+									<col  />
+									<col  />
+									<col  />
+									<col  />
+									<col  />
+									<col  />
+								</colgroup>
+								<thead>
+									<tr>
+										<th scope="col">구분</th>
+										<th scope="col">시험명</th>
+										<th scope="col">시험일</th>
+										<th scope="col">응시지역</th>
+										<th scope="col">시험장소</th>
+										<th scope="col">합격여부</th>
+										<th scope="col">합격증</th>
+										<th scope="col">비고</th>
+									</tr>
+								</thead>
+								<tbody>
+									<c:set var="oldDiv" value="N"/>
+									<c:if test="${not empty passYnMap}">
+										<c:forEach var="result" items="${passYnMap}" varStatus="status">
+											<!-- 발표일시 -->
+											<c:if test="${result.PUBLICYN eq 'Y' }">
+												<c:set var="oldDiv" value="Y"/>
+												<tr>
+													<td class="align_center"><c:out value='${result.MT_APP_NAME}'/></td>
+													<td><c:out value='${result.ROUND_NM}'/></td>
+													<td class="align_center"><c:out value='${result.EXAM_DT}(${result.DAY})'/></td>
+													<td class="align_center"><c:out value='${result.PLACE_LOC}'/></td>
+													<td class="align_center"><c:out value='${result.PLACE_TITLE}'/></td>
+		                                  			
+		                                  			<c:if test="${result.POLL_YN eq 'N'}">
+														<td class="align_center">
+ 															<button type="button" onclick="resultCheck('<c:out value='${result.CC_NO}'/>', '<c:out value='${result.PASS_YN}'/>', '<c:out value='${result.MT_APP_TYPE}'/>', '<c:out value='${result.CC_APP_NO}'/>'); return false;" class="btn_bluebg">
+<%-- 															<button type="button" onclick="resultCheck('<c:out value='${result.CC_NO}'/>', '<c:out value='${result.MT_APP_TYPE}'/>', '<c:out value='${result.CC_APP_NO}'/>'); return false;" class="btn_bluebg">
+ --%>																<span>결과확인</span>
+															</button>
+														</td>
+														<td class="align_center">-</td>
+														<td class="align_center">-</td>
+													</c:if>
+													
+													<c:if test="${result.POLL_YN eq 'Y'}">
+				                                  		<c:if test="${result.PASS_YN eq 'Y' }"><td class="align_center"><span><c:out value="합격"/></span></td></c:if>
+				                                  		<c:if test="${result.PASS_YN eq 'N' }"><td class="align_center"><span><c:out value="불합격"/></span></td></c:if>
+				                                  		<!-- 수료증 버튼 -->
+				                                  		<c:if test="${result.PASS_YN eq 'Y'}">
+				                                  			<td class="align_center">
+	                                 								<button type="button" class="btn_blueline" onclick="printCertifi('<c:out value='${result.CC_NO}'/>', '<c:out value='${result.CC_APP_NO}'/>', '<c:out value='${result.MT_APP_TYPE}'/>'); return false;"><span class="pc_mobile">합격증출력</span><span class="mobile_pc">출력</span></button>
+	                                 							</td>
+				                                  		</c:if>
+				                                  		<c:if test="${result.PASS_YN eq 'N'}">
+				                                  			<td class="align_center">-</td>
+				                                  		</c:if>
+				                                  		<!-- 상세보기 -->
+				                                  		<td class="align_center">
+	                                 						<button type="button" class="btn_blueline" onclick="resultDetailInfo('<c:out value='${result.CC_NO}'/>', '<c:out value='${result.PASS_YN}'/>', '<c:out value='${result.MT_APP_TYPE}'/>', '<c:out value='${result.CC_APP_NO}'/>'); return false;"><span class="pc_mobile">상세보기</span><span class="mobile_pc">상세</span></button>
+	                                 					</td>
+				                                  	</c:if>
+												</tr>
+											</c:if>
+											
+										<!-- 발표일시가 아닐 경우 -->
+										<c:if test="${status.last}">
+ 									 		<c:if test="${oldDiv eq 'N'}">
+ 									 			<tr> 
+ 									 				<td class="align_center" colspan="8">해당 내역이 없습니다. </td>
+ 												</tr>
+ 											</c:if>
+ 										</c:if>
+											
+										</c:forEach>
+									</c:if>
+									
+									
+									<c:if test="${empty passYnMap}">
+										<tr>
+											<td class="align_center" colspan="8"> 해당 내역이 없습니다. </td>
+										</tr>
+									</c:if>
+								</tbody>
+							</table>
+						</div>
+					</div>
+					
+					<!-- 기존 START 2018-08-30  -->
+<!-- 					<div class="c_section"> -->
+<!-- 						<h4 class="c_tit">합격자 조회 및 자격증 발급 진행 순서 안내</h4> -->
+<!-- 						<div class="c_img_step"> -->
+<!-- 							<div class="pc"><img src="/cmmn/images/sub/img_c_step.png" alt="진행순서" /></div> -->
+<!-- 							<div class="mobile"><img src="/cmmn/images/sub/m_img_c_step.png" alt="진행순서" /></div> -->
+<!-- 							<ol class="alt_text"> -->
+<!-- 								<li>설문조사</li> -->
+<!-- 								<li><strong>응시자</strong><br />합격여부 확인</li> -->
+<!-- 								<li><strong>합격자</strong><br />개인정보수집·이용·제공 동의</li> -->
+<!-- 								<li><strong>합격자</strong><br />추가 정보 입력</li> -->
+<!-- 								<li><strong>합격자</strong><br />소양교육 동영상</li> -->
+<!-- 								<li><strong>합격자</strong><br />자격증 발급 신청</li> -->
+<!-- 							</ol> -->
+<!-- 						</div> -->
+<!-- 					</div> -->
+					<!-- 기존 END 2018-08-30  -->
+					
+					
+					<!-- 2018-08-28 김동인 작업 S --> 
+					<div class="c_section">
+						<h4 class="c_tit">합격자 조회 및 자격증 발급 진행 순서 안내</h4>
+						<div class="c_img_step">
+<!-- 							<div class="pc"><img src="/cmmn/images/sub/img_c_step.png" alt="진행순서" /></div> -->
+							<div class="pc"><img src="/cmmn/images/sub/m_img_c_step_10px.png" alt="진행순서" /></div>
+							<div class="mobile"><img src="/cmmn/images/sub/m_img_c_step.png" alt="진행순서" /></div>
+							<ol class="alt_text">
+								<li>설문조사</li>
+								<li><strong>응시자</strong><br />합격여부 확인</li>
+								<li><strong>합격자</strong><br />개인정보수집·이용·제공 동의</li>
+								<li><strong>합격자</strong><br />추가 정보 입력</li>
+								<li><strong>합격자</strong><br />소양교육 동영상</li>
+								<li><strong>합격자</strong><br />자격증 발급 신청</li>
+							</ol>
+						</div>
+					</div>
+					
+					
+					
+					
+					<!-- 2018-08-28 김동인 작업 E -->
+
+
+					<!--// end -->
+				</div>
+				<!--// 본문내용 -->
+				
+			<!--  -->
+			</div>
+			<!--// content 본문 -->
+			</form>
+			
+			
+			
+			
+			
+		
+		<!-- con_center end -->
+		</div>
+	
+	</div>
+	<!--// container -->
+
+	<!-- foot -->
+	<%@ include file="/WEB-INF/jsp/ccedu/inc/footer_inc.jsp"%>
+	<!--// foot end -->
+
+</div>
+
+</body>
+</html>

@@ -1,0 +1,186 @@
+<%
+/****************************************
+    subject : 찾아가는 교육
+    summary : 찾아가는 교육 > 신청결과 확인폼
+    author  : SANGS"src/main/resources/sangs/props"
+    date    : 2018-06-15
+****************************************/
+%>
+<%@ page language="java" contentType="text/html; charset=utf-8" pageEncoding="utf-8"%>
+<%@ include file="/WEB-INF/jsp/ccedu/inc/taglib_inc.jsp"%>
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+	<title>신청결과 확인 > 찾아가는 교육 > 신용회복위원회 신용교육원</title>
+	<%@ include file="/WEB-INF/jsp/ccedu/inc/head_inc.jsp"%>
+	<script type="text/javascript">
+		
+		$(document).ready(function() {
+		
+		})
+	
+		//이메일 셀렉트박스 세팅
+	    function emailSelect(val){
+	        $('#email2').val(val);
+	    }
+	    function userEmailSelect(val){
+	        $('#userEmail2').val(val);
+	    }
+		
+		function lectureResult() {
+			if(!fnValiCheck($("#slAppNm"), "이름을 입력해주시기 바랍니다.")) return false;
+			if(!fnValiCheck($("#email1"), "이메일 아이디를 입력해주시기 바랍니다.")) return false;
+			if(!fnValiCheck($("#email2"), "이메일 주소를 입력해주시기 바랍니다.")) return false;
+			$("#slAppEmail").val($("#email1").val() + "@" + $("#email2").val());
+			if(!fnValiEmail($("#slAppEmail"), "올바른 이메일 형식을 입력해주시기 바랍니다.")) return false;
+			$("#pageMode").val('inquiry');
+			$("#frm").submit();
+			
+		}
+		
+		// 엔터 검색
+		$('#slAppEmail, #slAppName').bind('keydown', function(e) {
+            if (e.keyCode == 13) { // enter key
+            	lectureResult();
+                return false;
+            }
+        })
+		
+
+	</script>
+</head>
+
+<body>
+
+<!-- skip nav -->
+	<%@ include file="/WEB-INF/jsp/ccedu/inc/nav_inc.jsp"%>
+<!--// skip nav -->
+
+
+<div id="wrap">
+
+	<!-- header -->
+	<%@ include file="/WEB-INF/jsp/ccedu/inc/header_inc.jsp"%>
+	<!--// header -->
+
+	<!-- container -->
+	<div id="container">
+
+		<!-- location -->
+		<jsp:include page="/WEB-INF/jsp/ccedu/inc/location/loc_02_03.jsp">
+			<jsp:param name="menuNm" value="신청결과 확인"/> 
+		</jsp:include> 
+		<!--// location -->
+
+		<div class="con_center">
+
+			<!-- lnb -->
+			<div id="lnb">
+				<jsp:include page="/WEB-INF/jsp/ccedu/inc/lnb/lnb_02.jsp">
+					<jsp:param name="dep2" value="03"/>
+				</jsp:include>
+			</div>
+			<!--// lnb -->
+			
+			
+			<form id="frm" method="post" action="/ccedu/visit/lectureCheckList.do">
+				<input type="hidden" name="pageMode" id="pageMode" value=""/>
+				<input type="hidden" name="slAppEmail" id="slAppEmail" value="">
+			
+			<!-- content 본문 -->
+			<div id="content">
+			
+				<!-- 기존 START 2018-08-30  -->
+<!-- 				<h3 class="cont_titile">신청결과 확인</h3> -->
+				<!-- 기존 END 2018-08-30  -->
+					
+				<!-- 2018-08-28 김동인 작업 S --> 
+				<h3 class="cont_titile type02">신청결과 확인<span></span></h3>
+				<!-- 2018-08-28 김동인 작업 E -->
+
+				<!-- 본문내용 -->
+				<div class="cont_body">
+					<!-- start -->
+
+					<div class="c_section">
+						<ul class="c_txtlist mgt0">
+							<li>
+								찾아가는교육 신청 후 2~3일 이내에 담당자가 유선으로 연락드립니다.<br />
+								신청완료 후 교육일정을 변경,취소하고자 하시는 경우 신용교육원으로 직접 연락하시기 바랍니다.
+							</li>
+						</ul>
+						<ul class="c_txtlist">
+							<li>
+<!-- 								<h5>교육관련 문의</h5> -->
+								<h5>신용교육원</h5>
+								<ul class="in_txtul">
+									<li>TEL : 02-750-1232,1233</li>
+<!-- 									<li>FAX : 02-722-8304</li> -->
+								</ul>
+							</li>
+						</ul>
+					</div>
+
+					<div class="c_section">
+						<h4 class="c_tit">신청정보</h4>
+						<div class="table_style_row">
+							<table>
+								<caption>이름, 이메일 등 항목을 작성하는 표 입니다.</caption>
+								<colgroup>
+									<col class="col2_1" />
+									<col />
+								</colgroup>
+								<tr>
+									<th scope="row">이름</th>
+									<td>
+										<div class="form_field">
+											<input type="text" id="slAppNm" name="slAppNm" title="이름 입력" class="wid_1" maxlength="25"/>
+										</div>
+									</td>
+								</tr>
+								<tr>
+									<th scope="row">이메일</th>
+									<td>
+										<div class="form_field">
+											<input type="text" id="email1" name="email1" maxlength="30" title="이메일 아이디 입력" class="input_email_id" />
+											<span class="widbox widbox_email">@</span>
+											<input type="text" id="email2" name="email2" maxlength="20" onkeypress="if(event.keyCode == 13) {lectureResult(); return false;}" title="도메인 입력" class="input_email_domain" />
+											<select id="email3" name="email3" onchange="emailSelect(this.value);return false;" title="직접입력 할 수 있는 도메인 선택" class="select_email_domain">
+												<option value="">직접입력</option>
+												<c:forEach var="emap2" items="${mtEmailCodeList}" varStatus="status2">
+													<option value="${emap2.MT_SUB_NAME}"><c:out value="${emap2.MT_SUB_NAME}"/></option>
+												</c:forEach>
+											</select>
+										</div>
+									</td>
+								</tr>
+							</table>
+						</div>
+					</div>
+
+					<div class="c_btn_center">
+						<button type="button" onclick="lectureResult(); return false;" class="btn_bluebg03">조회</button>
+					</div>
+
+					<!--// end -->
+				</div>
+				<!--// 본문내용 -->
+				
+			<!--  -->
+			</div>
+			<!--// content 본문 -->
+			</form>
+			
+		</div>
+	
+	</div>
+	<!--// container -->
+
+	<!-- foot -->
+	<%@ include file="/WEB-INF/jsp/ccedu/inc/footer_inc.jsp"%>
+	<!--// foot end -->
+
+</div>
+
+</body>
+</html>

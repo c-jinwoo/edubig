@@ -1,0 +1,141 @@
+<%
+/****************************************
+    subject : 회원관리
+    summary : 회원관리 : 회원 확인
+    author  : SANGS
+    date    : 2018-06-15
+****************************************/
+%>
+<%@ page language="java" contentType="text/html; charset=utf-8" pageEncoding="utf-8"%>
+<%@ include file="/WEB-INF/jsp/ccedu/inc/taglib_inc.jsp"%>
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+	<title>나의강의실 > 개인정보관리</title>
+	<%@ include file="/WEB-INF/jsp/ccedu/inc/head_inc.jsp"%>
+	<script type="text/javascript" src="/cmmn/js/jquery.cookie.js"></script>
+	<script type="text/javascript">
+		
+		function enterChk() {
+			if(event.keyCode == 13) {
+				go_exec();
+			}
+		}
+		
+		var delay = 1000;
+		var submitted = false;
+		
+		function submitCheck() {
+			if(submitted == true) { 
+				fnModalMsg('로그인 처리중 입니다. 잠시만 기다려주세요.');
+				return; 
+			}
+		  	setTimeout ('go_exec()', delay);
+		  	
+		}
+		
+		function go_exec() {
+			
+			if($('input[name=isMobile]').val() == 'true')	mtk.fillEncData();
+		
+			if('' == $('#pwd').val()) {
+				fnModalMsg('비밀번호를 입력해 주세요');
+				$('#pwd').focus();
+				return;
+			}
+		    
+		    submitted = true;
+		    frm.submit();
+			return; 
+		}
+	
+	</script>
+</head>
+
+<body>
+
+<!-- skip nav -->
+	<%@ include file="/WEB-INF/jsp/ccedu/inc/nav_inc.jsp"%>
+<!--// skip nav -->
+
+
+<div id="wrap">
+
+	<!-- header -->
+	<%@ include file="/WEB-INF/jsp/ccedu/inc/header_inc.jsp"%>
+	<!--// header -->
+
+	<!-- container -->
+	<div id="container">
+
+		<!-- location -->
+		<jsp:include page="/WEB-INF/jsp/ccedu/inc/location/loc_06_03.jsp"> 
+		  	<jsp:param name="menuNm" value="개인정보관리"/> 
+		</jsp:include> 
+		<!--// location -->
+
+		<div class="con_center">
+
+			<!-- lnb -->
+			<div id="lnb">
+				<jsp:include page="/WEB-INF/jsp/ccedu/inc/lnb/lnb_06.jsp"> 
+				  	<jsp:param name="dep2" value="04"/>
+				  	<jsp:param name="dep3" value="02"/>
+				</jsp:include> 
+			</div>
+			<!--// lnb -->
+
+			<!-- content 본문 -->
+			<div id="content">
+			
+				<!-- 기존 START 2018-08-30  -->
+<!-- 				<h3 class="cont_titile">개인정보관리</h3> -->
+				<!-- 기존 END 2018-08-30  -->
+				
+				<!-- 2018-08-28 김동인 작업 S --> 
+				<h3 class="cont_titile type06">개인정보관리<span></span></h3>
+				<!-- 2018-08-28 김동인 작업 E -->
+
+				<!-- 본문내용 -->
+				<div class="cont_body">
+					<!-- start -->
+
+					<div class="c_section">
+						<form name="frm" id="frm" action="/ccedu/common/modiForm.do" method="post"  target="_self">
+							<input type="hidden" name="isMobile" value=""/>
+ 							<div class="c_my_login">
+								<div class="con_login">
+									<h4 class="ico_login">LOGIN</h4>
+									<p class="nt">본인 확인을 위해 비밀번호를 입력해 주세요.</p>
+									<input type="text" title="아이디" value="<c:out value="${REQUEST_DATA.userId }"/>" disabled="disabled" />
+									<input type="password" title="비밀번호 입력" placeholder="PASSWORD" id="pwd" name="pwd" class="enKey_qwer"/>
+								</div>
+							</div>
+							<div class="c_btn_center">
+								<button type="button" onclick="history.back(-1);" class="btn_graybg03">취소</button>
+								<button type="button" onclick="submitCheck()" class="btn_bluebg03">본인확인</button>
+							</div>
+						</form>
+					</div>
+
+					<!--// end -->
+				</div>
+				<!--// 본문내용 -->
+				
+			<!--  -->
+			</div>
+			<!--// content 본문 -->
+		
+		</div>
+	
+	</div>
+	<!--// container -->
+
+	<!-- foot -->
+	<%@ include file="/WEB-INF/jsp/ccedu/inc/footer_inc.jsp"%>
+	<!--// foot end -->
+
+</div>
+
+</body>
+</html>

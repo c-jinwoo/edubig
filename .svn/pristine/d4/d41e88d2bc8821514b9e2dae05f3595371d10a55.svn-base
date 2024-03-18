@@ -1,0 +1,65 @@
+<%@page import="java.net.HttpCookie"%>
+<%
+/****************************************
+    subject : [공통] 상단영역
+    summary : 상단영역
+****************************************/
+%>
+<%@ page language="java" contentType="text/html; charset=utf-8" pageEncoding="utf-8"%>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1.0,minimum-scale=1.0,maximum-scale=1.0,user-scalable=yes" />
+<meta name="format-detection" content="telephone=no"/>
+<!-- <meta name="robots" content="index,nofollow"> -->
+<meta name="description" content="">
+<meta property="og:type" content='website'>
+<meta property="og:url" content=''>
+<meta property="og:title" content="">
+<meta property="og:description" content="">
+<title>에듀빅 :: 온라인 교육</title>
+<link type="text/css" rel="stylesheet" href="/cmmn/css/jquery-ui.css" />  
+<link type="text/css" rel="stylesheet" href="/cmmn/css/swiper-3.4.2.min.css?Ver20200309" />
+<link type="text/css" rel="stylesheet" href="/cmmn/css/style.css?Ver20200309" /><!-- 공통 -->
+<link type="text/css" rel="stylesheet" href="/cmmn/css/main.css?Ver20200309" />
+<link type="text/css" rel="stylesheet" href="/cmmn/css/sub.css?Ver20200309" />
+<link type="text/css" rel="stylesheet" href="/cmmn/css/bootstrap_jy.css" media="all">
+<link type="text/css" rel="stylesheet" href="/cmmn/css/slick.css"/>
+<link type="text/css" rel="stylesheet" href="/cmmn/css/slick-theme.css"/>
+<noscript>
+	<link type="text/css" rel="stylesheet" href="/cmmn/css/noscript_style.css" />
+</noscript>
+
+<script src="/cmmn/js/jquery-1.11.1.min.js??Ver20200309"></script>
+<script type="text/javascript">
+	jQuery.browser = {};
+	(function () {
+	    jQuery.browser.msie = false;
+	    jQuery.browser.version = 0;
+	    if (navigator.userAgent.match(/MSIE ([0-9]+)\./)) {
+	        jQuery.browser.msie = true;
+	        jQuery.browser.version = RegExp.$1;
+	    }
+	})();
+</script>
+<script type="text/javascript" src="/cmmn/js/jquery-1.11.1.min.js"></script>
+<script type="text/javascript" src="/cmmn/js/jquery-migrate-1.2.1.min.js"></script>
+<script src="/cmmn/js/jquery-ui.min.js"></script>
+<script src="/cmmn/js/swiper-3.4.2.min.js?Ver20200309"></script>
+<script src="/cmmn/js/design.js?Ver20200309"></script><!-- 공통 -->
+<script src="/cmmn/js/jquery.alphanumeric.pack.js?Ver20180618_01"></script>
+<script src="/cmmn/js/jquery.showLoading.js?Ver20180618_01"></script>
+<script src="/cmmn/js/common.js?Ver20180618_01"></script>
+<script src="/cmmn/js/sub.js"></script>
+<script src="/cmmn/js/printThis.js"></script>
+<script src="/cmmn/js/jquery.printelement.js"></script>
+<script src="/cmmn/js/main.js"></script>
+<script src="/cmmn/js/jquery.cookie.js"></script> 
+<script type="text/javascript" src="/cmmn/js/slick.js"></script>
+<script type="text/javascript" src="/cmmn/js/slick.min.js"></script>
+<script type="text/javascript" src="/cmmn/js/html2canvas.js"></script>
+<script src="https://developers.kakao.com/sdk/js/kakao.js"></script>
+<script type="text/javascript" src="https://static.nid.naver.com/js/naveridlogin_js_sdk_2.0.0.js" charset="utf-8"></script>
+<script type="text/javascript" src="https://static.nid.naver.com/js/naverLogin_implicit-1.0.3.js" charset="utf-8"></script>
+<script>
+	Kakao.init('88cedcadb22844a65917515f169cb60c');
+</script>
+<%@ include file="/WEB-INF/jsp/ccedu/inc/modal_inc.jsp"%>

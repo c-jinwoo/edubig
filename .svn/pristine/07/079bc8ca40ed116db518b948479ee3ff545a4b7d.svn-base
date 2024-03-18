@@ -1,0 +1,220 @@
+.list_box{
+	width:20px;
+	height:20px;
+/* 	border-radius:50%; */
+/* 	background:#000000; */
+	float:left;
+/* 	text-align:center; */
+/* 	line-height:200px; */
+	
+	 background: url(../img/dot.png) no-repeat;
+	 position: absolute;
+	 left:17px;
+	 margin-top: 1px;
+}
+.list_box.hover{
+/* 	width:20px; */
+/* 	height:20px; */
+/* 	border-radius:50%; */
+/* 	background:#000000; */
+/* 	float:left; */
+/* 	text-align:center; */
+/* 	line-height:200px; */
+	
+/* 	 background: url(../img/dot_over.png) no-repeat; */
+/* 	 position: absolute; */
+/* 	 left:17px; */
+}
+
+
+.list_box.toggle{
+	width:20px;
+	height:20px;
+/* 	border-radius:50%; */
+/* 	background:#000000; */
+	float:left;
+/* 	text-align:center; */
+/* 	line-height:200px; */
+	
+	 background: url(../img/dot_over.png) no-repeat;
+	 position: absolute;
+	 left:17px;
+}
+
+
+.content > .openMenu {
+  position: absolute;
+  top: 50%;
+  right:0;
+  width: 38px;
+  height: 68px;
+  margin-top: -34px;
+  padding:0;
+  background: url(../img/menu.png) no-repeat 100% 100% / 100% 100%;
+  border: 0px;
+  z-index: 102;
+  transition-duration: 0.4s;
+  cursor: pointer;
+}
+
+.content > .indexMenu {
+	position: absolute;
+	z-index: 102;
+	right:0;
+	background:#280138;
+	background-size: 100% 100%;
+	width: 320px;
+	height: 720px;
+	transition-duration: 0.4s;
+	display: none;
+}
+
+.content > .indexMenu > .closeMenu {
+  position: absolute;
+  z-index: 103;
+/*   top: 1%; */
+  right: 1px;
+  border: 1px;
+  background: url(../img/menu_close.png) no-repeat;
+  background-size: 100% 100%;
+  height: 64px;
+  width: 64px;
+  cursor: pointer;
+
+}
+
+.content > .indexMenu > .list{
+  position: relative;
+  top : 10%;
+  cursor: pointer;
+  font-family: 'Nanum Gothic';
+/*   font-family: 'NanumSquere'; */
+  font-weight: 700;
+}
+
+.content > .indexMenu > .list > .mainTitle {
+	color: #FFF;
+	font-size: 23px;
+	/*   font-size: 1.4em; */
+	/* 	margin: 14px 50px 10px 20px; */
+	border: 1px;
+	text-align: left;
+	background-color: hsla(0, 10%, 10%, 0);
+	text-indent: 10px;
+	cursor: pointer;
+	width: 213px;
+	height: 33px;
+	margin : 12px 0px 16px 0px;
+	letter-spacing:-1px;
+}
+
+/* .content > .indexMenu > .list >  #1.toggle { */
+/*   color: #ffffff; */
+/*   background-color: #35b7e8; */
+/* } */
+/* .content > .indexMenu > .list >  #2.toggle { */
+/*   color: #ffffff; */
+/*   background-color: #35b7e8; */
+/* } */
+/* .content > .indexMenu > .list >  #12.toggle { */
+/*   color: #ffffff; */
+/*   background-color: #35b7e8; */
+/* } */
+
+
+.content > .indexMenu > .list > .subTitle {
+	width:100%;
+	padding:5px 0px 5px 36px;
+	color: #FFF;
+	font-size: 16px;
+	border: 0px;
+	text-align: left;
+	background-color: hsla(0, 10%, 10%, 0);
+	cursor: pointer;
+	letter-spacing: -1px;  
+}
+
+.content > .indexMenu > .list > .subTitle.toggle,
+.content > .indexMenu > .list > .subTitle:hover{
+	background:linear-gradient(to right, #28C0F8, rgba(0,0,0,0));
+}
+
+
+.topLeftTopic{
+    position: absolute;
+    width: auto;
+    z-index: 999;
+    padding: 10px;
+    font-size: 25px;
+    color: #FFF;
+}
+
+.rMap_bg{
+	z-index:999;
+	position:absolute;
+	top:0;left:0;
+	width:100%;
+	height:590px;
+	background:#000;
+	opacity:0.5;
+	display:none;
+}
+.rMap_img{
+	z-index:9999;
+	position: absolute;
+	width:640px;
+	height:480px;
+	top:50%;left:50%;
+	margin-top:-240px;
+	margin-left:-320px;
+	background: url(../img/map.png) no-repeat;
+	display:none;
+}
+.rMap_img.active,
+.rMap_bg.active{
+	display:block;
+}
+
+
+
+
+@media screen and (min-width:1300px) {
+  .content > .indexMenu > .list > .mainTitle {font-size: 1.6em;}
+  .content > .indexMenu > .list > .subTitle {font-size: 1.4em;}
+}
+
+@media screen and (min-width:1400px) {
+  .content > .indexMenu > .list > .mainTitle {
+    margin: 30px 60px 15px 35px;
+    font-size: 1.7em;
+  }
+  .content > .indexMenu > .list > .subTitle {
+    font-size: 1.4em;
+    margin-left: 70px;
+  }
+}
+
+@media screen and (min-width:1500px) {
+  .content > .indexMenu > .list > .mainTitle {
+    margin: 40px 70px 20px 40px;
+    font-size: 1.8em;
+  }
+  .content > .indexMenu > .list > .subTitle {
+    font-size: 1.5em;
+    margin-left: 80px;
+  }
+}
+
+@media screen and (min-width:1700px) {
+  .content > .indexMenu > .list > .mainTitle {
+    margin: 50px 80px 30px 50px;
+    font-size: 1.9em;
+  }
+  .content > .indexMenu > .list > .subTitle {
+    font-size: 1.6em;
+    margin-left: 100px;
+  }
+  .content {
+	width: 50%;
+  }
+}

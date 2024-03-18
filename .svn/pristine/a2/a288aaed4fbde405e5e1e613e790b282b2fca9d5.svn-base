@@ -1,0 +1,139 @@
+<%
+/****************************************
+    subject : 전체메뉴
+    summary : 전체메뉴 > 이용안내 > 사이트맵
+    author  : SANGS
+    date    : 2018-06-15
+****************************************/
+%>
+<%@ page language="java" contentType="text/html; charset=utf-8" pageEncoding="utf-8"%>
+<%@ include file="/WEB-INF/jsp/ccedu/inc/taglib_inc.jsp"%>
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+	<title>이용안내 > 전체메뉴</title>
+	<%@ include file="/WEB-INF/jsp/ccedu/inc/head_inc.jsp"%>
+</head>
+
+<body>
+
+<!-- skip nav -->
+	<%@ include file="/WEB-INF/jsp/ccedu/inc/nav_inc.jsp"%>
+<!--// skip nav -->
+
+
+<div id="wrap">
+
+	<!-- header -->
+	<%@ include file="/WEB-INF/jsp/ccedu/inc/header_inc.jsp"%>
+	<!--// header -->
+
+	<!-- container -->
+	<div id="container">
+
+		<!-- location -->
+		<jsp:include page="/WEB-INF/jsp/ccedu/inc/location/loc_14.jsp"> 
+		  	<jsp:param name="menuNm" value="전체메뉴"/> 
+		</jsp:include> 
+		<!--// location -->
+
+		<div class="con_center">
+
+			<!-- lnb -->
+			<div id="lnb">
+				<jsp:include page="/WEB-INF/jsp/ccedu/inc/lnb/lnb_14.jsp">
+					<jsp:param name="dep2" value="07"/>
+				</jsp:include>
+			</div>
+			<!--// lnb -->
+			
+			
+			<!-- content 본문 -->
+			<div id="content">
+				<!-- 기존 START 2018-08-30  -->
+<!-- 				<h3 class="cont_titile">전체메뉴</h3> -->
+				<!-- 기존 END 2018-08-30  -->
+				
+				<!-- 2018-08-28 김동인 작업 S -->
+				<h3 class="cont_titile type07">전체메뉴<span></span></h3>
+				<!-- 2018-08-28 김동인 작업 E -->
+
+				<!-- 본문내용 -->
+				<div class="cont_body">
+					<!-- start -->
+
+					<div class="sitemap_section">
+						<h4>교육안내</h4>
+						<ul class="sitemap_menu">
+							<li>
+								<a href="/ccedu/online/onlineEducationInfo.do">교육소개</a>
+							</li>
+						</ul>
+					</div>
+					
+					<div class="sitemap_section">
+						<h4>교육과정</h4>
+						<ul class="sitemap_menu">
+						
+							<li style="width:75%;">
+								<a href="/ccedu/online/onlineDetailList.do?mtSubCode=SC1001">경영빅데이터분석사</a>
+							</li>
+						</ul>
+					</div>
+					
+
+					<div class="sitemap_section">
+						<h4>알림마당</h4>
+						<ul class="sitemap_menu">
+						
+							<li>
+								<a href="/ccedu/notice/faqList.do?bcateno=1">공지사항</a>
+							</li>
+							<li style="width:75%;">
+								<a href="/ccedu/notice/faqList.do?bcateno=5">자주묻는질문 (FAQ)</a>
+							</li>
+						</ul>
+					</div>
+
+					<div class="sitemap_section">
+						<h4>나의강의실</h4>
+						<ul class="sitemap_menu">
+							<li>
+								<a href="/ccedu/myclass/learningStatusList.do">학습현황</a>
+							</li>
+							<li>
+								<a href="/ccedu/myclass/learningStatusList.do">강의실</a>
+							</li>
+							<li>
+								<a href="/ccedu/myclass/payList.do">결제내역조회</a>
+							</li>
+							<li>
+								<a href="/ccedu/common/modiCheck.do">개인정보관리</a>
+							</li>
+						</ul>
+					</div>
+
+					<!--// end -->
+				</div>
+				<!--// 본문내용 -->
+				
+			<!--  -->
+			</div>
+			<!--// content 본문 -->
+			
+			
+			
+			
+		</div>
+	
+	</div>
+	<!--// container -->
+
+	<!-- foot -->
+	<%@ include file="/WEB-INF/jsp/ccedu/inc/footer_inc.jsp"%>
+	<!--// foot end -->
+
+</div>
+
+</body>
+</html>

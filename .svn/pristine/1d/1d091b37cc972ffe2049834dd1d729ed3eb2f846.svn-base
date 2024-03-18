@@ -1,0 +1,153 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes" ?>
+<event>
+<!-- 강조빨간색칠하기-->
+<!-- &lt;span style="color:#ff3300"&gt;&lt;u&gt;않은&lt;&#47;span&gt;&lt;&#47;u&gt; -->
+<!-- 내려쓰기 -->
+<!-- &lt;br&gt; -->
+  <quiz flag="5" >
+      <page num="1" answer="2" type="multiple">
+          <question>
+              <alternate>문제 일. 다음 중 비즈니스 인텔리전스(BI)에 대한 설명으로 가장 적합한 것은?</alternate>
+			  <symbol>Q1.</symbol>
+              <text>다음 중 비즈니스 인텔리전스(BI)에 대한 설명으로 가장 적합한 것은?</text>
+          </question>
+
+          <feedback>
+              <alternate>
+			  정답은 이번입니다.
+			  BI는 의사결정에 대한 지원에 사용되는 기술, 프로세스, 스킬, 응용프로그램 등을 모두 포함하는 포괄적인 용어이다.  
+			  BI는 요구 상황에서 추후의 의사결정을 돕기 위해 과거 데이터, 이미 사용된 데이터를 다루는 것이다. 전략적인 계획에 적용되는  
+			  경영문제의 내부 정보에 초점을 맞춘다.정보는 일반적으로 하나 혹인 여러 방식으로 구조화된 관점과 현재의 프로세스에서 수집된다.  
+			  기본 데이터의 산출물은 내부분석에서 주로 사용하지만 경쟁력 분석을 위한 외부 분석에도 함께 사용 될 수 있다. 관점에 따라서  
+			  BI란 고객, 제품, 서비스, 운영, 공급자, 파트너에 대한 개별 정보 및 모든 관련 거래 데이터를 모으고, 관리하며, 분석하는 것으로도 정의된다.   
+			  </alternate>
+              <answer>
+                  <symbol>정답</symbol>
+                  <text>2</text>
+              </answer>
+              <explain>
+                  <symbol>2</symbol>
+                  <text>
+			  BI는 의사결정에 대한 지원에 사용되는 기술, 프로세스, 스킬, 응용프로그램 등을 모두 포함하는 포괄적인 용어이다.  
+			  BI는 요구 상황에서 추후의 의사결정을 돕기 위해 과거 데이터, 이미 사용된 데이터를 다루는 것이다. 전략적인 계획에 적용되는  
+			  경영문제의 내부 정보에 초점을 맞춘다.정보는 일반적으로 하나 혹인 여러 방식으로 구조화된 관점과 현재의 프로세스에서 수집된다. 
+			  기본 데이터의 산출물은 내부분석에서 주로 사용하지만 경쟁력 분석을 위한 외부 분석에도 함께 사용 될 수 있다. 관점에 따라서  
+			  BI란 고객, 제품, 서비스, 운영, 공급자, 파트너에 대한 개별 정보 및 모든 관련 거래 데이터를 모으고, 관리하며, 분석하는 것으로도 정의된다. 
+				</text>
+              </explain>
+          </feedback>
+
+          <example num="1">
+              <alternate>보기 일번 BI는 과거에 일어난 사건이나 행동의 원인과 결과를 분석하기 위한 목적으로 사용된다.  </alternate>
+              <symbol>1</symbol>
+              <text>BI는 과거에 일어난 사건이나 행동의 원인과 결과를 분석하기 위한 목적으로 사용된다.</text>
+          </example>
+          <example num="2">
+              <alternate>보기 이번 BI는 고객, 제품, 서비스, 운영 등의 개별 정보 및 모든 거래 데이터를 모으고 관리하며 분석하는 것을 말한다.</alternate>
+              <symbol>2</symbol>
+              <text>BI는 고객, 제품, 서비스, 운영 등의 개별 정보 및 모든 거래 데이터를 모으고 관리하며 분석하는 것을 말한다.</text>
+          </example>
+          <example num="3">
+              <alternate>보기 삼번 BI는 빅데이터를 이용하면 데이터 양과 복잡성으로 인해 실시간 분석이 불가능해진다. </alternate>
+              <symbol>3</symbol>
+              <text>BI는 빅데이터를 이용하면 데이터 양과 복잡성으로 인해 실시간 분석이 불가능해진다. </text>
+          </example>
+          <example num="4">
+              <alternate>보기 사번 BI는 소셜데이터는 활용하지 않는다.</alternate>
+              <symbol>4</symbol>
+              <text>BI는 소셜데이터는 활용하지 않는다.</text>
+          </example>
+      </page>
+
+      <page num="2" answer="2" type="multiple">
+          <question>
+              <alternate>문제 이. 다음 중 프로세스와 관련되는 설명으로 옳지 않은 것은?</alternate>
+			  <symbol>Q2.</symbol>
+              <text>다음 중 프로세스와 관련되는 설명으로 옳지 않은 것은?</text>
+          </question>
+
+          <feedback>
+              <alternate>정답은 이 번입니다. 커다란 프로세스는 한 개 이상의 부프로세스를 
+가지며, 이 부프로세스는 여러 개의 활동들을 가진다.</alternate>
+              <answer>
+                  <symbol>정답</symbol>
+                  <text>2</text>
+              </answer>
+              <explain>
+                  <symbol>2</symbol>
+                  <text>커다란 프로세스는 한 개 이상의 부프로세스를 
+가지며, 이 부프로세스는 여러 개의 활동들을 가진다.</text>
+              </explain>
+          </feedback>
+
+          <example num="1">
+              <alternate>보기 일번 한 개 이상의 입력을 통해서 가치 있는 
+산출물로 전환하는 활동을 말한다.</alternate>
+              <symbol>1</symbol>
+              <text>한 개 이상의 입력을 통해서 가치 있는 
+산출물로 전환하는 활동을 말한다.</text>
+          </example>
+          <example num="2">
+		  <alternate>보기 이번 커다란 프로세스는 부프로세스를 가지며, 부프로세스는 하나의 활동을 가진다.</alternate>
+              <symbol>2</symbol>
+              <text>커다란 프로세스는 부프로세스를 가지며, 부프로세스는 하나의 활동을 가진다.</text>
+          </example>
+          <example num="3">
+              <alternate>보기 삼번 활동은 더 작고 간단한 직무로 
+나누어진다.</alternate>
+              <symbol>3</symbol>
+              <text>활동은 더 작고 간단한 직무로 
+나누어진다.</text>
+          </example>
+          <example num="4">
+              <alternate>보기 사번 직무는 아주 단순 단계로 구성되어 
+있다.</alternate>
+              <symbol>4</symbol>
+              <text>직무는 아주 단순 단계로 구성되어 
+있다.</text>
+          </example>
+      </page>
+
+      <page num="3" answer="1" type="multiple">
+          <question>
+              <alternate>문제 삼. 비즈니스 프로세스의 구성요소로 알맞지 않은 것은?</alternate>
+			  <symbol>Q3.</symbol>
+              <text>비즈니스 프로세스의 구성요소로 알맞지 않은 것은?</text>
+          </question>
+
+          <feedback>
+              <alternate>정답일 일 번입니다. 비즈니스 프로세스의 구성요소는 활동, 의사결정, 역할, 자원과 저장소이다. 이 중 의사결정 과정의 하나가 탐색이다.</alternate>
+              <answer>
+                  <symbol>정답</symbol>
+                  <text>1</text>
+              </answer>
+              <explain>
+                  <symbol>1</symbol>
+                  <text>비즈니스 프로세스의 구성요소는 활동, 의사결정, 역할, 자원과 저장소이다. 이 중 의사결정 과정의 하나가 탐색이다.</text>
+
+              </explain>
+          </feedback>
+
+          <example num="1">
+              <alternate>보기 일번 탐색</alternate>
+              <symbol>1</symbol>
+              <text>탐색</text>
+          </example>
+          <example num="2">
+              <alternate>보기 이번 의사결정</alternate>
+              <symbol>2</symbol>
+              <text>의사결정</text>
+          </example>
+          <example num="3">
+              <alternate>보기 삼번 역할</alternate>
+              <symbol>3</symbol>
+              <text>역할</text>
+          </example>
+          <example num="4">
+              <alternate>보기 사번 자원</alternate>
+              <symbol>4</symbol>
+              <text>자원</text>
+          </example>
+      </page>
+  </quiz>
+</event>

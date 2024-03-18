@@ -1,0 +1,77 @@
+<%@ page contentType="text/html; charset=utf-8" pageEncoding="utf-8"%>
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+	<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+	<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+	<title>에듀빅 :: 온라인 교육</title>
+	<%@ include file="/WEB-INF/jsp/inc/head_inc.jsp"%>
+	<script type="text/javascript">
+		$(document).ready(function(){
+			$(".gnb_items li").on("mouseover",function(e){
+			    if($(e.currentTarget).hasClass("target_s_layer")){
+			        if($(e.currentTarget).hasClass("course_layer")){
+			            $(".gnb_s_layer").removeClass("on");
+			            $(".gnb_course_layer").addClass("on");
+			        }
+			    }else{
+			        $(".gnb_s_layer").removeClass("on");
+			    }
+			});
+			
+			$(".gnb_s_layer").on("mouseleave",function(){
+			    $(".gnb_s_layer").removeClass("on");
+			});
+		});
+		function navi(){
+			if($(".new_navi").hasClass("active")){
+				$(".new_navi").removeClass("active");
+				$(".mobile_head .btn_allmenu").css("background","url('/cmmn/images/m_btn_allmenu.png') no-repeat 100% 100% / 100% 100%");	
+			}
+			else{
+				$(".new_navi").addClass("active");
+				$(".mobile_head .btn_allmenu").css("background","url('/cmmn/images/m_btn_allmenu_close.png') no-repeat 100% 100% / 100% 100%");	
+			}
+		}	
+	</script>
+	<style>
+		.error{height:638px;}
+		.box{text-align:center; padding-top:160px;}
+		.box h1{font-size:30px; padding:15px 0px; color:#000;}
+		.box h3{font-size:15px; line-height:20px; margin-bottom:30px; font-weight:400;}
+		.err_btn{background:#2684BA; color:#fff; font-size:15px; padding:8px 20px;}
+		
+		@media (max-width:768px) {
+			.box h1 {font-size:20px;}
+			.box h3 {font-size:13px;}
+		}
+		
+		@media (max-width:480px){
+			.box h1 {font-size:15px;}
+			.box h3 {font-size:11px;}
+		}
+	</style>
+</head>
+<body>
+	<!-- header -->
+	<%@ include file="/WEB-INF/jsp/inc/header_inc.jsp"%>
+	<!--// header -->
+	
+	<div id="content">
+		<div class="error">
+			<div class="cm_wrapper">
+				<div class="box">
+					<img src="/cmmn/images/sub/img_error_404.png" alt="요청하신 페이지를 찾을 수 없습니다.">
+					<h1>죄송합니다.</br>요청하신 페이지를 찾을 수 없습니다.</h1>
+					<h3>존재하지 않는 주소를 입력하셨거나,</br>요청하신 페이지의 주소가 변경, 삭제되어 찾을 수 없습니다.</br>입력하신 주소가  정확한지 다시 확인해주시기 바랍니다.</h3>
+					<a href="/main/main.do" class="err_btn">메인으로</a>
+				</div>
+			</div>
+		</div>
+	</div>
+	
+	<!-- foot -->
+	<%@ include file="/WEB-INF/jsp/inc/footer_inc.jsp"%>
+	<!--// foot end -->
+</body>
+</html>

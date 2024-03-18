@@ -1,0 +1,58 @@
+<%
+/****************************************
+    subject : 좌측 메뉴
+    summary : 좌측 메뉴 : 신용상담사(03)
+    author  : SANGS
+    date    : 2018-06-12
+****************************************/
+%>
+<%@ page language="java" contentType="text/html; charset=utf-8" pageEncoding="utf-8"%>
+<%
+	String dep2 = (String)request.getParameter("dep2"); 
+	String dep3 = (String)request.getParameter("dep3");
+%>
+
+
+<h2>신용상담사</h2>
+	 <ul class="lnb_menu">
+		<li <%if("01".equals(dep2)) out.print("class=\"on\""); %>>
+			<a href="#none" onclick="toggleLNB(this); return false;"><span>자격시험</span></a>
+			<ul>
+				<li><a href="/ccedu/cc/ccEduIntro.do" <%if("01".equals(dep2) && "01".equals(dep3)) out.print("class=\"on\""); %>><span>자격소개</span></a></li>
+				<li><a href="/ccedu/cc/ccEduExamInfo.do" <%if("01".equals(dep2) && "02".equals(dep3)) out.print("class=\"on\""); %>><span>시험안내</span></a></li>
+				<li><a href="/ccedu/cc/ccEduSchedule.do" <%if("01".equals(dep2) && "03".equals(dep3)) out.print("class=\"on\""); %>><span>시험(일정)공고</span></a></li>
+			</ul>
+		</li>
+		<li <%if("02".equals(dep2)) out.print("class=\"on\""); %>>
+			<a href="#none" onclick="toggleLNB(this); return false;"><span>원서접수</span></a>
+			<ul>
+				<li><a href="/ccedu/cc/applicationApply.do" <%if("02".equals(dep2) && "01".equals(dep3)) out.print("class=\"on\""); %>><span>원서접수</span></a></li>
+				<li><a href="/ccedu/cc/applicationCheck.do" <%if("02".equals(dep2) && "02".equals(dep3)) out.print("class=\"on\""); %>><span>접수조회/수정</span></a></li>
+				<li><a href="/ccedu/cc/identifiList.do" <%if("02".equals(dep2) && "03".equals(dep3)) out.print("class=\"on\""); %>><span>수험표 출력</span></a></li>
+			</ul>
+		</li>
+		<li <%if("03".equals(dep2)) out.print("class=\"on\""); %>>
+			<a href="#none" onclick="toggleLNB(this); return false;"><span>합격자조회/자격증신청</span></a>
+			<ul>
+				<li><a href="/ccedu/cc/examPassYnList.do" <%if("03".equals(dep2) && "01".equals(dep3)) out.print("class=\"on\""); %>><span>합격자조회</span></a></li>
+				<li><a href="/ccedu/cc/addEduCheck.do" <%if("03".equals(dep2) && "02".equals(dep3)) out.print("class=\"on\""); %>><span>자격증 신청</span></a></li>
+				<li><a href="/ccedu/cc/ccLicenseList.do" <%if("03".equals(dep2) && "03".equals(dep3)) out.print("class=\"on\""); %>><span>자격증발급조회/수정</span></a></li>
+			</ul>
+		</li>
+		<li <%if("04".equals(dep2)) out.print("class=\"on\""); %>>
+			<a href="#none" onclick="toggleLNB(this); return false;"><span>보수교육</span></a>
+			<ul>
+				<li><a href="/ccedu/cc/refreTrainingInfo.do" <%if("04".equals(dep2) && "01".equals(dep3)) out.print("class=\"on\""); %>><span>교육안내</span></a></li>
+				<li><a href="/ccedu/cc/refreTraining.do" <%if("04".equals(dep2) && "02".equals(dep3)) out.print("class=\"on\""); %>><span>수강하기</span></a></li>
+			</ul>
+		</li>
+		<li <%if("05".equals(dep2)) out.print("class=\"on\""); %>>
+			<a href="#none" onclick="toggleLNB(this); return false;"><span>고객센터</span></a>
+			<ul>
+				<li><a href="/ccedu/cc/boardList.do?bcateno=11" <%if("05".equals(dep2) && "01".equals(dep3)) out.print("class=\"on\""); %>><span>공지사항</span></a></li>
+				<li><a href="/ccedu/cc/faqList.do?bcateno=12" <%if("05".equals(dep2) && "02".equals(dep3)) out.print("class=\"on\""); %>><span>FAQ</span></a></li>
+				<li><a href="/ccedu/cc/cmtBoardList.do?bcateno=13" <%if("05".equals(dep2) && "03".equals(dep3)) out.print("class=\"on\""); %>><span>Q&amp;A</span></a></li>
+				<li><a href="/ccedu/cc/boardList.do?bcateno=14" <%if("05".equals(dep2) && "04".equals(dep3)) out.print("class=\"on\""); %>><span>자료실</span></a></li>
+			</ul>
+		</li>
+	</ul>

@@ -1,0 +1,243 @@
+<%
+/****************************************************
+	system	: 기관 검색
+	summary	:	
+	wdate	: 2018-06-21
+	writer	: sangs
+*****************************************************/
+%>
+<%@ page language="java" contentType="text/html; charset=utf-8" pageEncoding="utf-8"%>
+<script type="text/javascript">
+	
+	var tableBody = '';
+	
+	$(document).ready(function() {
+		tableBody = $('.table_style_col').html();
+		
+		$('#compBizno1, #compBizno2, #compBizno3').keyup(function () { 
+		    this.value = this.value.replace(/[^0-9]/g,'');
+		});
+		
+		
+		$('#popOfficeClose').click(function(){
+			$('#popOffice').find($('input')).val('');
+			$('.table_style_col').children().remove();
+			$('.table_style_col').html(tableBody);
+		});
+		
+	})
+	
+	// 1 레이어 > 취소 
+	function goBack() {
+		$('.table_style_col').children().remove()
+		$('.table_style_col').html(tableBody);
+		$("#compBizno1").val('');
+		$("#compBizno2").val('');
+		$("#compBizno3").val('');
+		$("#popOfficeClose").click();
+	}
+	
+	
+	// 방문교육관리 > 기관 검색
+	function getOffice() {
+		var bizno = $("#compBizno1").val()+$("#compBizno2").val()+$("#compBizno3").val();
+		
+		if( bizno.length < 10 ) {
+			fnModalMsg('사업자 번호가 올바르지 않습니다.');
+		}else{
+			var compBizno = $("#compBizno1").val()+$("#compBizno2").val()+$("#compBizno3").val();
+			
+			$.ajax({
+		        type: 'POST',
+		        dataType : "json",
+				url: '/ccedu/visit/officeSearchAjax.do',
+				data : 
+				 {
+					compBizno : compBizno
+				 } ,
+				
+				success:function(data){
+					
+					$('.table_style_col').children().remove();
+					$('.table_style_col').html(tableBody);
+					
+		        	
+		        	var htmlStr = ""; 
+		            if(data != "insert"){
+		            		// 기관이 있을 경우,
+		            		$("#officeBody").html('');
+		            		htmlStr += "<input type='hidden' id='contentBody' name='contentBody'>"
+							htmlStr += "<input type='hidden' id='compSeq' name='compSeq' value='"+ data.COMP_NO +"'>";
+							htmlStr += "<input type='hidden' id='compName' name='compName' value='"+ data.COMP_NM +"'>";
+							htmlStr += "<input type='hidden' id='compPostNumnber' name='compPostNumnber' value='"+ data.COMP_POSTNO +"'>";
+							htmlStr += "<input type='hidden' id='compAddress1' name='compAddress1' value='"+ data.COMP_ADDR1 +"'>";
+							
+							var data2 = "";
+							if(isEmpty(data.COMP_ADDR2)){
+								// true
+							}else{
+								// flase
+								data2 = data.COMP_ADDR2								
+							}
+							
+							
+							htmlStr += "<input type='hidden' id='compAddress2' name='compAddress2' value='"+ data2 + "'>";
+			    			htmlStr += "<tr>";
+			    			htmlStr += "<td class='align_center'><input type='radio' name='officeSelect' id='officeSelect' title="+data.COMP_NM+" value="+data.COMP_NO+"></td>";
+			    			htmlStr += "<td class='align_center'>"+data.COMP_NM+"</td>";
+			    			htmlStr += "<td class='align_center'>"+data.COMP_BIZNO.substr(0,3)+"-"+data.COMP_BIZNO.substr(3,2)+"-"+data.COMP_BIZNO.substr(5,6)+"</td>";
+			    			htmlStr += "<td class='align_center'>"+data.COMP_CEO_NM+"</td>";
+			    			htmlStr += "</tr>";
+			    		
+			    		$("#officeBody").html(htmlStr);
+			    		
+		            } else {
+		            	// 기관이 엾을 경우,
+		            	$(".table_style_col").html('');
+			    		htmlStr += "<div class='c_msg_left'>";
+			    		htmlStr += "	<input type='hidden' id='fullCompBizno' name='fullCompBizno' value='"+bizno+"'>"
+			    		htmlStr += "	<div class='img_msg_talk'><p>조회하신 사업자번호로 등록된 기관이 없습니다.<br/>해당 사업자번호를 등록하시려면 [신규등록] 버튼을 클릭해주세요.</p>";
+			    		htmlStr += "		<div class='addist'><button class='btn_graybg02' onclick='goOfficeForm(); return false;' data-tooltip='popsearch04'>신규등록</button></div>";
+						htmlStr += "	</div>";
+						htmlStr += "</div>";
+		            	$(".table_style_col").html(htmlStr);
+		            }
+				}
+			});
+		}
+	}
+	
+	// 신규등록 레이어로 이동
+	function goOfficeForm() {
+		html = '';
+		var fullCompBizno = $("#fullCompBizno").val();
+		html += fullCompBizno.substring(0, 3);
+		html += '-';
+		html += fullCompBizno.substring(3, 5);
+		html += '-';
+		html += fullCompBizno.substring(5, 11);
+		$("#compBiznoInput").html(html);
+		
+		// 사업자 번호 넣기
+		$("#compBizno1").val(fullCompBizno.substring(0, 3));
+		$("#compBizno2").val(fullCompBizno.substring(3, 5));
+		$("#compBizno3").val(fullCompBizno.substring(5, 11));
+		
+		
+	}
+	
+	
+    function isEmpty(str){
+         
+        if(typeof str == "undefined" || str == null || str == "")
+            return true;
+        else
+            return false ;
+    }
+
+	
+	function officeSelect() {
+		
+		if(!fnValiCheck($("#compBizno1"), "사업자 번호를 확인해주세요.")) return false;
+		if(!fnValiCheck($("#compBizno2"), "사업자 번호를 확인해주세요.")) return false;
+		if(!fnValiCheck($("#compBizno3"), "사업자 번호를 확인해주세요.")) return false;
+		
+		$("#compNo").val($("#compSeq").val());
+		$('#compNm').val($("#compName").val());
+		$("#compPostNo").val($("#compPostNumnber").val());
+		$("#compAddr1").val($("#compAddress1").val());
+		$("#compAddr2").val($("#compAddress2").val());
+		
+		var htmlStr = ""; 
+		
+		if($("#compName").val() == undefined) {
+			htmlStr += '';
+		} else {
+			htmlStr += ""+$("#compPostNumnber").val()+"</br>";
+			htmlStr += $("#compAddress1").val() + $("#compAddress2").val();
+		}
+		
+		
+		$("#compBizno1, #compBizno2, #compBizno3").val('');
+		$('#compAddr').html(htmlStr); 
+		$('.table_style_col').children().remove();
+		$('.table_style_col').html(tableBody);
+		$("#popOfficeClose").click();
+		
+	}
+	
+
+</script>
+
+
+<!-- layer pop 기관검색 -->
+<div class="layerpop company" id="popOffice"  tabindex="0" data-tooltip-con="popsearch03"  data-focus="popsearch03" data-focus-prev="popsearch03-close">
+	<div class="layer_mask tooltip"></div><!-- 블랙mask영역 -->
+	<div class="layer_cont">
+		<div class="lc_head">
+			<h4 class="lc_tit">기관 검색</h4>
+		</div>
+		<div class="lc_cont">
+
+			<div class="company_con_search">
+				<ul class="c_txtlist">
+					<li>사업자번호 조회 후 등록되어 있지 않은 경우 신규로 등록하여야 합니다.</li>
+					<li>기존에 등록된 사업자정보 변경을 희망하실 경우, 관리자에게 요청해 주시기 바랍니다.</li>
+					<li>사업자번호 등 정보가 없는 단체의 경우 관리자에게 직접 연락주시기 바랍니다.</li>
+				</ul>
+				<fieldset>
+					<legend>기관 검색 영역</legend>
+					<span class="tittxt">사업자번호</span>
+					<input type="text" id="compBizno1" name="compBizno1" value="" maxlength="3" title="사업자번호 앞자리를 입력하세요." class="num num_wid1" />
+					<span class="widbox">-</span>
+					<input type="text" id="compBizno2" name="compBizno2" value="" maxlength="2" title="사업자번호 가운데자리를 입력하세요." class="num num_wid2" />
+					<span class="widbox">-</span>
+					<input type="text" id="compBizno3" name="compBizno3" value="" maxlength="5" title="사업자번호 마지막자리를 입력하세요." class="num num_wid3" />
+					<button class="btn_bluebg02" type="button" onclick="getOffice(); return false;">조회</button>
+				</fieldset>
+
+				<!-- result -->
+				<div class="result_box">
+
+					<!-- 성공시 내용 -->
+					<div class="table_style_col">
+						<table>
+							<caption>선택, 학교·기관·단체, 사업자번호, 대표이사 등 항목을 확인할수있는표</caption>
+							<colgroup>
+								<col />
+								<col />
+								<col />
+								<col />
+							</colgroup>
+							<thead>
+								<tr>
+									<th scope="col">선택</th>
+									<th scope="col">학교·기관·단체</th>
+									<th scope="col">사업자번호</th>
+									<th scope="col">대표이사</th>
+								</tr>
+							</thead>
+							<tbody id="officeBody">
+							</tbody>
+						</table>
+					</div>
+
+					<div class="c_btn_center">
+						<button class="btn_blueline02" onclick="goBack(); return false;" type="button">취소</button>
+						<button class="btn_bluebg02" type="button" onclick="officeSelect(); return false;">확인</button>
+					</div>
+
+				</div>
+				<!--// result -->
+
+			</div>
+
+		</div>
+	</div>
+	<button class="btn_close tooltip-close" id="popOfficeClose" data-focus="popsearch03-close" data-focus-next="popsearch03">닫기</button>
+</div>
+<!--// layer pop -->
+
+<%@ include file="/WEB-INF/jsp/common/pop_officeForm.jsp"%>
+
+	

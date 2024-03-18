@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>신용회복위원회 신용교육원 홈페이지를 방문해주셔서 감사드립니다.</title>
+<script src="/cmmn/js/jquery-1.11.1.min.js?Ver20180618_01"></script>
+<script type="text/javascript" src="/cmmn/js/jquery.cookie.js"></script>
+<script type="text/javascript">
+
+	$(document).ready(function() {
+
+		$('#popupNewClose').on('click', function () {
+			
+			$.cookie('popupNew','Y',{expires:1,path: '/'});
+			self.close();
+			
+		});
+		
+	});
+	
+</script>
+</head>
+<body>
+<a href="#none" onclick="window.opener.location.href='/ccedu/notice/faqList.do?bcateno=5'; self.close();"> 
+<img alt="신용회복위원회 신용교육원 홈페이지를 방문해주셔서 감사드립니다." src="/cmmn/images/popupNew.png">
+</a>
+<label style="float: right; margin-right:108px;"><a href="#none" id="popupNewClose">1일동안 보지 않기</a></label>
+</body>
+</html>

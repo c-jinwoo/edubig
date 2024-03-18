@@ -1,0 +1,334 @@
+<%
+/****************************************
+	subject	: 강사공간 게시판 목록
+	summary	: 
+	author	: 이진영
+	date	: 2017-06-04
+****************************************/
+%>
+<%@ page language="java" contentType="text/html; charset=utf-8" pageEncoding="utf-8"%>
+	<%@ include file="/WEB-INF/jsp/common/inc/taglib_inc.jsp"%>
+	<%@ include file="/WEB-INF/jsp/academy/cmmn/inc/top_inc.jsp"%>
+	<%@ include file="/WEB-INF/jsp/academy/cmmn/inc/header_inc.jsp"%>
+	
+	<script type="text/javascript">
+	function move_page(cPage){
+		$('#cPage').val(cPage);
+		$("#searchWord").val($("#searchText").val());
+		$('form[name=frm]').attr('action', '<c:out value="${ctx}"/>/academy/tutor/tutorBoardList.do').submit();
+	} 
+	
+	//검색
+	function searchWord(){
+		$('#cPage').val(1);
+		$("#searchWord").val($("#searchText").val());
+		$("#frm").attr("action" , "/academy/tutor/tutorBoardList.do").submit();
+	}
+	
+	var arySeqTitle = new Array;
+	var aryCseqNo = new Array;
+	var arryMtScCode = new Array;
+	var arryClassDesk = new Array;
+	var arryEduseqYn = new Array;
+
+	
+
+	<c:forEach var="result" items="${seqList}" varStatus="status">
+		arySeqTitle.push('${result.SEQ_TITLE}');     //타이틀
+		aryCseqNo.push('${result.CSEQNO}');  		 // 코드
+		arryMtScCode.push('${result.MT_SC_CODE}');   // 과정구분 코드
+		arryClassDesk.push('${result.CLASS_DESK}');  // 클래스데스크(학습, 시험, 설문)
+		arryEduseqYn.push('${result.EDUSEQ_YN}');    // 순차여부
+	</c:forEach>
+
+	function selectCh(pthis){
+
+		var append = '';
+		var arryIdx = 0;
+		var idx = 0;
+
+		for(var i = 0; i < arryMtScCode.length ; i++){
+			if($(pthis).val() == arryMtScCode[i]){
+				if(idx < 0){
+					idx++
+					arryIdx = i; 
+				}
+				append += '<option value="'+aryCseqNo[i]+'"> '+arySeqTitle[i]+'</option>';
+			}
+		}
+		$('#cseqno').find('option').remove();
+		$('#cseqno').append(append);
+
+	}
+
+	//진도 체크
+	function progExec(cuserno, treeno, sday, studytime, totalEduTime){
+
+        $.ajax({
+            url : "/academy/myclass/ajaxProgressCheck.do",
+            data : { cuserno : cuserno
+	               , treeno : treeno
+	               , studytime : studytime 
+	               , totalEduTime : totalEduTime
+	               , sday : sday
+            	   },
+            dataType : "json",
+            type : 'post',
+            success : function(res) { 		            	
+            	location.reload();
+            },
+            error : function(e) {
+                alert("error :" + e.responseText);
+            }
+        }); 
+    }
+
+
+	//상세보기
+	function fnView(idx){
+
+		var aryData1 = new Array;
+		var aryData2 = new Array;
+		var aryData3 = new Array;
+		var aryData4 = new Array;
+		var aryData5 = new Array;
+		var aryData6 = new Array;
+		
+		<c:forEach var="result" items="${listData}" varStatus="status">
+			aryData1.push('${result.FILE_PATH}');   // 경로
+			aryData2.push('${result.MEDIA_FILE}');  // mp4 파일명 
+			aryData3.push('${result.CUSERNO}');    // 수강코드
+			aryData4.push('${result.TREENO}');     // 목차코드
+			aryData5.push('${result.STUDYTIME}'); // 학습시간
+			aryData6.push('${result.SDAY}'); // 페이지
+		</c:forEach>
+		
+		
+		$('#filePath').val(aryData1[idx]);
+		$('#mediaFile').val(aryData2[idx]);
+		$('#cuserno').val(aryData3[idx]);
+		$('#treeno').val(aryData4[idx]);
+		$('#studytime').val(aryData5[idx]);
+		$('#sday').val(aryData6[idx]);
+		
+		window.open("http://localhost:8080/edu-data/contents/1001.html","mediaPop","width=1000,height=650");
+	}
+	
+	function form_page(){
+		$('#cPage').val(cPage);	
+		$("#searchWord").val($("#searchText").val());
+		<%--  frm.pageMode.value = "<%=SangsProperties.getProperty("Globals.PAGE_MODE_REG")%>"; --%>
+		$("#frm").attr("action", "/academy/tutor/tutorBoardForm.do").submit();
+	}
+
+	function selectTitle(){
+
+
+		$("#frm").attr("action", "/academy/myclass/classBoardList.do").submit();
+	}
+	
+	$(document).ready(function(){
+		selectCh($('#mtScGnbCode'));
+	});
+	
+</script>
+<div class="container" id="Subcontent">
+    <article class="subArea">
+        <div class="subCntWrap">
+		<%@ include file="/WEB-INF/jsp/academy/cmmn/inc/lnb_tutor.jsp" %>
+			<div class="path">
+           		<ul>
+               		<li><span class="home text-hide">홈</span></li>
+                    <li>학습현황</li>
+                    <li class="active"><c:out value="${categoryData.BCATENAME}"/></li>
+                </ul>
+            </div>
+			<div class="subConts" id="sub-content">
+				<section class="bgTop_cate06"><!--   카테고리별 이미지 추가  -->
+            		<div class="contTop">
+            			<h2 class="h2_tit"><c:out value="${categoryData.BCATENAME}"/></h2>
+            		</div>           	
+	            </section>
+			
+
+	
+					<form name="frm" id="frm" action="" method="post">
+						<input type="hidden" name="cPage" id="cPage" value="<c:out value="${REQUEST_DATA.cPage}"/>"/>
+						<input type="hidden" name="bbsNo" id="bbsNo" value=""/>
+						<input type="hidden" name="prevBbsNo" id="prevBbsNo" value=""/>
+						<input type="hidden" name="nextBbsNo" id="nextBbsNo" value=""/>
+						<input type="hidden" name="qu" id="qu" value="insert"/>
+						<input type="hidden" name="bcateno" id="bcateno" value="${REQUEST_DATA.bcateno}"/>
+						<input type="hidden" name="searchWord" id="searchWord" value=""/>
+						<input type="hidden" name="filePath" id="filePath" value=""/>
+						<input type="hidden" name="mediaFile" id="mediaFile" value=""/>
+						<input type="hidden" name="cuserno" id="cuserno" value=""/>
+						<input type="hidden" name="treeno" id="treeno" value=""/>
+						<input type="hidden" name="studytime" id="studytime" value=""/>
+						<input type="hidden" name="sday" id="sday" value=""/>
+					</form>
+					
+					<div class="searchWrap">
+                        	<fieldset>
+                            	<legend class="sr-only">검색 </legend>
+                                  <div class="sel2Search">
+                                  	<div class="form-inline">
+                                    	<label for="schOnline" class="bold po_C9">강의선택</label>
+                                    	<div class="form-group classec">
+                                    		<select name="mtScGnbCode" id="mtScGnbCode" title="과정구분"  class="form-control" onchange="selectCh(this)">
+												<c:forEach var="result" items="${mtScCodeList}" varStatus="status2">
+													<option value="<c:out value="${result.MT_SC_CODE}"/>" <c:if test="${REQUEST_DATA.mtScGnbCode == result.MT_SC_CODE}"> selected="selected"</c:if>><c:out value="${result.MT_SC_NAME}"/></option>
+												</c:forEach>
+							 				</select>
+                                        </div>
+
+                                        <div class="form-group classtit">
+                                        	<select name="cseqno" id="cseqno" title="과정명"  class="form-control" >
+												<c:forEach var="result" items="${seqList}" varStatus="status2">
+													<option value="<c:out value="${result.CSEQNO}"/>" <c:if test="${REQUEST_DATA.mtScGnbCode == result.CSEQNO}"> selected="selected"</c:if>><c:out value="${result.SEQ_TITLE}"/></option>
+												</c:forEach>
+							 				</select>
+                                        </div>
+                                        	<button type="submit" name="button" class="btn btn-sm btn-mint" onclick="selectTitle(this);" title="검색">검색</button>
+                                    </div>
+                                  </div>
+                           </fieldset>
+                    </div>
+
+					<!-- table -->
+	                <section class="tableBox">
+	                	<h2 class="h2_tit">온라인학습</h2>
+	                	<div class="tblTop row">
+	                    	<div class="col-sm-6"></div>
+	                        <div class="col-sm-6 col-xs-12">
+	                        </div>
+	                     </div>
+	                     <div class="tblWrap">
+	                     	<table class="boardList">
+	                        <colgroup>
+	                        	<col style="width:20%">
+	                        	<col style="width:*">
+	                        	<col style="width:20%">
+	                            <col style="width:20%">
+	                        </colgroup>
+	                        <header>
+	                        	<th>차수명</th>
+	                        	<th>진도율</th>
+	                        	<th>마지막 수강일 </th>
+	                        	<th></th>
+	                        </header>
+	                        <tbody>
+	                        	<c:forEach var="result" items="${listData}" varStatus="status2">
+		                        	<tr>
+		                        		<td><c:out value="${status2.index+1}"/></td>
+		                        		<td><c:out value="${result.SUBJECT}"/></td>
+		                        		<td><c:out value="${result.VAL}"/></td>
+		                        		<td><a href="#none" onclick="" class="btn_login Out">학습</a>
+		                        		</td>
+		                        	</tr>
+	                        	</c:forEach>
+	                        </tbody>
+	                        </table>
+	                     </div>
+
+	                     <br/><br/>
+	                     <div id = "div1">
+		                     <h2 class="h2_tit">시험</h2>
+		                     <div class="tblWrap">
+		                     	<table class="boardList">
+		                        <colgroup>
+		                        	<col style="width:20%">
+		                        	<col style="width:*">
+		                        	<col style="width:20%">
+		                            <col style="width:20%">
+		                        </colgroup>
+		                        <header>
+		                        	<th>차수명</th>
+		                        	<th>진도율</th>
+		                        	<th>마지막 수강일 </th>
+		                        	<th></th>
+		                        </header>
+		                        <tbody>
+		                        	<c:forEach var="result" items="${lectExamList}" varStatus="status2">
+			                        	<tr>
+			                        		<td><c:out value="${status2.index+1}"/></td>
+			                        		<td><c:out value="${result.SUBJECT}"/></td>
+			                        		<td><c:out value="${result.VAL}"/></td>
+			                        		<td><a href="#none" onclick="" class="btn_login Out">학습</a>
+			                        		</td>
+			                        	</tr>
+		                        	</c:forEach>
+		                        </tbody>
+		                        </table>
+		                     </div>
+
+		                     <br/><br/>
+		                     <h2 class="h2_tit">설문</h2>
+		                     <div class="tblWrap">
+		                     	<table class="boardList">
+		                        <colgroup>
+		                        	<col style="width:20%">
+		                        	<col style="width:*">
+		                        	<col style="width:20%">
+		                            <col style="width:20%">
+		                        </colgroup>
+		                        <header>
+		                        	<th>차수명</th>
+		                        	<th>진도율</th>
+		                        	<th>마지막 수강일 </th>
+		                        	<th></th>
+		                        </header>
+		                        <tbody>
+		                        	<c:forEach var="result" items="${lePollResultList}" varStatus="status2">
+			                        	<tr>
+			                        		<td><c:out value="${status2.index+1}"/></td>
+			                        		<td><c:out value="${result.SUBJECT}"/></td>
+			                        		<td><c:out value="${result.VAL}"/></td>
+			                        		<td><a href="#none" onclick="" class="btn_login Out">학습</a>
+			                        		</td>
+			                        	</tr>
+		                        	</c:forEach>
+		                        </tbody>
+		                        </table>
+		                     </div>
+		                 </div>
+
+	                     <br/><br/>
+	                     <h2 class="h2_tit">공지사항</h2>
+	                     <div class="tblWrap">
+	                     	<table class="boardList">
+	                        <colgroup>
+	                        	<col style="width:20%">
+	                        	<col style="width:*">
+	                        	<col style="width:20%">
+	                            <col style="width:20%">
+	                        </colgroup>
+	                        <header>
+	                        	<th>차수명</th>
+	                        	<th>진도율</th>
+	                        	<th>마지막 수강일 </th>
+	                        	<th></th>
+	                        </header>
+	                        <tbody>
+	                        	<c:forEach var="result" items="${courselistData}" varStatus="status2">
+		                        	<tr>
+		                        		<td><c:out value="${status2.index+1}"/></td>
+		                        		<td><c:out value="${result.SUBJECT}"/></td>
+		                        		<td><c:out value="${result.VAL}"/></td>
+		                        		<td><a href="#none" onclick="" class="btn_login Out">학습</a>
+		                        		</td>
+		                        	</tr>
+	                        	</c:forEach>
+	                        </tbody>
+	                        </table>
+	                     </div>
+	                     
+	                </section><!--// table -->
+			</div><!-- //sub-contents -->
+
+		</div>
+	</article>
+</div>	 
+	 
+<!-- footer -->
+<%@ include file="/WEB-INF/jsp/academy/cmmn/inc/footer_inc.jsp"%>

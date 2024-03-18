@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes" ?>
+<list>
+  <index>
+    <topic>
+      <list title="main" page="1">소개하기</list>
+      <list title="sub" page="1">통계 기반 데이터 분석</list>
+
+      <list title="main" page="2">살펴보기</list>
+      <list title="sub" page="2">통계의 개념 및 통계량</list>
+      <list title="sub" page="3">변수의 측정과 척도</list>
+	  <list title="sub" page="4">평균, 분산 및 표준편차</list>
+	  <list title="sub" page="5">통계적 가설 검증</list>
+	  <list title="sub" page="6">검정</list>
+	  <list title="sub" page="7">상관관계 분석</list>
+	  <list title="sub" page="8">요인분석</list>
+	  <list title="sub" page="9">회귀분석</list>
+
+      <list title="main" page="10">정리하기</list>
+      <list title="sub" page="10">핵심평가</list>
+      <list title="sub" page="11">학습정리</list>
+    </topic>
+  </index>
+</list>

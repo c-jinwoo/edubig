@@ -1,0 +1,41 @@
+<%
+/****************************************
+    subject : 상단 메뉴
+    summary : 상단 메뉴 : 기타(13)
+    author  : SANGS
+    date    : 2018-06-12
+****************************************/
+%>
+<%@ page language="java" contentType="text/html; charset=utf-8" pageEncoding="utf-8"%>
+		<!-- location -->
+		<div id="location_wrap">
+			<div class="con_center">
+				 <div class="location">
+				 	<h2 class="alt_text">현재위치</h2>
+					<a href="/ccedu/main/main.do" class="btn_home"><img src="/cmmn/images/location_home.png" alt="홈" /></a>
+					<ul class="location_nav">
+						<%
+							if(request.getParameter("menuTitle") == null){
+								if(request.getParameter("menuNm") == "합격자 정보 추가 입력") {
+						%>
+						<li><span>합격자조회</span></li>
+						<% 
+								} else {
+						%>
+						<li><span>기타</span></li>
+						<%
+								}
+						%>
+						<%
+							}else{
+						%>
+						<li><span><%=request.getParameter("menuTitle") %></span></li>
+						<%
+							}
+						%>
+						<li><span><%=request.getParameter("menuNm") %></span></li>
+					</ul>
+				 </div>
+			 </div>
+		</div>
+		<!-- location  -->

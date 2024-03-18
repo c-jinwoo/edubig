@@ -1,0 +1,57 @@
+var aInfo	= new Array();  // 페이지 정보
+aInfo[1]	= 7;
+aInfo[2]	= 7;
+aInfo[3]	= 5;
+aInfo[4]	= 5;
+aInfo[5]	= 6;
+aInfo[6]	= 6;
+aInfo[7]	= 7;
+aInfo[8]	= 5;
+aInfo[9]	= 5;
+aInfo[10]	= 6;
+aInfo[11]	= 6;
+aInfo[12]	= 11;
+aInfo[13]	= 10;
+aInfo[14]	= 8;
+aInfo[15]	= 6;
+aInfo[16]	= 6;
+aInfo[17]	= 7;
+aInfo[18]	= 9;
+aInfo[19]	= 9;
+
+_this = this;
+var bolPorted = false; // 포팅여부
+var subjectCode = "JP19000619"; // 과정코드
+var strChapter = getURL(1); // 현재 차시문자
+var strPage = getURL(0);    // 현재 페이지문자
+
+_this.$strInitial = "";                // 과정 이니셜
+_this.$curPageNumber = getURL(0) * 1;    // 현재 페이지
+_this.$curChapter = getURL(1) * 1;       // 현재 차시
+_this.$contentWidth = "1280px";          // 콘텐츠 높이
+_this.$contentHeight = "760px";          // 콘텐츠 넓이
+_this.$os = getOSType();                 // 사용 os
+_this.$browser =  getBrowserType();      // 사용 browser
+_this.$totalPageNumber = aInfo[_this.$curChapter]; //전체 페이지 수
+_this.$bolFullScreen = false; // 전체화면 여부 ( false : 창모드 true : 전체화면 )
+_this.$bolPlay = false;  // 재생 여부 ( fasle : 일시정지 true : 재생중 )
+_this.$movieName = strChapter + "_" +  strPage +".mp4";
+_this.$moviePath = "http://cslabs-cvod.myskcdn.net/_definst_/mp4:bigdata/"+strChapter+"/"+_this.$movieName+"/playlist.m3u8";
+_this.$content = $("body").children(".content");
+
+var player;
+var cuserno = $( '#cuserno', parent.opener.document ).val(); //수강코드 
+var treeno = $( '#treeno', parent.opener.document ).val();   //목차코드
+var frameseq = $( '#sday', parent.opener.document ).val();   //현재프래임번호
+var sTime = $('#studytime', parent.opener.document ).val();// 수강시간
+var vodPath = $('#filePath', parent.opener.document ).val();
+var vodName = $('#mediaFile', parent.opener.document ).val();
+var appendHTML = "";
+	appendHTML += "<video id='my_video_"+_this.$curPageNumber+"' class='video-js' autoplay playsinline preload='auto' width='1280' height='720' data-setup='{}'>";
+	appendHTML += "<source src='"+_this.$moviePath+"' type='application/x-mpegURL'>";
+	appendHTML += "</video>";
+_this.$content.append(appendHTML);
+
+$(window).load(function(){
+	setPage();
+});

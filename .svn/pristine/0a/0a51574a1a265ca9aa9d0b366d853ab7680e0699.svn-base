@@ -1,0 +1,236 @@
+<%
+/****************************************
+    subject : 신용상담사
+    summary : 신용상담사 > 수료증진위확인여부
+    author  : SANGS
+    date    : 2018-06-15
+****************************************/
+%>
+<%@ page language="java" contentType="text/html; charset=utf-8" pageEncoding="utf-8"%>
+<%@ include file="/WEB-INF/jsp/ccedu/inc/taglib_inc.jsp"%>
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+	<title>수료증 진위여부 확인 | 기타</title>
+	<%@ include file="/WEB-INF/jsp/ccedu/inc/head_inc.jsp"%>
+	<script type="text/javascript">
+	
+	
+		$(document).ready(function() {
+		
+			$(".mgt_first").hide();
+			$(".etc_center").hide();
+			
+// 			$('#examNo').keyup(function () { 
+// 			    this.value = this.value.replace(/[^0-9-]|^[-]/gi,"");
+// 			});
+			
+		});
+
+// 	   function autoHypen(pthis) {
+		   
+// 		   var html = '';
+// 	       var examNo = $(pthis).val();
+           
+// 	       if(examNo.length == 4) {
+// 	    	   html += examNo.substr(0, 4);
+// 	           html += '-';
+// 	           $(pthis).val(html);
+// 	       } else if(examNo.length == 7) {
+	    	   
+// 	    	   html += examNo.substr(0, 4);
+// 		 	   html += '-';
+// 		 	   html += examNo.substr(5, 2);
+// 		 	   html += '-';
+// 		 	   $(pthis).val(html);
+// 	       }
+// 	   }
+	   
+	   function certifiResult() {
+		   
+		   if(!fnValiMinCheck($("#examNo"), "수료코드를 확인해주세요.", 12)) return false;
+		   $.ajax({
+			   
+			   url : "/ccedu/cc/certificateCheckInfo.do",
+			   data : 
+				{
+					examNo : $("#examNo").val()
+				},
+				
+			   dataType : "json",
+			   type : 'post',
+			   success : function(data) {
+				   	
+				   $("#examNo").val('');
+				   
+				   if(data != "NOTDATA") {
+					   
+					   $(".etc_center").hide();
+					   $(".mgt_first").show();
+					
+	    			   var html = "";
+	    			   html += "<tr>";
+	    			   html += "	<th scope='row'>이름</th>";
+		    		   html += "	<td>"+data.MBERNM+"</td>";
+		    		   html += "</tr>";
+		    		   html += "<tr>";
+	    			   html += "	<th scope='row'>생년월일</th>";
+		    		   html += "	<td>"+data.BRTHDY+"</td>";
+		    		   html += "</tr>";
+		    		   html += "<tr>";
+	    			   html += "	<th scope='row'>과정명</th>";
+		    		   html += "	<td>"+data.COURSETITLE+"</td>";
+		    		   html += "</tr>";
+		    		   html += "<tr>";
+	    			   html += "	<th scope='row'>수료일자</th>";
+	    			   html += "	<td>"+ data.COMPDATE +"</td>";
+		    		   html += "</tr>";
+		    		   $("#result").html(html);
+					
+				   } else {
+					   $(".mgt_first").hide();
+					   $(".etc_center").show();
+				   }
+				
+				},
+				
+				error : function(e) {
+					fnModalMsg("error :" + e.responseText);
+				}
+			}); // ajax
+		}
+		
+	</script>
+</head>
+
+<body>
+
+<!-- skip nav -->
+	<%@ include file="/WEB-INF/jsp/ccedu/inc/nav_inc.jsp"%>
+<!--// skip nav -->
+
+
+<div id="wrap">
+
+	<!-- header -->
+	<%@ include file="/WEB-INF/jsp/ccedu/inc/header_inc.jsp"%>
+	<!--// header -->
+
+	<!-- container -->
+	<div id="container">
+
+		<!-- location -->
+		<jsp:include page="/WEB-INF/jsp/ccedu/inc/location/loc_13.jsp">
+			<jsp:param name="menuNm" value="수료증진위여부"/>
+		</jsp:include>
+		<!--// location -->
+
+		<div class="con_center">
+
+			<!-- lnb -->
+			<div id="lnb">
+				<jsp:include page="/WEB-INF/jsp/ccedu/inc/lnb/lnb_13.jsp">
+					<jsp:param name="dep2" value="01"/>
+					<jsp:param name="menuNm" value="수료증진위여부"/>
+				</jsp:include>
+			</div>
+			<!--// lnb -->
+			
+			
+			<form id="frm" method="post">
+				
+				<!-- content 본문 -->
+				<div id="content">
+				
+					<!-- 기존 START 2018-08-30  -->
+<!-- 					<h3 class="cont_titile">수료증 진위여부 확인</h3> -->
+					<!-- 기존 END 2018-08-30  -->
+					
+					<!-- 2018-08-28 김동인 작업 S --> 
+					<h3 class="cont_titile type08">수료증 진위여부 확인<span></span></h3>
+					<!-- 2018-08-28 김동인 작업 E -->
+					<!-- 본문내용 -->
+					<div class="cont_body">
+						<!-- start -->
+	
+						<div class="c_section">
+							<ul class="c_txtlist">
+								<li>
+									대출금리 인하 등의 목적으로 수료증 위변조가 우려됨에 따라 은행 등 금융기관에서 본인의 동의 하에 수료증 진위여부를 해당 페이지에서 조회할 수 있습니다.<br/>
+									정상적으로 조회가되지 않는 경우 신용교육원으로 연락주시기 바랍니다. 
+								</li>
+								<li>'-' 빼고 입력해주시기 바랍니다.</li>
+							</ul>
+						</div>
+	
+						<div class="c_section">
+							<h4 class="c_tit">수료증 진위여부 확인</h4>
+							<div class="table_style_row">
+								<table>
+									<caption>수료코드로 조회하는 표 입니다.</caption>
+									<colgroup>
+										<col class="col2_1" />
+										<col />
+									</colgroup>
+									<tr>
+										<th scope="row">수료코드</th>
+										<td>
+											<div class="form_field">
+												<input type="text" style="display: none;" id="hidden" name="hidden" />
+												<input type="text" id="examNo" name="examNo" maxlength="15" value="" onkeyup="autoHypen(this);" title="수료코드 입력" class="wid_1" />
+											</div>
+										</td>
+									</tr>
+								</table>
+							</div>
+						</div>
+	
+						<div class="c_btn_center">
+							<button type="button" onclick="certifiResult(); return false;" class="btn_bluebg03">조회</button>
+						</div>
+						
+						<div class="c_section mgt_first">
+							<div class="table_style_row">
+								<table id="test">
+									<caption>이름, 생년월일, 과정명, 수료일자 등 조회결과를 보여주는 표 입니다.</caption>
+									<colgroup>
+										<col class="col2_1" />
+										<col />
+									</colgroup>
+									<tbody id="result"></tbody>
+								</table>
+							</div>
+						</div>
+						
+						<div class="c_section">
+							<div class="c_msg_left etc_center">
+								<div class="img_msg_talk">
+									<p>해당 수료코드에 관한 정보가 없습니다.<br />수료코드를 정확히 입력 후 조회해주시기 바랍니다.</p>
+								</div>
+							</div>
+						</div>
+	
+						<!--// end -->
+					</div>
+					<!--// 본문내용 -->
+				
+				<!--  -->
+				</div>
+			<!--// content 본문 -->
+			
+			</form>
+			
+				
+		</div>
+	
+	</div>
+	<!--// container -->
+
+	<!-- foot -->
+	<%@ include file="/WEB-INF/jsp/ccedu/inc/footer_inc.jsp"%>
+	<!--// foot end -->
+
+</div>
+
+</body>
+</html>

@@ -1,0 +1,157 @@
+<%
+/****************************************
+	subject	: 강사공간 게시판 목록
+	summary	: 
+	author	: 이진영
+	date	: 2017-06-04
+****************************************/
+%>
+<%@ page language="java" contentType="text/html; charset=utf-8" pageEncoding="utf-8"%>
+	<%@ include file="/WEB-INF/jsp/common/inc/taglib_inc.jsp"%>
+	<%@ include file="/WEB-INF/jsp/academy/cmmn/inc/top_inc.jsp"%>
+	<%@ include file="/WEB-INF/jsp/academy/cmmn/inc/header_inc.jsp"%>
+	
+	<script type="text/javascript">
+	function move_page(cPage){
+		$('#cPage').val(cPage);
+		$("#searchWord").val($("#searchText").val());
+		$('form[name=frm]').attr('action', '<c:out value="${ctx}"/>/academy/tutor/tutorBoardList.do').submit();
+	} 
+	
+	function move_tab(ispass){
+		$('#ispass').val(ispass);
+		$('form[name=frm]').attr('action', '<c:out value="${ctx}"/>/academy/myclass/learningStatusList.do').submit();
+	} 
+	
+
+	function fnClassMove(courseno, searchCseqno){
+		$('#courseno').val(courseno);
+		$('#searchCseqno').val(searchCseqno);
+		$('form[name=frm]').attr('action', '/classdesk/main/main.do').submit();
+	}
+
+	//수료증 출력 
+	function fnPrint( cuserNo ){		
+		$('#cuserNo').val(cuserNo);
+
+		var w1 =1070;
+		var h1 = 900;
+		var url = "/academy/myclass/cerOnlinePrint.do";
+		
+		window.open( url+"?"+$("#frm").serialize()
+			,"cert_pop","width="+w1+" height="+h1+", top=0, left=0, resizable=yes, status=no, menubar=no, toolbar=no, scrollbars=yes, location=no");
+	}
+	
+
+	
+	
+</script>
+<div class="container" id="Subcontent">
+    <article class="subArea">
+        <div class="subCntWrap">
+		<%@ include file="/WEB-INF/jsp/academy/cmmn/inc/lnb_tutor.jsp" %>
+			<div class="path">
+           		<ul>
+               		<li><span class="home text-hide">홈</span></li>
+                    <li>학습현황</li>
+                    <li class="active"><c:out value="${categoryData.BCATENAME}"/></li>
+                </ul>
+            </div>
+			<div class="subConts" id="sub-content">
+				<section class="bgTop_cate06"><!--   카테고리별 이미지 추가  -->
+            		<div class="contTop">
+            			<h2 class="h2_tit"><c:out value="${categoryData.BCATENAME}"/></h2>
+            		</div>           	
+	            </section>
+			
+
+	
+					<form name="frm" id="frm" action="" method="post">
+						<input type="hidden" name="cPage" id="cPage" value="<c:out value="${REQUEST_DATA.cPage}"/>"/>
+						<input type="hidden" name="cuserNo" id="cuserNo" value=""/>
+						<input type="hidden" name="courseno" id="courseno" value=""/>
+						<input type="hidden" name="searchCseqno" id="searchCseqno" value=""/>
+						<input type="hidden" name="ispass" id="ispass" value=""/>
+						
+					</form>
+					
+					<!-- table -->
+	                <section class="tableBox">
+	                	<div class="tblTop row">
+	                    	<div class="col-sm-6"></div>
+	                        <div class="col-sm-6 col-xs-12">
+	                        	<a href="#none" onclick="move_tab('N')" class="btn_login Out">수강중인 강좌</a>
+	                        	<a href="#none" onclick="move_tab('Y')" class="btn_login Out">수강 완료 강좌</a>
+	                        </div>
+	                     </div>
+	                     <div class="tblWrap">
+	                     	<table class="boardList">
+	                        <colgroup>
+	                        	<col style="width:15%">
+	                            <col style="width:*">
+	                        </colgroup>
+	                        <tbody>
+	                        <c:forEach var="result" items="${listData}" varStatus="status">
+		                        <tr>
+		                        	<td class="text-center">
+										<input type="checkbox" />
+									</td>
+									<td class="text-center">
+										<strong class="fnt16 po_C7">1</strong>
+										<input name="test" id="test" type="hidden" value="<c:out value="${REQUEST_DATA.bcateno}"/>" />
+									</td>
+									<td>
+					                	<dl class="dl_notice">
+					                    	<dt>
+					                        	<a href="#none" class="noti_tit" onclick="fnView(${status.index}); return false;">
+					                        		<c:out value="${result.SUBJECT}"/>
+					                        	</a>
+											</dt>
+											<dd>
+												<ul class="mrg_t5 noaddfile">
+													<li class="li_bar"><strong class="mrg_r10">과정명</strong> <span> <c:out value="${result.SEQ_TITLE}"/></span></li>
+													<li class="li_bar"><strong class="mrg_r10">진도율</strong> <span> <c:out value="${result.PROGRESS_AVG}"/> %</span></li>
+													<c:if test="${ not empty result.EVAL_PROGRESS}">
+														<li class="li_bar">
+															<strong class="mrg_r10">학습</strong> (<span><c:out value="${result.EVAL_PROGRESS}"/></span>)
+															<c:if test="${ not empty result.EVAL_PROGRESS}">
+																<br/>+<br/><strong class="mrg_r10">시험</strong> (<span><c:out value="${result.EVAL_EXAM_FINAL}"/></span>)
+															</c:if>
+														</li>
+													</c:if>
+													<li class="li_bar">
+														<c:if test="${result.ISPASS eq 'N'}">
+															<a href="#none" onclick="fnClassMove('<c:out value="${result.COURSENO}"/>','<c:out value="${result.CSEQNO}"/>')" class="btn_login Out">강의실</a>
+														</c:if>
+														<c:if test="${result.ISPASS eq 'Y'}">
+															<a href="#none" onclick="fnClassMove('<c:out value="${result.COURSENO}"/>','<c:out value="${result.CSEQNO}"/>')" class="btn_login Out">복습하기</a>
+															<a href="#none" onclick="fnPrint('${result.CUSERNO}')" class="btn_login Out">수료증 출력</a>
+														</c:if>
+													</li>
+													
+												</ul>	
+											</dd>
+										</dl>
+									</td>
+								</tr>
+							</c:forEach>
+	                        </tbody>
+	                        </table>
+	                     </div>
+	                      <hr/>
+	                      <hr/>
+	                     <c:if test="${REQUEST_DATA.bcateno eq '1030'}">
+		                      <div class="btnAreaR board">
+		                     	<a href="#" onclick="form_page();" class="btn btn-blue btn-sm">글쓰기</a>
+		                     </div> 
+	                     </c:if>
+	                     
+	                </section><!--// table -->
+			</div><!-- //sub-contents -->
+
+		</div>
+	</article>
+</div>	 
+	 
+<!-- footer -->
+<%@ include file="/WEB-INF/jsp/academy/cmmn/inc/footer_inc.jsp"%>

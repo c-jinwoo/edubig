@@ -1,0 +1,30 @@
+<%
+/****************************************
+    subject : 좌측 메뉴
+    summary : 좌측 메뉴 : 신용상담사(03)
+    author  : SANGS
+    date    : 2018-06-12
+****************************************/
+%>
+<%@ page language="java" contentType="text/html; charset=utf-8" pageEncoding="utf-8"%>
+<%
+	String dep2 = (String)request.getParameter("dep2"); 
+	String dep3 = (String)request.getParameter("dep3");
+%>
+
+
+<h2>나의강의실</h2>
+	 <ul class="lnb_menu">
+		<li <%if("01".equals(dep2)) out.print("class=\"on\""); %>>
+			<a href="/ccedu/myclass/learningStatusList.do"><span>학습현황</span></a>
+		</li>
+		<li <%if("02".equals(dep2)) out.print("class=\"on\""); %>>
+			<a href="/ccedu/myclass/learningClassList.do"><span>강의실</span></a>
+		</li>
+		<li <%if("03".equals(dep2)) out.print("class=\"on\""); %>>
+			<a href="/ccedu/myclass/payList.do"><span>결제내역조회</span></a>
+		</li>
+		<li <%if("04".equals(dep2)) out.print("class=\"on\""); %>>
+			<a href="/ccedu/common/modiCheck.do"><span>개인정보관리</span></a>
+		</li>
+	</ul>

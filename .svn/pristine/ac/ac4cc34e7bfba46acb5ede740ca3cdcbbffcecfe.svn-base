@@ -1,0 +1,76 @@
+<%
+/****************************************
+    subject : 온라인서점
+    summary : 온라인서점
+****************************************/
+%>
+<%@ page language="java" contentType="text/html; charset=utf-8" pageEncoding="utf-8"%>
+<%@ include file="/WEB-INF/jsp/ccedu/inc/taglib_inc.jsp"%>
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+	<%@ include file="/WEB-INF/jsp/ccedu/inc/head_inc.jsp"%>
+</style>
+<script type="text/javascript">	
+	function bookView(bno){
+		$("#bookNo").val(bno);	
+		$("#frm").submit();
+	}	
+</script>
+</head>
+<body>	
+	<!-- header -->
+	<%@ include file="/WEB-INF/jsp/ccedu/inc/header_inc.jsp"%>
+	<!--// header -->
+	
+	<form name="frm" id="frm" method="post" action="/ccedu/book/view.do">
+		<input type="hidden" id="bookNo" name="bookNo" value=""/>
+	</form>	
+	<!-- container -->
+	<div id="container">
+		<div class="con_center">	
+			<div class="cont_title_wrapper">
+				<div class="wrapper">
+					<h3 class="cont_title">온라인서점</h3>
+				</div>			
+			</div>			
+			<div id="content">
+				<div class="wrapper">		
+					<div class="cont_body">
+						<c:forEach items="${courseList}" var="course" varStatus="stat">
+							<div class="course_wrapper">
+								<h3 class="cont_title"><c:out value="${course.P_VALUE}"/></h3>
+								<div class="book_list_box">
+									<ul class="book_list">
+										<c:forEach items="${listData}" var="result">
+											<c:if test="${result.COURSENO == stat.count}">										
+												<li>
+													<div class="inbox" style="cursor:pointer;" onClick="bookView('<c:out value="${result.BOOKNO}"/>');">
+														<img style="width:100%;height:auto;" src="/att_file/book/<c:out value="${result.SAVFILE}"/>" alt="<c:out value="${result.TITLE}"/>"/>
+														<div class="info">
+															<p class="main_book_slide_title"><c:out value="${result.TITLE}"/></p>
+															<c:if test="${not empty result.PRICE}">
+																<p class="main_book_slide_vprice"><c:out value="${result.PRICE}"/>원</p>
+															</c:if>
+															<p class="main_book_slide_rprice"><c:out value="${result.PRICE_REAL}"/>원</p>
+														</div>
+													</div>
+												</li>							
+											</c:if>											
+										</c:forEach>
+									</ul>
+								</div>
+							</div>
+						</c:forEach>
+					</div>
+				</div>
+			</div>
+		</div>	
+	</div>
+	<!--// container -->
+	
+	<!-- foot -->
+	<%@ include file="/WEB-INF/jsp/ccedu/inc/footer_inc.jsp"%>
+	<!--// foot end -->
+</body>
+</html>

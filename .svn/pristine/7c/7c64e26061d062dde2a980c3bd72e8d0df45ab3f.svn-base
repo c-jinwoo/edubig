@@ -1,0 +1,651 @@
+<%
+/****************************************
+    subject : 회원서비스
+    summary : 회원서비스 : ID/PW 찾기
+****************************************/
+%>
+<%@ page language="java" contentType="text/html; charset=utf-8" pageEncoding="utf-8"%>
+<%@ include file="/WEB-INF/jsp/ccedu/inc/taglib_inc.jsp"%>
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+	<%@ include file="/WEB-INF/jsp/ccedu/inc/head_inc.jsp"%>
+	
+	<script type="text/javascript">
+		var checkEmail = false;
+		var searching = false;
+		$(document).ready(function(){
+			fnSetFindType('id');
+
+			onlyNum2('moblphon2');
+			onlyNum2('moblphon3');
+			
+			$("#certified").hide();
+			checkEmail = false;
+			
+		});
+	
+		function onlyNumber(obj) {
+		    $(obj).keyup(function(){
+		         $(this).val($(this).val().replace(/[^0-9]/g,""));
+		    }); 
+		}
+		
+		
+		//입력폼 초기화
+	 	function fnFormReset(){
+			
+			$('.findIdSec').hide();
+			$('.findPwSec').hide();
+			
+			$('#mberId').val('');
+			$('#mberNm').val('');
+			$('#brthYear').val('');
+			$('#brthMonth').val('');
+			$('#brthDay').val('');
+			$('#moblphon1').val('010');
+			$('#moblphon2').val('');
+			$('#moblphon3').val('');
+			$('#mail').val('');
+			$('#mail2').val('');
+			$('#mail3').val('');
+			
+			$('#ruId').val('');
+			$('#ruNm').val('');
+			$('#ruBrthdy').val('');
+			$('#ruMoblphon').val('');
+			
+			$('#authYn').val('N');
+			$('#authNumber').val('');
+			
+			$("#certified").hide();
+			$('#firstNum').val('');
+			$("#moblphon2, #moblphon3").removeAttr('readonly');
+			$('#time').html('');
+		}
+		
+		// id, pw 찾기 세팅
+		function fnSetFindType(type){
+			//파라미터 세팅
+			$('#findType').val(type);
+			
+			//입력창 세팅
+			if(type == 'id') {
+				$('#memberIdTr').hide();
+			}else{
+				$('#memberIdTr').show();
+			}
+			
+			$('.tabMenu').removeClass('on');
+			$('#'+type+'Search').addClass('on');
+			
+			fnFormReset();
+		}
+		
+		function fnGoSubmit(){						
+			
+			/*
+			var findType = $('#findType').val();
+			
+			if(findType == 'pw') if(!fnValiCheck($('#mberId'),'아이디를 입력 해 주세요.')) return false;
+			
+			if(!fnValiCheck($('#mberNm'),'이름을 입력 해 주세요.')) return false;
+			
+			
+			if(!fnValiCheck($('#brthYear'),'생년월일 년도를 선택 해 주세요.')) return false;
+			if(!fnValiCheck($('#brthMonth'),'생년월일 월을 선택 해 주세요.')) return false;
+			if(!fnValiCheck($('#brthDay'),'생년월일 일을 선택 해 주세요.')) return false;		
+			if(!fnValiCheck($('#mail'),'이메일을 입력 해 주세요.')) return false;
+			
+			//if(!fnValiCheck($('#moblphon1'),'핸드폰번호 첫자리를 입력 해 주세요.')) return false;
+			///if(!fnValiCheck($('#moblphon2'),'핸드폰번호 둘째자리를 입력 해 주세요.')) return false;
+			//if(!fnValiCheck($('#moblphon3'),'핸드폰번호 셋째자리를 입력 해 주세요.')) return false;		
+			
+			if(findType == 'id') {
+				fnFindIdExec();
+			} else fnFindPwExec();{
+				
+			}
+			*/			
+		}
+		
+		//아이디 찾기 실행
+		function fnFindIdExec(){
+			/*
+			if($('#authYn').val() == 'Y'){				
+				
+			}else{
+				
+				fnModalMsg('본인인증을 해주세요.');
+				return false;
+			}
+	
+			$.ajax( {
+			    type : "POST", 
+			    url : "/ccedu/user/memberFindIdAjax.do",
+			    data :  $('form[name=frm]').serialize(),
+			    dataType : "json",
+			    success : function( data ) {
+			    	if(data == 'FAIL'){
+			    		fnModalMsg('조회 중 일시적인 오류가 발생했습니다.');
+			    	} else if(data == 'CERT_FAIL'){
+			    		fnModalMsg('잘못된 방법으로 진입 하셨습니다.');
+			    	} else if(data == null || data == ''){
+			    		
+			    		fnConfirm("입력하신 회원정보가 존재하지 않습니다.<br/>회원가입 페이지로 이동하시겠습니까?", function(result) {
+							
+			    			if(result){
+				    			$("#frm").attr("action", '/ccedu/user/memberJoinType.do');
+				    			$("#frm").submit();
+			    			}
+			    			return false;
+			    			
+						});
+			    		return false;
+			    		
+			    		
+			    	}
+//				    	else if(data.TOTAL_COUNT > 1 ){
+//				    		fnModalMsg('중복된 정보의 회원이 존재합니다.<br/>관리자에게 문의 해 주세요.');
+//				    	}
+			    	else{
+			    		fnFindIdSucces(data.UNITY_ID);
+			    	}
+			    	
+			    }
+			});	
+			*/
+			
+			var rmNm = $("#mberNm").val();
+			var ruBrthdy = $("#brthYear").val()+$("#brthMonth").val()+$("#brthDay").val();
+			var email = $("#mail").val();
+			
+			$.ajax( {
+				type : "POST",
+				url : "/ccedu/user/ajaxSendEmail.do",
+				data : {
+					rmNm : rmNm,
+					ruBrthdy: ruBrthdy,
+					email: email
+				},
+				dataType: "json",
+				success: function(data) {
+					console.log(data);
+				},
+		        error : function(e) {
+		        	console.log("error");
+		            fnModalMsg("error :" + e.responseText);
+		        }
+			});
+		}
+	
+		//아이디 찾기 결과
+ 		function fnFindIdSucces(id){
+			
+			$('#userId').html(id);
+			$('.findIdSec').show();
+			return false;
+		} 
+ 		
+		//패스워드 찾기 실행
+		function fnFindPwExec(){
+			
+			if($('#authYn').val() == 'Y'){
+				
+				$.ajax( {
+				    type : "POST", 
+				    url : "/ccedu/user/memberFindPwAjax.do",
+				    data :  $('form[name=frm]').serialize(),
+				    dataType : "json",
+				    success : function( data ) {
+				    	if(data == 'FAIL'){
+				    		fnModalMsg('조회 중 일시적인 오류가 발생했습니다.');
+				    	} else if(data == 'CERT_FAIL'){
+				    		fnModalMsg('잘못된 방법으로 접근하셨습니다.');
+				    	} else if(data == null || data == ''){
+								fnConfirm("입력하신 회원정보가 존재하지 않습니다.<br/>ID찾기 페이지로 이동하시겠습니까?", function(result) {
+								
+					    			if(result){
+						    			$("#frm").attr("action", '/ccedu/user/memberFindIdPw.do');
+						    			$("#frm").submit();
+					    			}
+					    			return false;
+					    			
+								});
+				    		return false;
+				    		
+				    	}else if(data.TOTAL_COUNT > 1 ){
+				    		fnModalMsg('중복된 정보의 회원이 존재합니다.<br/>관리자에게 문의 해 주세요.');
+				    	}else{
+				    		fnFindPwSucces(data);
+				    	}
+				    	
+				    }
+				});
+				
+			}else{
+				
+				fnModalMsg('본인인증을 해주세요.');
+				return false;
+			}
+	
+		}
+		
+		//패스워드 찾기 결과
+		function fnFindPwSucces(data){
+			$('#ruId').val(data.UNITY_ID);
+			$('#ruNm').val(data.MBERNM);
+			$('#ruBrthdy').val(data.BRTHDY);
+			$('#ruMoblphon').val(data.MOBLPHON);
+			$('.findPwSec').show();
+			return false;
+		} 
+		
+		
+		function submitSms() {
+			if(searching) {
+				return;
+			}
+			searching = true;
+			var findType = $('#findType').val();
+			
+			if(findType == 'pw') if(!fnValiCheck($('#mberId'),'아이디를 입력 해 주세요.')) return false;			
+			if(!fnValiCheck($('#mberNm'),'이름을 입력해 주세요.')) return false;
+			if(!fnValiCheck($('#brthYear'),'연도를 선택해 주세요.')) return false;
+			if(!fnValiCheck($('#brthMonth'),'월을 선택해 주세요.')) return false;
+			if(!fnValiCheck($('#brthDay'),'일을 선택해 주세요.')) return false;
+			if(!fnValiCheck($('#mail'),'메일을 입력해 주세요.')) return false;
+			//if(!fnValiCheck($('#moblphon2'),'휴대전화 가운데 번호를 입력해 주세요.')) return false;
+			//if(!fnValiCheck($('#moblphon3'),'휴대전화 뒷 번호를 입력해 주세요.')) return false;			
+			// $("#moblphon1, #moblphon2, #moblphon3").attr('disabled', 'false');
+			
+			var ruId = $("#mberId").val();
+			var rmNm = $("#mberNm").val();
+			var ruBrthdy = $("#brthYear").val()+$("#brthMonth").val()+$("#brthDay").val();
+			var email = $("#mail").val() + "@" + $("#mail2").val();
+			
+			//var ruMoblphon = $("#moblphon1").val()+"-"+$("#moblphon2").val()+"-"+$("#moblphon3").val();
+			
+			//$("#checkSms").hide();
+			
+			$('#authYn').val('N');
+			
+			$.ajax({
+			    url : "/ccedu/user/ajaxMemberCheck.do",
+			    data : 
+			    {
+			    	findType : findType,
+					rmNm : rmNm,
+					ruBrthdy : ruBrthdy,
+					ruId : ruId,
+					email : email
+					//ruMoblphon : ruMoblphon,
+			  	},
+			    dataType : "json",
+			    type : 'post',
+			    success : function(data) {
+			    	
+			    	if(data.result == "SUCCESS") {
+			    		/*
+			    		$("#certified").show();
+			    		$('#firstNum').val($('#moblphon1').val());
+			    		
+			    		$('#moblphon1').on('change',function(){
+			    			
+			    			if($('#firstNum').val() != ''){
+								$(this).val($('#firstNum').val());
+			    			}
+			    		});
+			    		
+			    		$("#moblphon2, #moblphon3").attr('readonly', 'readonly');
+			    		fnModalMsg("인증번호가 발송되었습니다.",function(){
+			    			if(SetTime != 300){
+			    				clearInterval(tid);		// 타이머 해제
+			    			}
+				    		timeOut();
+			    		});
+			    		*/	
+			    		$("#certified").hide();
+			    		
+			    		
+			    		fnModalMsg("메일을 전송하였습니다");			    	
+			    		searching = false;
+			    	} else if(data.result == "FAIL") {
+			    		/*
+			    		$("#certified").hide();
+			    		
+			    		if('id' == $('#findType').val()){
+				    		fnConfirm("입력하신 회원정보가 존재하지 않습니다.<br/>회원가입 페이지로 이동하시겠습니까?", function(result) {
+				    			if(result){
+					    			$("#frm").attr("action", '/ccedu/user/memberJoinType.do');
+					    			$("#frm").submit();
+				    			}
+				    			return false;
+							});
+			    		}else{
+			    			fnConfirm("입력하신 회원정보가 존재하지 않습니다.<br/>ID찾기 페이지로 이동하시겠습니까?", function(result) {
+				    			if(result){
+					    			$("#frm").attr("action", '/ccedu/user/memberFindIdPw.do');
+					    			$("#frm").submit();
+				    			}
+				    			return false;
+							});
+			    		}			    		
+			    		*/
+			    		$("#certified").hide();	    		
+			    		
+			    		fnModalMsg("일치하는 정보가 없습니다");			    		
+			    		searching = false;
+			    		return false;
+			    	}
+			    
+			    },
+			    error : function(e) {
+			    }
+		    });
+			fnFormReset();
+		};
+	
+		function athnt(){
+			
+			/*
+			var authNumber = $('#authNumber').val();
+			authNumber = fn_encrypt(encodeURIComponent($('#authNumber').val()));
+			
+			$.ajax({
+			    url : "/ccedu/user/ajaxAuthCodeCheck.do",
+			    data : 
+			    { 
+			    	authNumber : authNumber
+			  	},
+			    dataType : "json",
+			    type : 'post',
+			    success : function(data) {
+			    	
+			    	console.log(data);
+			    	if(data == "SUCCESS") {
+			    		
+			    		fnModalMsg("본인인증이 완료되었습니다.");
+						$('#authYn').val('Y');
+						clearInterval(tid);		// 타이머 해제
+						SetTime = 300;
+						
+						$('.findIdSec').hide();
+				 		$('.findPwSec').hide();
+			    		
+			    	} else {
+			    		
+			    		fnModalMsg("입력하신 인증번호가 일치하지 않습니다.<br>다시 확인해보시기 바랍니다.");
+						$('#authYn').val('N');
+			    		
+			    	}
+			    
+			    },
+			    error : function(e) {
+			    }
+		    });			
+			*/			
+		}
+		
+		//암호화
+		function fn_encrypt(str){
+			return fn_encode(escape(str));
+		}
+
+		function fn_encode(input){
+			
+			/* var keyStr = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/=";
+			var output = "";
+			var chr1,chr2,chr3;
+			var enc1, enc2, enc3, enc4;
+			var i =0;
+			do{
+				chr1 = input.charCodeAt(i++);
+				chr2 = input.charCodeAt(i++);
+				chr3 = input.charCodeAt(i++);
+				enc1 = chr1 >> 2;
+				enc2 = ((chr1 & 3) <<  4 | (chr2 >> 4));
+				enc3 = ((chr2 & 15) <<  2 | (chr3 >> 6));
+				enc4 = chr3 & 63;
+				if(isNaN(chr2)){
+					enc3 = enc4 =64;
+				}else if(isNaN(chr3)){
+					enc4 =64;
+				}
+				output = output + keyStr.charAt(enc1) + keyStr.charAt(enc2) + keyStr.charAt(enc3) + keyStr.charAt(enc4);
+				
+			}while(i<input.length);
+			return output;
+		}
+		
+		
+		function timeOut(){
+			SetTime = 300;
+			tid=setInterval(msg_time, 1000);
+		}
+		
+		
+		var SetTime = 300;		// 최초 설정 시간(기본 : 초)
+
+		function msg_time() {	// 1초씩 카운트			
+			
+			m = Math.floor(SetTime / 60) + "분 " + (SetTime % 60) + "초";	// 남은 시간 계산
+			
+			var msg = "현재 남은 시간은 <font color='red'>" + m + "</font> 입니다.";
+			
+			$('#time').html(msg);		// div 영역에 보여줌 
+					
+			SetTime--;					// 1초씩 감소
+			
+			if (SetTime < 0) {			// 시간이 종료 되었으면..
+				clearInterval(tid);		// 타이머 해제
+				$('#authYn').val('N');
+				$('#time').html('');
+				$('#certified').hide();
+				SetTime = 300;
+				fnModalMsg('입력시간이 초과되었습니다.<br> 다시 인증번호를 전송해 주시기 바랍니다.');
+			}
+			*/
+		}
+		function fnEmailDomainSet(){
+			var selectedDomain = $('#mail3').val();
+			$('#mail2').val('');
+			
+			if(selectedDomain == ''){
+				$('#mail2').removeAttr('readonly');
+			}else{
+				$('#mail2').val(selectedDomain);
+				$('#mail2').attr('readonly','readonly');
+			}
+		}
+	</script>
+</head>
+
+<body>
+
+<!-- skip nav -->
+	<%@ include file="/WEB-INF/jsp/ccedu/inc/nav_inc.jsp"%>
+<!--// skip nav -->
+
+
+<div id="wrap">
+
+	<!-- header -->
+	<%@ include file="/WEB-INF/jsp/ccedu/inc/header_inc.jsp"%>
+	<!--// header -->
+
+	<!-- container -->
+	<div id="container">
+
+		<!-- location -->
+		<jsp:include page="/WEB-INF/jsp/ccedu/inc/location/loc_07.jsp"> 
+		  	<jsp:param name="menuNm" value="ID/PW 찾기"/> 
+		</jsp:include> 
+		<!--// location -->
+
+		<div class="con_center">
+
+			<!-- lnb -->
+			<div id="lnb"> 
+				<jsp:include page="/WEB-INF/jsp/ccedu/inc/lnb/lnb_07.jsp"> 
+				  	<jsp:param name="dep2" value="03"/>
+				</jsp:include> 
+			</div>
+			<!--// lnb -->
+
+			<!-- content 본문 -->
+			<div id="content">
+	          <form name="frm" id="frm" method="post" action="">
+          		<fieldset>
+  		            <input type="hidden" name="findType" id="findType" value="id"/>
+  		            <input type="hidden" name="mberNm"/>
+                   	<input type="hidden" name="brthYear"/>
+                   	<input type="hidden" name="brthMonth"/>
+                   	<input type="hidden" name="brthDay"/>
+                   	<input type="hidden" name="mail"/>
+                   	<input type="hidden" name="isMobile" value=""/>
+                   	<input type="hidden" name="authYn" id="authYn" value="N"/>
+                   	<input type="hidden" name="firstNum" id="firstNum" value=""/> 
+<!--                <input type="hidden" name="ruId" id="ruId" value=""/>
+                   	<input type="hidden" name="ruNm" id="ruNm" value=""/>
+                   	<input type="hidden" name="ruBrthdy" id="ruBrthdy" value=""/>
+                   	<input type="hidden" name="ruMoblphon" id="ruMoblphon" value=""/> -->                  	
+                   	
+				<h3 class="cont_titile type09">ID/PW 찾기<span></span></h3>
+                   	
+				<!-- 본문내용 -->
+				<div class="cont_body">
+					<!-- start -->
+
+					<div class="c_section">
+						
+						<div class="c_tab_link">
+							<ul>
+								<li style="width:50%;"><a href="#none" id="idSearch" onclick="fnSetFindType('id')" class="tabMenu on" title="ID찾기 페이지 선택">ID찾기</a></li>
+								<li style="width:50%;"><a href="#none" id="pwSearch" onclick="fnSetFindType('pw')" class="tabMenu" title="PW찾기 페이지 선택">PW찾기</a></li>
+							</ul>
+						</div>
+
+						<ol class="c_txtnoti">
+							<li>1. 회원가입 시 입력한 정보로 간편하게 ID찾기 및 패스워드 재설정이 가능합니다. </li>
+							<li>2. 타인의 개인정보를 부정하게 사용하는 경우 처벌받을 수 있습니다.</li>
+						</ol>
+						
+						<div class="table_style_row">
+							<table>
+								<caption>이름, 생년월일, 휴대전화로 조회하는 표 입니다.</caption>
+								<colgroup>
+									<col class="col2_1" />
+									<col />
+								</colgroup>
+								<tr>
+									<th scope="row">이름</th>
+									<td>
+										<div class="form_field">
+											<input type="text" title="이름 입력" id="mberNm" name="mberNm" class="wid_1" maxlength="20"/>
+										</div>
+									</td>
+								</tr>
+								<tr id="memberIdTr">
+									<th scope="row">아이디</th>
+									<td>
+										<div class="form_field">
+											<input type="text" title="아이디 입력" id="mberId" name="mberId" class="wid_1" maxlength="20"/>
+										</div>
+									</td>
+								</tr>
+								<tr>
+									<th scope="row">생년월일</th>
+									<td>
+										<div class="form_field">
+											<select title="생년월일 년 선택" id="brthYear" name="brthYear" class="wid_date">
+                                           		<option value="">선택</option>
+                                           		<c:forEach var="i" begin="0" end="120" step="1">
+                                           			<option value="<c:out value="${REQUEST_DATA.nowYear + 12 - i}"/>"> <c:out value="${REQUEST_DATA.nowYear + 12 - i}"/>년 </option>
+                                           		</c:forEach>
+											</select>
+											<select title="생년월일 월 선택" id="brthMonth" name="brthMonth" class="wid_date">
+                                          		<option value="">선택</option>
+                                           		<c:forEach var="i" begin="1" end="12" step="1">
+                                           			<option value="<fmt:formatNumber value="${i}" pattern="00"/>"> <c:out value="${i}"/>월 </option>
+                                           		</c:forEach>
+											</select>
+											<select title="생년월일 일 선택" id="brthDay" name="brthDay" class="wid_date">
+                                        		<option value="">선택</option>
+                                        		<c:forEach var="i" begin="1" end="31" step="1">
+                                        			<option value="<fmt:formatNumber value="${i}" pattern="00"/>"> <c:out value="${i}"/>일 </option>
+                                        		</c:forEach>
+											</select>
+										</div>
+									</td>
+								</tr>
+								<tr>
+									<th scope="row">이메일</th>
+									<td>
+										<div class="form_field">
+											<input type="text" title="이메일 아이디 입력"  id="mail" name="mail" maxlength="30" class="input_email_id"/>
+											<span class="widbox widbox_email">@</span>
+											<input type="text" title="도메인 입력" id="mail2" name="mail2" maxlength="50" class="input_email_domain"/>
+											<select title="직접입력 할 수 있는 도메인 선택" class="select_email_domain" id="mail3" name="mail3" onchange="fnEmailDomainSet(); return false;">
+                                                <option value="">직접입력</option>
+                                                <c:forEach var="emap2" items="${mailDomainCodeList}" varStatus="status2">
+									        		<option value="${emap2.MT_SUB_NAME}"><c:out value="${emap2.MT_SUB_NAME}"/></option>
+										        </c:forEach>
+										    </select>										
+										</div>
+									</td>
+								</tr>
+								<tr id="certified">
+									<th scope="row">인증번호</th>
+									<td>
+										<div class="form_field phone_code">
+											<input type="text" maxlength="5" onkeydown="onlyNumber(this)" title="인증번호 입력" id="authNumber" style="width:100%;" />
+											<button class="btn_bluebg04" onclick="athnt(); return false;">인증번호 확인</button> <sapn id="time"></sapn>
+										</div>
+									</td>
+								</tr>
+							</table>
+							<span style="color: rgb(239, 84, 0); font-size: 14px;">※ 입력한 이메일이 회원정보와 일치하여야 메일이 전송 됩니다.</sapn>
+							
+						</div>
+					
+					</div>					
+
+					<div class="c_btn_center">
+						<a href="#none" onclick="submitSms();" class="btn_bluebg03">전송</a>
+					</div>
+					
+					<!-- id 찾기 결과 -->
+					<div class="find_result findIdSec" style="display:none;">
+						<p>회원님의 아이디는 <strong id="userId"></strong> 입니다.</p>
+					</div>
+					<div class="find_result_center findIdSec" style="display:none;">
+						<a href="/ccedu/common/login.do" class="btn_blueline02">로그인 바로가기</a>
+					</div>
+					<!--// id 찾기 결과 -->
+					
+					
+					<!--// end -->
+				</div>
+				<!--// 본문내용 -->
+				
+			<!--  -->
+			
+				</fieldset>
+			  </form>
+			</div>
+			<!--// content 본문 -->
+		
+		</div>
+	
+	</div>
+	<!--// container -->
+
+	<!-- foot -->
+	<%@ include file="/WEB-INF/jsp/ccedu/inc/footer_inc.jsp"%>
+	<!--// foot end -->
+
+</div>
+
+</body>
+</html>

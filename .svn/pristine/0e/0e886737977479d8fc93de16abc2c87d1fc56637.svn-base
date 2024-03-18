@@ -1,0 +1,11 @@
+_this.$quizInfo = [
+	["다음 중 Project(투영)에 대한 설명으로 <span style='color:#FF0000;'>틀린</span> 것은?","3D Model(모델)을 작업 평면에 투영시켜 Sketch(스케치)를 생성한다.","설정을 통해 3D Model(모델)의 특정 면을 Sketch(스케치)로 생성할 수 있다.","설정을 통해 3D Model(모델)의 전체 윤곽선을 Sketch(스케치)로 생성할 수 있다.","3D Model(모델) 내부에 작업 평면이 있는 경우 단면을 투영할 수 있다.",false],	
+	["다음 중 Intersect(교차)에 대한 설명으로 <span style='color:#FF0000;'>틀린</span> 것은?","3D Model(모델) 내부에 작업 평면이 있는 경우 단면을 Sketch(스케치)로 생성한다.","옵션 설정을 통해 선택한 면(Face) 혹은 단면의 윤곽을 Sketch(스케치)로 생성할 수 있다.","3D Model(모델)의 윤곽 모서리를 Sketch(스케치)로 변환할 수 있다.","Selection Filter(선택 필터)는 Sketch(스케치)의 생성 범위를 설정한다.",false],
+	["다음 중 치수 유형에 대한 설명으로 <span style='color:#FF0000;'>틀린</span> 것은?","Align(정렬) 치수: 커서의 위치에 따라 수평, 수직, 사선 치수를 생성한다.","Angle(각도) 치수: 평행하지 않은 두 개의 직선을 클릭하여 생성한다.","Radius(반지름) 치수: 원이나 호에 대해 반지름 치수를 생성한다.","Driven(연계) 치수: 참조 치수를 생성하며, 수치를 변경하여 Sketch를 편집할 수 있다.",false]
+];
+
+_this.$quizAnsInfo = [
+	[4,"3D Model(모델)의 단면을 투영하는 명령어는 Intersect(교차)이다."],
+	[3,"3D Model의 윤곽 모서리를 Sketch(스케치)로 변환하는 명령어는 Include 3D Geometry(3D 형상 투영)이다."],
+	[4,"Driven(연계) 치수는 참조 치수를 생성하며 수치를 변경하여 Sketch(스케치)를 편집할 수 없다."]
+];

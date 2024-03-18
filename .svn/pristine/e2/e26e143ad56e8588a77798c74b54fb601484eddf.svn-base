@@ -1,0 +1,83 @@
+<%
+/****************************************
+    subject : 신용상담사
+    summary : 신용상담사 > 수료증진위확인여부
+    author  : SANGS
+    date    : 2018-06-15
+****************************************/
+%>
+<%@ page language="java" contentType="text/html; charset=utf-8" pageEncoding="utf-8"%>
+<%@ include file="/WEB-INF/jsp/ccedu/inc/taglib_inc.jsp"%>
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+	<title>결제</title>
+	<%@ include file="/WEB-INF/jsp/ccedu/inc/head_inc.jsp"%>
+	<script type="text/javascript">
+	
+		$(document).ready(function() {
+			
+			fnModalMsg("결제 취소를 완료했습니다.",function(){
+				self.close();
+			});			
+			
+			$('#modal-window').css('background-color','#909090');
+			
+		});
+		
+		
+		function onExit(){
+			parent.opener.appliPayCancelSuc();
+        }
+		
+		
+	</script>
+</head>
+
+<body onunload="onExit();">
+
+<!-- skip nav -->
+	<%@ include file="/WEB-INF/jsp/ccedu/inc/nav_inc.jsp"%>
+<!--// skip nav -->
+
+
+<div id="wrap">
+
+	<!-- header -->
+	<%@ include file="/WEB-INF/jsp/ccedu/inc/header_inc.jsp"%>
+	<!--// header -->
+
+	<!-- container -->
+	<div id="container">
+
+		<!-- location -->
+		<jsp:include page="/WEB-INF/jsp/ccedu/inc/location/loc_13.jsp">
+			<jsp:param name="menuNm" value="결제"/>
+		</jsp:include>
+		<!--// location -->
+
+		<div class="con_center">
+
+			<!-- lnb -->
+			<div id="lnb">
+				<jsp:include page="/WEB-INF/jsp/ccedu/inc/lnb/lnb_13.jsp">
+					<jsp:param name="dep2" value="01"/>
+					<jsp:param name="menuNm" value="결제"/>
+				</jsp:include>
+			</div>
+			<!--// lnb -->
+			<h2> 결제 진행 중입니다. </h2>
+			<h2> 잠시만 기다려주세요. </h2>
+		</div>
+	
+	</div>
+	<!--// container -->
+
+	<!-- foot -->
+	<%@ include file="/WEB-INF/jsp/ccedu/inc/footer_inc.jsp"%>
+	<!--// foot end -->
+
+</div>
+
+</body>
+</html>

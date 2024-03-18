@@ -1,0 +1,307 @@
+<%
+/****************************************
+    subject : 온라인교육
+    summary : 온라인교육 > 과정 상세
+    author  : SANGS
+    date    : 2018-06-15
+****************************************/
+%>
+<%@ page language="java" contentType="text/html; charset=utf-8" pageEncoding="utf-8"%>
+<%@ include file="/WEB-INF/jsp/ccedu/inc/taglib_inc.jsp"%>
+<%@ include file="/WEB-INF/jsp/ccedu/inc/top_inc.jsp"%>
+<% pageContext.setAttribute("newline", "\n"); %>
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+	<title>교육과정 > ${REQUEST_DATA.mtScName}</title>
+	<%@ include file="/WEB-INF/jsp/ccedu/inc/head_inc.jsp"%>
+<style>
+.table_style_row table th,
+.table_style_row table td{
+	padding:10px;
+	text-align:center;
+}
+.table_style_row table tr:last-child h2{
+	font-size:18px;
+	padding:15px;
+}
+.table_style_row table tr:last-child h2 span{
+	color:#FE642E;
+}
+.table_style_row table label{
+	margin-left:50px;
+}
+.table_style_row table input{
+	margin-right:5px;
+	cursor:pointer;
+}
+</style>
+<script language=JavaScript charset='euc-kr' src="https://tx.allatpay.com/common/NonAllatPayRE.js"></script>
+<script type="text/javascript">
+$(document).ready(function(){
+	$('.modal-backdrop').click(function(){
+		$('.modal-backdrop').hide();
+		$('#layer_01').attr('style','display:none;');
+		$('#layer_02').attr('style','display:none;');
+	})
+});
+$(document).ready(function(){
+	$(".vbank").hide();
+});
+var beforeChecked = -1;
+$(document).on("click", "input[type=radio]", function(e) {	 
+    var index = $(this).parent().index("label");
+    if(beforeChecked == index) {
+   		beforeChecked = -1;
+    }else{
+    	beforeChecked = index;
+    }
+
+    if($(this).val() == "vbank"){
+    	$(".vbank").show();    	
+    }
+    else{
+    	$(".vbank").hide();
+    }
+ });
+//결제
+function ftn_approval(dfm){
+	var st = $("input:radio[name=ptype]:checked").val();
+	if(st == null){
+		fnModalMsg("결제 방법을 선택해주시기 바랍니다.");	
+		return;
+	}
+	else{
+		$("#allat_card_yn, #allat_bank_yn, #allat_vbank_yn").val("N");
+		if(st == "card"){			
+			$("#allat_card_yn").val("Y");
+			$("#allat_pay_type").val("1");
+			$("#allat_pay_stat").val("1");
+		}else if(st == "bank"){
+			$("#allat_bank_yn").val("Y");
+			$("#allat_pay_type").val("2");
+			$("#allat_pay_stat").val("1");		
+		}else if(st == "vbank"){
+			$("#allat_vbank_yn").val("Y");
+			$("#allat_pay_type").val("3");
+			$("#allat_pay_stat").val("2");
+		}	
+	}	
+	fnConfirm("결제 하시겠습니까?",function(result){
+		if(result){
+			$.ajax({
+				type : "post",
+	    		url : '/ccedu/online/ajaxFindLastOrderIdx.do',
+	    		success : function(data) {
+	    			var today = new Date();
+	    			var year = today.getFullYear().toString();
+	    			var month = (today.getMonth()+1).toString();
+	    			var date = today.getDate().toString();
+	    			var userno = $("#allat_buyer_no").val();
+	    			var orderIdx = data;
+	    			var orderNo = year+month+date+userno+orderIdx;
+	    			$("#allat_order_no").val(orderNo);
+	    			AllatPay_Approval(dfm);
+	    			// 결제창 자동종료 체크 시작
+	    			AllatPay_Closechk_Start();	
+	    		}
+	    	}); 		
+		}
+	});
+}
+// 결과값 반환( receive 페이지에서 호출 )
+function result_submit(result_cd,result_msg,enc_data) {
+	// 결제창 자동종료 체크 종료
+	AllatPay_Closechk_End();
+	if( result_cd != '0000'){
+		fnModalMsg("결제에 실패했습니다.");
+	} else {
+		fm.allat_enc_data.value = enc_data;
+		fm.action = "/ccedu/online/onlinePayApprove.do";
+		fm.method = "post";
+		fm.target = "_self";
+		fm.submit();
+	}
+}
+function fnList() {
+	location.href = "/ccedu/online/onlineDetailList.do?mtSubCode="+'${param.mtScCode}';
+}
+</script>
+</head>
+<body>
+<!-- skip nav -->
+	<%@ include file="/WEB-INF/jsp/ccedu/inc/nav_inc.jsp"%>
+<!--// skip nav -->
+<div id="wrap">
+	<!-- header -->
+	<%@ include file="/WEB-INF/jsp/ccedu/inc/header_inc.jsp"%>
+	<!--// header -->
+
+	<!-- container -->
+	<div id="container">
+
+		<!-- location -->
+		<jsp:include page="/WEB-INF/jsp/ccedu/inc/location/loc_01_02.jsp"> 
+		  	<jsp:param name="menuNm" value="${param.mtScName}"/> 
+		</jsp:include> 
+		<!--// location -->
+
+		<div class="con_center">
+
+			<!-- lnb -->
+			<div id="lnb">
+
+				<jsp:include page="/WEB-INF/jsp/ccedu/inc/lnb/lnb_02.jsp">
+				  	<jsp:param name="dep2" value="0${fn:substring(REQUEST_DATA.mtScCode,2,3)+1}"/>
+				  	<jsp:param name="dep3" value="0${fn:substring(REQUEST_DATA.mtScCode,5,6)}"/>
+				</jsp:include> 
+
+				
+			</div>
+			<!--// lnb -->
+
+			<!-- content 본문 -->
+			<div id="content">			
+				<h3 class="cont_titile type01">${REQUEST_DATA.mtScName}<span></span></h3>
+				<!-- 본문내용 -->
+				<div class="cont_body">
+					<!-- start -->
+   					<form name="fm"  method=POST action="/ccedu/online/onlinePayApprove.do">
+						<input type="hidden" name="allat_cross_key" value="752b3446617012b238db8e61d6826a99">
+						<input type="hidden" name="allat_shop_id" value="codiedu">
+						<input type="hidden" name="allat_order_no" id="allat_order_no" value="">
+						<input type="hidden" name="allat_amt" value="<c:out value="${REQUEST_DATA.price}"/>"/>
+						<input type="hidden" name="allat_pmember_id" value="<c:out value="${REQUEST_DATA.SES_USERID}"/>"/>
+						<input type="hidden" name="allat_product_cd" value="TT0001"/>
+						<input type="hidden" name ="allat_product_nm" value="<c:out value="${REQUEST_DATA.mtScName}"/>"/>
+						<input type="hidden" name ="allat_buyer_nm" value="<c:out value="${REQUEST_DATA.SES_USERNAME}"/>"/>
+						<input type="hidden" name ="allat_buyer_no" id="allat_buyer_no" value="<c:out value="${REQUEST_DATA.SES_USERNO}"/>"/>
+						<input type="hidden" name ="allat_recp_nm" value="<c:out value="${REQUEST_DATA.SES_USERNAME}"/>"/>
+						<input type="hidden" name ="allat_recp_addr" value="공백">
+						<input type="hidden" name="shop_receive_url" value="http://192.168.0.26/ccedu/online/onlinePayReceive.do">
+						<input type=hidden name=allat_enc_data value=''>
+						<input type="hidden" name="allat_encode_type" value="U"/>
+						<input type="hidden" name="allat_card_yn" id="allat_card_yn" value="N">
+						<input type="hidden" name="allat_bank_yn" id="allat_bank_yn" value="N">
+						<input type="hidden" name="allat_vbank_yn" id="allat_vbank_yn" value="N">
+						<input type="hidden" name="allat_hp_yn" value="N">
+						<input type="hidden" name="allat_ticket_yn" value="N">
+						<input type="hidden" name="allat_pay_type" id="allat_pay_type" value="">
+						<input type="hidden" name="allat_pay_stat" id="allat_pay_stat" value="">
+						<!--  테스트 결제 여부 -->
+						<input type="hidden" name="allat_test_yn" value="Y">	
+						
+						<!-- 과정정보 -->
+						<input type="hidden" name="returnUrl" id="returnUrl" value=""/>
+						<input type="hidden" name="goodname" id="goodname" value="<%=request.getParameter("goodname")%>"/>
+						<input type="hidden" name="price" value="<%=request.getParameter("price")%>"/>
+						<input type="hidden" name="searchWord" id="searchWord" value=""/> 
+						<input type="hidden" name="cseqno" id="cseqno"  value="<%=request.getParameter("cseqno")%>"/>
+						<input type="hidden" name="searchCseqno" id="searchCseqno"  value="<%=request.getParameter("searchCseqno")%>"/>
+						<input type="hidden" name="courseno" id="courseno"  value="<%=request.getParameter("courseno")%>"/>
+						<input type="hidden" name="cuserno" id="cuserno"  value="<%=request.getParameter("cuserno")%>"/>
+						<input type="hidden" name="targetYn" id="targetYn"  value="<%=request.getParameter("targetYn")%>"/>
+						<input type="hidden" name="mtScCode" id="mtScCode" value="<%=request.getParameter("mtScCode")%>"/>
+						<input type="hidden" name="mtCtypeCode" id="mtCtypeCode" value="<%=request.getParameter("mtCtypeCode")%>"/>
+						<input type="hidden" name="ref1" id="ref1" value="<%=request.getParameter("ref1")%>"/>
+						<input type="hidden" name="applyChk" id="applyChk" value="N"/><!-- 과정 중복수강방지 -->
+						<input type="hidden" name="multipleCancelYn" id="multipleCancelYn" value="N" />
+						<input type="hidden" name="startDate"  id="startDate" value="<%=request.getParameter("startDate")%>">
+						<input type="hidden" name="endDate"  id="endDate" value="<%=request.getParameter("endDate")%>">
+						<input type="hidden" name="fileid"  id="fileid" value="">
+						<input type="hidden" name="fileseq"  id="fileseq" value="">
+						<input type="hidden" name="applyYn"  id="applyYn" value="<%=request.getParameter("applyYn")%>">
+					
+						<input type="hidden" name="logUserNo" id="logUserNo"  value="<%=request.getParameter("logUserNo")%>"/>
+						<input type="hidden" name="logUserId" id="logUserId"  value="<%=request.getParameter("logUserId")%>"/>
+						
+						<!-- 강의실 이동 -->
+						<input type="hidden" name="paramcSeqNo" id="paramcSeqNo"  value="<%=request.getParameter("paramcSeqNo")%>"/>
+						<input type="hidden" name="paramCourseNo" id="paramCourseNo"  value="<%=request.getParameter("paramCourseNo")%>"/>
+						<input type="hidden" name="paramcUserNo" id="paramcUserNo"  value="<%=request.getParameter("paramcUserNo")%>"/>
+						<input type="hidden" name="CLASSDESK" id="CLASSDESK"  value="<%=request.getParameter("CLASSDESK")%>"/>
+						<input type="hidden" name="paramcMtScCode" id="paramcMtScCode"  value="<%=request.getParameter("paramcMtScCode")%>"/>
+						
+						<input type="hidden" id="fileSubmitYn" value="<%=request.getParameter("fileSubmitYn")%>"/>
+						
+						<!-- 미디어 -->
+					    <input type="hidden" name="filePath" id="filePath" value="<%=request.getParameter("filePath")%>"/>
+						<input type="hidden" name="mediaFile" id="mediaFile" value="<%=request.getParameter("mediaFile")%>"/>
+						<input type="hidden" name="progressChk" id="progressChk" value="false"/>
+						<input type="hidden" name="mediaPath" id="mediaPath" value="<%=request.getParameter("mediaPath")%>"/>					
+											
+   					</form>
+					<div class="c_section">
+						<h4 class="c_tit">수강 결제</h4>
+						<div class="table_style_row">
+							<table>
+								<colgroup>
+									<col width="70%" />
+									<col width="30%" />
+								</colgroup>
+								<tr>
+									<th scope="row">과정명</th>
+									<th scope="row">금액</th>
+								</tr>
+								<tr>
+									<td><c:out value="${REQUEST_DATA.goodname}"/></td>
+									<td><c:out value="${REQUEST_DATA.price}"/>원</td>
+								</tr>
+								<tr>
+									<td colspan="2">
+										<h2>
+											주문금액  : <span><c:out value="${REQUEST_DATA.price}"/></span> 원
+											=
+											최종결제금액  : <span><c:out value="${REQUEST_DATA.price}"/></span> 원
+										</h2>										
+									</td>
+								</tr>
+							</table>
+						</div>
+					</div>
+
+					<div class="c_section" style="margin-top:100px;">
+						<h4 class="c_tit">결제 방법</h4>
+						<div class="table_style_row">
+							<table>
+								<tr>
+									<th scope="row">
+										<label><input type="radio" name="ptype" value="card">신용카드</label>
+										<label><input type="radio" name="ptype" value="bank">실시간계좌이체</label>
+										<label><input type="radio" name="ptype" value="vbank">무통장입금(가상계좌)</label>
+									</th>
+								</tr>
+								<tr class="vbank">
+									<th scope="row">
+										입금계좌 : 신한은행 110-433-998866 / 예금주 : 씨에스랩</br>
+										입금 3일 이후에도 입금처리가 되지 않으면 1544-3705로 연락바랍니다.</br>
+										(평일 운영시간 09:00 ~ 18:00 을 제외한 주말 및 공휴일은 처리가 어렵습니다.)
+									</th>
+								</tr>
+							</table>
+						</div>
+					</div>
+					<div class="c_btn_center">
+						<button type="button" class="btn_bluebg03" onclick="ftn_approval(document.fm);return false;" >결제하기</button>
+						<button type="button" class="btn_blueline03" onclick="fnList(); return false;" title="목록">목록</button>					
+					</div>
+
+				</div>
+				<!--// 본문내용 -->
+				
+			<!--  -->
+			</div>
+			<!--// content 본문 -->
+			
+		</div>
+	</div>
+	<!--// container -->
+
+	<!-- foot -->
+	<%@ include file="/WEB-INF/jsp/ccedu/inc/footer_inc.jsp"%>
+	<!--// foot end -->
+
+</div>
+
+</body>
+</html>
